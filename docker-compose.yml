@@ -4,10 +4,12 @@ volumes:
   postgres_storage:
   qdrant_storage:
   sqlserver_storage:
+  devserver_storage:
   open-webui:
 
 networks:
   homelab:
+    driver: bridge
 
 services:
   dashy:
@@ -70,6 +72,8 @@ services:
       - "5678:5678"
     volumes:
       - n8n_storage:/home/node/.n8n
+    environment:
+      - N8N_SECURE_COOKIES=false
     restart: always
   
   qlserver:
@@ -114,3 +118,17 @@ services:
       - 6333:6333
     volumes:
       - qdrant_storage:/qdrant/storage
+
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SUDO_PASSWORD=123456
+    volumes:
+      - devserver_storage:/config
+    ports:
+      - 8441:8443
+    restart: always

@@ -8,16 +8,40 @@ sections: # An array of sections
       - title: n8n
         description: AI Workflow Builder
         icon: fas fa-cogs
-        url: http://localhost:5678/home/workflows
+        url: http://172.20.37.3:5678/home/workflows
       - title: ollama be
         description: AI Language Models
         icon: fas fa-brain
-        url: http://localhost:11434
+        url: http://172.20.37.3:11434
       - title: Open Web UI
         description: AI Web Interface
         icon: fas fa-globe
-        url: http://localhost:11435
+        url: http://172.20.37.3:11435
       - title: langflow
         description: Flow-based Language AI
         icon: fas fa-code-branch
-        url: http://localhost:7860
+        url: http://172.20.37.3:7860
+
+  - name: Databases
+    icon: fas fa-database
+    items:
+      - title: SQL Server
+        description: Microsoft SQL Server
+        icon: fas fa-database
+        url: http://
+      - title: PostgreSQL
+        description: PostgreSQL Database
+        icon: fas fa-database
+        url: http://
+      - title: Qdrant
+        description: Vector Database
+        icon: fas fa-database
+        url: http://
+
+  - name: Development
+    icon: fas fa-code
+    items:
+      - title: Code Server
+        description: VS Code in the browser
+        icon: fas fa-code
+        url: http://172.20.37.3:8441
