@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  dashy:
+    image: lissy93/dashy:latest
+    container_name: my-dashboard
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dashy-config.yml:/app/user-data/conf.yml
+    restart: always
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: always
+
+  open-web-ui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-web-ui
+    ports:
+      - "11435:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+    volumes:
+      - open-webui:/app/backend/data
+    restart: always
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: always
+
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: langflow
+    ports:
+      - "7860:7860"
+    restart: always
+
+volumes:
+  ollama:
+  n8n_data:
+  open-webui:

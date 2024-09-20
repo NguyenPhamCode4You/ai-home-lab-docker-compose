@@ -1,0 +1,23 @@
+pageInfo:
+  title: Nguyen HomeLab
+
+sections: # An array of sections
+  - name: AI Servers
+    icon: fas fa-server
+    items:
+      - title: n8n
+        description: AI Workflow Builder
+        icon: fas fa-cogs
+        url: http://localhost:5678/home/workflows
+      - title: ollama be
+        description: AI Language Models
+        icon: fas fa-brain
+        url: http://localhost:11434
+      - title: Open Web UI
+        description: AI Web Interface
+        icon: fas fa-globe
+        url: http://localhost:11435
+      - title: langflow
+        description: Flow-based Language AI
+        icon: fas fa-code-branch
+        url: http://localhost:7860
