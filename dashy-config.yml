@@ -28,7 +28,7 @@ sections: # An array of sections
       - title: Portainer
         description: Docker Management
         icon: fab fa-docker
-        url: http://172.20.37.3:9000
+        url: http://172.20.37.3:8990
       - title: Ngix Proxy Manager
         description: Reverse Proxy Management
         icon: fas fa-network-wired
@@ -45,6 +45,10 @@ sections: # An array of sections
         description: Log Segmentation
         icon: fas fa-book
         url: http://172.20.37.3:3001
+      - title: Ragflow
+        description: AI Knowledge Base
+        icon: fas fa-book
+        url: http://172.20.37.3:9280
 
   - name: Storage
     icon: fas fa-hdd

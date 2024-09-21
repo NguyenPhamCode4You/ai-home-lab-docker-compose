@@ -10,7 +10,6 @@ volumes:
   metabase_storage:
   ngix-proxy-manager-storage:
   nextcloud_storage:
-  appflowy-storage:
   logseq_storage:
   open-webui:
   letsencrypt:
@@ -37,7 +36,7 @@ services:
     networks:
     - homelab
     ports:
-      - "9000:9000"
+      - "8990:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_storage:/data
@@ -45,6 +44,7 @@ services:
   
   ngix-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
+    container_name: ngix-proxy-manager
     restart: always
     ports:
       - '80:80'
@@ -195,7 +195,6 @@ services:
       - "3001:80"
     volumes:
       - ./logseq_storage/pages:/pages
-      
     restart: always
 
   code-server:
