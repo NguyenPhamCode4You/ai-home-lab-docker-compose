@@ -38,6 +38,14 @@ sections: # An array of sections
         icon: fas fa-chart-bar
         url: http://172.20.37.3:3000
 
+  - name: Knowledge Base
+    icon: fas fa-book
+    items:
+      - title: LogSeg
+        description: Log Segmentation
+        icon: fas fa-book
+        url: http://172.20.37.3:3001
+
   - name: Storage
     icon: fas fa-hdd
     items:

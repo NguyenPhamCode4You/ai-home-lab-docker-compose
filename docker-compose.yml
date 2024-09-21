@@ -10,6 +10,8 @@ volumes:
   metabase_storage:
   ngix-proxy-manager-storage:
   nextcloud_storage:
+  appflowy-storage:
+  logseq_storage:
   open-webui:
   letsencrypt:
 
@@ -183,6 +185,18 @@ services:
       - 6333:6333
     volumes:
       - qdrant_storage:/qdrant/storage
+
+  logseg:
+    image: ghcr.io/logseq/logseq-webapp:latest
+    container_name: logseq
+    networks:
+    - homelab
+    ports:
+      - "3001:80"
+    volumes:
+      - ./logseq_storage/pages:/pages
+      
+    restart: always
 
   code-server:
     image: lscr.io/linuxserver/code-server:latest
