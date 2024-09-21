@@ -1,0 +1,4 @@
+./nextcloud_storage/**/*
+./ngix-proxy-manager-storage/
+
+jellyfin

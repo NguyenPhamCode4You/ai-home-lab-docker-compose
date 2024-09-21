@@ -19,8 +19,36 @@ sections: # An array of sections
         url: http://172.20.37.3:11435
       - title: langflow
         description: Flow-based Language AI
-        icon: fas fa-code-branch
+        icon: fas code-branch
         url: http://172.20.37.3:7860
+  
+  - name: Monitoring
+    icon: fas fa-chart-line
+    items:
+      - title: Portainer
+        description: Docker Management
+        icon: fab fa-docker
+        url: http://172.20.37.3:9000
+      - title: Ngix Proxy Manager
+        description: Reverse Proxy Management
+        icon: fas fa-network-wired
+        url: http://172.20.37.3:81
+      - title: Metabase
+        description: Data Visualization
+        icon: fas fa-chart-bar
+        url: http://172.20.37.3:3000
+
+  - name: Storage
+    icon: fas fa-hdd
+    items:
+      - title: Nextcloud
+        description: Nextcloud Database
+        icon: fas fa-cloud
+        url: http://172.20.37.3:8081
+      - title: Jellyfin
+        description: Jellyfin Database
+        icon: fas fa-film
+        url: http://172.20.37.3:8096
 
   - name: Databases
     icon: fas fa-database
@@ -45,3 +73,7 @@ sections: # An array of sections
         description: VS Code in the browser
         icon: fas fa-code
         url: http://172.20.37.3:8441
+      - title: Jupyter Lab
+        description: Jupyter Notebook in the browser
+        icon: fab fa-python
+        url: http://172.20.37.3:8888

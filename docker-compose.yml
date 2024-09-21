@@ -5,7 +5,13 @@ volumes:
   qdrant_storage:
   sqlserver_storage:
   devserver_storage:
+  jupyter_storage:
+  portainer_storage:
+  metabase_storage:
+  ngix-proxy-manager-storage:
+  nextcloud_storage:
   open-webui:
+  letsencrypt:
 
 networks:
   homelab:
@@ -21,6 +27,68 @@ services:
       - "8080:8080"
     volumes:
       - ./dashy-config.yml:/app/user-data/conf.yml
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    networks:
+    - homelab
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_storage:/data
+    restart: always
+  
+  ngix-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: always
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ngix-proxy-manager-storage:/data
+      - letsencrypt:/etc/letsencrypt
+
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
+    networks:
+    - homelab
+    ports:
+      - "3000:3000"
+    volumes:
+      - metabase_storage:/metabase-data
+    restart: always
+
+  next-cloud:
+    image: nextcloud
+    container_name: next-cloud
+    networks:
+    - homelab
+    ports:
+      - "8081:80"
+    links:
+      - postgres
+    volumes:
+      - nextcloud_storage:/var/www/html
+    environment:
+      - NEXTCLOUD_ADMIN_USER=admin
+      - NEXTCLOUD_ADMIN_PASSWORD=admin
+      - OVERWRITEHOST=172.20.37.3:8081
+    restart: always
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    networks:
+    - homelab
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./jellyfin:/media
     restart: always
 
   ollama:
@@ -78,6 +146,7 @@ services:
   
   qlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
     networks:
     - homelab
     ports:
@@ -91,6 +160,7 @@ services:
 
   postgres:
     image: postgres:latest
+    container_name: postgres
     ports:
       - "5432:5432"
     networks:
@@ -102,11 +172,6 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - postgres_storage:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   qdrant:
     image: qdrant/qdrant
@@ -132,3 +197,38 @@ services:
     ports:
       - 8441:8443
     restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  jupyter-lab:
+    build:
+      context: .
+      dockerfile: jupyter.Dockerfile
+    container_name: jupyter-lab
+    user: root
+    networks:
+    - homelab
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jupyter-lab:/home/jovyan/work
+      - jupyter_storage:/home/jovyan
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=123456
+      - SUDO_PASSWORD=123456
+      - GRANT_SUDO=yes
+    command: start-notebook.py --NotebookApp.token='123456'
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
