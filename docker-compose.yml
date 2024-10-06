@@ -110,6 +110,12 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "nvidia-smi || exit 1"]  # Checks GPU status using nvidia-smi
+      interval: 30s       # Check every 30 seconds
+      timeout: 10s        # Wait 10 seconds for the check to complete
+      retries: 3          # Restart after 3 consecutive failures
+      start_period: 40s 
 
   open-web-ui:
     image: ghcr.io/open-webui/open-webui:main
