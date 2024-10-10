@@ -111,11 +111,11 @@ services:
               count: 1
               capabilities: [gpu]
     healthcheck:
-      test: ["CMD-SHELL", "nvidia-smi || exit 1"]  # Checks GPU status using nvidia-smi
-      interval: 30s       # Check every 30 seconds
-      timeout: 10s        # Wait 10 seconds for the check to complete
-      retries: 3          # Restart after 3 consecutive failures
-      start_period: 40s 
+      test: ["CMD-SHELL", "nvidia-smi || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   open-web-ui:
     image: ghcr.io/open-webui/open-webui:main
@@ -204,7 +204,9 @@ services:
     restart: always
 
   code-server:
-    image: lscr.io/linuxserver/code-server:latest
+    build:
+      context: .
+      dockerfile: codeserver.Dockerfile
     container_name: code-server
     environment:
       - PUID=1000
@@ -214,7 +216,10 @@ services:
     volumes:
       - devserver_storage:/config
     ports:
-      - 8441:8443
+      - 8443:8443
+      - 3333:3333
+      - 5177:5177
+      - 5041:5041
     restart: always
     deploy:
       resources:
@@ -223,6 +228,12 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "nvidia-smi || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   jupyter-lab:
     build:
@@ -233,7 +244,7 @@ services:
     networks:
     - homelab
     ports:
-      - "8888:8888"
+      - "8883:8888"
     volumes:
       - ./jupyter-lab:/home/jovyan/work
       - jupyter_storage:/home/jovyan
@@ -251,3 +262,9 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "nvidia-smi || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
