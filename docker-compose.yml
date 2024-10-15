@@ -5,7 +5,7 @@ volumes:
   qdrant_storage:
   sqlserver_storage:
   devserver_storage:
-  jupyter_storage:
+  jupyter_lab_storage:
   portainer_storage:
   metabase_storage:
   ngix-proxy-manager-storage:
@@ -247,7 +247,7 @@ services:
       - "8883:8888"
     volumes:
       - ./jupyter-lab:/home/jovyan/work
-      - jupyter_storage:/home/jovyan
+      - jupyter_lab_storage:/home/jovyan
     environment:
       - JUPYTER_ENABLE_LAB=yes
       - JUPYTER_TOKEN=123456

@@ -76,6 +76,17 @@ RUN pip install --no-cache-dir tf_keras
 # Set working directory
 WORKDIR /home/jovyan
 
+# Clone the llama.cpp repository
+RUN git clone https://github.com/ggerganov/llama.cpp.git
+
+# Change directory into the cloned llama.cpp and build the project
+WORKDIR /home/jovyan/llama.cpp
+RUN make
+
+# Change back to the home directory
+WORKDIR /home/jovyan
+
+
 # Expose Jupyter notebook port
 EXPOSE 8888
 
