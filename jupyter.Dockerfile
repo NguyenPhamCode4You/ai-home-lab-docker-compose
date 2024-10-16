@@ -77,11 +77,10 @@ RUN pip install --no-cache-dir tf_keras
 WORKDIR /home/jovyan
 
 # Clone the llama.cpp repository
-RUN git clone https://github.com/ggerganov/llama.cpp.git
-
+# RUN git clone https://github.com/ggerganov/llama.cpp.git
 # Change directory into the cloned llama.cpp and build the project
-WORKDIR /home/jovyan/llama.cpp
-RUN make
+# WORKDIR /home/jovyan/llama.cpp
+# RUN make
 
 # Change back to the home directory
 WORKDIR /home/jovyan
