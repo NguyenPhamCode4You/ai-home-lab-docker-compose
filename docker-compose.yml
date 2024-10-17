@@ -221,7 +221,7 @@ services:
     volumes:
       - devserver_storage:/config
     ports:
-      - 8443:8443
+      - 8442:8443
       - 3333:3333
       - 5177:5177
       - 5041:5041

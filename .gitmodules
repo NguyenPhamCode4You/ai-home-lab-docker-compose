@@ -1,3 +1,6 @@
 [submodule "dify"]
 	path = dify
 	url = https://github.com/langgenius/dify.git
+[submodule "supabase"]
+	path = supabase
+	url = https://github.com/supabase/supabase
