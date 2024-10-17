@@ -13,6 +13,11 @@ volumes:
   logseq_storage:
   open-webui:
   letsencrypt:
+  anythingllm_storage:
+    driver_opts:
+      type: none
+      o: bind
+      device: ./anythingllm
 
 networks:
   homelab:
@@ -47,9 +52,9 @@ services:
     container_name: ngix-proxy-manager
     restart: always
     ports:
-      - '80:80'
       - '81:81'
-      - '443:443'
+      # - '80:80'
+      # - '443:443'
     volumes:
       - ngix-proxy-manager-storage:/data
       - letsencrypt:/etc/letsencrypt
@@ -198,7 +203,7 @@ services:
     networks:
     - homelab
     ports:
-      - "3001:80"
+      - "4001:80"
     volumes:
       - ./logseq_storage/pages:/pages
     restart: always
@@ -268,3 +273,35 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  anythingllm:
+    image: mintplexlabs/anythingllm
+    container_name: anythingllm
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+    - "3001:3001"
+    cap_add:
+      - SYS_ADMIN
+    environment:
+    # Adjust for your environment
+      - STORAGE_DIR=/app/server/storage
+      - JWT_SECRET="make_this_a_large_list_of_random_numbers_and_letters_20+"
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_PATH=http://host.docker.internal:11434
+      - OLLAMA_MODEL_PREF=llama3.1:latest
+      - OLLAMA_MODEL_TOKEN_LIMIT=4096
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_BASE_PATH=http://host.docker.internal:11434
+      - EMBEDDING_MODEL_PREF=nomic-embed-text:latest
+      - EMBEDDING_MODEL_MAX_CHUNK_LENGTH=8192
+      - VECTOR_DB=lancedb
+      - WHISPER_PROVIDER=local
+      - TTS_PROVIDER=native
+      - PASSWORDMINCHAR=8
+      # Add any other keys here for services or settings
+      # you can find in the docker/.env.example file
+    volumes:
+      - anythingllm_storage:/app/server/storage
+    restart: always
+

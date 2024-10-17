@@ -21,6 +21,10 @@ sections: # An array of sections
         description: Flow-based Language AI
         icon: fas code-branch
         url: http://10.13.13.4:7860
+      - title: anythingllm
+        description: AnythingLLM
+        icon: fas fa-brain
+        url: http://10.13.13.4:3001
   
   - name: Monitoring
     icon: fas fa-chart-line
@@ -44,7 +48,7 @@ sections: # An array of sections
       - title: LogSeg
         description: Log Segmentation
         icon: fas fa-book
-        url: http://10.13.13.4:3001
+        url: http://10.13.13.4:4001
       - title: Ragflow
         description: AI Knowledge Base
         icon: fas fa-book
