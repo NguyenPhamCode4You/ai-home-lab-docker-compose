@@ -4,3 +4,6 @@
 [submodule "supabase"]
 	path = supabase
 	url = https://github.com/supabase/supabase
+[submodule "jupyter-lab/llama.cpp"]
+	path = jupyter-lab/llama.cpp
+	url = https://github.com/ggerganov/llama.cpp.git
