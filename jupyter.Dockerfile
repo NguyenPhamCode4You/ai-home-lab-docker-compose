@@ -53,7 +53,13 @@ WORKDIR /home/jovyan
 # Install Python packages
 RUN pip install -r requirements.txt
 
-RUN pip install "unsloth[cu121-ampere-torch230] @ git+https://github.com/unslothai/unsloth.git"
+COPY ./unsloth /home/jovyan/unsloth
+WORKDIR /home/jovyan/unsloth
+RUN "unsloth[colab-new]"
+RUN pip install --no-deps trl peft accelerate bitsandbytes
+
+# Set working directory
+WORKDIR /home/jovyan
 
 # Expose Jupyter notebook port
 EXPOSE 8888
