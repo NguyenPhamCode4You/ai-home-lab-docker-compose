@@ -57,6 +57,7 @@ COPY ./unsloth /home/jovyan/unsloth
 WORKDIR /home/jovyan/unsloth
 RUN pip install "unsloth[colab-new]"
 RUN pip install --no-deps trl peft accelerate bitsandbytes
+RUN pip install huggingface_hub
 
 # Set working directory
 WORKDIR /home/jovyan
