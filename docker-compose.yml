@@ -21,7 +21,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./dashy-config.yml:/app/user-data/conf.yml
+      - ./lab404.yml:/app/user-data/conf.yml
     restart: always
 
   next-cloud:
