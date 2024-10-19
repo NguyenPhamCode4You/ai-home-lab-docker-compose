@@ -36,5 +36,9 @@ sections: # An array of sections
     items:
       - title: Nextcloud
         description: Nextcloud Database
-        icon: fas fa-cloud
+        icon: fas fa-storage
         url: http://10.13.13.4:8081/apps/files/files
+      - title: Supabase
+        description: Supabase Cloud
+        icon: fas fa-cloud
+        url: http://10.13.13.4:8000
