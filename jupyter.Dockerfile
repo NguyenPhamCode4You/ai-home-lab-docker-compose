@@ -55,7 +55,7 @@ RUN pip install -r requirements.txt
 
 COPY ./unsloth /home/jovyan/unsloth
 WORKDIR /home/jovyan/unsloth
-RUN "unsloth[colab-new]"
+RUN pip install "unsloth[colab-new]"
 RUN pip install --no-deps trl peft accelerate bitsandbytes
 
 # Set working directory
