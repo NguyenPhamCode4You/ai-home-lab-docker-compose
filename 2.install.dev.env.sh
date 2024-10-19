@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Set the HOME environment variable (adjust path if necessary)
+export HOME="/root"  # or /path/to/home
+export DOTNET_CLI_HOME="$HOME"
+
 # Set up the working directory
 WORKDIR="/config"
 mkdir -p "$WORKDIR"
