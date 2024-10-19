@@ -30,31 +30,6 @@ RUN apt-get update && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Python packages for Machine Learning
-RUN pip install --no-cache-dir \
-    numpy \
-    pandas \
-    matplotlib \
-    seaborn \
-    scikit-learn \
-    tensorflow \
-    keras \
-    torch \
-    torchvision \
-    jupyterlab \
-    nltk \
-    opencv-python \
-    pillow \
-    h5py \
-    tqdm \
-    requests \
-    transformers \
-    sentencepiece \
-    tensorflow-text \
-    tfa-nightly \
-    ollama \
-    unsloth
-
 # Install C++ and Machine Learning dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -72,6 +47,9 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir unsloth
 RUN pip install --no-cache-dir tf_keras
 # RUN curl -fsSL https://ollama.com/install.sh | sh
+
+WORKDIR /home/jovyan/work
+RUN pip install -r requirements.txt
 
 # Set working directory
 WORKDIR /home/jovyan
