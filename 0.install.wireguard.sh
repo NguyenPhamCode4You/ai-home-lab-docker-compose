@@ -20,5 +20,6 @@ WantedBy=multi-user.target" | sudo tee /etc/systemd/system/wg-peer3.service
 
 # Enable the service to run at startup
 sudo systemctl enable wg-peer3.service
+sudo systemctl start wg-peer3.service
 
 echo "WireGuard installation complete and configured to start on boot."
