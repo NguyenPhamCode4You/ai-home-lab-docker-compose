@@ -43,16 +43,15 @@ RUN apt-get update && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Unsloth
-RUN pip install --no-cache-dir unsloth
-RUN pip install --no-cache-dir tf_keras
 # RUN curl -fsSL https://ollama.com/install.sh | sh
 
-WORKDIR /home/jovyan/work
-RUN pip install -r requirements.txt
+COPY ./requirements.txt /home/jovyan/requirements.txt
 
 # Set working directory
 WORKDIR /home/jovyan
+
+# Install Python packages
+RUN pip install -r requirements.txt
 
 # Expose Jupyter notebook port
 EXPOSE 8888

@@ -17,6 +17,7 @@ tensorflow-text
 tfa-nightly
 ollama
 unsloth
+tf_keras
 torch=2.5.0
 torchvision
 torchaudionumpy
