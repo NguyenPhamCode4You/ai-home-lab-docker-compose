@@ -1,3 +1,6 @@
 [submodule "jupyter-lab/llama.cpp"]
 	path = jupyter-lab/llama.cpp
 	url = https://github.com/ggerganov/llama.cpp.git
+[submodule "unsloth"]
+	path = unsloth
+	url = https://github.com/unslothai/unsloth.git
