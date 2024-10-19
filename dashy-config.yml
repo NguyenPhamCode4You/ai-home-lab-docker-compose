@@ -38,19 +38,3 @@ sections: # An array of sections
         description: Nextcloud Database
         icon: fas fa-cloud
         url: http://10.13.13.4:8081
-
-  - name: Databases
-    icon: fas fa-database
-    items:
-      - title: SQL Server
-        description: Microsoft SQL Server
-        icon: fas fa-database
-        url: http://
-      - title: PostgreSQL
-        description: PostgreSQL Database
-        icon: fas fa-database
-        url: http://
-      - title: Qdrant
-        description: Vector Database
-        icon: fas fa-database
-        url: http://
