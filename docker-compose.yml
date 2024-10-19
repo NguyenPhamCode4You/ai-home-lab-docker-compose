@@ -4,20 +4,9 @@ volumes:
   postgres_storage:
   qdrant_storage:
   sqlserver_storage:
-  devserver_storage:
   jupyter_lab_storage:
-  portainer_storage:
-  metabase_storage:
-  ngix-proxy-manager-storage:
   nextcloud_storage:
-  logseq_storage:
   open-webui:
-  letsencrypt:
-  anythingllm_storage:
-    driver_opts:
-      type: none
-      o: bind
-      device: ./anythingllm
 
 networks:
   homelab:
@@ -28,53 +17,18 @@ services:
     image: lissy93/dashy:latest
     container_name: my-dashboard
     networks:
-    - homelab
+      - homelab
     ports:
       - "8080:8080"
     volumes:
       - ./dashy-config.yml:/app/user-data/conf.yml
     restart: always
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    networks:
-    - homelab
-    ports:
-      - "8990:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_storage:/data
-    restart: always
-  
-  ngix-proxy-manager:
-    image: 'jc21/nginx-proxy-manager:latest'
-    container_name: ngix-proxy-manager
-    restart: always
-    ports:
-      - '81:81'
-      # - '80:80'
-      # - '443:443'
-    volumes:
-      - ngix-proxy-manager-storage:/data
-      - letsencrypt:/etc/letsencrypt
-
-  metabase:
-    image: metabase/metabase
-    container_name: metabase
-    networks:
-    - homelab
-    ports:
-      - "3000:3000"
-    volumes:
-      - metabase_storage:/metabase-data
-    restart: always
-
   next-cloud:
     image: nextcloud
     container_name: next-cloud
     networks:
-    - homelab
+      - homelab
     ports:
       - "8081:80"
     links:
@@ -87,24 +41,13 @@ services:
       - OVERWRITEHOST=172.20.37.3:8081
     restart: always
 
-  jellyfin:
-    image: jellyfin/jellyfin
-    container_name: jellyfin
-    networks:
-    - homelab
-    ports:
-      - "8096:8096"
-    volumes:
-      - ./jellyfin:/media
-    restart: always
-
   ollama:
     image: ollama/ollama
     container_name: ollama
     ports:
       - "11434:11434"
     networks:
-    - homelab
+      - homelab
     volumes:
       - ollama_storage:/root/.ollama
     restart: always
@@ -135,15 +78,6 @@ services:
       - open-webui:/app/backend/data
     restart: always
 
-  langflow:
-    image: langflowai/langflow:latest
-    container_name: langflow
-    networks:
-      - homelab
-    ports:
-      - "7860:7860"
-    restart: always
-
   n8n:
     image: docker.n8n.io/n8nio/n8n
     container_name: n8n
@@ -154,14 +88,14 @@ services:
     volumes:
       - n8n_storage:/home/node/.n8n
     environment:
-      - N8N_SECURE_COOKIES=false
+      - N8N_SECURE_COOKIE=false
     restart: always
-  
+
   qlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: sqlserver
     networks:
-    - homelab
+      - homelab
     ports:
       - "1433:1433"
     environment:
@@ -177,7 +111,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-    - homelab
+      - homelab
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -190,55 +124,12 @@ services:
     image: qdrant/qdrant
     container_name: qdrant
     networks:
-    - homelab
+      - homelab
     restart: always
     ports:
       - 6333:6333
     volumes:
       - qdrant_storage:/qdrant/storage
-
-  logseg:
-    image: ghcr.io/logseq/logseq-webapp:latest
-    container_name: logseq
-    networks:
-    - homelab
-    ports:
-      - "4001:80"
-    volumes:
-      - ./logseq_storage/pages:/pages
-    restart: always
-
-  code-server:
-    build:
-      context: .
-      dockerfile: codeserver.Dockerfile
-    container_name: code-server
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SUDO_PASSWORD=123456
-    volumes:
-      - devserver_storage:/config
-    ports:
-      - 8442:8443
-      - 3333:3333
-      - 5177:5177
-      - 5041:5041
-    restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    healthcheck:
-      test: ["CMD-SHELL", "nvidia-smi || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   jupyter-lab:
     build:
@@ -247,7 +138,7 @@ services:
     container_name: jupyter-lab
     user: root
     networks:
-    - homelab
+      - homelab
     ports:
       - "8883:8888"
     volumes:
@@ -273,35 +164,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  anythingllm:
-    image: mintplexlabs/anythingllm
-    container_name: anythingllm
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-    - "3001:3001"
-    cap_add:
-      - SYS_ADMIN
-    environment:
-    # Adjust for your environment
-      - STORAGE_DIR=/app/server/storage
-      - JWT_SECRET="make_this_a_large_list_of_random_numbers_and_letters_20+"
-      - LLM_PROVIDER=ollama
-      - OLLAMA_BASE_PATH=http://host.docker.internal:11434
-      - OLLAMA_MODEL_PREF=llama3.1:latest
-      - OLLAMA_MODEL_TOKEN_LIMIT=4096
-      - EMBEDDING_ENGINE=ollama
-      - EMBEDDING_BASE_PATH=http://host.docker.internal:11434
-      - EMBEDDING_MODEL_PREF=nomic-embed-text:latest
-      - EMBEDDING_MODEL_MAX_CHUNK_LENGTH=8192
-      - VECTOR_DB=lancedb
-      - WHISPER_PROVIDER=local
-      - TTS_PROVIDER=native
-      - PASSWORDMINCHAR=8
-      # Add any other keys here for services or settings
-      # you can find in the docker/.env.example file
-    volumes:
-      - anythingllm_storage:/app/server/storage
-    restart: always
-
