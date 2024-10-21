@@ -136,7 +136,7 @@ services:
     depends_on:
       - postgres
     environment:
-      LANGFLOW_DATABASE_URL: postgresql://postgres:Your_password123@postgres:5433/langflow?sslmode=disable
+      LANGFLOW_DATABASE_URL: postgresql://postgres:Your_password123@postgres:5433/postgres?sslmode=disable
       LANGFLOW_CONFIG_DIR: /var/lib/langflow
       LANGFLOW_SUPERUSER: langflow
       LANGFLOW_SUPERUSER_PASSWORD: langflow
