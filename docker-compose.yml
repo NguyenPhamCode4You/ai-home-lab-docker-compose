@@ -122,49 +122,6 @@ services:
     volumes:
       - postgres_storage:/var/lib/postgresql/data
 
-  langflow-db:
-    networks:
-      - homelab
-    image: postgres:16-alpine
-    container_name: langflow-db
-    hostname: langflow-db
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - langflow-db:/var/lib/postgresql/data:rw
-    environment:
-      POSTGRES_DB: langflow-db
-      POSTGRES_USER: langflow-db
-      POSTGRES_PASSWORD: langflow-db
-    restart: on-failure:5
-
-  langflow:
-    image: langflowai/langflow:latest
-    container_name: langflow
-    user: root
-    ports:
-      - 7860:7860
-    healthcheck:
-      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/7860' || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 90s
-    restart: on-failure:5
-    depends_on:
-      - langflow-db
-    environment:
-      LANGFLOW_DATABASE_URL: postgresql://langflow-db:langflow-db@langflow-db:5432/langflow-db?sslmode=disable
-      LANGFLOW_CONFIG_DIR: /var/lib/langflow
-      LANGFLOW_SUPERUSER: langflow
-      LANGFLOW_SUPERUSER_PASSWORD: langflow
-      LANGFLOW_AUTO_LOGIN: True
-    volumes:
-      - langflow:/var/lib/langflow:rw
-
   qdrant:
     image: qdrant/qdrant
     container_name: qdrant
