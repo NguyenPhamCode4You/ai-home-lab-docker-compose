@@ -7,6 +7,7 @@ volumes:
   jupyter_lab_storage:
   nextcloud_storage:
   open-webui:
+  langflow:
 
 networks:
   homelab:
@@ -142,7 +143,7 @@ services:
       LANGFLOW_SUPERUSER_PASSWORD: langflow
       LANGFLOW_AUTO_LOGIN: True
     volumes:
-      - ./langflow:/var/lib/langflow:rw
+      - langflow:/var/lib/langflow:rw
 
   qdrant:
     image: qdrant/qdrant
