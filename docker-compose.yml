@@ -8,6 +8,7 @@ volumes:
   nextcloud_storage:
   open-webui:
   langflow:
+  langflow-db:
 
 networks:
   homelab:
@@ -121,6 +122,25 @@ services:
     volumes:
       - postgres_storage:/var/lib/postgresql/data
 
+  langflow-db:
+    networks:
+      - homelab
+    image: postgres:16-alpine
+    container_name: langflow-db
+    hostname: langflow-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - langflow-db:/var/lib/postgresql/data:rw
+    environment:
+      POSTGRES_DB: langflow-db
+      POSTGRES_USER: langflow-db
+      POSTGRES_PASSWORD: langflow-db
+    restart: on-failure:5
+
   langflow:
     image: langflowai/langflow:latest
     container_name: langflow
@@ -135,9 +155,9 @@ services:
       start_period: 90s
     restart: on-failure:5
     depends_on:
-      - postgres
+      - langflow-db
     environment:
-      LANGFLOW_DATABASE_URL: postgresql://postgres:Your_password123@postgres:5433/postgres?sslmode=disable
+      LANGFLOW_DATABASE_URL: postgresql://langflow-db:langflow-db@langflow-db:5433/langflow-db?sslmode=disable
       LANGFLOW_CONFIG_DIR: /var/lib/langflow
       LANGFLOW_SUPERUSER: langflow
       LANGFLOW_SUPERUSER_PASSWORD: langflow
