@@ -120,6 +120,30 @@ services:
     volumes:
       - postgres_storage:/var/lib/postgresql/data
 
+  langflow:
+    image: langflowai/langflow:latest
+    container_name: langflow
+    user: root
+    ports:
+      - 7860:7860
+    healthcheck:
+      test: timeout 10s bash -c ':> /dev/tcp/127.0.0.1/7860' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    restart: on-failure:5
+    depends_on:
+      - postgres
+    environment:
+      LANGFLOW_DATABASE_URL: postgresql://postgres:Your_password123@postgres:5433/langflow?sslmode=disable
+      LANGFLOW_CONFIG_DIR: /var/lib/langflow
+      LANGFLOW_SUPERUSER: langflow
+      LANGFLOW_SUPERUSER_PASSWORD: langflow
+      LANGFLOW_AUTO_LOGIN: True
+    volumes:
+      - ./langflow:/var/lib/langflow:rw
+
   qdrant:
     image: qdrant/qdrant
     container_name: qdrant
