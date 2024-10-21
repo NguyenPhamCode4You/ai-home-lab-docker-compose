@@ -57,7 +57,7 @@ COPY ./unsloth /home/jovyan/unsloth
 WORKDIR /home/jovyan/unsloth
 RUN pip install "unsloth[colab-new]"
 RUN pip install --no-deps trl peft accelerate bitsandbytes
-RUN pip install kor langchain langchain_community
+RUN pip install kor langchain langchain_community bs4 markdownify
 
 # Set working directory
 WORKDIR /home/jovyan
