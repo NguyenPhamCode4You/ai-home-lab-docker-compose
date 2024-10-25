@@ -59,6 +59,11 @@ RUN pip install "unsloth[colab-new]"
 RUN pip install --no-deps trl peft accelerate bitsandbytes
 RUN pip install kor langchain langchain_openai
 
+
+COPY ./LightRAG /home/jovyan/LightRAG
+WORKDIR /home/jovyan/LightRAG
+RUN pip install -e .
+
 # Set working directory
 WORKDIR /home/jovyan
 
