@@ -4,3 +4,6 @@
 [submodule "unsloth"]
 	path = unsloth
 	url = https://github.com/unslothai/unsloth.git
+[submodule "LightRAG"]
+	path = LightRAG
+	url = https://github.com/HKUDS/LightRAG.git
