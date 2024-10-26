@@ -164,3 +164,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  kotaemon:
+    image: ghcr.io/cinnamon/kotaemon:main-full
+    container_name: kotaemon
+    networks:
+      - homelab
+    ports:
+      - "7860:7860"
+    environment:
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+      - OPENAI_API_BASE=https://api.openai.com/v1
+      - OPENAI_API_KEY=<OPENAI_API_KEY>
+      - OPENAI_CHAT_MODEL=gpt-3.5-turbo
+      - OPENAI_EMBEDDINGS_MODEL=text-embedding-ada-002
+      - LOCAL_MODEL=llama3.2:3b-instruct-fp16
+      - LOCAL_MODEL_EMBEDDINGS=nomic-embed-text:137m-v1.5-fp16
+      - GRAPHRAG_API_KEY=<OPENAI_API_KEY>
+      - GRAPHRAG_LLM_MODEL=gpt-4o-mini
+      - GRAPHRAG_EMBEDDING_MODEL=text-embedding-3-small
+      - USE_CUSTOMIZED_GRAPHRAG_SETTING=false
+    restart: always
