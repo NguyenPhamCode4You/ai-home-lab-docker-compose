@@ -63,16 +63,16 @@ ollama push nichealpham/lora-8b
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create a table to store your documents
-create table n8n_documents_ollama (
+create table n8n_documents_norm (
   id bigserial primary key,
   content text, -- corresponds to Document.pageContent
   metadata jsonb, -- corresponds to Document.metadata
-  embedding vector(3072) -- 1536 works for openai embeddings, change if needed
+  embedding vector(768) -- 1536 works for openai embeddings, change if needed
 );
 
 -- Create a function to search for documents
-create function match_n8n_documents_ollama (
-  query_embedding vector(3072),
+create function match_n8n_documents_norm (
+  query_embedding vector(768),
   match_count int default null,
   filter jsonb DEFAULT '{}'
 ) returns table (
@@ -90,10 +90,10 @@ begin
     id,
     content,
     metadata,
-    1 - (n8n_documents_ollama.embedding <=> query_embedding) as similarity
-  from n8n_documents_ollama
+    1 - (n8n_documents_norm.embedding <=> query_embedding) as similarity
+  from n8n_documents_norm
   where metadata @> filter
-  order by n8n_documents_ollama.embedding <=> query_embedding
+  order by n8n_documents_norm.embedding <=> query_embedding
   limit match_count;
 end;
 $$;
