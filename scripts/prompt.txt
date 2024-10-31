@@ -2,36 +2,18 @@ Your goal is to extract structured information from the user's input that matche
 
 ```TypeScript
 
-cargoOrders: Array<{ // Details of cargo orders including freight, laycan dates, arrival dates, loading/discharging rates, terms, and packing list items.
+cargoOrders: Array<{ // Details of cargo orders including freight, laycanPeriod, loading/discharging rates, terms.
+ cargo_items: Array<string> // Names of the cargo items to be transported
+ loading_ports: Array<string> // Name of the ports where the cargo will be loaded
+ discharging_ports: Array<string> // Name of the ports where the cargo will be dischared
  freight: number // The freight cost as a numeric value, e.g., 455000.
- currencyUnit: string // The currency unit for the freight, e.g., USD or EUR.
- loadingRate: number // The rate at which cargo is loaded, usually in tons/day.
- loadingRateUnit: string // The unit for the loading rate, e.g., tons/day.
- dischargingRate: number // The rate at which cargo is discharged, usually in tons/day.
- dischargingRateUnit: string // The unit for the discharging rate, e.g., tons/day.
- loadingTermName: string // The term that defines the loading condition, e.g., FOB.
- dischargingTermName: string // The term that defines the discharging condition, e.g., CIF.
- shipmentTermName: string // The general shipping term for the cargo, e.g., CFR.
- vesselRequirements: string // Specific vessel requirements, if any, e.g., Panamax vessel required.
+ currency: string // The currency unit for the freight, USD or EUR.
+ detail_requirements: string // Specific vessel requirements, route, ..., if any, e.g.
+ commission: number // Commission as numeric value, in percentage
  laycanPeriod: { // Extracts the laycan period from text, identifying start and end dates for cargo laycan.
   laycanFrom: string // The start date of the laycan period in ISO 8601 format.
   laycanTo: string // The end date of the laycan period in ISO 8601 format.
  }
- packingListItems: { // Details of individual items included in the cargo packing list.
-  name: string // The name of the cargo item.
-  quantity: number // The quantity of this item.
-  cargoLength: number // The length of the cargo item in meters.
-  cargoWidth: number // The width of the cargo item in meters.
-  cargoHeight: number // The height of the cargo item in meters.
-  cargoVolume: number // The volume of the cargo item in cubic meters.
-  volumeUnit: string // The unit for the cargo volume, typically cubic meters (cbm).
-  cargoArea: number // The area occupied by the cargo item in square meters.
-  areaUnit: string // The unit for the cargo area, typically square meters (sqm).
- }
- ports: Array<{ // Details of the ports where the cargo will be loaded / dischared. Type = POL or POD
-  port_name: string // The name of the loading port.
-  type: string // POL = Loading, POD: Discharging
- }>
 }>
 ```
 
@@ -40,8 +22,29 @@ Please output the extracted information in JSON format. Do not output anything e
 
 
 
-Input: The cargo order includes 2 hydraulic power units to be loaded and shipped from Shanghai to Qidong. The loading rate is 500 tons/day, and the discharging rate is 600 tons/day. Freight is 455000 USD. Laycan is from 15th Feb to 25th Feb, and arrival is until 06th April agw, wp, fme.
-Output: <json>{"cargoOrders": [{"freight": 455000, "currencyUnit": "USD", "laycanPeriod": [{"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T00:00:00"}], "ports": [{"port_name": "Bergen", "type": "POL"}, {"port_name": "Shanghai", "type": "POD"}, {"port_name": "Qidong", "type": "POD"}], "loadingRate": 500, "loadingRateUnit": "tons/day", "dischargingRate": 600, "dischargingRateUnit": "tons/day", "loadingTermName": "FOB", "dischargingTermName": "CIF", "shipmentTermName": "CFR", "vesselRequirements": "Panamax vessel required", "packingListItems": [{"name": "hydraulic power unit", "quantity": 2, "cargoWeight": 44.43, "weightUnit": "mt", "cargoLength": 13.56, "cargoWidth": 4.2, "cargoHeight": 2.87, "cargoVolume": 2912, "volumeUnit": "cbm", "cargoArea": 728, "areaUnit": "sqm"}]}]}</json>
+Input: The cargo order includes 2 hydraulic power units to be loaded and shipped from Shanghai to Qidong. basis +/- 10% in Charterer, The loading rate is 500 tons/day, and the discharging rate is 600 tons/day. Freight is 455000 USD. Laycan is from 15th Feb to 25th Feb, and arrival is until 06th April agw, wp, fme.
+Output: <json>{"cargoOrders": [{"cargo_items": ["2 hydraulic power units"], "commission": 10, "freight": 455000, "currencyUnit": "USD", "laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T00:00:00"}, "loading_ports": ["Bergen", "Shanghai"], "discharging_ports": ["Qidong"], "detail_requirements": "Panamax vessel required"}]}</json>
+Input: Engines ex Vaasa
+POL: Vaasa, FI
+Cargo: 4511 cbm / 1454 tons / incl 3x 205 mt units
+POD
+Output: <json>{"cargoOrders": [{"cargo_items": ["Engines: 4511 cbm / 1454 tons / incl 3x 205 mt units"]}]}</json>
+Input: POL: Hamburg, DE
+Output: <json>{"cargoOrders": [{"loading_ports": ["Hamburg"]}]}</json>
+Input: The shipment will be loaded at Bergen and Shanghai.
+Output: <json>{"cargoOrders": [{"loading_ports": ["Bergen", "Shanghai"]}]}</json>
+Input: Cargo load at Da Nang
+Output: <json>{"cargoOrders": [{"loading_ports": ["Da Nang"]}]}</json>
+Input: Cargo Unload at Arzew, Algeria
+Output: <json>{"cargoOrders": [{"discharging_ports": ["Arzew"]}]}</json>
+Input: Shipment Discharge at Houston or Leer
+Output: <json>{"cargoOrders": [{"discharging_ports": ["Houston", "Leer"]}]}</json>
+Input: POD: Duqm, Oman
+Output: <json>{"cargoOrders": [{"discharging_ports": ["Duqm"]}]}</json>
+Input: 5% comm
+Output: <json>{"cargoOrders": [{"commission": 5}]}</json>
+Input: commission: 7 %
+Output: <json>{"cargoOrders": [{"commission": 7}]}</json>
 Input: TOS 4th Quarter 2024
 Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-10-01T00:00:00", "laycanTo": "2024-12-31T23:59:59"}]}]}</json>
 Input: Laycan: March 2023 to May 2023
@@ -52,20 +55,7 @@ Input: Ly: 18th to 25th November 2024.
 Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-11-25T23:59:59"}]}]}</json>
 Input: 18/11 - 3/12
 Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-12-03T23:59:59"}]}]}</json>
-Input: 1x hydraulic power unit, 13m long, 56 wide, 4m high, volume 2912 cbm, occupying 728 sqm.
-Output: <json>{"cargoOrders": [{"packingListItems": [{"name": "hydraulic power unit", "quantity": 1, "cargoLength": 13, "cargoWidth": 56, "cargoHeight": 4, "cargoVolume": 2912, "volumeUnit": "cbm", "cargoArea": 728, "areaUnit": "sqm"}]}]}</json>
-Input: The shipment will be loaded at Bergen and Shanghai.
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Bergen", "type": "POL"}, {"port_name": "Shanghai", "type": "POL"}]}]}</json>
-Input: POL: Hamburg, DE
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Hamburg", "type": "POL"}]}]}</json>
-Input: Cargo load at Da Nang
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Da Nang", "type": "POL"}]}]}</json>
-Input: POD: Duqm, Oman
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Duqm", "type": "POD"}]}]}</json>
-Input: Discharge at Houston
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Houston", "type": "POD"}]}]}</json>
-Input: Unload at Arzew, Algeria
-Output: <json>{"cargoOrders": [{"ports": [{"port_name": "Arzew", "type": "POD"}]}]}</json>
+Input: 15-25 Feb
+Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T23:59:59"}]}]}</json>
 
-
-User input: 
+User Input: 
