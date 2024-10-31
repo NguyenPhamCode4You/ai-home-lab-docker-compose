@@ -46,16 +46,16 @@ Output: <json>{"cargoOrders": [{"commission": 5}]}</json>
 Input: commission: 7 %
 Output: <json>{"cargoOrders": [{"commission": 7}]}</json>
 Input: TOS 4th Quarter 2024
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-10-01T00:00:00", "laycanTo": "2024-12-31T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-10-01T00:00:00", "laycanTo": "2024-12-31T23:59:59"}}]}</json>
 Input: Laycan: March 2023 to May 2023
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2023-03-01T00:00:00", "laycanTo": "2023-05-31T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2023-03-01T00:00:00", "laycanTo": "2023-05-31T23:59:59"}}]}</json>
 Input: shipment time July 2025
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2025-05-01T00:00:00", "laycanTo": "2025-05-31T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2025-05-01T00:00:00", "laycanTo": "2025-05-31T23:59:59"}}]}</json>
 Input: Ly: 18th to 25th November 2024.
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-11-25T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-11-25T23:59:59"}}]}</json>
 Input: 18/11 - 3/12
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-12-03T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-12-03T23:59:59"}}]}</json>
 Input: 15-25 Feb
-Output: <json>{"cargoOrders": [{"laycanPeriod": [{"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T23:59:59"}]}]}</json>
+Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T23:59:59"}}]}</json>
 
 User Input: 
