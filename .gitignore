@@ -2,3 +2,5 @@
 ./ngix-proxy-manager-storage/
 
 jellyfin
+
+node_modules
