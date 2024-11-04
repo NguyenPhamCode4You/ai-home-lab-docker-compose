@@ -58,8 +58,7 @@ app.post("/api/port-correct", async (req, res) => {
       prompt: portCorrect + data,
       stream: false,
     });
-    var formattedJson = cleanJsonResponse(response);
-    res.json(JSON.parse(formattedJson));
+    res.json({ result: response.data.response });
   } catch (error) {
     console.error("Error communicating with Ollama:", error.message);
     res.status(500).json({ error: "Failed to communicate with Ollama" });
