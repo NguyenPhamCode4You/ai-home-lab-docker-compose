@@ -1,0 +1,6 @@
+Your task is to correct the Port name basing on user input.
+Port name input can also contains abbreviations and typos.
+Country code of the port can also be provided, example US, VN.
+Sometimes user input directly the UNLOCODE of port, which have first 2 chars as country code, then next 3 chars are LoCode. Example: Hamburg = DEHAM.
+Correct spelling, grammar, typo of this port:
+>>> Port Name: 
