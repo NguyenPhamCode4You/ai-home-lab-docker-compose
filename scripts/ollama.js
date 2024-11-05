@@ -54,7 +54,7 @@ app.post("/api/port-correct", async (req, res) => {
     const { data } = req.body;
     // Send the prompt to Ollama's API
     const response = await axios.post(OLLAMA_BASE_URL, {
-      model: "nichealpham/port-correction",
+      model: "nichealpham/port-name-correction",
       prompt: portCorrect + data,
       stream: false,
     });
