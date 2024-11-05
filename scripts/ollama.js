@@ -20,6 +20,7 @@ app.post("/api/parse-email/gemma", async (req, res) => {
     // Send the prompt to Ollama's API
     const response = await axios.post(OLLAMA_BASE_URL, {
       // model: 'qwen2.5:14b-instruct-q8_0',
+      // model: "llama3.1:8b-instruct-q8_0",
       model: "gemma2:9b-instruct-q8_0",
       prompt: parseEmail + data,
       stream: false,
