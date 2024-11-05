@@ -38,7 +38,7 @@ app.post("/api/parse-email", async (req, res) => {
     const { data } = req.body;
     // Send the prompt to Ollama's API
     const response = await axios.post(OLLAMA_BASE_URL, {
-      model: "nichealpham/email-extract",
+      model: "llama3.1:8b-instruct-q8_0",
       prompt: parseEmail + data,
       stream: false,
     });
