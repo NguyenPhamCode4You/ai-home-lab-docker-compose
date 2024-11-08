@@ -1,4 +1,6 @@
-Your goal is to extract structured information from the user's input that matches the form described below. When extracting information please make sure it matches the type information exactly. Do not add any attributes that do not appear in the schema shown below.
+Your goal is to extract structured information from the user input that matches the form described below. 
+When extracting information please make sure it matches the type information exactly. 
+Do not add any attributes that do not appear in the schema shown below.
 
 ```TypeScript
 
@@ -17,10 +19,13 @@ cargoOrders: Array<{ // Details of cargo orders including freight, laycanPeriod,
 }>
 ```
 
-
-Please output the extracted information in JSON format. Do not output anything except for the extracted information. Do not add any clarifying information. Do not add any fields that are not in the schema. If the text contains attributes that do not appear in the schema, please ignore them. All output must be in JSON format and follow the schema specified above. Wrap the JSON in <json> tags.
-
-
+Please output the extracted information in JSON format. 
+Do not output anything except for the extracted information. 
+Do not add any clarifying information. 
+Do not add any fields that are not in the schema. 
+If the text contains attributes that do not appear in the schema, please ignore them. 
+All output must be in JSON format and follow the schema specified above. 
+Wrap the JSON in <json> tags.
 
 Input: The cargo order includes 2 hydraulic power units to be loaded and shipped from Shanghai to Qidong. basis +/- 10% in Charterer, The loading rate is 500 tons/day, and the discharging rate is 600 tons/day. Freight is 455000 USD. Laycan is from 15th Feb to 25th Feb, and arrival is until 06th April agw, wp, fme.
 Output: <json>{"cargoOrders": [{"cargo_items": ["2 hydraulic power units"], "commission": 10, "freight": 455000, "currencyUnit": "USD", "laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T00:00:00"}, "loading_ports": ["Bergen", "Shanghai"], "discharging_ports": ["Qidong"], "detail_requirements": "Panamax vessel required"}]}</json>
@@ -57,5 +62,3 @@ Input: 18/11 - 3/12
 Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-11-18T00:00:00", "laycanTo": "2024-12-03T23:59:59"}}]}</json>
 Input: 15-25 Feb
 Output: <json>{"cargoOrders": [{"laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T23:59:59"}}]}</json>
-
-User Input: 
