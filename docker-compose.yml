@@ -42,7 +42,7 @@ services:
     restart: always
 
   ollama:
-    image: ollama/ollama
+    image: ollama/ollama:0.4.0
     container_name: ollama
     ports:
       - "11434:11434"
