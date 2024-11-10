@@ -122,7 +122,7 @@ for root, _, files in os.walk(directory_path):
     md_file_path = os.path.join(root, f"{filename}.md")
 
     print(f"Processing {file_path} => {md_file_path}")
-    cmd = f"docling {file_path}"
+    cmd = f"docling {file_path}  --output {directory_path}"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()  # Wait for the command to finish
     
