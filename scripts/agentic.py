@@ -9,6 +9,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 import pandas as pd
 import os
+import subprocess
 
 class OllamaEndpoint:
     def __init__(self, message: str, url: str = "http://10.13.13.4:11434/api/generate", model: str = "llama3.2:latest"):
@@ -119,23 +120,32 @@ for root, _, files in os.walk(directory_path):
     file_path = os.path.join(root, file)
     filename, file_extension = os.path.splitext(file_path)
     # Call docling to get markdown text for the file, using cmd to call "docling ./file_path"
-    markdown_text = os.popen(f"docling ./{file_path}")
+    # Use subprocess to call docling and capture the output
+    cmd = f"docling ./{file_path}"
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()  # Wait for the command to finish
+    
+    # Check for errors
+    if process.returncode != 0:
+        print(f"Error processing {file_path}: {stderr.decode()}")
+        continue
 
-    # write the file to a temporary file md
-    with open(f"./{filename}.md", "w") as f:
-      f.write(markdown_text)
+    md_file_path = os.path.join(root, f"{filename}.md")
 
     # read the file
-    loader = TextLoader(file_path=f"./{filename}.md")
+    loader = TextLoader(file_path=md_file_path)
     documents = loader.load()
     chunked_texts = text_splitter.split_documents(documents)
 
     i = 0
     for chunk in chunked_texts:
-      print(f"Chunk {i} of {len(chunked_texts)}")
       ollama_response = OllamaEndpoint(chunk, model="gemma2:9b-instruct-q8_0").run()
       ollama_response = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 7]
-      key_sentences.extend(ollama_response)
+      for sentence in ollama_response:
+        sentence = filename + ": " + sentence.strip()
+        key_sentences.append(sentence)
+        print(f"Sentence {i} {sentence}")
+        i += 1
 
 # Define Supabase credentials
 SUPABASE_URL = "http://10.13.13.4:8000"
