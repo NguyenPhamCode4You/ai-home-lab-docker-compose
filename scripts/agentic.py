@@ -118,7 +118,7 @@ key_sentences = []
 for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
-    filename, file_extension = os.path.splitext(file_path)
+    filename = os.path.splitext(file)[0]
     md_file_path = os.path.join(root, f"{filename}.md")
 
     print(f"Processing {file_path} => {md_file_path}")
