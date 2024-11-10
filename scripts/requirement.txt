@@ -1,8 +1,6 @@
 langchain
-langchain-openai
 langchain-core
 langchain-community
-supabase
 requests
 pandas
 docling
