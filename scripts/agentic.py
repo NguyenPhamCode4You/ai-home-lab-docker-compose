@@ -119,9 +119,10 @@ for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
     filename, file_extension = os.path.splitext(file_path)
-    # Call docling to get markdown text for the file, using cmd to call "docling ./file_path"
-    # Use subprocess to call docling and capture the output
-    cmd = f"docling ./{file_path}"
+    md_file_path = os.path.join(root, f"{filename}.md")
+
+    print(f"Processing {file_path} => {md_file_path}")
+    cmd = f"docling {file_path}  --output {md_file_path}"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()  # Wait for the command to finish
     
@@ -130,7 +131,6 @@ for root, _, files in os.walk(directory_path):
         print(f"Error processing {file_path}: {stderr.decode()}")
         continue
 
-    md_file_path = os.path.join(root, f"{filename}.md")
 
     # read the file
     loader = TextLoader(file_path=md_file_path)
