@@ -8,6 +8,7 @@ import requests
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 import pandas as pd
+from docling.document_converter import DocumentConverter
 import os
 
 class OllamaEndpoint:
@@ -151,4 +152,3 @@ for sentence in key_sentences:
   supabase.insert_embedding(sentence, embedding)
   j += 1
   print(f"Inserted {j} embeddings / {len(key_sentences)}")
-# from docling.document_converter import DocumentConverter
