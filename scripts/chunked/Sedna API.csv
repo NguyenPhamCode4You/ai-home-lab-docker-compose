@@ -1,0 +1,76 @@
+Sedna API,content
+0,This document is designed to be a high level overview of leveraging Sedna's API's for Document management purposes.
+1,Save time by allowing the users to complete a simple action to save documents within an alternate system. 
+2,Using a common reference you allow ease of filing structure that is consistent across the business.
+3,Create a Sedna App to be able to insert documents directly into emails from an alternate system saving time and context switching.
+4,"Sedna's APIs allow you to be able to create integrations with your business systems to provide efficiency, accuracy and context gains. "
+5,Sedna recommends the following 3 options for leveraging these APIs in the Document Management space.  
+6,- 1. Save Documents with Job & Category application using the event stream
+7,- 2. Save Documents via a Connected App
+8,- 3. Insert Documents in the composer with Connected App
+9,Job Reference Tag is a green tag in Sedna used to group related business transactions. 
+10,"Category Tag is a blue tag used to add context like Recap, Final Documents or Certificates. "
+11,Attributes are meta data within a Job Reference used for integration & auto tagging.
+12,Message ID is a unique number given to each message in Sedna. 
+13,This is a unique number that each Job Reference Tag is given upon creation 
+14,This is a unique number that each Category Tag is given upon creation 
+15,Message Shared Within Sedna a message can be visible to multiple different mailboxes.
+16,Sharing a message allows the message to be visible to another mailbox as specified.   
+17,An event is something that is triggered by an action in your Sedna system. 
+18,This is a list of current events happening within your Sedna System. This can. 
+19,This is a specific access point to an entity within your Sedna System.  
+20,Using Sedna's Event Stream API we allow users to control the saving of documentation in a simple quick action. 
+21,You can use this to save documents into an alternate system and also create a repository of documents.
+22,Sedna should be set up with two things: Job Reference Tags linked to a business transaction and Category Tags for document categorization.  
+23,You will use the Job Reference and its attributes plus the Category Tag to retrieve the message ID for download and guide upload location. 
+24,The coloured flow is related to the end user and the grey flow is related to the flow of the automation. 
+25,Use the event endpoint to capture real time events. 
+26,An event is something that is triggered by an action in your tenant such as sending a message or adding a tag. 
+27,Sedna preserves one month of events so actions to be completed based on events should be taken within this timeframe.  
+28,Events are triggered on the event endpoint as follows:
+29,- Message received - event.message.received
+30,- Message scheduled (for sending) - event.message.message_scheduled
+31,- Message sent - event.message.sent
+32,- Message shared - event.message.shared
+33,- Category tag added - event.message.tag.added.category
+34,- Job reference added - event.message.tag.added.job-reference
+35,- Draft edited - event.message.draft.edited
+36,- Category tag added endpoint looking for the specific Category tag ID identified 
+37,- Read latest events endpoint [GET] {{baseUrl}}/platform/2019-01-01/event/latest   
+38,- Loop on the 'next' links. Check on each iteration if anything has changed.
+39,"-  `public function loop\_events() { $loop\_wait = 1; //Seconds //Get the latest event $url = $this->base\_url . ""/event/latest""; $r = $this->api\_get($url); $url = $r['links']['next']; //This sets us on the current cursor which we'll loop $last\_id = ''; do { $r = $this->api\_get($url); foreach($r['data'] as $ix=>$data) { $id = $data['id']; //If not a new message wait a sec and restart the loop if ($id == $last\_id) {sleep($loop\_wait); continue;}}`  "
+40,//Get basic event metadata $atts = $data['attributes']; 
+41,$time = $atts['time']; 
+42,$eventType = $atts['eventType']; //Only deal with incoming messages using the below 
+43,if ($eventType <> 'event.message.received') continue; //Get the message subject 
+44,$msg_id = $data['relationships']['message']['data']['id']; 
+45,$msg = $this->get_message($msg_id); 
+46,"$subject = $msg['data']['attributes']['subject']; echo ""$time $eventType $id $subject ""; "
+47,Once you have the Message ID you can get message information that you need. This is broken down into two pieces. - 1. The job reference applied to the message  - [GET] /platform/2019-01-01/message/{{MessageID}}/relationships/job-reference/   - 2. The documents attached to the message  - [GET] /platform/2019-01-01/message/{{MessageID}}/relationships/document
+48,You can use this to find the category tags applied if you wish to use them to add extra information for the file path. 
+49,Once you have these two pieces of information you can move onto the next step.
+50,Using the same document endpoint above you would then download the attachments (documents). 
+51,"public function download\_document($in\_document\_id, $in\_file\_loc = '/tmp/sedna\_merge') { //Create destination $in\_file\_loc if it doesn't exists if (!file\_exists($in\_file\_loc)) mkdir($in\_file\_loc,0777); //Download the file to the directory given by $in\_file\_loc $url = $this->base\_url . ""/download/document/$in\_document\_id""; $output\_file = ""$in\_file\_loc/$in\_document\_id.pdf""; $r = $this->api\_download($url,$output\_file); //api\_download in appendix below return $output\_file; }"
+52,The job reference is related to the business transaction so should give you the path to finding the record to upload to.  
+53,- ● Job Reference Endpoint [GET] {{baseurl}}/platform/2019-01-01/job-reference 
+54,"{ ""data"": { ""type"": ""job-reference"", ""attributes"": { ""name"": ""Vessel Name. - 2202"", ""archived"": false , ""date"": null , ""type"": ""voyage"", ""foreignKey"": ""1667622"", ""attributes"": { ""type"": ""DEFAULT"", ""vesselName"": ""Vessel Name"", ""displayName"": ""Vessel Name - 2202"", ""voyageNumber"": ""2202"", ""imo"": ""930215"" } } } }"
+55,"The table describes fields, their names, descriptions, formats, and examples. "
+56,Field Name Description Format Examples Source  
+57,Container for all field lds 
+58,All Job Reference attributes 
+59,Job Reference name                                                                                                                             | String  
+60,Created Date associated with transaction                                                                                                      | Iso 8601     
+61,Job Reference type is a String value. 
+62,Unique id relating to alternate system is a String.  
+63,These are self describing key value pairs. 
+64,"Other key value pairs may be included for future use, see format for string length constraint."
+65,Two values expected. 
+66,"Allowed values ""true"" or ""false"".  "
+67,"Job Reference will be considered by Auto-taggers if it is set to ""True""."
+68,Refers to all Data provided to API.
+69,The data.attributes.name value shows as the job reference in SEDNA. 
+70,The data.type value should indicate the type of job reference.  
+71,These 3 pieces of information should give you the ability to save the documents to your alternate system.
+72,The category tag event is the trigger that indicates the message or documents should be saved.
+73,The message id allows you to find the job reference id and the documents to be downloaded.
+74,"The job reference attributes gives you the information to guide you to where the document should be saved for example, using the Vessel name and the reference number. "

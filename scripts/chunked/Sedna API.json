@@ -1,0 +1,75 @@
+{"Sedna API":0,"content":"This document is designed to be a high level overview of leveraging Sedna's API's for Document management purposes."}
+{"Sedna API":1,"content":"Save time by allowing the users to complete a simple action to save documents within an alternate system. "}
+{"Sedna API":2,"content":"Using a common reference you allow ease of filing structure that is consistent across the business."}
+{"Sedna API":3,"content":"Create a Sedna App to be able to insert documents directly into emails from an alternate system saving time and context switching."}
+{"Sedna API":4,"content":"Sedna's APIs allow you to be able to create integrations with your business systems to provide efficiency, accuracy and context gains. "}
+{"Sedna API":5,"content":"Sedna recommends the following 3 options for leveraging these APIs in the Document Management space.  "}
+{"Sedna API":6,"content":"- 1. Save Documents with Job & Category application using the event stream"}
+{"Sedna API":7,"content":"- 2. Save Documents via a Connected App"}
+{"Sedna API":8,"content":"- 3. Insert Documents in the composer with Connected App"}
+{"Sedna API":9,"content":"Job Reference Tag is a green tag in Sedna used to group related business transactions. "}
+{"Sedna API":10,"content":"Category Tag is a blue tag used to add context like Recap, Final Documents or Certificates. "}
+{"Sedna API":11,"content":"Attributes are meta data within a Job Reference used for integration & auto tagging."}
+{"Sedna API":12,"content":"Message ID is a unique number given to each message in Sedna. "}
+{"Sedna API":13,"content":"This is a unique number that each Job Reference Tag is given upon creation "}
+{"Sedna API":14,"content":"This is a unique number that each Category Tag is given upon creation "}
+{"Sedna API":15,"content":"Message Shared Within Sedna a message can be visible to multiple different mailboxes."}
+{"Sedna API":16,"content":"Sharing a message allows the message to be visible to another mailbox as specified.   "}
+{"Sedna API":17,"content":"An event is something that is triggered by an action in your Sedna system. "}
+{"Sedna API":18,"content":"This is a list of current events happening within your Sedna System. This can. "}
+{"Sedna API":19,"content":"This is a specific access point to an entity within your Sedna System.  "}
+{"Sedna API":20,"content":"Using Sedna's Event Stream API we allow users to control the saving of documentation in a simple quick action. "}
+{"Sedna API":21,"content":"You can use this to save documents into an alternate system and also create a repository of documents."}
+{"Sedna API":22,"content":"Sedna should be set up with two things: Job Reference Tags linked to a business transaction and Category Tags for document categorization.  "}
+{"Sedna API":23,"content":"You will use the Job Reference and its attributes plus the Category Tag to retrieve the message ID for download and guide upload location. "}
+{"Sedna API":24,"content":"The coloured flow is related to the end user and the grey flow is related to the flow of the automation. "}
+{"Sedna API":25,"content":"Use the event endpoint to capture real time events. "}
+{"Sedna API":26,"content":"An event is something that is triggered by an action in your tenant such as sending a message or adding a tag. "}
+{"Sedna API":27,"content":"Sedna preserves one month of events so actions to be completed based on events should be taken within this timeframe.  "}
+{"Sedna API":28,"content":"Events are triggered on the event endpoint as follows:"}
+{"Sedna API":29,"content":"- Message received - event.message.received"}
+{"Sedna API":30,"content":"- Message scheduled (for sending) - event.message.message_scheduled"}
+{"Sedna API":31,"content":"- Message sent - event.message.sent"}
+{"Sedna API":32,"content":"- Message shared - event.message.shared"}
+{"Sedna API":33,"content":"- Category tag added - event.message.tag.added.category"}
+{"Sedna API":34,"content":"- Job reference added - event.message.tag.added.job-reference"}
+{"Sedna API":35,"content":"- Draft edited - event.message.draft.edited"}
+{"Sedna API":36,"content":"- Category tag added endpoint looking for the specific Category tag ID identified "}
+{"Sedna API":37,"content":"- Read latest events endpoint [GET] {{baseUrl}}\/platform\/2019-01-01\/event\/latest   "}
+{"Sedna API":38,"content":"- Loop on the 'next' links. Check on each iteration if anything has changed."}
+{"Sedna API":39,"content":"-  `public function loop\\_events() { $loop\\_wait = 1; \/\/Seconds \/\/Get the latest event $url = $this->base\\_url . \"\/event\/latest\"; $r = $this->api\\_get($url); $url = $r['links']['next']; \/\/This sets us on the current cursor which we'll loop $last\\_id = ''; do { $r = $this->api\\_get($url); foreach($r['data'] as $ix=>$data) { $id = $data['id']; \/\/If not a new message wait a sec and restart the loop if ($id == $last\\_id) {sleep($loop\\_wait); continue;}}`  "}
+{"Sedna API":40,"content":"\/\/Get basic event metadata $atts = $data['attributes']; "}
+{"Sedna API":41,"content":"$time = $atts['time']; "}
+{"Sedna API":42,"content":"$eventType = $atts['eventType']; \/\/Only deal with incoming messages using the below "}
+{"Sedna API":43,"content":"if ($eventType <> 'event.message.received') continue; \/\/Get the message subject "}
+{"Sedna API":44,"content":"$msg_id = $data['relationships']['message']['data']['id']; "}
+{"Sedna API":45,"content":"$msg = $this->get_message($msg_id); "}
+{"Sedna API":46,"content":"$subject = $msg['data']['attributes']['subject']; echo \"$time $eventType $id $subject \"; "}
+{"Sedna API":47,"content":"Once you have the Message ID you can get message information that you need. This is broken down into two pieces. - 1. The job reference applied to the message  - [GET] \/platform\/2019-01-01\/message\/{{MessageID}}\/relationships\/job-reference\/   - 2. The documents attached to the message  - [GET] \/platform\/2019-01-01\/message\/{{MessageID}}\/relationships\/document"}
+{"Sedna API":48,"content":"You can use this to find the category tags applied if you wish to use them to add extra information for the file path. "}
+{"Sedna API":49,"content":"Once you have these two pieces of information you can move onto the next step."}
+{"Sedna API":50,"content":"Using the same document endpoint above you would then download the attachments (documents). "}
+{"Sedna API":51,"content":"public function download\\_document($in\\_document\\_id, $in\\_file\\_loc = '\/tmp\/sedna\\_merge') { \/\/Create destination $in\\_file\\_loc if it doesn't exists if (!file\\_exists($in\\_file\\_loc)) mkdir($in\\_file\\_loc,0777); \/\/Download the file to the directory given by $in\\_file\\_loc $url = $this->base\\_url . \"\/download\/document\/$in\\_document\\_id\"; $output\\_file = \"$in\\_file\\_loc\/$in\\_document\\_id.pdf\"; $r = $this->api\\_download($url,$output\\_file); \/\/api\\_download in appendix below return $output\\_file; }"}
+{"Sedna API":52,"content":"The job reference is related to the business transaction so should give you the path to finding the record to upload to.  "}
+{"Sedna API":53,"content":"- \u25cf Job Reference Endpoint [GET] {{baseurl}}\/platform\/2019-01-01\/job-reference "}
+{"Sedna API":54,"content":"{ \"data\": { \"type\": \"job-reference\", \"attributes\": { \"name\": \"Vessel Name. - 2202\", \"archived\": false , \"date\": null , \"type\": \"voyage\", \"foreignKey\": \"1667622\", \"attributes\": { \"type\": \"DEFAULT\", \"vesselName\": \"Vessel Name\", \"displayName\": \"Vessel Name - 2202\", \"voyageNumber\": \"2202\", \"imo\": \"930215\" } } } }"}
+{"Sedna API":55,"content":"The table describes fields, their names, descriptions, formats, and examples. "}
+{"Sedna API":56,"content":"Field Name Description Format Examples Source  "}
+{"Sedna API":57,"content":"Container for all field lds "}
+{"Sedna API":58,"content":"All Job Reference attributes "}
+{"Sedna API":59,"content":"Job Reference name                                                                                                                             | String  "}
+{"Sedna API":60,"content":"Created Date associated with transaction                                                                                                      | Iso 8601     "}
+{"Sedna API":61,"content":"Job Reference type is a String value. "}
+{"Sedna API":62,"content":"Unique id relating to alternate system is a String.  "}
+{"Sedna API":63,"content":"These are self describing key value pairs. "}
+{"Sedna API":64,"content":"Other key value pairs may be included for future use, see format for string length constraint."}
+{"Sedna API":65,"content":"Two values expected. "}
+{"Sedna API":66,"content":"Allowed values \"true\" or \"false\".  "}
+{"Sedna API":67,"content":"Job Reference will be considered by Auto-taggers if it is set to \"True\"."}
+{"Sedna API":68,"content":"Refers to all Data provided to API."}
+{"Sedna API":69,"content":"The data.attributes.name value shows as the job reference in SEDNA. "}
+{"Sedna API":70,"content":"The data.type value should indicate the type of job reference.  "}
+{"Sedna API":71,"content":"These 3 pieces of information should give you the ability to save the documents to your alternate system."}
+{"Sedna API":72,"content":"The category tag event is the trigger that indicates the message or documents should be saved."}
+{"Sedna API":73,"content":"The message id allows you to find the job reference id and the documents to be downloaded."}
+{"Sedna API":74,"content":"The job reference attributes gives you the information to guide you to where the document should be saved for example, using the Vessel name and the reference number. "}
