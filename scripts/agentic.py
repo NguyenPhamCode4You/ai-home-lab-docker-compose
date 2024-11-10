@@ -8,7 +8,6 @@ import requests
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 import pandas as pd
-from docling.document_converter import DocumentConverter
 import os
 
 class OllamaEndpoint:
@@ -112,21 +111,22 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-converter = DocumentConverter()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 
 key_sentences = []
 for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
-    # Call docling to get markdown text for the file
-    markdown_text = converter.convert(file_path).export_to_markdown()
+    filename, file_extension = os.path.splitext(file_path)
+    # Call docling to get markdown text for the file, using cmd to call "docling ./file_path"
+    markdown_text = os.popen(f"docling ./{file_path}")
+
     # write the file to a temporary file md
-    with open(f"./chunked/{file}.md", "w") as f:
+    with open(f"./{filename}.md", "w") as f:
       f.write(markdown_text)
 
     # read the file
-    loader = TextLoader(file_path=f"./chunked/{file}.md")
+    loader = TextLoader(file_path=f"./{filename}.md")
     documents = loader.load()
     chunked_texts = text_splitter.split_documents(documents)
 
