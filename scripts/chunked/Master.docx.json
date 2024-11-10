@@ -1,0 +1,70 @@
+{"Master Data":0,"content":"This document is designed to be a high level overview of leveraging Sedna's API's for Document management purposes."}
+{"Master Data":1,"content":"For full reference to SEDNA API: https:\/\/developers.sedna.com\/reference"}
+{"Master Data":2,"content":"Save time by allowing the users to complete a simple action to save documents within an alternate system."}
+{"Master Data":3,"content":"Using a common reference you allow ease of filing structure that is consistent across the business."}
+{"Master Data":4,"content":"Create a Sedna App to be able to insert documents directly into emails from an alternate system saving time and context switching."}
+{"Master Data":5,"content":"Sedna's APIs allow you to be able to create integrations with your business systems to provide efficiency, accuracy and context gains."}
+{"Master Data":6,"content":"Sedna recommends the following 3 options for leveraging these APIs in the Document Management space."}
+{"Master Data":7,"content":"A green tag within Sedna is used to group messages that relate to a business transaction, such as Vessel - Voyage or Linkage ID."}
+{"Master Data":8,"content":"A blue tag within Sedna is used to add additional context to a message, such as Recap, Final Documents or Certificates."}
+{"Master Data":9,"content":"Attributes are the meta data held within a Job Reference, such as Vessel Name, Voyage Reference, Linkage ID or CP Date."}
+{"Master Data":10,"content":"Each message inside Sedna is given a unique number upon ingest, allowing messages to be found and actions to be taken using this ID."}
+{"Master Data":11,"content":"This is a unique number that each Job Reference Tag is given upon creation."}
+{"Master Data":12,"content":"This is a unique number that each Category Tag is given upon creation."}
+{"Master Data":13,"content":"A message can be visible to multiple different mailboxes in Sedna. Sharing a message allows it to be visible to another specified mailbox."}
+{"Master Data":14,"content":"An event is something that is triggered by an action in your Sedna system."}
+{"Master Data":15,"content":"Event Stream is a list of current events happening within your Sedna System."}
+{"Master Data":16,"content":"An End Point is a specific access point to an entity within your Sedna System."}
+{"Master Data":17,"content":"Using Sedna's Event Stream API we allow users to control the saving of documentation in a simple quick action."}
+{"Master Data":18,"content":"Sedna should be set up with two things to allow this method to be efficient: Job Reference Tags and Category Tags."}
+{"Master Data":19,"content":"You will use the Job Reference and its attributes plus the Category Tag to retrieve the message ID for download."}
+{"Master Data":20,"content":"The coloured flow is related to the end user and the grey flow is related to the flow of the automation."}
+{"Master Data":21,"content":"Use the event endpoint to capture real time events triggered by actions in your tenant."}
+{"Master Data":22,"content":"Sedna preserves one month of events so actions to be completed based on events should be taken within this timeframe."}
+{"Master Data":23,"content":"Message received - event.message.received"}
+{"Master Data":24,"content":"Message scheduled (for sending) - event.message.message\\_scheduled"}
+{"Master Data":25,"content":"Message sent - event.message.sent"}
+{"Master Data":26,"content":"Message shared - event.message.shared"}
+{"Master Data":27,"content":"Category tag added - event.message.tag.added.category"}
+{"Master Data":28,"content":"Category tag removed - event.message.tag.removed.category"}
+{"Master Data":29,"content":"Job reference added - event.message.tag.added.job-reference"}
+{"Master Data":30,"content":"Job reference removed - event.message.tag.removed.job-reference"}
+{"Master Data":31,"content":"Draft edited - event.message.draft.edited"}
+{"Master Data":32,"content":"In the situation where you want to save a document to an alternate system based on the application of a category tag, you would use:"}
+{"Master Data":33,"content":"Category tag added endpoint looking for the specific Category tag ID identified"}
+{"Master Data":34,"content":"You would use this to identify the Sedna Message ID for the mail that the tag has been applied to."}
+{"Master Data":35,"content":"An example on how to loop specific message events:"}
+{"Master Data":36,"content":"Read latest events endpoint [GET] {{baseUrl}}\/platform\/2019-01-01\/event\/latest"}
+{"Master Data":37,"content":"Read the 'next' link"}
+{"Master Data":38,"content":"Loop on the 'next' links. Check on each iteration if anything has changed."}
+{"Master Data":39,"content":"SEDNA plans to implement webhooks for events in the future, which will eliminate the need for a polling loop on events."}
+{"Master Data":40,"content":"public function loop\\_events() { $loop\\_wait = 1; \/\/Seconds \/\/Get the latest event $url = $this->base\\_url . \"\/event\/latest\"; $r = $this->api\\_get($url); $url = $r['links']['next']; \/\/This sets us on the current cursor which we'll loop $last\\_id = ''; do { $r = $this->api\\_get($url); foreach($r['data'] as $ix=>$data) { $id = $data['id']; \/\/If not a new message wait a sec and restart the loop if ($id == $last\\_id) {sleep($loop\\_wait); continue;}}"}
+{"Master Data":41,"content":"\/\/Get basic event metadata $atts = $data['attributes']; $time = $atts['time']; $eventType = $atts['eventType']; \/\/Only deal with incoming messages using the below \/\/if ($eventType <> 'event.message.received') continue; \/\/Get the message subject $msg_id = $data['relationships']['message']['data']['id']; $msg = $this->get_message($msg_id); $subject = $msg['data']['attributes']['subject']; echo \"$time $eventType $id $subject \"; } $last_id = $id; $url = $r['links']['next']; sleep($loop_wait); } while (true); }"}
+{"Master Data":42,"content":"Once you have the Message ID you can get message information that you need. This is broken down into two pieces."}
+{"Master Data":43,"content":"The job reference applied to the message is accessed via [GET] \/platform\/2019-01-01\/message\/{{MessageID}}\/relationships\/job-reference\/."}
+{"Master Data":44,"content":"The documents attached to the message can be retrieved using [GET] \/platform\/2019-01-01\/message\/{{MessageID}}\/relationships\/document."}
+{"Master Data":45,"content":"You can also use this to find the category tags applied if you wish to use them to add extra information for the file path."}
+{"Master Data":46,"content":"This can be done using: - 1. [GET] \/platform\/2019-01-01\/message\/{{MessageID}}\/relationships\/category-tag\/"}
+{"Master Data":47,"content":"Using the same document endpoint above you would then download the attachments (documents)."}
+{"Master Data":48,"content":"public function download\\_document($in\\_document\\_id, $in\\_file\\_loc = '\/tmp\/sedna\\_merge') { \/\/Create destination $in\\_file\\_loc if it doesn't exists if (!file\\_exists($in\\_file\\_loc)) mkdir($in\\_file\\_loc,0777); \/\/Download the file to the directory given by $in\\_file\\_loc $url = $this->base\\_url . \"\/download\/document\/$in\\_document\\_id\"; $output\\_file = \"$in\\_file\\_loc\/$in\\_document\\_id.pdf\"; $r = $this->api\\_download($url,$output\\_file); \/\/api\\_download in appendix below return $output\\_file; }"}
+{"Master Data":49,"content":"The job reference is related to the business transaction so should give you the path to finding the record to upload to."}
+{"Master Data":50,"content":"Job Reference Endpoint [GET] {{baseurl}}\/platform\/2019-01-01\/job-reference"}
+{"Master Data":51,"content":"{ \"data\": { \"type\": \"job-reference\", \"attributes\": { \"name\": \"Vessel Name. - 2202\", \"archived\": false , \"date\": null , \"type\": \"voyage\", \"foreignKey\": \"1667622\", \"attributes\": { \"type\": \"DEFAULT\", \"vesselName\": \"Vessel Name\", \"displayName\": \"Vessel Name - 2202\", \"voyageNumber\": \"2202\", \"imo\": \"930215\" } } } }"}
+{"Master Data":52,"content":"Field ref, Field Name, Description, Format, Examples, and Source are key components of the document."}
+{"Master Data":53,"content":"The document outlines various fields and their descriptions, formats, and examples."}
+{"Master Data":54,"content":"Container for all fields"}
+{"Master Data":55,"content":"All Job Reference attributes"}
+{"Master Data":56,"content":"| jr-f3       | name         | Job Reference name                                                                                                                            | String                                                                       | Cape Alaska - 12345                                                                                                     | System      |"}
+{"Master Data":57,"content":"| jr-f4       | date         | Created Date associated with transaction                                                                                                      | Iso 8601                                                                     | 2020-02-06T 12:51:47Z                                                                                                   | System      |"}
+{"Master Data":58,"content":"Job Reference type is a string value."}
+{"Master Data":59,"content":"Unique id relating to alternate system is a string."}
+{"Master Data":60,"content":"These are self describing key value pairs."}
+{"Master Data":61,"content":"Other key value pairs may be included for future use, see format for string length constraint."}
+{"Master Data":62,"content":"Allowed values are 'true' or 'false'."}
+{"Master Data":63,"content":"The lowest level attributes section can be varied and attributes can be added in this section to support the customer's configuration."}
+{"Master Data":64,"content":"The data.attributes.name value is what shows as the job reference in SEDNA."}
+{"Master Data":65,"content":"The data.type value should indicate the type of job reference, which is useful when more than one job reference is applied."}
+{"Master Data":66,"content":"These 3 pieces of information should give you the ability to save the documents to your alternate system."}
+{"Master Data":67,"content":"The category tag event is the trigger that indicates the message or documents should be saved."}
+{"Master Data":68,"content":"The message id allows you to find the job reference id and the documents to be downloaded."}
+{"Master Data":69,"content":"The job reference attributes gives you the information to guide you to where the document should be saved."}
