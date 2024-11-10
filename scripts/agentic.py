@@ -12,7 +12,7 @@ import os
 import subprocess
 
 class OllamaEndpoint:
-    def __init__(self, message: str, url: str = "http://10.13.13.4:11434/api/generate", model: str = "llama3.2:latest"):
+    def __init__(self, message: str, url: str = "http://localhost:11434/api/generate", model: str = "llama3.2:latest"):
         self.message = str(message)
         self.url = url
         self.model = model
@@ -51,7 +51,7 @@ class OllamaEndpoint:
 
 
 class OllamaEmbeddingEndpoint:
-    def __init__(self, message: str, url: str = "http://10.13.13.4:11434/api/embed", model: str = "nomic-embed-text:137m-v1.5-fp16"):
+    def __init__(self, message: str, url: str = "http://localhost:11434/api/embed", model: str = "nomic-embed-text:137m-v1.5-fp16"):
         self.message = str(message)
         self.url = url
         self.model = model
@@ -122,15 +122,9 @@ for root, _, files in os.walk(directory_path):
     md_file_path = os.path.join(root, f"{filename}.md")
 
     print(f"Processing {file_path} => {md_file_path}")
-    cmd = f"docling {file_path}  --output {directory_path}"
+    cmd = f"docling {file_path}"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()  # Wait for the command to finish
-    
-    # Check for errors
-    if process.returncode != 0:
-        print(f"Error processing {file_path}: {stderr.decode()}")
-        continue
-
 
     # read the file
     loader = TextLoader(file_path=md_file_path)
@@ -148,7 +142,7 @@ for root, _, files in os.walk(directory_path):
         i += 1
 
 # Define Supabase credentials
-SUPABASE_URL = "http://10.13.13.4:8000"
+SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 TABLE_NAME = "n8n_documents_norm"
 
