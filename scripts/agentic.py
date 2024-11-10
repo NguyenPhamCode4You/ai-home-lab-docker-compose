@@ -1,0 +1,154 @@
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
+from langchain.chains import create_extraction_chain
+from typing import Optional, List
+from langchain.chains import create_extraction_chain_pydantic
+from langchain_core.pydantic_v1 import BaseModel
+import requests
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
+import pandas as pd
+import os
+
+class OllamaEndpoint:
+    def __init__(self, message: str, url: str = "http://10.13.13.4:11434/api/generate", model: str = "llama3.2:latest"):
+        self.message = str(message)
+        self.url = url
+        self.model = model
+        self.base_prompt = """
+        You are an expert at analyzing and extracting key sentences from a document.
+        1. Each key sentence can contain 1 to 3 original sentences.
+        2. Each key sentence should not exceed 200 characters.
+        3. Each key sentence should contain meaningful information.
+        4. Ignore key sentences that contain only numbers or special characters.
+        5. Ignore key sentences that contain less than 7 words.
+        6. For code, always try to keep them together as one key sentence.
+        7. Dont return blank sentences, or sentence with only special characters.
+
+        Here are the sentences from the document. Please truncate them into key sentences, each on a new line.
+        Return only the key sentences, nothing else, no extra information or explanations.
+        """
+
+    def run(self):
+        # Send the request to the Ollama API
+        response = requests.post(
+            self.url,
+            json={"model": self.model, "prompt": self.base_prompt + self.message, "stream": False}
+        )
+        
+        # Check if the response is successful
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        # Clean and format the JSON response
+        return self._clean_json_response(response.json())
+
+    def _clean_json_response(self, response_data):
+        # Assuming the API response has a 'response' field with the raw JSON text
+        response = response_data.get("response", "")
+        return response
+
+
+class OllamaEmbeddingEndpoint:
+    def __init__(self, message: str, url: str = "http://10.13.13.4:11434/api/embed", model: str = "nomic-embed-text:137m-v1.5-fp16"):
+        self.message = str(message)
+        self.url = url
+        self.model = model
+    
+    def run(self):
+        # Send the request to the Ollama API
+        response = requests.post(
+            self.url,
+            json={"model": self.model, "input": self.message}
+        )
+        
+        # Check if the response is successful
+        response_data = response.json()
+        
+        # Extract embeddings from the response data, assuming it's stored under a key called "embeddings"
+        embeddings = response_data.get("embeddings")
+        if embeddings is None:
+            raise ValueError("No embeddings found in the response.")
+        
+        # Return the embeddings
+        return embeddings[0]
+    
+class SupabaseVectorStore:
+    def __init__(self, url: str, token: str, table_name: str):
+        self.url = url
+        self.token = token
+        self.table_name = table_name
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.token}",
+            "apikey": self.token  # Supabase requires both Authorization and apikey headers
+        }
+
+    def insert_embedding(self, text: str, embedding: list[float]):
+        """
+        Inserts an embedding into the Supabase Postgres database.
+        
+        :param text: The original text for which the embedding was created.
+        :param embedding: A list of floats representing the embedding vector.
+        :return: The response from the Supabase API call.
+        """
+        data = {
+            "content": text,
+            "metadata": {},
+            "embedding": embedding
+        }
+        
+        response = requests.post(
+            f"{self.url}/rest/v1/{self.table_name}",
+            headers=self.headers,
+            json=data
+        )
+
+        # Check if the insertion was successful
+        if response.status_code != 201:
+            raise Exception(f"Failed to insert embedding: {response.status_code}, {response.text}")
+        
+        return True
+
+directory_path = './documents'
+converter = DocumentConverter()
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+
+key_sentences = []
+for root, _, files in os.walk(directory_path):
+  for file in files:
+    file_path = os.path.join(root, file)
+    # Call docling to get markdown text for the file
+    markdown_text = converter.convert(file_path).export_to_markdown()
+    # write the file to a temporary file md
+    with open(f"./chunked/{file}.md", "w") as f:
+      f.write(markdown_text)
+
+    # read the file
+    loader = TextLoader(file_path=f"./chunked/{file}.md")
+    documents = loader.load()
+    chunked_texts = text_splitter.split_documents(documents)
+
+    i = 0
+    for chunk in chunked_texts:
+      print(f"Chunk {i} of {len(chunked_texts)}")
+      ollama_response = OllamaEndpoint(chunk, model="gemma2:9b-instruct-q8_0").run()
+      ollama_response = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 7]
+      key_sentences.extend(ollama_response)
+
+# Define Supabase credentials
+SUPABASE_URL = "http://10.13.13.4:8000"
+SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
+TABLE_NAME = "n8n_documents_norm"
+
+supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
+
+j = 0
+for sentence in key_sentences:
+  print(f"Embedding {j} of {len(key_sentences)}")
+  embedding = OllamaEmbeddingEndpoint(sentence).run()
+  # Insert the embedding into the Supabase database
+  supabase.insert_embedding(sentence, embedding)
+  j += 1
+  print(f"Inserted {j} embeddings / {len(key_sentences)}")
+# from docling.document_converter import DocumentConverter
