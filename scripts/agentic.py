@@ -45,6 +45,23 @@ class OllamaEndpoint:
         [Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
         [Example Code] ```python def hello_world(): print("Hello, world!") ```
 
+        Here is another example of table:
+        # Product Comparison
+        | Product    | Price | Rating | Description                         |
+        |------------|-------|--------|-------------------------------------|
+        | Product A  | $10   | 4.5    | Affordable and high-quality.        |
+        | Product B  | $20   | 4.8    | Premium quality with extra features.|
+        | Product C  | $15   | 4.2    | Good value for the price.           |
+
+        # Summary
+        Product B has the highest rating and is recommended for users seeking premium features.
+
+        Output:
+        [Product Comparison] Product A is affordable and high-quality, priced at $10 with a 4.5 rating.
+        [Product Comparison] Product B, priced at $20, is premium quality with extra features and a 4.8 rating.
+        [Product Comparison] Product C offers good value at $15 with a 4.2 rating.
+        [Summary] Product B has the highest rating and is recommended for premium features.
+
         Now, please extract the key sentences from the following text: 
         """
 
