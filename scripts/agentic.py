@@ -27,6 +27,8 @@ class OllamaEndpoint:
         6. Markdown Titles as Keywords: Precede each key sentence with the title of its markdown section in square brackets as a keyword for context (e.g., [Introduction]).
         
         Here is an example of how to format your output:
+
+        Example -----------------------------------------------------
         # Introduction
         Markdown is a lightweight markup language with plain-text formatting syntax. 
 
@@ -38,6 +40,7 @@ class OllamaEndpoint:
         def hello_world():
             print("Hello, world!")
         ```
+        End of example.----------------------------------------------
 
         Output:
         [Introduction] Markdown is a lightweight markup language with plain-text formatting.
@@ -46,6 +49,8 @@ class OllamaEndpoint:
         [Example Code] ```python def hello_world(): print("Hello, world!") ```
 
         Here is another example of table:
+        
+        Example -----------------------------------------------------
         # Product Comparison
         | Product    | Price | Rating | Description                         |
         |------------|-------|--------|-------------------------------------|
@@ -55,12 +60,33 @@ class OllamaEndpoint:
 
         # Summary
         Product B has the highest rating and is recommended for users seeking premium features.
+        End of example.----------------------------------------------
 
         Output:
         [Product Comparison] Product A is affordable and high-quality, priced at $10 with a 4.5 rating.
         [Product Comparison] Product B, priced at $20, is premium quality with extra features and a 4.8 rating.
         [Product Comparison] Product C offers good value at $15 with a 4.2 rating.
         [Summary] Product B has the highest rating and is recommended for premium features.
+
+        Note:
+        - Always put the title of the markdown section in square brackets before the key sentence.
+        - For lines contain only the title, ignore them.
+        - For code blocks, keep them as one key sentence, if they are too long, put the function name or the main idea of the code block as the title.
+
+        Example -----------------------------------------------------
+        # Data Processing Code
+        ```python
+        def process_data(data):
+            # This function processes data by cleaning and transforming it
+            cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]
+            transformed_data = [int(item) for item in cleaned_data if item.isdigit()]
+            return transformed_data
+        ```
+        End of example.----------------------------------------------
+
+        Output
+        [Data Processing Code] ```python def process_data(data): cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]; ```
+        [Data Processing Code] ```python def process_data(data): transformed_data = [int(item) for item in cleaned_data if item.isdigit()]; return transformed_data```
 
         Now, please extract the key sentences from the following text: 
         """
