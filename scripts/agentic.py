@@ -148,7 +148,7 @@ for root, _, files in os.walk(directory_path):
 
     for chunk in chunked_texts:
       try:
-        ollama_response = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
+        ollama_response = OllamaEndpoint(chunk, model="gemma2:9b-instruct-q8_0").run()
         sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 9]
       except Exception as e:
         print(f"Error extracting sentences: {e}")
