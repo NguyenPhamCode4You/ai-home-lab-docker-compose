@@ -25,6 +25,7 @@ class OllamaEndpoint:
         4. Code Blocks: When a sentence includes code, keep it as one key sentence.
         5. Exclusion of Blank or Irrelevant Sentences: Do not return blank sentences or sentences with only special characters.
         6. Markdown Titles as Keywords: Precede each key sentence with the title of its markdown section in square brackets as a keyword for context (e.g., [Introduction]).
+        7. Seperated Sentences: Each key sentence should be separated by a "VNLPAGL".
         
         Here is an example of how to format your output:
 
@@ -43,10 +44,10 @@ class OllamaEndpoint:
         End of example.----------------------------------------------
 
         Output:
-        [Introduction] Markdown is a lightweight markup language with plain-text formatting.
-        [Introduction][Features] It is designed so that it can be converted to HTML and many other formats using a tool by the same name.
-        [Introduction][Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
-        [Introduction][Example Code] ```python def hello_world(): print("Hello, world!") ```
+        VNLPAGL[Introduction] Markdown is a lightweight markup language with plain-text formatting.
+        VNLPAGL[Introduction][Features] It is designed so that it can be converted to HTML and many other formats using a tool by the same name.
+        VNLPAGL[Introduction][Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
+        VNLPAGL[Introduction][Example Code] ```python def hello_world(): print("Hello, world!") ```
 
         Here is another example of table:
 
@@ -63,10 +64,10 @@ class OllamaEndpoint:
         End of example.----------------------------------------------
 
         Output:
-        [Product Comparison] Product A is affordable and high-quality, priced at $10 with a 4.5 rating.
-        [Product Comparison] Product B, priced at $20, is premium quality with extra features and a 4.8 rating.
-        [Product Comparison] Product C offers good value at $15 with a 4.2 rating.
-        [Summary] Product B has the highest rating and is recommended for premium features.
+        VNLPAGL[Product Comparison] Product A is affordable and high-quality, priced at $10 with a 4.5 rating.
+        VNLPAGL[Product Comparison] Product B, priced at $20, is premium quality with extra features and a 4.8 rating.
+        VNLPAGL[Product Comparison] Product C offers good value at $15 with a 4.2 rating.
+        VNLPAGL[Summary] Product B has the highest rating and is recommended for premium features.
 
         Note:
         - Always put the title of the markdown section in square brackets before the key sentence.
@@ -85,9 +86,10 @@ class OllamaEndpoint:
         End of example.----------------------------------------------
 
         Output
-        [Data Processing Code] ```python def process_data(data): cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]; ```
-        [Data Processing Code] ```python def process_data(data): transformed_data = [int(item) for item in cleaned_data if item.isdigit()]; return transformed_data```
+        VNLPAGL[Data Processing Code] ```python def process_data(data): cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]; ```
+        VNLPAGL[Data Processing Code] ```python def process_data(data): transformed_data = [int(item) for item in cleaned_data if item.isdigit()]; return transformed_data```
 
+        Again, always use "VNLPAGL" to separate key sentences.
         Now, please extract the key sentences from the following text: 
         """
 
@@ -173,7 +175,7 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
 
 file_index = 0
 sentence_index = 0
@@ -224,7 +226,7 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace("  ", "")
       try:
         ollama_response = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
-        sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 15]
+        sentences = [sentence for sentence in ollama_response.split("VNLPAGL") if len(sentence) > 7]
       except Exception as e:
         print(f"Error extracting sentences: {e}")
         continue
