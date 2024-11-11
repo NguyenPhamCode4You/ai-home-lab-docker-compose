@@ -188,6 +188,11 @@ supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
+    if (file_path.endswith(".md") == True):
+      print(f"Skipping {file_path}")
+      file_index += 1
+      continue
+
     filename = os.path.splitext(file)[0]
     md_file_path = os.path.join(root, f"{filename}.md")
 
