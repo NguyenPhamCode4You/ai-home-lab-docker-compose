@@ -208,6 +208,11 @@ for root, _, files in os.walk(directory_path):
       continue
 
     for chunk in chunked_texts:
+      chunk = chunk.strip()
+      chunk = chunk.replace("\n", " ")
+      chunk = chunk.replace("\r", " ")
+      chunk = chunk.replace("\t", " ")
+      chunk = chunk.replace("  ", "")
       try:
         ollama_response = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
         sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 9]
