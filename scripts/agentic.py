@@ -226,11 +226,10 @@ for root, _, files in os.walk(directory_path):
     
       for sentence in sentences:
         sentence = filename + ": " + sentence.strip()
-        print(f"File {file_index}/{len(files)} Sentence {sentence_index}: {sentence}")
         try:
             embedding = OllamaEmbeddingEndpoint(sentence).run()
             supabase.insert_embedding(sentence, embedding)
-            print(f"File {file_index}/{len(files)} Inserted embedding for: {sentence}")
+            print(f"File {file_index}/{len(files)} Success embedding for: {sentence}")
         except Exception as e:
             print(f"File {file_index}/{len(files)} Error inserting embedding for: {sentence}")
         
