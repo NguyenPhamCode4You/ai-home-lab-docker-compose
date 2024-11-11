@@ -32,10 +32,10 @@ class OllamaEndpoint:
         # Introduction
         Markdown is a lightweight markup language with plain-text formatting syntax. 
 
-        # Features
+        ## Features
         Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
 
-        # Example Code
+        ## Example Code
         ```python
         def hello_world():
             print("Hello, world!")
@@ -44,21 +44,21 @@ class OllamaEndpoint:
 
         Output:
         [Introduction] Markdown is a lightweight markup language with plain-text formatting.
-        [Introduction] It is designed so that it can be converted to HTML and many other formats using a tool by the same name.
-        [Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
-        [Example Code] ```python def hello_world(): print("Hello, world!") ```
+        [Introduction][Features] It is designed so that it can be converted to HTML and many other formats using a tool by the same name.
+        [Introduction][Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
+        [Introduction][Example Code] ```python def hello_world(): print("Hello, world!") ```
 
         Here is another example of table:
 
         Example -----------------------------------------------------
-        # Product Comparison
+        ## Product Comparison
         | Product    | Price | Rating | Description                         |
         |------------|-------|--------|-------------------------------------|
         | Product A  | $10   | 4.5    | Affordable and high-quality.        |
         | Product B  | $20   | 4.8    | Premium quality with extra features.|
         | Product C  | $15   | 4.2    | Good value for the price.           |
 
-        # Summary
+        ## Summary
         Product B has the highest rating and is recommended for users seeking premium features.
         End of example.----------------------------------------------
 
@@ -219,7 +219,7 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace("  ", "")
       try:
         ollama_response = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
-        sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 9]
+        sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 15]
       except Exception as e:
         print(f"Error extracting sentences: {e}")
         continue
