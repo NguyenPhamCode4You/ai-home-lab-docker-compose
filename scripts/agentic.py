@@ -163,6 +163,6 @@ for root, _, files in os.walk(directory_path):
             print(f"File {file_index}/{len(files)} Inserted embedding for: {sentence}")
         except Exception as e:
             print(f"File {file_index}/{len(files)} Error inserting embedding for: {sentence}")
+        
         sentence_index += 1
-
     file_index += 1
