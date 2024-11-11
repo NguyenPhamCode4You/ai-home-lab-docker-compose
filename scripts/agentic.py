@@ -173,7 +173,7 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=50)
 
 file_index = 0
 sentence_index = 0
