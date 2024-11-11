@@ -232,6 +232,8 @@ for root, _, files in os.walk(directory_path):
         continue
     
       for sentence in sentences:
+        if len(sentence) < 7 or sentence.isspace() or sentence.contains("**") or sentence.contains("----"):
+          continue
         sentence = filename + ": " + sentence.strip()
         try:
             embedding = OllamaEmbeddingEndpoint(sentence).run()
