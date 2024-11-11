@@ -208,6 +208,10 @@ for root, _, files in os.walk(directory_path):
       continue
 
     for chunk in chunked_texts:
+      if isinstance(chunk, str):
+        chunk = chunk
+      else:
+        chunk = str(chunk)
       chunk = chunk.strip()
       chunk = chunk.replace("\n", " ")
       chunk = chunk.replace("\r", " ")
