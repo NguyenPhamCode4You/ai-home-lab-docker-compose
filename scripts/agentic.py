@@ -17,17 +17,35 @@ class OllamaEndpoint:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an expert at analyzing and extracting key sentences from a document.
-        1. Each key sentence can contain 1 to 3 original sentences.
-        2. Each key sentence should not exceed 200 characters.
-        3. Each key sentence should contain meaningful information.
-        4. Ignore key sentences that contain only numbers or special characters.
-        5. Ignore key sentences that contain less than 7 words.
-        6. For code, always try to keep them together as one key sentence.
-        7. Dont return blank sentences, or sentence with only special characters.
+        You are an expert in analyzing markdown documents and extracting key sentences that convey essential information. Follow these guidelines to extract meaningful content:
 
-        Here are the sentences from the document. Please truncate them into key sentences, each on a new line.
-        Return only the key sentences, nothing else, no extra information or explanations.
+        1. Key Sentence Composition: Each key sentence should consist of 1 to 3 sentences from the original text.
+        2. Length Restriction: Limit each key sentence to a maximum of 200 characters.
+        3. Informational Value: Each key sentence must convey meaningful information, ignoring sentences that contain only numbers, special characters, or fewer than 7 words.
+        4. Code Blocks: When a sentence includes code, keep it as one key sentence.
+        5. Exclusion of Blank or Irrelevant Sentences: Do not return blank sentences or sentences with only special characters.
+        6. Markdown Titles as Keywords: Precede each key sentence with the title of its markdown section in square brackets as a keyword for context (e.g., [Introduction]).
+        
+        Here is an example of how to format your output:
+        # Introduction
+        Markdown is a lightweight markup language with plain-text formatting syntax. 
+
+        # Features
+        Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
+
+        # Example Code
+        ```python
+        def hello_world():
+            print("Hello, world!")
+        ```
+
+        Output:
+        [Introduction] Markdown is a lightweight markup language with plain-text formatting.
+        [Introduction] It is designed so that it can be converted to HTML and many other formats using a tool by the same name.
+        [Features] Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
+        [Example Code] ```python def hello_world(): print("Hello, world!") ```
+
+        Now, please extract the key sentences from the following text: 
         """
 
     def run(self):
