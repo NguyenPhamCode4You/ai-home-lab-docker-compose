@@ -49,7 +49,7 @@ class OllamaEndpoint:
         [Example Code] ```python def hello_world(): print("Hello, world!") ```
 
         Here is another example of table:
-        
+
         Example -----------------------------------------------------
         # Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -173,7 +173,7 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=50)
 
 file_index = 0
 sentence_index = 0
