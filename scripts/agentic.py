@@ -154,7 +154,7 @@ for root, _, files in os.walk(directory_path):
         print(f"Error extracting sentences: {e}")
         continue
     
-    for sentence in sentences:
+      for sentence in sentences:
         sentence = filename + ": " + sentence.strip()
         print(f"File {file_index}/{len(files)} Sentence {sentence_index}: {sentence}")
         try:
