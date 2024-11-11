@@ -138,19 +138,31 @@ for root, _, files in os.walk(directory_path):
     print(f"Finish file: {file_index} - {md_file_path}")
 
     # read the file
-    loader = TextLoader(file_path=md_file_path)
-    documents = loader.load()
-    chunked_texts = text_splitter.split_documents(documents)
+    try:
+      loader = TextLoader(file_path=md_file_path)
+      documents = loader.load()
+      chunked_texts = text_splitter.split_documents(documents)
+    except Exception as e:
+      print(f"Error loading documents: {e}")
+      continue
 
     for chunk in chunked_texts:
-      ollama_response = OllamaEndpoint(chunk, model="gemma2:9b-instruct-q8_0").run()
-      sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 9]
-      for sentence in sentences:
+      try:
+        ollama_response = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
+        sentences = [sentence for sentence in ollama_response.split("\n") if len(sentence) > 9]
+      except Exception as e:
+        print(f"Error extracting sentences: {e}")
+        continue
+    
+    for sentence in sentences:
         sentence = filename + ": " + sentence.strip()
         print(f"File {file_index}/{len(files)} Sentence {sentence_index}: {sentence}")
-        embedding = OllamaEmbeddingEndpoint(sentence).run()
-        supabase.insert_embedding(sentence, embedding)
-        print(f"File {file_index}/{len(files)} Inserted embedding for: {sentence}")
+        try:
+            embedding = OllamaEmbeddingEndpoint(sentence).run()
+            supabase.insert_embedding(sentence, embedding)
+            print(f"File {file_index}/{len(files)} Inserted embedding for: {sentence}")
+        except Exception as e:
+            print(f"File {file_index}/{len(files)} Error inserting embedding for: {sentence}")
         sentence_index += 1
 
     file_index += 1
