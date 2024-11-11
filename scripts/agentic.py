@@ -232,7 +232,7 @@ for root, _, files in os.walk(directory_path):
         continue
     
       for sentence in sentences:
-        if len(sentence) < 10 or sentence.isspace() or sentence.contains("**") or sentence.contains("----"):
+        if len(sentence) < 10 or sentence.isspace() or "**" in sentence or "----" in sentence:
           continue
         sentence = filename + ": " + sentence.strip()
         try:
