@@ -277,7 +277,8 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
+# text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=10)
 
 file_index = 0
 sentence_index = 0
@@ -323,58 +324,61 @@ for root, _, files in os.walk(directory_path):
       else:
         chunk = chunk.page_content
       
-      # chunk = chunk.strip()
-      # chunk = chunk.replace("\n", " ")
-      # chunk = chunk.replace("\r", " ")
-      # chunk = chunk.replace("\t", " ")
-      # chunk = chunk.replace("  ", "")
+      chunk = chunk.strip()
+      chunk = chunk.replace("\n", " ")
+      chunk = chunk.replace("\r", " ")
+      chunk = chunk.replace("\t", " ")
+      chunk = chunk.replace("  ", "")
+
+      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+        continue
       
-      # try:
-      #   datadata_responses = MetadataExtractor(chunk).run()
-      #   metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
-      # except Exception as e:
-      #   print(f"Error extracting sentences: {e}")
-      #   continue
+      try:
+        datadata_responses = MetadataExtractor(chunk).run()
+        metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      except Exception as e:
+        print(f"Error extracting sentences: {e}")
+        continue
     
-      # for metadata in metadatas:
-      #   metadata = filename + ":" + metadata.strip()
-      #   try:
-      #     embedding = CreateEmbedding(metadata).run()
-      #     # supabase.insert_embedding(sentence, embedding)
-      #     supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
-      #     print(f">>>>> File {file_index}/{len(files)} Chunk:\n\n\n {chunk}\n\n\n")
-      #     print(f">>>>>>> {metadata}\n\n\n\n\n\n")
-      #   except Exception as e:
-      #     print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
-      #   sentence_index += 1
+      for metadata in metadatas:
+        metadata = filename + ":" + metadata.strip()
+        try:
+          embedding = CreateEmbedding(metadata).run()
+          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+          print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+          print(f"....... {chunk}\n")
+          print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+        except Exception as e:
+          print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+        sentence_index += 1
 
       # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
       #   continue
       
-      parts_response = ChunkedTextExtractor(chunk).run()
-      parts = [part for part in parts_response.split("VNLPAGL") if len(part) > 10]
-      for part in parts:
-        part = part.strip()
-        part = part.replace("\n", " ")
-        part = part.replace("\r", " ")
-        part = part.replace("\t", " ")
-        part = part.replace("  ", "")
-        try:
-          metadata_responses = MetadataExtractor(part).run()
-          metadatas = [metadata for metadata in metadata_responses.split("VNLPAGL") if len(metadata) > 10]
-        except Exception as e:
-          print(f"Error extracting sentences: {e}")
-          continue
+      # parts_response = ChunkedTextExtractor(chunk).run()
+      # parts = [part for part in parts_response.split("VNLPAGL") if len(part) > 10]
+      # for part in parts:
+      #   part = part.strip()
+      #   part = part.replace("\n", " ")
+      #   part = part.replace("\r", " ")
+      #   part = part.replace("\t", " ")
+      #   part = part.replace("  ", "")
+      #   try:
+      #     metadata_responses = MetadataExtractor(part).run()
+      #     metadatas = [metadata for metadata in metadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      #   except Exception as e:
+      #     print(f"Error extracting sentences: {e}")
+      #     continue
         
-        for metadata in metadatas:
-          metadata = filename + ":" + metadata.strip()
-          try:
-            embedding = CreateEmbedding(metadata).run()
-            supabase.insert_embedding(text=part, embedding=embedding, metadata=metadata)
-            print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
-            print(f"....... {part}\n")
-            print(f">>>>>>> {metadata}\n\n\n\n\n\n")
-          except Exception as e:
-            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {part}\n\n\n\n\n")
-          sentence_index += 1
+      #   for metadata in metadatas:
+      #     metadata = filename + ":" + metadata.strip()
+      #     try:
+      #       embedding = CreateEmbedding(metadata).run()
+      #       supabase.insert_embedding(text=part, embedding=embedding, metadata=metadata)
+      #       print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+      #       print(f"....... {part}\n")
+      #       print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+      #     except Exception as e:
+      #       print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {part}\n\n\n\n\n")
+      #     sentence_index += 1
     file_index += 1
