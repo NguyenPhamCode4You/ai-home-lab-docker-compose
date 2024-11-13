@@ -310,7 +310,7 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace("\n", " ")
       chunk = chunk.replace("\r", " ")
       chunk = chunk.replace("\t", " ")
-      chunk = chunk.replace("  ", " ")
+      chunk = chunk.replace("  ", "")
 
       if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
         continue
