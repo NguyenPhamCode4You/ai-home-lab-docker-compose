@@ -315,7 +315,7 @@ for root, _, files in os.walk(directory_path):
       if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
         continue
       try:
-        datadata_responses = MetadataExtractor(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
+        datadata_responses = MetadataExtractor(chunk).run()
         metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
       except Exception as e:
         print(f"Error extracting sentences: {e}")
