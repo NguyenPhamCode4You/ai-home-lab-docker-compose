@@ -172,7 +172,7 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=20)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=120, chunk_overlap=10)
 
 file_index = 0
 sentence_index = 0
@@ -180,7 +180,7 @@ sentence_index = 0
 # Define Supabase credentials
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_norm"
+TABLE_NAME = "n8n_documents_768"
 
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
@@ -231,13 +231,13 @@ for root, _, files in os.walk(directory_path):
       for sentence in sentences:
         if len(sentence) < 10 or sentence.isspace() or "**" in sentence or "----" in sentence:
           continue
-        # sentence = filename + ": " + sentence.strip()
+        sentence = filename + ": " + sentence.strip()
         try:
             embedding = OllamaEmbeddingEndpoint(sentence).run()
             # supabase.insert_embedding(sentence, embedding)
             supabase.insert_embedding(text=chunk, embedding=embedding, metadata=sentence)
             print(f"File {file_index}/{len(files)} Success embedding for chunk: {chunk}")
-            print(f"File {file_index}/{len(files)} Imported Embeding for: {sentence}")
+            print(f"File {file_index}/{len(files)} >>>>>>> Imported Embeding for: {sentence}")
         except Exception as e:
             print(f"File {file_index}/{len(files)} Error inserting embedding for chunk: {chunk}")
         
