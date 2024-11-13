@@ -16,9 +16,8 @@ class ChunkedTextExtractor:
         self.base_prompt = """
         You are an expert in analyzing markdown documents and put a break between the key sentences. Follow the guidelines below:
 
-        1. Use "VNLPAGL" to separate key sentences.
-        2. Each key sentence should consist of 1 to 3 sentences from the original text.
-        3. Length Restriction: Limit each key sentence to a maximum of 250 characters.
+        1. Use "VNLPAGL" to separate between key sentences.
+        2. Length Restriction: Limit the length of each key sentence to less than 200 characters.
         
         Here is an example:
 
