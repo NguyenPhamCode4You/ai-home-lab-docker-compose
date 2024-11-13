@@ -295,14 +295,12 @@ for root, _, files in os.walk(directory_path):
       loader = TextLoader(file_path=md_file_path)
       documents = loader.load()
       # replace new lines with space inside the document
-      documents = [doc.replace("\n", " ") for doc in documents]
-      documents = [doc.replace("\r", " ") for doc in documents]
+      documents = [doc.page_content.replace("\n", " ") for doc in documents]
+      documents = [doc.page_content.replace("\r", " ") for doc in documents]
       # replace tabs with space inside the document
-      documents = [doc.replace("\t", " ") for doc in documents]
+      documents = [doc.page_content.replace("\t", " ") for doc in documents]
       # replace multiple spaces with single space inside the document
-      documents = [doc.replace("  ", " ") for doc in documents]
-      # remove empty documents
-      documents = [doc for doc in documents if len(doc) > 10]
+      documents = [doc.page_content.replace("  ", " ") for doc in documents]
       # split the documents into chunks
       chunked_texts = text_splitter.split_documents(documents)
 
