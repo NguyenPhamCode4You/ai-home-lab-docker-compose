@@ -327,10 +327,10 @@ for root, _, files in os.walk(directory_path):
             embedding = CreateEmbedding(metadata).run()
             # supabase.insert_embedding(sentence, embedding)
             supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
-            print(f"File {file_index}/{len(files)} Chunk: {chunk}\n")
-            print(f"File {file_index}/{len(files)} >>>>>>> Embeding: {metadata}\n\n\n")
+            print(f">>>>> File {file_index}/{len(files)} Chunk:\n {chunk}\n\n")
+            print(f">>>>>>> {metadata}\n\n\n\n\n")
         except Exception as e:
-            print(f"File {file_index}/{len(files)} \n\n\nError inserting embedding for chunk: {chunk}\n\n\n")
+            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
         
         sentence_index += 1
     file_index += 1
