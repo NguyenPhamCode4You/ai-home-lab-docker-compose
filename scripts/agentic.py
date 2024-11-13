@@ -215,7 +215,7 @@ for root, _, files in os.walk(directory_path):
       if isinstance(chunk, str):
         chunk = chunk
       else:
-        chunk = str(chunk)
+        chunk = chunk.page_content
       chunk = chunk.strip()
       chunk = chunk.replace("\n", " ")
       chunk = chunk.replace("\r", " ")
