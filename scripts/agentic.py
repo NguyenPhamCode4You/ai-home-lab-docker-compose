@@ -238,10 +238,10 @@ for root, _, files in os.walk(directory_path):
             embedding = OllamaEmbeddingEndpoint(sentence).run()
             # supabase.insert_embedding(sentence, embedding)
             supabase.insert_embedding(text=chunk, embedding=embedding, metadata=sentence)
-            print(f"File {file_index}/{len(files)} Success embedding for chunk: {chunk}")
-            print(f"File {file_index}/{len(files)} >>>>>>> Imported Embeding for: {sentence}")
+            print(f"File {file_index}/{len(files)} Chunk: {chunk}\n")
+            print(f"File {file_index}/{len(files)} >>>>>>> Embeding: {sentence}\n\n\n")
         except Exception as e:
-            print(f"File {file_index}/{len(files)} Error inserting embedding for chunk: {chunk}")
+            print(f"File {file_index}/{len(files)} \n\n\nError inserting embedding for chunk: {chunk}\n\n\n")
         
         sentence_index += 1
     file_index += 1
