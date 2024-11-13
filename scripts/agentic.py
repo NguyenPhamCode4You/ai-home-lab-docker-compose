@@ -327,8 +327,8 @@ for root, _, files in os.walk(directory_path):
             embedding = CreateEmbedding(metadata).run()
             # supabase.insert_embedding(sentence, embedding)
             supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
-            print(f">>>>> File {file_index}/{len(files)} Chunk:\n {chunk}\n\n")
-            print(f">>>>>>> {metadata}\n\n\n\n\n")
+            print(f">>>>> File {file_index}/{len(files)} Chunk:\n\n\n {chunk}\n\n\n")
+            print(f">>>>>>> {metadata}\n\n\n\n\n\n")
         except Exception as e:
             print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
         
