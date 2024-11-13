@@ -294,14 +294,6 @@ for root, _, files in os.walk(directory_path):
     try:
       loader = TextLoader(file_path=md_file_path)
       documents = loader.load()
-      # replace new lines with space inside the document
-      documents = [doc.page_content.replace("\n", " ") for doc in documents]
-      documents = [doc.page_content.replace("\r", " ") for doc in documents]
-      # replace tabs with space inside the document
-      documents = [doc.page_content.replace("\t", " ") for doc in documents]
-      # replace multiple spaces with single space inside the document
-      documents = [doc.page_content.replace("  ", " ") for doc in documents]
-      # split the documents into chunks
       chunked_texts = text_splitter.split_documents(documents)
 
     except Exception as e:
@@ -313,7 +305,13 @@ for root, _, files in os.walk(directory_path):
         chunk = chunk
       else:
         chunk = chunk.page_content
+      
       chunk = chunk.strip()
+      chunk = chunk.replace("\n", " ")
+      chunk = chunk.replace("\r", " ")
+      chunk = chunk.replace("\t", " ")
+      chunk = chunk.replace("  ", " ")
+
       if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
         continue
       try:
