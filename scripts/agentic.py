@@ -221,6 +221,8 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace("\r", " ")
       chunk = chunk.replace("\t", " ")
       chunk = chunk.replace("  ", "")
+      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+          continue
       try:
         chunked_responses = OllamaEndpoint(chunk, model="codegemma:7b-instruct-v1.1-q8_0").run()
         sentences = [sentence for sentence in chunked_responses.split("VNLPAGL") if len(sentence) > 10]
