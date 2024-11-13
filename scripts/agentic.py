@@ -14,19 +14,17 @@ class ChunkedTextExtractor:
     def __init__(self, message: str):
         self.message = str(message)
         self.base_prompt = """
-        You are an expert in analyzing markdown documents and extracting key sentences that convey essential information. Follow these guidelines to extract meaningful content:
+        You are an expert in analyzing markdown documents and put a break between the key sentences. Follow the guidelines below:
 
-        1. Key Sentence Composition: Each key sentence should consist of 1 to 3 sentences from the original text.
-        2. Length Restriction: Limit each key sentence to a maximum of 250 characters.
-        3. Replace the markdown title with the bracketed title, e.g., ## title -> [title].
+        1. Use "VNLPAGL" to separate key sentences.
+        2. Each key sentence should consist of 1 to 3 sentences from the original text.
+        3. Length Restriction: Limit each key sentence to a maximum of 250 characters.
         
-        Here is an example of how to format your output:
+        Here is an example:
 
         Example -----------------------------------------------------
         # Introduction
-        Markdown is a lightweight markup language with plain-text formatting syntax. 
-
-        ## Features
+        Markdown is a lightweight markup language with plain-text formatting syntax.
         Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
 
         ## Example Code
@@ -37,11 +35,17 @@ class ChunkedTextExtractor:
         End of example.----------------------------------------------
 
         Output:
-        VNLPAGL[Introduction] Markdown is a lightweight markup language with plain-text formatting.
-        VNLPAGL[Features] It is designed so that it can be converted to HTML and many other formats using a tool by the same name. Markdown supports headers, lists, emphasis, links, images. Syntax is designed for readability.
-        VNLPAGL[Example Code] ```python def hello_world(): print("Hello, world!") ```
+        # Introduction
+        Markdown is a lightweight markup language with plain-text formatting syntax.
+        Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
+        VNLPAGL
+        ## Example Code
+        ```python
+        def hello_world():
+            print("Hello, world!")
+        ```
 
-        6. For table, put the column name before the value, also dont forget the Markdown Titles as Keyword!
+        4. For table, put the column name before the value, also dont forget the Markdown Titles as Keyword!
         Here is the example of a table:
 
         Example -----------------------------------------------------
@@ -54,11 +58,12 @@ class ChunkedTextExtractor:
         End of example.----------------------------------------------
 
         Output:
-        VNLPAGL[Product Comparison] Product: Product A, Price: 10, Rating: 4.5, Description: Affordable and high-quality.
-        VNLPAGL[Product Comparison] Product: Product B, Price: 20, Rating: 4.8, Description: Premium quality with extra features.
-        VNLPAGL[Product Comparison] Product: Product C, Price: 15, Rating: 4.2, Description: Good value for the price.
+        [Product Comparison]
+        Product: Product A, Price: 10, Rating: 4.5, Description: Affordable and high-quality. Product: Product B, Price: 20, Rating: 4.8, Description: Premium quality with extra features.
+        VNLPAGL
+        [Product Comparison] Product: Product C, Price: 15, Rating: 4.2, Description: Good value for the price.
 
-        7. For Code block, always try to put them together as one row. 
+        7. For Code block, always try to put them together as one key sentence.
         8. If Code blocks are too long, seperated rows should also contain the function name at the beginning!
 
         Example -----------------------------------------------------
@@ -73,13 +78,26 @@ class ChunkedTextExtractor:
         End of example.----------------------------------------------
 
         Output
-        VNLPAGL[Data Processing Code] ```python def process_data(data): cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]; ```
-        VNLPAGL[Data Processing Code] ```python def process_data(data): transformed_data = [int(item) for item in cleaned_data if item.isdigit()]; return transformed_data```
+        [Data Processing Code] 
+        ```python
+        def process_data(data):
+            # This function processes data by cleaning and transforming it
+            cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]
+            ...
+        ```
+        VNLPAGL
+        [Data Processing Code] 
+        ```python
+        def process_data(data):
+            ...
+            transformed_data = [int(item) for item in cleaned_data if item.isdigit()]
+            return transformed_data
+        ```
 
         Again, Important Notes:
         - Always use "VNLPAGL" to separate key sentences.
-        - Always put the title of the markdown section in square brackets before the key sentence.
-        - For code blocks, try to keep them as one key sentence. If they are too long, put the function name or the main idea of the code block at the beginning!.
+        - Always put the title of the markdown section in square brackets.
+        - For code blocks, try to keep them as one key sentence. If they are too long, put the function name at the beginning of the next part.
         
         Now, please extract the key sentences from the following text: 
         """
@@ -260,7 +278,7 @@ class SupabaseVectorStore:
         return True
 
 directory_path = './documents'
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=10)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
 
 file_index = 0
 sentence_index = 0
@@ -268,7 +286,7 @@ sentence_index = 0
 # Define Supabase credentials
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_768"
+TABLE_NAME = "n8n_documents_norm"
 
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
@@ -306,31 +324,58 @@ for root, _, files in os.walk(directory_path):
       else:
         chunk = chunk.page_content
       
-      chunk = chunk.strip()
-      chunk = chunk.replace("\n", " ")
-      chunk = chunk.replace("\r", " ")
-      chunk = chunk.replace("\t", " ")
-      chunk = chunk.replace("  ", "")
-
-      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
-        continue
-      try:
-        datadata_responses = MetadataExtractor(chunk).run()
-        metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
-      except Exception as e:
-        print(f"Error extracting sentences: {e}")
-        continue
+      # chunk = chunk.strip()
+      # chunk = chunk.replace("\n", " ")
+      # chunk = chunk.replace("\r", " ")
+      # chunk = chunk.replace("\t", " ")
+      # chunk = chunk.replace("  ", "")
+      
+      # try:
+      #   datadata_responses = MetadataExtractor(chunk).run()
+      #   metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      # except Exception as e:
+      #   print(f"Error extracting sentences: {e}")
+      #   continue
     
-      for metadata in metadatas:
-        metadata = filename + ":" + metadata.strip()
+      # for metadata in metadatas:
+      #   metadata = filename + ":" + metadata.strip()
+      #   try:
+      #     embedding = CreateEmbedding(metadata).run()
+      #     # supabase.insert_embedding(sentence, embedding)
+      #     supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+      #     print(f">>>>> File {file_index}/{len(files)} Chunk:\n\n\n {chunk}\n\n\n")
+      #     print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+      #   except Exception as e:
+      #     print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+      #   sentence_index += 1
+
+      # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+      #   continue
+      
+      parts_response = ChunkedTextExtractor(chunk).run()
+      parts = [part for part in parts_response.split("VNLPAGL") if len(part) > 10]
+      for part in parts:
+        part = part.strip()
+        part = part.replace("\n", " ")
+        part = part.replace("\r", " ")
+        part = part.replace("\t", " ")
+        part = part.replace("  ", "")
         try:
-            embedding = CreateEmbedding(metadata).run()
-            # supabase.insert_embedding(sentence, embedding)
-            supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
-            print(f">>>>> File {file_index}/{len(files)} Chunk:\n\n\n {chunk}\n\n\n")
-            print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+          metadata_responses = MetadataExtractor(part).run()
+          metadatas = [metadata for metadata in metadata_responses.split("VNLPAGL") if len(metadata) > 10]
         except Exception as e:
-            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+          print(f"Error extracting sentences: {e}")
+          continue
         
-        sentence_index += 1
+        for metadata in metadatas:
+          metadata = filename + ":" + metadata.strip()
+          try:
+            embedding = CreateEmbedding(metadata).run()
+            supabase.insert_embedding(text=part, embedding=embedding, metadata=metadata)
+            print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+            print(f"....... {part}\n")
+            print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+          except Exception as e:
+            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {part}\n\n\n\n\n")
+          sentence_index += 1
     file_index += 1
