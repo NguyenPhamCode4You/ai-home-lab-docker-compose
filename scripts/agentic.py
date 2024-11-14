@@ -11,7 +11,9 @@ from SupabaseVectorStore import SupabaseVectorStore
 from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
+
 directory_path = './documents'
 file_index = 0
 sentence_index = 0
@@ -62,7 +64,7 @@ for root, _, files in os.walk(directory_path):
 
     loader = TextLoader(file_path=md_file_path)
     documents = loader.load()
-    paragraphs = text_splitter.split_documents(documents)
+    paragraphs = paragraph_splitter.split_documents(documents)
 
     for paragraph in paragraphs:
       try:
@@ -74,13 +76,13 @@ for root, _, files in os.walk(directory_path):
         paragraph = clean_text(paragraph)
         paragraph = TextFormater(paragraph).run()
 
-        print(f"oooooooooooo Processing paragraph:\n{paragraph}\n")
+        print(f"oooooooooooo Processing paragraph:\n{paragraph}")
 
         chunks_response = TextSpliter(paragraph).run()
 
         chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
         chunks = remove_dupplicated(chunks)
-        
+
         for chunk in chunks:
           chunk = clean_text(chunk)
           if word_count_less_than(chunk, 5):
@@ -94,6 +96,7 @@ for root, _, files in os.walk(directory_path):
 
           datadata_responses = MetadataExtractor(chunk).run()
           metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+          metadatas = remove_dupplicated(metadatas)
         
           for metadata in metadatas:
             metadata = filename + ":" + metadata.strip()
