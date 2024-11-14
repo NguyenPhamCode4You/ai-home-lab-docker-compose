@@ -67,6 +67,7 @@ class TextSpliter:
         Important:
             - Avoid adding any extra spaces, symbols, or labels such as "Chunk 1" or "Key Sentence."
             - Use only "VNLPAGL" as the chunk separator.
+            - Only return the text content without any additional explanations or comments.
 
         Now, apply these guidelines to split the following text into chunks: 
         """
