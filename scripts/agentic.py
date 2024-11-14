@@ -105,8 +105,10 @@ for root, _, files in os.walk(directory_path):
             print(f"............ {chunk}\n")
             print(f">>>>>>>>>>>> {metadata}\n")
             print(f"File {file_index}/{len(files)} - Sentence {sentence_index}\n")
+            
+            sentence_index += 1
+
       except Exception as e:
         print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk} {e}\n\n\n\n\n")
       
-      sentence_index += 1
     file_index += 1
