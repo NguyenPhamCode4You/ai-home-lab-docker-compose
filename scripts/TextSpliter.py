@@ -11,7 +11,7 @@ class TextSpliter:
         self.base_prompt = """
         You are an expert in segmenting text into concise, meaningful chunks. Follow these guidelines to split the provided text:
 
-        1. Chunk Length: Each chunk should be no longer than 250 characters.
+        1. Chunk Length: Each chunk should be no longer than 150 characters.
         2. Sentence Integrity: Split only at sentence boundaries, ensuring each chunk ends with a complete sentence.
         3. Separator: Use "VNLPAGL" exclusively to separate each chunk.
         4. Exceptions:
@@ -65,6 +65,7 @@ class TextSpliter:
         VNLPAGL Product Comparison: Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
 
         Important:
+            - Each chunk should be no longer than 150 characters.
             - Avoid adding any extra spaces, symbols, or labels such as "Chunk 1" or "Key Sentence."
             - Use only "VNLPAGL" as the chunk separator.
             - Only return the text content without any additional explanations or comments.

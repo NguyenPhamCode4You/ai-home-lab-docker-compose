@@ -11,7 +11,7 @@ from SupabaseVectorStore import SupabaseVectorStore
 from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=0)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 directory_path = './documents'
@@ -32,8 +32,14 @@ def word_count_less_than(chunk, count = 7):
   # Check if the word count is less than 5
   return word_count < count
 
-def remove_dupplicated(chunks):
-  return list(set(chunks))
+def remove_duplicated(chunks):
+    seen = set()
+    unique_chunks = []
+    for chunk in chunks:
+        if chunk not in seen:
+            unique_chunks.append(chunk)
+            seen.add(chunk)
+    return unique_chunks
 
 def clean_text(text):
   # Remove newlines, tabs, and extra spaces
