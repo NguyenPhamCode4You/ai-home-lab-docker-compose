@@ -74,6 +74,9 @@ for root, _, files in os.walk(directory_path):
       
       paragraph = clean_text(paragraph)
       paragraph = TextFormater(paragraph).run()
+
+      print(f"Processing paragraph: {paragraph}")
+      
       chunks_response = TextSpliter(paragraph).run()
 
       chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
