@@ -10,6 +10,87 @@ ollama_embeding_url = "http://localhost:11434/api/embed"
 ollama_instruct_model = "codegemma:7b-instruct-v1.1-q8_0"
 ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
 
+class ChunkValidator:
+    def __init__(self, message: str):
+        self.message = str(message)
+        self.base_prompt = """
+        You are an expert in analyzing markdown documents and validating the usefulness of the paragraph or sentences. Follow the guidelines below:
+        1. Read the paragraph or sentences and determine if it contains useful information.
+        2. If the paragraph or sentences contain useful information, return "Yes".
+        3. If the paragraph or sentences contain a code block or table, always return "Yes".
+        4. If the paragraph or sentences do not contain useful information, return "No".
+
+        How to determine if the paragraph or sentences doest not contain useful information:
+        - Too short or empty, just a few words or characters.
+        - Mostly only contains special characters, symbols, comments or annotations.
+        - Does not provide any meaningful information or context.
+        - Does not have any keywords or relevant entities.
+
+        Here is some example of useful and non-useful information:
+        
+        Example -----------------------------------------------------
+        # Introduction
+        Markdown is a lightweight markup language with plain-text formatting syntax. Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
+        End of example.----------------------------------------------
+
+        Output:
+        Yes
+
+        Example -----------------------------------------------------
+        <!-- image -->## Integration Support
+        End of example.----------------------------------------------
+
+        Output:
+        No
+
+        Example -----------------------------------------------------
+        # Data Processing Code
+        ```python
+        def process_data(data):
+            # This function processes data by cleaning and transforming it
+            cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]
+            transformed_data = [int(item) for item in cleaned_data if item.isdigit()]
+            return transformed_data
+        ```
+        End of example.----------------------------------------------
+
+        Output:
+        Yes
+
+        Example -----------------------------------------------------
+        | jr-f7 | attribute s| || Information | Description |
+        End of example.----------------------------------------------
+
+        Output:
+        No
+
+        Again, Important Notes:
+        - Always return "Yes" if the paragraph or sentences contain useful information.
+        - Always return "No" if the paragraph or sentences do not contain useful information.
+
+        Now, please validate the usefulness of the following text: 
+        """
+
+    def run(self):
+        # Send the request to the Ollama API
+        response = requests.post(
+            ollama_instruct_url,
+            json={"model": ollama_instruct_model, "prompt": self.base_prompt + self.message, "stream": False}
+        )
+        
+        # Check if the response is successful
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        # Clean and format the JSON response
+        return self._clean_json_response(response.json())
+
+    def _clean_json_response(self, response_data):
+        # Assuming the API response has a 'response' field with the raw JSON text
+        response = response_data.get("response", "")
+        return response
+
+
 class ChunkedTextExtractor:
     def __init__(self, message: str):
         self.message = str(message)
@@ -375,8 +456,7 @@ class SupabaseVectorStore:
 
 directory_path = './documents'
 # text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
-# text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=10)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=10)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=10)
 
 file_index = 0
 sentence_index = 0
@@ -422,16 +502,20 @@ for root, _, files in os.walk(directory_path):
       else:
         chunk = chunk.page_content
       
-      chunk = chunk.strip()
-      chunk = chunk.replace("\n", " ")
-      chunk = chunk.replace("\r", " ")
-      chunk = chunk.replace("\t", " ")
-      chunk = chunk.replace("  ", "")
-      chunk = chunk.replace("|||", "")
-      chunk = chunk.replace("| |", "")
-      chunk = chunk.replace(" | ", " - ")
+    #   chunk = chunk.strip()
+    #   chunk = chunk.replace("\n", " ")
+    #   chunk = chunk.replace("\r", " ")
+    #   chunk = chunk.replace("\t", " ")
+    #   chunk = chunk.replace("  ", "")
+    #   chunk = chunk.replace("|||", "")
+    #   chunk = chunk.replace("| |", "")
+    #   chunk = chunk.replace(" | ", " - ")
 
-      if len(chunk) < 15 or chunk.isspace() or "**" in chunk or "----" in chunk:
+    #   if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+    #     continue
+    
+      chunk_validation_response = ChunkValidator(chunk).run()
+      if "No" in chunk_validation_response.strip():
         continue
       
       try:
