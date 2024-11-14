@@ -2,7 +2,7 @@ import requests
 
 ollama_instruct_url = "http://localhost:11434/api/generate"
 ollama_embeding_url = "http://localhost:11434/api/embed"
-ollama_instruct_model = "codegemma:7b-instruct-v1.1-q8_0"
+ollama_instruct_model = "gemma2:9b-instruct-q8_0"
 ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
 
 class TextSpliter:
@@ -27,7 +27,11 @@ class TextSpliter:
         VNLPAGL Purpose: The purpose of the database in BVMS is to store and manage all relevant data related to cargo overview & voyage estimation, voyage management, voyage accounting, and master data.
         VNLPAGL Purpose: The database serves as a central repository for storing and retrieving voyage-related information and facilitating efficient order processing.
 
-        Now, please apply these guidelines to split the following text into chunks: 
+        Important:
+            - Avoid adding any extra spaces, symbols, or labels such as "Chunk 1" or "Key Sentence."
+            - Use only "VNLPAGL" as the chunk separator.
+
+        Now, apply these guidelines to split the following text into chunks: 
         """
 
     def run(self):
