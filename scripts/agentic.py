@@ -14,16 +14,21 @@ class ChunkValidator:
     def __init__(self, message: str):
         self.message = str(message)
         self.base_prompt = """
-        You are an expert in analyzing markdown documents and validating the usefulness of the paragraph or sentences.
-        1. How to determine if a paragraph is Useless:
-        - Too short or empty, just a few words, some random titles, or characters.
-        - Incomplete sentences or fragments with no context.
-        - Mostly only contains special characters or symbols.
+        You are an expert in analyzing markdown documents. Your task is to evaluate the usefulness of paragraphs or sentences based on the criteria below. Respond with "Yes" if useful, or "No" if not.
 
-        2. If not Useless, then return "Yes".
-        3. If the paragraph or sentences contain a code block or table, always return "Yes".
+        Guidelines:
+        When to return "No":
 
-        Here is some example of useful and non-useful information:
+        1. Length & Content: The text is too short, empty, or contains random words, titles, or characters.
+        2. Structure: Contains incomplete sentences or fragments that lack clear context.
+        3. Symbols: Consists primarily of special characters, symbols, or placeholders.
+        4. Names Only: Contains only names or attributions without additional content.
+        
+        When to return "Yes":
+        - Substantial Content: The paragraph or sentence is descriptive, complete, and informative.
+        - Code Blocks & Tables: Any text containing a code block or a table should always return "Yes," regardless of other factors.
+        
+        Examples of Useful and Non-Useful Information
         
         Example -----------------------------------------------------
         # Introduction
@@ -76,12 +81,14 @@ class ChunkValidator:
         Output:
         No
 
-        Again, Important Notes:
-        - Just return "Yes" or "No" as plain text.
-        - No extra explanation, notes, or additional information needed.
-        - Simply "Yes" or "No".
+        ### Important Notes:
+        - Only respond with "Yes" or "No" as plain text.
+        - Do not add extra explanations, comments, or additional information.
 
-        Now, please validate the usefulness of the following text: 
+        ---
+
+        **Text to Validate:**
+        
         """
 
     def run(self):
