@@ -11,7 +11,7 @@ from SupabaseVectorStore import SupabaseVectorStore
 from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
 directory_path = './documents'
 file_index = 0
 sentence_index = 0
@@ -29,6 +29,15 @@ def word_count_less_than(chunk, count = 7):
   word_count = len(cleaned_text.split())
   # Check if the word count is less than 5
   return word_count < count
+
+def clean_text(text):
+  # Remove newlines, tabs, and extra spaces
+  cleaned_text = text.trip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
+  cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
+  cleaned_text = cleaned_text.replace(" | ", "-")
+  cleaned_text = cleaned_text.replace("**", "").replace("--", "")
+
+  return cleaned_text
 
 for root, _, files in os.walk(directory_path):
   for file in files:
@@ -63,23 +72,13 @@ for root, _, files in os.walk(directory_path):
       else:
         paragraph = paragraph.page_content
       
-      paragraph = paragraph.strip()
-      paragraph = paragraph.replace("\n", " ")
-      paragraph = paragraph.replace("\r", " ")
-      paragraph = paragraph.replace("\t", " ")
-      paragraph = paragraph.replace("  ", "")
-      paragraph = paragraph.replace("|||", "")
-      paragraph = paragraph.replace("| |", "")
-      paragraph = paragraph.replace(" | ", " - ")
-      paragraph = paragraph.replace("**", "")
-      paragraph = paragraph.replace("--", "")
-
+      paragraph = clean_text(paragraph)
       paragraph = TextFormater(paragraph).run()
       chunks_response = TextSpliter(paragraph).run()
 
-      chunks = [chunk for chunk in chunks_response.split("VNLPAGL") if len(chunk) > 10]
+      chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
       for chunk in chunks:
-
+        chunk = clean_text(chunk)
         if word_count_less_than(chunk, 5):
           continue
 
