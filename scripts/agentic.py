@@ -32,7 +32,7 @@ def word_count_less_than(chunk, count = 7):
 
 def clean_text(text):
   # Remove newlines, tabs, and extra spaces
-  cleaned_text = text.trip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
+  cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
   cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
   cleaned_text = cleaned_text.replace(" | ", "-")
   cleaned_text = cleaned_text.replace("**", "").replace("--", "")
