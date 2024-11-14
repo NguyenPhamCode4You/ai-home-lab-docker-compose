@@ -88,7 +88,7 @@ class ChunkValidator:
         ---
 
         **Text to Validate:**
-        
+
         """
 
     def run(self):
@@ -532,9 +532,11 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace(" | ", " - ")
 
     #   if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
-      if len(chunk) < 20 or chunk.isspace() or "**" in chunk or "----" in chunk:
+      # Count the word count of chunk,first relace all special chars and number, then check word count if < 4 then skip
+
+      if ''.join(char for char in chunk if char.isalpha() or char.isspace()).split() < 5:
         continue
-    
+
       chunk_validation_response = ChunkValidator(chunk).run()
       print(f"Chunk: {chunk}")
       print(f"Chunk Validation Response: {chunk_validation_response}")
