@@ -50,6 +50,12 @@ class TextFormater:
         Output:
         Product Comparison: Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality. Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features. Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
         
+        Important:
+        - Keep the output concise and focused on the content.
+        - Ensure that the output is clean and free of any unnecessary characters or formatting.
+        - Do not include any special symbols or separators in the output.
+        - Do not add extra explanations, comments, or additional information.
+
         Now, please extract the key sentences from the following text: 
         """
 
