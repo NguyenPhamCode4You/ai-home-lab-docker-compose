@@ -551,46 +551,46 @@ for root, _, files in os.walk(directory_path):
       if "No" in chunk_validation_response.strip():
         continue
       
-      try:
-        questions_response = QuestionAsker(chunk).run()
-        questions = [question for question in questions_response.split("VNLPAGL") if len(question) > 10]
-      except Exception as e:
-        print(f"Error extracting sentences: {e}")
-        continue
-    
-      for question in questions:
-        question = filename + ":" + question.strip()
-        try:
-          embedding = CreateEmbedding(question).run()
-          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=question)
-          print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
-          print(f"....... {chunk}\n")
-          print(f">>>>>>> {question}\n\n\n\n\n\n")
-        except Exception as e:
-          print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
-        sentence_index += 1
-
-      # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
-      #   continue
-      
       # try:
-      #   datadata_responses = MetadataExtractor(chunk).run()
-      #   metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      #   questions_response = QuestionAsker(chunk).run()
+      #   questions = [question for question in questions_response.split("VNLPAGL") if len(question) > 10]
       # except Exception as e:
       #   print(f"Error extracting sentences: {e}")
       #   continue
     
-      # for metadata in metadatas:
-      #   metadata = filename + ":" + metadata.strip()
+      # for question in questions:
+      #   question = filename + ":" + question.strip()
       #   try:
-      #     embedding = CreateEmbedding(metadata).run()
-      #     supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+      #     embedding = CreateEmbedding(question).run()
+      #     supabase.insert_embedding(text=chunk, embedding=embedding, metadata=question)
       #     print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
       #     print(f"....... {chunk}\n")
-      #     print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+      #     print(f">>>>>>> {question}\n\n\n\n\n\n")
       #   except Exception as e:
       #     print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
       #   sentence_index += 1
+
+      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+        continue
+      
+      try:
+        datadata_responses = MetadataExtractor(chunk).run()
+        metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      except Exception as e:
+        print(f"Error extracting sentences: {e}")
+        continue
+    
+      for metadata in metadatas:
+        metadata = filename + ":" + metadata.strip()
+        try:
+          embedding = CreateEmbedding(metadata).run()
+          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+          print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+          print(f"....... {chunk}\n")
+          print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+        except Exception as e:
+          print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+        sentence_index += 1
 
       # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
       #   continue
