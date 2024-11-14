@@ -87,7 +87,7 @@ for root, _, files in os.walk(directory_path):
         chunks_response = TextSpliter(paragraph).run()
 
         chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
-        chunks = remove_dupplicated(chunks)
+        chunks = remove_duplicated(chunks)
 
         for chunk in chunks:
           chunk = clean_text(chunk)
@@ -102,7 +102,7 @@ for root, _, files in os.walk(directory_path):
 
           datadata_responses = MetadataExtractor(chunk).run()
           metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
-          metadatas = remove_dupplicated(metadatas)
+          metadatas = remove_duplicated(metadatas)
         
           for metadata in metadatas:
             metadata = filename + ":" + metadata.strip()
