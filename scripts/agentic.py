@@ -127,8 +127,7 @@ class QuestionAsker:
         You are an expert anylyzing markdown documents and ask at least 03 questions about the content. Follow the guidelines below:
         
         1. Provide questions that lead to the main idea or purpose of the paragraph or sentences.
-        2. Use "VNLPAGL" to separate between questions.
-        3. Length Restriction: Limit the total length of one question to be less than 500 characters.
+        2. Use \n to separate between questions.
         4. Always try to put keywords of the content in the question.
 
         Here is an example:
@@ -138,11 +137,12 @@ class QuestionAsker:
         End of example.----------------------------------------------
 
         Output:
-        VNLPAGL What is Markdown?
-        VNLPAGL What does Markdown support?
-        VNLPAGL Are lists, emphasis, links, and images supported by Markdown?
+        \n What is Markdown?
+        \n What does Markdown support?
+        \n Are lists, emphasis, links, and images supported by Markdown?
 
         5. For table, try to put lots of contents/keywords in each questions. Generate questions based on the content/items of the table.
+        6. If questions length become > 500 characters, use "VNLPAGL" to separate between questions.
         Example -----------------------------------------------------
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -153,11 +153,11 @@ class QuestionAsker:
         End of example.----------------------------------------------
 
         Output:
-        VNLPAGL What are the products compared based on?; What are the prices, ratings, and descriptions of the products?
-        VNLPAGL What is the description of Product A?; What is the price of Product B? What is the rating of Product C?
-        VNLPAGL What is the best value product?; What is the most expensive product?
-        VNLPAGL What product has the highest rating? What product has the lowest price?
-        VNLPAGL What are the features of Product B?; What are the features of Product C?
+        \n What are the products compared based on?; What are the prices, ratings, and descriptions of the products?
+        \n What is the description of Product A?; What is the price of Product B? What is the rating of Product C?
+        \n What is the best value product?; What is the most expensive product?
+        VNLPAGL\n What product has the highest rating? What product has the lowest price?
+        \n What are the features of Product B?; What are the features of Product C?
 
         6. For Code block, try to put the function name or API Url in the question.
         7. Try to infer the main idea or purpose of the code block and generate questions based on that.
@@ -174,11 +174,11 @@ class QuestionAsker:
         End of example.----------------------------------------------
         
         Output:
-        VNLPAGL What does the process_data function do?; 
-        VNLPAGL How does the process_data function clean and transform data?
-        VNLPAGL What is the API URL of process_data?; 
-        VNLPAGL What API need to be called to process data?
-        VNLPAGL What is the purpose of the process_data function?;
+        \n What does the process_data function do?; 
+        \n How does the process_data function clean and transform data?
+        \n What is the API URL of process_data?; 
+        \n What API need to be called to process data?
+        \n What is the purpose of the process_data function?;
 
         9. If the text is just a useless text, return only one VNLPAGL.
         Example -----------------------------------------------------
@@ -190,7 +190,7 @@ class QuestionAsker:
         VNLPAGL
 
         Again, Important Notes:
-        - Always use "VNLPAGL" to separate questions.
+        - Always use "\n" to separate questions, use "VNLPAGL" to separate if questions length become > 500 characters.
         - For table, try to put lots of contents/keywords in the questions. Ask questions based on the content/items of the table.
         - For Code block, try to put the function name or API Url in the question. Generate at least 05 questions for each code block.
         
