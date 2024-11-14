@@ -9,40 +9,25 @@ class TextSpliter:
     def __init__(self, message: str):
         self.message = str(message)
         self.base_prompt = """
-        You are an expert in analyzing and spliting paragraphs into meaningful chunks. Follow the guidelines below to split the text into chunks:
+        You are an expert in segmenting text into concise, meaningful chunks. Follow these guidelines to split the provided text:
 
-        1. Splited chunk should not be longer than 250 charracters each.
-        2. Each chunk should contains complete sentences (Sentences should be split at the end of a sentence, not in the middle).
-        3. Always use "VNLPAGL" as the separator between chunks.
-        4. If paragraph is too short, empty, or contains random words, titles, or characters, do not split it.
-        5. If paragraph too long, split it into multiple chunks, however, each child chunk should have the title of the parent paragraph at the beginning.
+        1. Chunk Length: Each chunk should be no longer than 250 characters.
+        2. Sentence Integrity: Split only at sentence boundaries, ensuring each chunk ends with a complete sentence.
+        3. Separator: Use "VNLPAGL" exclusively to separate each chunk.
+        4. Exceptions:
+            - If the paragraph is too short, empty, or contains only random words, titles, or isolated characters, do not split it.
+            - For longer paragraphs, split into multiple chunks, with each chunk starting with the title of the paragraph where applicable.
+        5. Consistency:
+            - Avoid adding any extra spaces, symbols, or labels such as "Chunk 1" or "Key Sentence."
+            - Use only "VNLPAGL" as the chunk separator.
+        
+        Example Input: Purpose: The purpose of the database in BVMS is to store and manage all relevant data related to cargo overview & voyage estimation, voyage management, voyage accounting, and master data. The database serves as a central repository for storing and retrieving voyage-related information and facilitating efficient order processing.
+        
+        Example Output:
+        VNLPAGL Purpose: The purpose of the database in BVMS is to store and manage all relevant data related to cargo overview & voyage estimation, voyage management, voyage accounting, and master data.
+        VNLPAGL Purpose: The database serves as a central repository for storing and retrieving voyage-related information and facilitating efficient order processing.
 
-        Example -----------------------------------------------------
-        Purpose: The purpose of the database in BVMS is to store and manage all relevant data related to cargo overview & voyage estimation, voyage management, voyage accounting and master data. The database serves as a central repository for storing and retrieving voyage-related information and facilitating efficient order processing.
-        Scope: The database encompasses the following key functionalities: 
-        - Cargo Overview & Voyage Estimation: storing and managing cargo, quote, estimation, shipment , fleet…
-        - Voyage Management: storing and managing vessel scheduling, voyage operation..
-        - Voyage Accounting: storing and managing invoice, payment, statement...
-        - Master data: storing and managing user roles & permission, port list, vessel information...
-        End of example.----------------------------------------------
-
-        Output:
-        Purpose: The purpose of the database in BVMS is to store and manage all relevant data related to cargo overview & voyage estimation, voyage management, voyage accounting and master data. 
-        VNLPAGL
-        Purpose: The database serves as a central repository for storing and retrieving voyage-related information and facilitating efficient order processing. 
-        VNLPAGL
-        Scope: The database encompasses the following key functionalities: - Cargo Overview & Voyage Estimation: storing and managing cargo, quote, estimation, shipment , fleet… 
-        VNLPAGL
-        Scope: - Voyage Management: storing and managing vessel scheduling, voyage operation.. - Voyage Accounting: storing and managing invoice, payment, statement... 
-        VNLPAGL
-        Scope: - Master data: storing and managing user roles & permission, port list, vessel information...
-
-        Important Note:
-        - Always use "VNLPAGL" as the separator between chunks, not any other special characters.
-        - Dont ever use Chunk 1, Chunk 2, Key Sentences or any other special characters to separate the chunks. Only use "VNLPAGL".
-        - Dont add any extra spaces or special characters to any of the chunks.
-
-        Now, please split the following text into meaningful chunks: 
+        Now, please apply these guidelines to split the following text into chunks: 
         """
 
     def run(self):
