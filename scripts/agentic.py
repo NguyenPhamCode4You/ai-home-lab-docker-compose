@@ -120,6 +120,87 @@ class ChunkedTextExtractor:
         response = response_data.get("response", "")
         return response
 
+class QuestionAsker:
+    def __init__(self, message: str):
+        self.message = str(message)
+        self.base_prompt = """
+        You are an expert anylyzing markdown documents and ask questions about the content. Follow the guidelines below:
+        1. Provide questions that lead to the main idea or purpose of the paragraph or sentences.
+        2. Use ";" to separate between questions.
+        3. Length Restriction: Limit the total length of all questions generated to be less than 300 characters.
+        4. Always try to put keywords of the content in the question.
+
+        Here is an example:
+        Example -----------------------------------------------------
+        # Introduction
+        Markdown is a lightweight markup language with plain-text formatting syntax. Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
+        End of example.----------------------------------------------
+
+        Output:
+        What is Markdown?; What does Markdown support?; Are lists, emphasis, links, and images supported by Markdown?
+
+        5. For table, try to put lots of contents/keywords in the questions.
+        6. If the questions become too long, use "VNLPAGL" to separate the questions.
+        Example -----------------------------------------------------
+        ## Product Comparison
+        | Product    | Price | Rating | Description                         |
+        |------------|-------|--------|-------------------------------------|
+        | Product A  | $10   | 4.5    | Affordable and high-quality.        |
+        | Product B  | $20   | 4.8    | Premium quality with extra features.|
+        | Product C  | $15   | 4.2    | Good value for the price.           |
+        End of example.----------------------------------------------
+
+        Output:
+        What are the products compared based on?; What are the prices, ratings, and descriptions of the products?
+        VNLPAGL What is the description of Product A?; What is the price of Product B? What is the rating of Product C?
+        VNLPAGL What is the best value product?; What is the most expensive product?
+        VNLPAGL What product has the highest rating? What product has the lowest price?
+
+        7. For Code block, try to put the function name or API Url in the question.
+        8. If the questions become too long, use "VNLPAGL" to separate the questions.
+
+        Example -----------------------------------------------------
+        api_url = "https://api.example.com/data"
+        def process_data(data):
+            # This function processes data by cleaning and transforming it
+            cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)]
+            transformed_data = [int(item) for item in cleaned_data if item.isdigit()]
+            return transformed_data
+        ```
+        End of example.----------------------------------------------
+        
+        Output:
+        What does the process_data function do?; How does the process_data function clean and transform data?
+        VNLPAGL What is the API URL of process_data?; What API need to be called to process data?
+
+        Again, Important Notes:
+        - Always use "VNLPAGL" to separate if questions become too long.
+        - For table, try to put lots of contents/keywords in the questions.
+        - For Code block, try to put the function name or API Url in the question.
+        
+        Now, please extract the questions from the following text:  
+        """
+
+    def run(self):
+        # Send the request to the Ollama API
+        response = requests.post(
+            ollama_instruct_url,
+            json={"model": ollama_instruct_model, "prompt": self.base_prompt + self.message, "stream": False}
+        )
+        
+        # Check if the response is successful
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        # Clean and format the JSON response
+        return self._clean_json_response(response.json())
+
+    def _clean_json_response(self, response_data):
+        # Assuming the API response has a 'response' field with the raw JSON text
+        response = response_data.get("response", "")
+        return response
+        
+
 class MetadataExtractor:
     def __init__(self, message: str):
         self.message = str(message)
@@ -286,7 +367,7 @@ sentence_index = 0
 # Define Supabase credentials
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_norm"
+TABLE_NAME = "n8n_documents_768"
 
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
@@ -334,23 +415,45 @@ for root, _, files in os.walk(directory_path):
         continue
       
       try:
-        datadata_responses = MetadataExtractor(chunk).run()
-        metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+        questions_response = QuestionAsker(chunk).run()
+        questions = [question for question in questions_response.split("VNLPAGL") if len(question) > 10]
       except Exception as e:
         print(f"Error extracting sentences: {e}")
         continue
     
-      for metadata in metadatas:
-        metadata = filename + ":" + metadata.strip()
+      for question in questions:
+        question = filename + ":" + question.strip()
         try:
-          embedding = CreateEmbedding(metadata).run()
-          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+          embedding = CreateEmbedding(question).run()
+          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=question)
           print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
           print(f"....... {chunk}\n")
-          print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+          print(f">>>>>>> {question}\n\n\n\n\n\n")
         except Exception as e:
           print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
         sentence_index += 1
+
+      # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+      #   continue
+      
+      # try:
+      #   datadata_responses = MetadataExtractor(chunk).run()
+      #   metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
+      # except Exception as e:
+      #   print(f"Error extracting sentences: {e}")
+      #   continue
+    
+      # for metadata in metadatas:
+      #   metadata = filename + ":" + metadata.strip()
+      #   try:
+      #     embedding = CreateEmbedding(metadata).run()
+      #     supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+      #     print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+      #     print(f"....... {chunk}\n")
+      #     print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+      #   except Exception as e:
+      #     print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+      #   sentence_index += 1
 
       # if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
       #   continue
