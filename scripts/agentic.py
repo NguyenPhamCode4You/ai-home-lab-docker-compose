@@ -53,18 +53,15 @@ def clean_text(text):
 for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
-    if (file_path.endswith(f".{file_output_format}") == True):
-      print(f"Skipping {file_path}")
-      file_index += 1
-      continue
-
     filename = os.path.splitext(file)[0]
     md_file_path = os.path.join(root, f"{filename}.{file_output_format}")
 
-    print(f"Processing {file_path} => {md_file_path}")
-    cmd = f"docling {file_path} --output {directory_path} --to {file_output_format} --table-mode accurate"
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()  # Wait for the command to finish
+    # check if md_file_path exists
+    if os.path.exists(md_file_path) == False:
+      print(f"Processing {file_path} => {md_file_path}")
+      cmd = f"docling {file_path} --output {directory_path} --to {file_output_format} --table-mode accurate"
+      process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      stdout, stderr = process.communicate()  # Wait for the command to finish
 
     print(f"Finish file: {file_index} - {md_file_path}")
 
