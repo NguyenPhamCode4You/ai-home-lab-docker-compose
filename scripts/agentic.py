@@ -30,6 +30,9 @@ def word_count_less_than(chunk, count = 7):
   # Check if the word count is less than 5
   return word_count < count
 
+def remove_dupplicated(chunks):
+  return list(set(chunks))
+
 def clean_text(text):
   # Remove newlines, tabs, and extra spaces
   cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
@@ -76,6 +79,8 @@ for root, _, files in os.walk(directory_path):
         chunks_response = TextSpliter(paragraph).run()
 
         chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
+        chunks = remove_dupplicated(chunks)
+        
         for chunk in chunks:
           chunk = clean_text(chunk)
           if word_count_less_than(chunk, 5):
