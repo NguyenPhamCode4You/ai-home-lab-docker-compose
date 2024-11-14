@@ -98,3 +98,32 @@ begin
 end;
 $$;
 ```
+
+```sql
+CREATE FUNCTION match_n8n_documents_ebook2 (
+  query_embedding VECTOR(768),
+  match_count INT DEFAULT NULL,
+  filter JSONB DEFAULT '{}'
+) RETURNS TABLE (
+  id BIGINT,
+  content TEXT,
+  metadata JSONB,
+  similarity FLOAT
+)
+LANGUAGE plpgsql
+AS $$
+#variable_conflict use_column
+BEGIN
+  RETURN QUERY
+  SELECT
+    id,
+    content,
+    metadata,
+    2 - ((n8n_documents_ebook.embedding <=> query_embedding) + (n8n_documents_ebook.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_ebook
+  WHERE metadata @> filter
+  ORDER BY similarity DESC
+  LIMIT match_count;
+END;
+$$;
+```
