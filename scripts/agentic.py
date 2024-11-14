@@ -57,57 +57,48 @@ for root, _, files in os.walk(directory_path):
 
     print(f"Finish file: {file_index} - {md_file_path}")
 
-    try:
-      loader = TextLoader(file_path=md_file_path)
-      documents = loader.load()
-      paragraphs = text_splitter.split_documents(documents)
-
-    except Exception as e:
-      print(f"Error loading documents: {e}")
-      continue
+    loader = TextLoader(file_path=md_file_path)
+    documents = loader.load()
+    paragraphs = text_splitter.split_documents(documents)
 
     for paragraph in paragraphs:
-      if isinstance(paragraph, str):
-        paragraph = paragraph
-      else:
-        paragraph = paragraph.page_content
-      
-      paragraph = clean_text(paragraph)
-      paragraph = TextFormater(paragraph).run()
+      try:
+        if isinstance(paragraph, str):
+          paragraph = paragraph
+        else:
+          paragraph = paragraph.page_content
+        
+        paragraph = clean_text(paragraph)
+        paragraph = TextFormater(paragraph).run()
 
-      print(f"oooooooooooo Processing paragraph:\n{paragraph}\n")
+        print(f"oooooooooooo Processing paragraph:\n{paragraph}\n")
 
-      chunks_response = TextSpliter(paragraph).run()
+        chunks_response = TextSpliter(paragraph).run()
 
-      chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
-      for chunk in chunks:
-        chunk = clean_text(chunk)
-        if word_count_less_than(chunk, 5):
-          continue
+        chunks = [chunk for chunk in chunks_response.split("VNLPAGL")]
+        for chunk in chunks:
+          chunk = clean_text(chunk)
+          if word_count_less_than(chunk, 5):
+            continue
 
-        # chunk_validation_response = ChunkValidator(chunk).run()
-        # print(f"Chunk: {chunk}\n")
-        # print(f"======>>>: {chunk_validation_response}")
-        # if "No" in chunk_validation_response.strip():
-        #   continue
+          # chunk_validation_response = ChunkValidator(chunk).run()
+          # print(f"Chunk: {chunk}\n")
+          # print(f"======>>>: {chunk_validation_response}")
+          # if "No" in chunk_validation_response.strip():
+          #   continue
 
-        try:
           datadata_responses = MetadataExtractor(chunk).run()
           metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
-        except Exception as e:
-          print(f"Error extracting sentences: {e}")
-          continue
-      
-        for metadata in metadatas:
-          metadata = filename + ":" + metadata.strip()
-          try:
+        
+          for metadata in metadatas:
+            metadata = filename + ":" + metadata.strip()
             embedding = CreateEmbedding(metadata).run()
             supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
             print(f"............ {chunk}\n")
             print(f">>>>>>>>>>>> {metadata}\n")
             print(f"File {file_index}/{len(files)} - Sentence {sentence_index}\n")
-          except Exception as e:
-            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
-          sentence_index += 1
-
+      except Exception as e:
+        print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk} {e}\n\n\n\n\n")
+      
+      sentence_index += 1
     file_index += 1
