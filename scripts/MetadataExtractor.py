@@ -78,6 +78,7 @@ class MetadataExtractor:
         - Always use "VNLPAGL" to separate key sentences.
         - Always include [k], [a], and [s] in the output.
         - [k] should contain keywords, [a] should contain verbs or adjectives, and [s] should contain a brief summary, less than 100 characters.
+        - Do not add extra explanations, comments, or additional information.
         
         Now, please extract the key sentences from the following text:  
         """
