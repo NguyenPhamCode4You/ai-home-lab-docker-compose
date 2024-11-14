@@ -65,8 +65,9 @@ class ChunkValidator:
         No
 
         Again, Important Notes:
-        - Always return "Yes" if the paragraph or sentences contain useful information.
-        - Always return "No" if the paragraph or sentences do not contain useful information.
+        - Just return "Yes" or "No" based on the usefulness of the paragraph or sentences.
+        - Return plain text without any explanation, notes, or additional information.
+        - Simply "Yes" or "No".
 
         Now, please validate the usefulness of the following text: 
         """
