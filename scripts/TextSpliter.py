@@ -37,6 +37,10 @@ class TextSpliter:
         VNLPAGL
         Scope: - Master data: storing and managing user roles & permission, port list, vessel information...
 
+        Important Note:
+        - Always use "VNLPAGL" as the separator between chunks, not any other special characters.
+        - Dont add any extra spaces or special characters to any of the chunks.
+        
         Now, please split the following text into meaningful chunks: 
         """
 

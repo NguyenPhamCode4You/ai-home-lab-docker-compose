@@ -22,7 +22,7 @@ SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhb
 TABLE_NAME = "n8n_documents_768"
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
     
-def word_count_less_than(chunk, count = 5):
+def word_count_less_than(chunk, count = 7):
   # Keep only alphabetic characters and spaces
   cleaned_text = ''.join(char for char in chunk if char.isalpha() or char.isspace())
   # Split by spaces to get the words and count them
