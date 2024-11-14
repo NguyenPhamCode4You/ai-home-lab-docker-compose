@@ -4,11 +4,42 @@ from langchain_community.document_loaders import TextLoader
 import pandas as pd
 import os
 import subprocess
+import xml.etree.ElementTree as ET
 
 ollama_instruct_url = "http://localhost:11434/api/generate"
 ollama_embeding_url = "http://localhost:11434/api/embed"
 ollama_instruct_model = "codegemma:7b-instruct-v1.1-q8_0"
 ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
+
+def create_text_chunks(xml_content, max_length=250):
+  # Parse the XML content
+  root = ET.fromstring(xml_content)
+  
+  # Collect all text from <paragraph> and <body> tags
+  texts = []
+  for paragraph in root.findall(".//paragraph"):
+      texts.append(paragraph.text.strip())
+  for body in root.findall(".//body"):
+      if body.text:
+          texts.append(body.text.strip())
+
+  # Generate chunks
+  chunks = []
+  current_chunk = ""
+  for text in texts:
+      # Add text if within the max length
+      if len(current_chunk) + len(text) + 1 <= max_length:
+          current_chunk += (text + " ")
+      else:
+          # Add current chunk to chunks list and start a new chunk
+          chunks.append(current_chunk.strip())
+          current_chunk = text + " "
+  
+  # Add the last chunk if there's any remaining text
+  if current_chunk:
+      chunks.append(current_chunk.strip())
+  
+  return chunks
 
 class ChunkValidator:
     def __init__(self, message: str):
@@ -499,30 +530,37 @@ supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 for root, _, files in os.walk(directory_path):
   for file in files:
     file_path = os.path.join(root, file)
-    if (file_path.endswith(".md") == True):
+    if (file_path.endswith(".doctags") == True):
       print(f"Skipping {file_path}")
       file_index += 1
       continue
 
     filename = os.path.splitext(file)[0]
-    md_file_path = os.path.join(root, f"{filename}.md")
+    md_file_path = os.path.join(root, f"{filename}.doctags")
 
     print(f"Processing {file_path} => {md_file_path}")
-    cmd = f"docling {file_path} --output {directory_path}"
+    cmd = f"docling {file_path} --output {directory_path} --to doctags --table-mode accurate"
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()  # Wait for the command to finish
 
     print(f"Finish file: {file_index} - {md_file_path}")
 
     # read the file
-    try:
-      loader = TextLoader(file_path=md_file_path)
-      documents = loader.load()
-      chunked_texts = text_splitter.split_documents(documents)
+    # try:
+    #   loader = TextLoader(file_path=md_file_path)
+    #   documents = loader.load()
+    #   chunked_texts = text_splitter.split_documents(documents)
 
-    except Exception as e:
-      print(f"Error loading documents: {e}")
-      continue
+    # except Exception as e:
+    #   print(f"Error loading documents: {e}")
+    #   continue
+
+    # Open file and read the content
+    with open(md_file_path, "r") as file:
+      xml_content = file.read()
+
+    # Create text chunks
+    chunked_texts = create_text_chunks(xml_content)
 
     for chunk in chunked_texts:
       if isinstance(chunk, str):
