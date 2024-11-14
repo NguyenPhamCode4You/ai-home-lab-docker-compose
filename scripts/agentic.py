@@ -11,7 +11,7 @@ from SupabaseVectorStore import SupabaseVectorStore
 from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=0)
 directory_path = './documents'
 file_index = 0
 sentence_index = 0
