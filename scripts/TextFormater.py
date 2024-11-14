@@ -25,7 +25,7 @@ class TextFormater:
         Output:
         Introduction: Markdown is a lightweight markup language with plain-text formatting syntax. Markdown supports headers, lists, emphasis, links, images, and more. Syntax is designed for readability.
         
-        2. If you see code blocks, put the whole function in the same line. Remove unnecessary spaces and special characters.
+        2. For code blocks, put the whole function in the same line. Remove unnecessary spaces and special characters.
         Example -----------------------------------------------------
         ## Example Code
         ```python
