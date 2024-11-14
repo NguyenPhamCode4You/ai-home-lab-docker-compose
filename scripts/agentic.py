@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import subprocess
 
-from scripts import ChunkValidator, CreateEmbedding, MetadataExtractor, SupabaseVectorStore
+from . import ChunkValidator, CreateEmbedding, MetadataExtractor, SupabaseVectorStore
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 directory_path = './documents'
 file_index = 0
