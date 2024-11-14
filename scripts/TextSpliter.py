@@ -39,7 +39,7 @@ class TextSpliter:
 
         Important Note:
         - Always use "VNLPAGL" as the separator between chunks, not any other special characters.
-        - Dont put **Chunk 1**, **Chunk 2**, **Key sentences** or any other special characters to separate the chunks.
+        - Dont ever use Chunk 1, Chunk 2, Key Sentences or any other special characters to separate the chunks. Only use "VNLPAGL".
         - Dont add any extra spaces or special characters to any of the chunks.
 
         Now, please split the following text into meaningful chunks: 
