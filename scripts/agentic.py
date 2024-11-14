@@ -14,17 +14,14 @@ class ChunkValidator:
     def __init__(self, message: str):
         self.message = str(message)
         self.base_prompt = """
-        You are an expert in analyzing markdown documents and validating the usefulness of the paragraph or sentences. Follow the guidelines below:
-        1. Read the paragraph or sentences and determine if it contains useful information.
-        2. If the paragraph or sentences contain useful information, return "Yes".
-        3. If the paragraph or sentences contain a code block or table, always return "Yes".
-        4. If the paragraph or sentences do not contain useful information, return "No".
+        You are an expert in analyzing markdown documents and validating the usefulness of the paragraph or sentences.
+        1. How to determine if a paragraph is Useless:
+        - Too short or empty, just a few words, some random titles, or characters.
+        - Incomplete sentences or fragments with no context.
+        - Mostly only contains special characters or symbols.
 
-        How to determine if the paragraph or sentences doest not contain useful information:
-        - Too short or empty, just a few words or characters.
-        - Mostly only contains special characters, symbols, comments or annotations.
-        - Does not provide any meaningful information or context.
-        - Does not have any keywords or relevant entities.
+        2. If not Useless, then return "Yes".
+        3. If the paragraph or sentences contain a code block or table, always return "Yes".
 
         Here is some example of useful and non-useful information:
         
@@ -38,6 +35,13 @@ class ChunkValidator:
 
         Example -----------------------------------------------------
         <!-- image -->## Integration Support
+        End of example.----------------------------------------------
+
+        Output:
+        No
+
+        Example -----------------------------------------------------
+        ** Important Note: ** Caculation
         End of example.----------------------------------------------
 
         Output:
@@ -73,8 +77,8 @@ class ChunkValidator:
         No
 
         Again, Important Notes:
-        - Just return "Yes" or "No" based on the usefulness of the paragraph or sentences.
-        - Return plain text without any explanation, notes, or additional information.
+        - Just return "Yes" or "No" as plain text.
+        - No extra explanation, notes, or additional information needed.
         - Simply "Yes" or "No".
 
         Now, please validate the usefulness of the following text: 
