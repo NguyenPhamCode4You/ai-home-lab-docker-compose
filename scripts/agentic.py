@@ -8,8 +8,10 @@ from ChunkValidator import ChunkValidator
 from CreateEmbedding import CreateEmbedding
 from MetadataExtractor import MetadataExtractor
 from SupabaseVectorStore import SupabaseVectorStore
+from TextFormater import TextFormater
+from TextSpliter import TextSpliter
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
 directory_path = './documents'
 file_index = 0
 sentence_index = 0
@@ -49,55 +51,61 @@ for root, _, files in os.walk(directory_path):
     try:
       loader = TextLoader(file_path=md_file_path)
       documents = loader.load()
-      chunked_texts = text_splitter.split_documents(documents)
+      paragraphs = text_splitter.split_documents(documents)
 
     except Exception as e:
       print(f"Error loading documents: {e}")
       continue
 
-    for chunk in chunked_texts:
-      if isinstance(chunk, str):
-        chunk = chunk
+    for paragraph in paragraphs:
+      if isinstance(paragraph, str):
+        paragraph = paragraph
       else:
-        chunk = chunk.page_content
+        paragraph = paragraph.page_content
       
-      chunk = chunk.strip()
-      chunk = chunk.replace("\n", " ")
-      chunk = chunk.replace("\r", " ")
-      chunk = chunk.replace("\t", " ")
-      chunk = chunk.replace("  ", "")
-      chunk = chunk.replace("|||", "")
-      chunk = chunk.replace("| |", "")
-      chunk = chunk.replace(" | ", " - ")
+      paragraph = paragraph.strip()
+      paragraph = paragraph.replace("\n", " ")
+      paragraph = paragraph.replace("\r", " ")
+      paragraph = paragraph.replace("\t", " ")
+      paragraph = paragraph.replace("  ", "")
+      paragraph = paragraph.replace("|||", "")
+      paragraph = paragraph.replace("| |", "")
+      paragraph = paragraph.replace(" | ", " - ")
+      paragraph = paragraph.replace("**", "")
+      paragraph = paragraph.replace("--", "")
 
-      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
-        continue
+      paragraph = TextFormater(paragraph).run()
+      chunks_response = TextSpliter(paragraph).run()
 
-      if word_count_less_than(chunk, 5):
-        continue
+      chunks = [chunk for chunk in chunks_response.split("VNLPAGL") if len(chunk) > 10]
+      for chunk in chunks:
 
-      chunk_validation_response = ChunkValidator(chunk).run()
-      print(f"Chunk: {chunk}\n")
-      print(f"======>>>: {chunk_validation_response}")
-      if "No" in chunk_validation_response.strip():
-        continue
+        if word_count_less_than(chunk, 5):
+          continue
 
-      try:
-        datadata_responses = MetadataExtractor(chunk).run()
-        metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
-      except Exception as e:
-        print(f"Error extracting sentences: {e}")
-        continue
-    
-      for metadata in metadatas:
-        metadata = filename + ":" + metadata.strip()
+        # chunk_validation_response = ChunkValidator(chunk).run()
+        # print(f"Chunk: {chunk}\n")
+        # print(f"======>>>: {chunk_validation_response}")
+        # if "No" in chunk_validation_response.strip():
+        #   continue
+
         try:
-          embedding = CreateEmbedding(metadata).run()
-          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
-          print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
-          print(f"....... {chunk}\n")
-          print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+          datadata_responses = MetadataExtractor(chunk).run()
+          metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
         except Exception as e:
-          print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
-        sentence_index += 1
+          print(f"Error extracting sentences: {e}")
+          continue
+      
+        for metadata in metadatas:
+          metadata = filename + ":" + metadata.strip()
+          try:
+            embedding = CreateEmbedding(metadata).run()
+            supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+            print(f">>>>> File {file_index}/{len(files)} - sentence {sentence_index}:")
+            print(f"....... {chunk}\n")
+            print(f">>>>>>> {metadata}\n\n\n\n\n\n")
+          except Exception as e:
+            print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk}\n\n\n\n\n")
+          sentence_index += 1
+
     file_index += 1
