@@ -82,7 +82,7 @@ class ChunkValidator:
         No
 
         ### Important Notes:
-        - Only respond with "Yes" or "No" as plain text.
+        - Respond with only 01 time of "Yes" or "No", as plain text.
         - Do not add extra explanations, comments, or additional information.
 
         ---
