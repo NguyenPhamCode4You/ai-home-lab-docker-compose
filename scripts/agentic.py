@@ -75,7 +75,7 @@ for root, _, files in os.walk(directory_path):
       paragraph = clean_text(paragraph)
       paragraph = TextFormater(paragraph).run()
 
-      print(f"ooooooooooooooo Processing paragraph:\n {paragraph}")
+      print(f"ooooooooooooooo Processing paragraph:\n {paragraph}\n\n\n")
 
       chunks_response = TextSpliter(paragraph).run()
 
