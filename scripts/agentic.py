@@ -64,6 +64,14 @@ class ChunkValidator:
         Output:
         No
 
+        5. If the paragraph just show the name of some persion, also return "No".
+        Example -----------------------------------------------------
+         | 01/04/2024 - @(Lexie) Trang Nguyen Ha(Unlicensed) - Messages| A| Add messages - 1.2 |
+        End of example.----------------------------------------------
+
+        Output:
+        No
+
         Again, Important Notes:
         - Just return "Yes" or "No" based on the usefulness of the paragraph or sentences.
         - Return plain text without any explanation, notes, or additional information.
@@ -457,7 +465,7 @@ class SupabaseVectorStore:
 
 directory_path = './documents'
 # text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=10)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 file_index = 0
 sentence_index = 0
@@ -512,7 +520,8 @@ for root, _, files in os.walk(directory_path):
       chunk = chunk.replace("| |", "")
       chunk = chunk.replace(" | ", " - ")
 
-      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+    #   if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+      if len(chunk) < 20 or chunk.isspace() or "**" in chunk or "----" in chunk:
         continue
     
       chunk_validation_response = ChunkValidator(chunk).run()
