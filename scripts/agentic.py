@@ -502,19 +502,21 @@ for root, _, files in os.walk(directory_path):
       else:
         chunk = chunk.page_content
       
-    #   chunk = chunk.strip()
-    #   chunk = chunk.replace("\n", " ")
-    #   chunk = chunk.replace("\r", " ")
-    #   chunk = chunk.replace("\t", " ")
-    #   chunk = chunk.replace("  ", "")
-    #   chunk = chunk.replace("|||", "")
-    #   chunk = chunk.replace("| |", "")
-    #   chunk = chunk.replace(" | ", " - ")
+      chunk = chunk.strip()
+      chunk = chunk.replace("\n", " ")
+      chunk = chunk.replace("\r", " ")
+      chunk = chunk.replace("\t", " ")
+      chunk = chunk.replace("  ", "")
+      chunk = chunk.replace("|||", "")
+      chunk = chunk.replace("| |", "")
+      chunk = chunk.replace(" | ", " - ")
 
-    #   if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
-    #     continue
+      if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
+        continue
     
       chunk_validation_response = ChunkValidator(chunk).run()
+      print(f"Chunk: {chunk}")
+      print(f"Chunk Validation Response: {chunk_validation_response}")
       if "No" in chunk_validation_response.strip():
         continue
       
