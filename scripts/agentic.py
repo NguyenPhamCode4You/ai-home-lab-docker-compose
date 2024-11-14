@@ -473,6 +473,14 @@ class SupabaseVectorStore:
             raise Exception(f"Failed to insert embedding: {response.status_code}, {response.text}")
         
         return True
+    
+def word_count_less_than(chunk, count = 5):
+  # Keep only alphabetic characters and spaces
+  cleaned_text = ''.join(char for char in chunk if char.isalpha() or char.isspace())
+  # Split by spaces to get the words and count them
+  word_count = len(cleaned_text.split())
+  # Check if the word count is less than 5
+  return word_count < count
 
 directory_path = './documents'
 # text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=10)
@@ -534,7 +542,7 @@ for root, _, files in os.walk(directory_path):
     #   if len(chunk) < 10 or chunk.isspace() or "**" in chunk or "----" in chunk:
       # Count the word count of chunk,first relace all special chars and number, then check word count if < 4 then skip
 
-      if ''.join(char for char in chunk if char.isalpha() or char.isspace()).split() < 5:
+      if word_count_less_than(chunk, 5):
         continue
 
       chunk_validation_response = ChunkValidator(chunk).run()
