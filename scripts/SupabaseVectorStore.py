@@ -16,7 +16,7 @@ class SupabaseVectorStore:
             "apikey": self.token  # Supabase requires both Authorization and apikey headers
         }
 
-    def insert_embedding(self, text: str, embedding: list[float], metadata: str = ""):
+    def insert_embedding(self, text: str, embedding: list[float], metadata: str = "", embedding2: list[float] = []):
         """
         Inserts an embedding into the Supabase Postgres database.
         
@@ -27,7 +27,8 @@ class SupabaseVectorStore:
         data = {
             "content": text,
             "metadata": { "extracted": metadata },
-            "embedding": embedding
+            "embedding": embedding,
+            "embedding2": embedding2
         }
         
         response = requests.post(
