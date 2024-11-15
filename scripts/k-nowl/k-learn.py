@@ -2,9 +2,10 @@ import os
 
 from LinesExtractor import LinesExtractor
 from SentenceSummarizer import SentenceSummarizer
-from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 from CreateEmbedding import CreateEmbedding
 from SupabaseVectorStore import SupabaseVectorStore
+from KeywordExtraction import KeywordExtraction
+from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
@@ -38,13 +39,16 @@ for root, _, files in os.walk(f"./{document_path}"):
                     print(f"Line: {line}\n")
 
                     sumarize = SentenceSummarizer(line).run()
+                    keyword = KeywordExtraction(line).run()
                     filename = CleanText(filename.replace(document_path, ""))
-                    metadata = f"[f]={filename}, [t]={header}, [s]={sumarize}"
+                    metadata = f"[f]={filename}/[t]={header}/[k]={keyword}"
                     print(f">>>>>>>>>>>> {metadata}\n")
 
-                    embedding = CreateEmbedding(line).run()
-                    embedding_metadata = CreateEmbedding(metadata).run()
-                    supabase.insert_embedding(text=line, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
+                    embedding1 = CreateEmbedding(metadata).run()
+                    embedding2 = CreateEmbedding(sumarize).run()
+                    content = f"{header}: {line}"
+
+                    supabase.insert_embedding(text=content, embedding=embedding1, metadata=metadata, embedding2=embedding2)
                     print(f"File {file_index}/{len(files)} - Line {line_index} - {file_path}\noooooooooooooooooooo \n\n\n\n\n")
                     line_index += 1
 
