@@ -37,14 +37,14 @@ for root, _, files in os.walk(f"./{document_path}"):
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 10]:
                     print(f"Line: {line}\n")
 
-                    sumarize = SentenceSummarizer(content).run()
-                    metadata = f"{filename} / {header} - {sumarize}"
+                    sumarize = SentenceSummarizer(line).run()
+                    metadata = f"[f]={filename}, [t]={header}, [s]={sumarize}"
                     print(f">>>>>>>>>>>> {metadata}\n")
 
-                    embedding = CreateEmbedding(content).run()
+                    embedding = CreateEmbedding(line).run()
                     embedding_metadata = CreateEmbedding(metadata).run()
-                    supabase.insert_embedding(text=content, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
-                    print(f"File {file_index}/{len(files)} - Line {line_index}\n - [{file_path}]")
+                    supabase.insert_embedding(text=line, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
+                    print(f"File {file_index}/{len(files)} - Line {line_index} - {file_path} \n")
                     line_index += 1
 
         file_index += 1

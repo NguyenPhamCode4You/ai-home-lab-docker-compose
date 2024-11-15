@@ -12,6 +12,7 @@ class SentenceSummarizer:
         Sumarize: 
         - Should be concise, clear, and informative, less than 100 characters.
         - Should mention the main topic, keyword of the text.
+        - Sumarize should be a complete sentence, shorter than the original text.
 
         Important:
         - Return only the formatted text.
