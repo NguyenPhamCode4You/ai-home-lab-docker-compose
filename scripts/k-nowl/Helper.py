@@ -34,7 +34,6 @@ def GetMarkdownHeaderAndContent(message: str):
         list of tuples: A list where each tuple contains a header and its associated content.
     """
     chunks = SplitByMarkdownHeader(message)
-    print(chunks)
     header_content_pairs = []
 
     for chunk in chunks:
