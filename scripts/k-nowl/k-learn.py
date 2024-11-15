@@ -27,7 +27,11 @@ for root, _, files in os.walk(f"./{document_path}"):
             sections = SplitByMarkdownHeader(document)
             for section in sections:
 
-                header, content = ExtractMarkdownHeadersAndContent(section)[0]
+                try:
+                    header, content = ExtractMarkdownHeadersAndContent(section)[0]
+                except Exception as e:
+                    print(f"Error: {e}")
+                    header, content = "", section
 
                 lines = LinesExtractor(content).run()
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 10]:
