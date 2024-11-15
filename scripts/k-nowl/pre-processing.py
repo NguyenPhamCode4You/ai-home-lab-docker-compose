@@ -12,8 +12,9 @@ for root, _, files in os.walk(f"./{document_path}"):
     for file in files:
         file_path = os.path.join(root, file)
         filename = os.path.splitext(file)[0]
-        
-        processed_file_path = os.path.join(root, f"{filename}.{processed_prefix}.md")
+
+        processed_root = os.path.join(root, processed_prefix)
+        processed_file_path = os.path.join(processed_root, f"{filename}.{processed_prefix}.md")
         if os.path.exists(processed_file_path):
             continue
 
