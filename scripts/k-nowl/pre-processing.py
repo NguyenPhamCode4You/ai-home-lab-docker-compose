@@ -6,7 +6,7 @@ from Helper import SplitByMarkdownHeader, RecursiveSplitSentences
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 1400
+section_max_length = 4000
 
 for root, _, files in os.walk(f"./{document_path}"):
     processed_root = root.replace(document_path, f"{processed_prefix}")
@@ -27,8 +27,12 @@ for root, _, files in os.walk(f"./{document_path}"):
             document = file.read()
             sections = SplitByMarkdownHeader(document)
             for section in sections:
-                # section_parts = RecursiveSplitSentences(section, section_max_length)
                 section_parts = [section]
+                
+                if len(section) > section_max_length:
+                    print(f"Section too long: {len(section)}")
+                    section_parts = RecursiveSplitSentences(section, section_max_length)
+
                 for section in section_parts:
                     section = DataPreProcessing(section).run()
                     print(section)
