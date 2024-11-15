@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 from DataPreProcessing import DataPreProcessing
-from Helpers import MarkdownHeaderMarker
+from ProcessMarkdownHeader import ProcessMarkdownHeader
 
 paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1250, chunk_overlap=0)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
@@ -12,18 +12,23 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 document_path = './BVMS-1.md'
 document_path = './Sedna.md'
 
-marker_char = 'VNLPAGL\n'
-
 formatted_chunks = []
 
-# Load the document using open
-with open(document_path, 'r') as f:
-    document = f.read()
-    document = MarkdownHeaderMarker(document, marker_char)
+loader = TextLoader(document_path)
+documents = loader.load()
+documents = paragraph_splitter.split_documents(documents)
 
-    sections = document.split(marker_char)
+for document in documents:
+    if isinstance(document, str):
+        document = document
+    else:
+        document = document.page_content
+
+    document = ProcessMarkdownHeader(document)
+    sections = [section for section in document.split("VNLPAGL") if len(section) > 5]
+
     for section in sections:
-        section = DataPreProcessing(section).run()
+        # section = DataPreProcessing(section).run()
         print(section)
         formatted_chunks.append(section)
 
