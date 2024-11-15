@@ -24,7 +24,7 @@ for document in documents:
     else:
         document = document.page_content
 
-    document = ProcessMarkdownHeader(document)
+    document = ProcessMarkdownHeader(document).run()
     sections = [section for section in document.split("VNLPAGL") if len(section) > 5]
 
     for section in sections:
