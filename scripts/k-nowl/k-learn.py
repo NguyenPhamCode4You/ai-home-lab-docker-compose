@@ -35,18 +35,21 @@ for root, _, files in os.walk(f"./{document_path}"):
                     header, content = "", section
 
                 lines = LinesExtractor(content).run()
-                for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 10]:
-                    print(f"Line: {line}\n")
+                for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
                     sumarize = SentenceSummarizer(line).run()
                     keyword = KeywordExtraction(line).run()
                     filename = CleanText(filename.replace(document_path, ""))
                     metadata = f"[f]={filename}/[t]={header}/[k]={keyword}"
-                    print(f">>>>>>>>>>>> {metadata}\n")
 
                     embedding1 = CreateEmbedding(metadata).run()
+                    print(f"Embedding1: {metadata}\n")
+
                     embedding2 = CreateEmbedding(sumarize).run()
+                    print(f"Embedding2: {sumarize}\n")
+
                     content = f"{header}: {line}"
+                    print(f"Content: {content}\n")
 
                     supabase.insert_embedding(text=content, embedding=embedding1, metadata=metadata, embedding2=embedding2)
                     print(f"File {file_index}/{len(files)} - Line {line_index} - {file_path}\noooooooooooooooooooo \n\n\n\n\n")
