@@ -32,8 +32,10 @@ class DataPreProcessing:
         - Keep them untouched, put all in 01 line, wrap them in a <code> block.
         
         Example:
+        ```
         def hello_world():
             print("Hello, world!")
+        ```
 
         Output: <code>def hello_world(): print("Hello, world!")</code>
 
