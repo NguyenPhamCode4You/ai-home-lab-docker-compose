@@ -76,6 +76,9 @@ class DataPreProcessing:
         ## Voyage Revenues
         Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch
 
+        6. For lists:
+        - Convert items to numbering format.
+
         The rest of the text should be kept as is.
         Important:
         - Return only the formatted text.

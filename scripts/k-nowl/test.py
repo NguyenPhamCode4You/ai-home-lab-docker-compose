@@ -1,30 +1,18 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import TextLoader
-import pandas as pd
 import os
 
 from DataPreProcessing import DataPreProcessing
 from Helper import SplitByMarkdownHeader
-
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1250, chunk_overlap=0)
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 document_path = './BVMS-1.md'
 document_path = './Sedna.md'
 
 formatted_chunks = []
 
-# loader = TextLoader(document_path)
-# documents = loader.load()
-# documents = paragraph_splitter.split_documents(documents)
-
-# Read the document using io
 with open(document_path, 'r') as file:
     document = file.read()
-
     sections = SplitByMarkdownHeader(document)
     for section in sections:
-        # section = DataPreProcessing(section).run()
+        section = DataPreProcessing(section).run()
         print(section)
         formatted_chunks.append(section)
 
