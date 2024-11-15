@@ -2,7 +2,7 @@ import os
 
 from LinesExtractor import LinesExtractor
 from SentenceSummarizer import SentenceSummarizer
-from Helper import SplitByMarkdownHeader
+from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent
 from CreateEmbedding import CreateEmbedding
 from SupabaseVectorStore import SupabaseVectorStore
 
@@ -27,19 +27,20 @@ for root, _, files in os.walk(f"./{document_path}"):
             sections = SplitByMarkdownHeader(document)
             for section in sections:
 
-                lines = LinesExtractor(section).run()
+                header, content = ExtractMarkdownHeadersAndContent(section)[0]
+
+                lines = LinesExtractor(content).run()
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 10]:
                     print(f"Line: {line}\n")
-                    # header, content = line.split("VNLHEAD###\n") if "VNLHEAD###\n" in line else ("", line)
 
-                    # sumarize = SentenceSummarizer(content).run()
-                    # metadata = f"{filename} / {header} - {sumarize}"
-                    # print(f">>>>>>>>>>>> {metadata}\n")
+                    sumarize = SentenceSummarizer(content).run()
+                    metadata = f"{filename} / {header} - {sumarize}"
+                    print(f">>>>>>>>>>>> {metadata}\n")
 
-                    # embedding = CreateEmbedding(content).run()
-                    # embedding_metadata = CreateEmbedding(metadata).run()
-                    # supabase.insert_embedding(text=content, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
-                    # print(f"File {file_index}/{len(files)} - Line {line_index}\n - [{file_path}]")
-                    # line_index += 1
+                    embedding = CreateEmbedding(content).run()
+                    embedding_metadata = CreateEmbedding(metadata).run()
+                    supabase.insert_embedding(text=content, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
+                    print(f"File {file_index}/{len(files)} - Line {line_index}\n - [{file_path}]")
+                    line_index += 1
 
         file_index += 1
