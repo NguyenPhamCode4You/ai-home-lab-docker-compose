@@ -8,7 +8,7 @@ from DataPreProcessing import DataPreProcessing
 paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1600, chunk_overlap=20)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
-document_path = './Sedna.md'
+document_path = './BVMS-1.md'
 
 loader = TextLoader(document_path)
 document = loader.load()
