@@ -18,9 +18,6 @@ for root, _, files in os.walk(f"./{document_path}"):
         filename = os.path.splitext(file)[0]
         
         processed_file_path = os.path.join(processed_root, f"{filename}.{processed_prefix}.md")
-        if os.path.exists(processed_file_path):
-            continue
-
         formatted_chunks = []
 
         with open(file_path, 'r') as file:
@@ -29,9 +26,9 @@ for root, _, files in os.walk(f"./{document_path}"):
             for section in sections:
                 section_parts = [section]
                 
-                if len(section) > section_max_length:
-                    print(f"Section too long: {len(section)}")
-                    section_parts = RecursiveSplitSentences(section, section_max_length)
+                # if len(section) > section_max_length:
+                #     print(f"Section too long: {len(section)}")
+                #     section_parts = RecursiveSplitSentences(section, section_max_length)
 
                 for section in section_parts:
                     section = DataPreProcessing(section).run()
