@@ -13,7 +13,6 @@ class DataPreProcessing:
         1. For tables:
         - Remove table formating
         - Convert each table rows into lines with "comma" joined [column name]: [value]
-        - Put "----------" at the start and end of the extracted table.
         Example:
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -23,12 +22,10 @@ class DataPreProcessing:
         | Product C  | $15   | 4.2    | Good value for the price.           |
 
         Output:
-        ----------
         ## Product Comparison
         Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality.
         Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features.
         Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
-        ----------
 
         2. For code blocks, api urls:
         - Keep them untouched, but put in same line.
