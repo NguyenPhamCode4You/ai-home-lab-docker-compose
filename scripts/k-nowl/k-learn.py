@@ -2,7 +2,7 @@ import os
 
 from LinesExtractor import LinesExtractor
 from SentenceSummarizer import SentenceSummarizer
-from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent
+from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 from CreateEmbedding import CreateEmbedding
 from SupabaseVectorStore import SupabaseVectorStore
 
@@ -38,6 +38,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     print(f"Line: {line}\n")
 
                     sumarize = SentenceSummarizer(line).run()
+                    filename = CleanText(filename.replace(document_path, ""))
                     metadata = f"[f]={filename}, [t]={header}, [s]={sumarize}"
                     print(f">>>>>>>>>>>> {metadata}\n")
 

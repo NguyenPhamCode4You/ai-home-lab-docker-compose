@@ -47,6 +47,16 @@ def ExtractMarkdownHeadersAndContent(text):
     
     return header_content_pairs
 
+def CleanText(text):
+  # Remove newlines, tabs, and extra spaces
+  cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
+  cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
+  cleaned_text = cleaned_text.replace(" | ", "-")
+  cleaned_text = cleaned_text.replace("**", "").replace("--", "")
+  cleaned_text = cleaned_text.replace("-", " ")
+
+  return cleaned_text
+
 def RecursiveSplitSentences(document: str, limit: int = 1000):
     # Split the document into sentences
     sentences = document.split(".")
