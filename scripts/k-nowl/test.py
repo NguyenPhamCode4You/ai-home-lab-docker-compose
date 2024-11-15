@@ -36,4 +36,4 @@ filename = os.path.splitext(file)[0]
 processd_file_path = os.path.join(root, f"{filename}.{formated_prefix}.md")
 
 with open(processd_file_path, 'w') as f:
-    f.write('----------\n'.join(formatted_chunks))
+    f.write('\n----------\n'.join(formatted_chunks))
