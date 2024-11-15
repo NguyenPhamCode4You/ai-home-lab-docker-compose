@@ -30,11 +30,12 @@ class DataPreProcessing:
 
         3. For code blocks, api urls:
         - Keep them untouched, but put in same line.
+        - Try infer the programming language if possible.
         Example:
-        ```python
+
         def hello_world():
             print("Hello, world!")
-        ```
+
         Output:
         ```python def hello_world(): print("Hello, world!")```
 
