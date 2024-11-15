@@ -10,9 +10,21 @@ class DataPreProcessing:
         self.message = str(message)
         self.base_prompt = """
         You are an expert at re-formatting markdown text for further processing.
-        1. For tables:
+
+        1. For markdown headers:
+        - Remove the formatting, use the word: "Title" for it.
+        - Put a line break after each header.
+        Example:
+        # Markdown Header 1
+        ## Markdown Header 2
+        Output:
+        Title: Markdown Header 1\n
+        Title: Markdown Header 2\n
+
+        2. For tables:
         - Remove table formating
         - Convert each table rows into lines with "comma" joined [column name]: [value]
+        - Put a line break after each
         Example:
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -23,22 +35,24 @@ class DataPreProcessing:
 
         Output:
         ## Product Comparison
-        Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality.
-        Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features.
-        Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
+        Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality.\n
+        Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features.\n
+        Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.\n
 
-        2. For code blocks, api urls:
+        3. For code blocks, api urls:
         - Keep them untouched, but put in same line.
+        - Put a line break after the line.
         Example:
         ```python
         def hello_world():
             print("Hello, world!")
         ```
         Output:
-        ```python def hello_world(): print("Hello, world!")```
+        ```python def hello_world(): print("Hello, world!")```\n
 
-        3. For sentences or lines with length < 10 chars:
+        4. For sentences or lines with length < 10 chars:
         - Combine them into a single line.
+        - Put a line break at the end.
         Example:
         ---
         VOYAGE MANAGEMENT SYSTEM
@@ -55,11 +69,12 @@ class DataPreProcessing:
         ---
 
         Output:
-        VOYAGE MANAGEMENT SYSTEM, High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information
+        VOYAGE MANAGEMENT SYSTEM, High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information\n
 
-        4. For repeated lines or tables:
+        5. For repeated lines or tables:
         - Remove the repeated values, make the unique values comma separated.
         - Remove numbers, special characters, formatting.
+        - Put a line break at the end.
 
         Example:
         | Voyage Revenues      | Voyage Revenues      | Voyage Revenues      | 1.345.150      |
@@ -70,7 +85,7 @@ class DataPreProcessing:
         | Despatch             | Despatch             | Despatch             | 21.500         |
 
         Output:
-        Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch
+        Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch\n
 
         The rest of the text should be kept as is.
         Important:
