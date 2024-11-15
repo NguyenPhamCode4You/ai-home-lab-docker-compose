@@ -12,7 +12,7 @@ from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 from Helper import word_count_less_than, remove_duplicated, clean_text
 
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1200, chunk_overlap=0)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 directory_path = './documents'
@@ -22,7 +22,7 @@ file_output_format = "md"
 
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_768"
+TABLE_NAME = "n8n_documents_ebook"
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
     
 for root, _, files in os.walk(directory_path):
@@ -63,7 +63,7 @@ for root, _, files in os.walk(directory_path):
 
         for chunk in chunks:
           chunk = clean_text(chunk)
-          if word_count_less_than(chunk, 5):
+          if word_count_less_than(chunk, 3):
             continue
 
           # chunk_validation_response = ChunkValidator(chunk).run()
@@ -78,8 +78,9 @@ for root, _, files in os.walk(directory_path):
         
           for metadata in metadatas:
             metadata = filename + ":" + metadata.strip()
-            embedding = CreateEmbedding(metadata).run()
-            supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata)
+            embedding = CreateEmbedding(chunk).run()
+            embedding2 = CreateEmbedding(metadata).run()
+            supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata, embedding2=embedding2)
             print(f"............ {chunk}\n")
             print(f">>>>>>>>>>>> {metadata}\n")
             print(f"File {file_index}/{len(files)} - Sentence {sentence_index}\n")
