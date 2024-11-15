@@ -2,7 +2,7 @@ import os
 
 from LinesExtractor import LinesExtractor
 from SentenceSummarizer import SentenceSummarizer
-from Helper import SplitByMarkdownHeader, GetMarkdownHeaderAndContent
+from Helper import SplitByMarkdownHeader
 from CreateEmbedding import CreateEmbedding
 from SupabaseVectorStore import SupabaseVectorStore
 
