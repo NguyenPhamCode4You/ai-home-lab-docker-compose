@@ -12,6 +12,9 @@ for root, _, files in os.walk(document_path):
         filename = os.path.splitext(file)[0]
         
         processed_file_path = os.path.join(root, f"{filename}.{processed_prefix}.md")
+        if os.path.exists(processed_file_path):
+            continue
+        
         formatted_chunks = []
 
         with open(file_path, 'r') as file:
