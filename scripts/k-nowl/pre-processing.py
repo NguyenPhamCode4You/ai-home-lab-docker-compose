@@ -36,4 +36,4 @@ for root, _, files in os.walk(f"./{document_path}"):
                     formatted_chunks.append(section)
 
         with open(processed_file_path, 'w') as f:
-            f.write('\n----------\n'.join(formatted_chunks))
+            f.write('\n'.join(formatted_chunks))

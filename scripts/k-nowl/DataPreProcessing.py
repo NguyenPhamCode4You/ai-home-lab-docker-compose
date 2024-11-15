@@ -1,9 +1,7 @@
 import requests
 
 ollama_instruct_url = "http://localhost:11434/api/generate"
-ollama_embeding_url = "http://localhost:11434/api/embed"
 ollama_instruct_model = "gemma2:9b-instruct-q8_0"
-ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
 
 class DataPreProcessing:
     def __init__(self, message: str):
