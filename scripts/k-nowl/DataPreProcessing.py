@@ -62,7 +62,7 @@ class DataPreProcessing:
 
         5. For tables with repeated values
         - Remove the repeated values, make the unique values comma separated.
-        - Remove numbers, special characters, formatting.
+        - Remove numbers, special characters, formatting, spaces issues.
 
         Example:
         | Voyage Revenues      | Voyage Revenues      | Voyage Revenues      | 1.345.150      |
