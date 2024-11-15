@@ -14,3 +14,26 @@ def SplitByMarkdownHeader(message: str):
         content = parts[i + 1].strip() if i + 1 < len(parts) else ""
         chunks.append(f"{header}\n{content}")
     return chunks
+
+def RecursiveSplitSentences(document: str, limit: int = 1000):
+    # Split the document into sentences
+    sentences = document.split(".")
+    
+    # Recursively split long sentences
+    paragraphs = []
+    paragraph = ""
+    while len(sentences) > 0:
+        sentence = sentences.pop(0)
+        if len(paragraph) + len(sentence) < limit:
+            paragraph += f"{sentence.strip()}. "
+        else:
+            paragraphs.append(paragraph.strip())
+            paragraph = f"{sentence.strip()}. "
+
+    # Add the last paragraph
+    if len(paragraph) > 0:
+        paragraphs.append(paragraph.strip())
+
+    return paragraphs
+
+    
