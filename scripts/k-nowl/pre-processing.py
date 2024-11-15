@@ -9,7 +9,7 @@ processed_prefix = 'processed'
 section_max_length = 1400
 
 for root, _, files in os.walk(f"./{document_path}"):
-    processed_root = os.path.join(root, processed_prefix)
+    processed_root = root.replace(document_path, f"{processed_prefix}")
     if not os.path.exists(processed_root):
         os.makedirs(processed_root)
 
@@ -27,7 +27,8 @@ for root, _, files in os.walk(f"./{document_path}"):
             document = file.read()
             sections = SplitByMarkdownHeader(document)
             for section in sections:
-                section_parts = RecursiveSplitSentences(section, section_max_length)
+                # section_parts = RecursiveSplitSentences(section, section_max_length)
+                section_parts = [section]
                 for section in section_parts:
                     section = DataPreProcessing(section).run()
                     print(section)
