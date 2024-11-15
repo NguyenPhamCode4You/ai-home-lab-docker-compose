@@ -10,14 +10,13 @@ class ProcessMarkdownHeader:
         self.message = str(message)
         self.base_prompt = """
         Your task is to process markdown headers. Markdown headers are denoted by "#" symbols at the beginning of a line. 
-        The number of "#" symbols indicates the level of the header. For example, "# Header 1" is a level 1 header, "## Header 2" is a level 2 header, and so on.
+        The number of "#" symbols indicates the level of the header. 
+        For example, "# Header 1" is a level 1 header, "## Header 2" is a level 2 header, and so on.
 
         Now do the following steps:
-        1. Recognize the markdown headers and their levels.
-        2. Put the parent header as prefix to the child header, seperated bt "/" to get a new header.
-        3. Replace the original header with the new header.
-        4. Then, add a marker character 'VNLPAGL' before the header.
-        5. The content under the header should remain unchanged.
+        1. Recognize the markdown headers.
+        2. Add a marker character 'VNLPAGL' before each header.
+        3. The content should be kept as is.
 
         Example:
         # Header 1
@@ -30,16 +29,16 @@ class ProcessMarkdownHeader:
         Output:
         VNLPAGL# Header 1
         Content 1, content 1, content 1.
-        VNLPAGL# Header 1/Header 2
+        VNLPAGL## Header 2
         Content 2, content 2, content 2.
-        VNLPAGL# Header 1/Header 2/Header 3
+        VNLPAGL## Header 3
         Content 3, content 3, content 3.
         
         Important:
-        - Return only the formatted result.
         - Do not include the base prompt in the response.
         - Do not include the input text in the response.
         - Do not include any additional information.
+        - Return only the formatted result.
 
         Now, please re-format the following text: 
         """
