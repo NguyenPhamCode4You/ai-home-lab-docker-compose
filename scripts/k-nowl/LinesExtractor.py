@@ -22,6 +22,14 @@ class LinesExtractor:
         VNLPAGL\nThis is another bullet point.
         VNLPAGL\nThis is the last bullet point.
 
+        5. If markdown header is included in the text, put it as the first line of the text, followed by "VNLHEAD###\n".
+        Example:
+        ### This is a header.
+        This is the content of the header.
+
+        Output:
+        This is a header.VNLHEAD###\n
+
         Important:
         - Return only the formatted text.
         - Do not include the base prompt in the response.
