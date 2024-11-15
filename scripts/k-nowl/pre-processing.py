@@ -28,7 +28,6 @@ for root, _, files in os.walk(f"./{document_path}"):
                 
                 for section in section_parts:
                     section = DataPreProcessing(section).run()
-                    section = section.strip()
                     section = section.replace('  ', '')
                     print(section)
                     formatted_chunks.append(section)
