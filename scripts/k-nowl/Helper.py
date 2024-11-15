@@ -41,6 +41,7 @@ def ExtractMarkdownHeadersAndContent(text):
     for i in range(1, len(parts), 2):  # Headers are in odd indices
         header = parts[i].strip()  # Strip whitespace from the header
         header = header.replace("#", " ")  # Replace newline characters with spaces
+        header = header.replace("  ", "")  # Replace newline characters with spaces
         content = parts[i + 1].strip() if i + 1 < len(parts) else ""  # Get content after the header
         header_content_pairs.append((header, content))
     
