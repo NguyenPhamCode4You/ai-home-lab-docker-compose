@@ -11,7 +11,7 @@ class TextSpliter:
         self.base_prompt = """
         You are an expert in segmenting text into concise, meaningful chunks. Follow these guidelines to split the provided text:
 
-        1. Chunk Length: Each chunk should be no longer than 90 characters.
+        1. Chunk Length: Each chunk should be no longer than 80 characters.
         2. Sentence Integrity: Split only at sentence boundaries, ensuring each chunk ends with a complete sentence.
         3. Separator: Use "VNLPAGL" exclusively to separate each chunk.
         4. Exceptions:
@@ -43,13 +43,6 @@ class TextSpliter:
         VNLPAGL Data Processing Code: def process_data(data): cleaned_data = [item.strip().lower() for item in data if isinstance(item, str)] transformed_data = [int(item) for item in cleaned_data if item.isdigit()] return transformed_data.
         
         7. If you encounter a table, split the content line by line:
-            7.1. Structure: Write each value of each column on a new line.
-            7.2. Format: Include the column name before each entry, with no special characters, punctuation, or separators. Use the following order:
-                - Column Name: First, write the name of each column followed by the entry for that cell.
-            7.3. New Entries: For each row, start with the first column's name and continue listing values until all columns are completed, moving to the next row without extra line breaks.
-            7.4. Examples and Special Cases:
-                - Do not include dividers, symbols, or other characters like "|", "---", or bullet points.
-        
         Example -----------------------------------------------------
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -65,7 +58,7 @@ class TextSpliter:
         VNLPAGL Product Comparison: Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
 
         Important:
-            - Each chunk should be no longer than 90 characters.
+            - Each chunk should be no longer than 80 characters.
             - Avoid adding any extra spaces, symbols, or labels such as "Chunk 1" or "Key Sentence."
             - Use only "VNLPAGL" as the chunk separator.
             - Only return the text content without any additional explanations or comments.

@@ -12,7 +12,7 @@ from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 from Helper import word_count_less_than, remove_duplicated, clean_text
 
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=650, chunk_overlap=20)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 directory_path = './documents'
@@ -69,17 +69,18 @@ for root, _, files in os.walk(directory_path):
           datadata_responses = MetadataExtractor(chunk).run()
           metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
           metadatas = remove_duplicated(metadatas)
+
+          metadata = metadatas[0] if len(metadatas) > 0 else ""
         
-          for metadata in metadatas:
-            metadata = filename + ":" + metadata.strip()
-            embedding = CreateEmbedding(chunk).run()
-            embedding2 = CreateEmbedding(metadata).run()
-            supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata, embedding2=embedding2)
-            print(f"............ {chunk}\n")
-            print(f">>>>>>>>>>>> {metadata}\n")
-            print(f"File {file_index}/{len(files)} - Sentence {sentence_index}\n")
-            
-            sentence_index += 1
+          metadata = filename + ":" + metadata.strip()
+          embedding = CreateEmbedding(chunk).run()
+          embedding2 = CreateEmbedding(metadata).run()
+          supabase.insert_embedding(text=chunk, embedding=embedding, metadata=metadata, embedding2=embedding2)
+          print(f"............ {chunk}\n")
+          print(f">>>>>>>>>>>> {metadata}\n")
+          print(f"File {file_index}/{len(files)} - Sentence {sentence_index}\n - [{md_file_path}]")
+          
+          sentence_index += 1
 
       except Exception as e:
         print(f"\n\n\n\n\nErrorn Errorn Errorn Error {file_index}/{len(files)}\n {chunk} {e}\n\n\n\n\n")
