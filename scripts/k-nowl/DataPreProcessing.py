@@ -13,6 +13,7 @@ class DataPreProcessing:
         1. For tables:
         - Remove table formating
         - Convert each table rows into lines with "comma" joined [column name]: [value]
+        - Put "----------\n" at the start and end of the extracted table.
         Example:
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -22,23 +23,29 @@ class DataPreProcessing:
         | Product C  | $15   | 4.2    | Good value for the price.           |
 
         Output:
+        ----------\n
         ## Product Comparison
         Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality.
         Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features.
         Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
+        ----------\n
 
         2. For code blocks, api urls:
         - Keep them untouched, but put in same line.
+        - Put "----------\n" at the start and end of the extracted code block.
         Example:
         ```python
         def hello_world():
             print("Hello, world!")
         ```
         Output:
+        ----------\n
         ```python def hello_world(): print("Hello, world!")```
+        ----------\n
 
         3. For sentences or lines with length < 10 chars:
         - Combine them into a single line.
+        - Put "----------\n" at the start and end of the extracted lines.
         Example:
         ---
         VOYAGE MANAGEMENT SYSTEM
@@ -55,11 +62,14 @@ class DataPreProcessing:
         ---
 
         Output:
+        ----------\n
         VOYAGE MANAGEMENT SYSTEM, High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information
+        ----------\n
 
         4. For repeated lines or tables:
         - Remove the repeated values, make the unique values comma separated.
         - Remove numbers, special characters, formatting.
+        - Put "----------\n" at the start and end of the extracted lines.
 
         Example:
         | Voyage Revenues      | Voyage Revenues      | Voyage Revenues      | 1.345.150      |
@@ -70,9 +80,12 @@ class DataPreProcessing:
         | Despatch             | Despatch             | Despatch             | 21.500         |
 
         Output:
+        ----------\n
         Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch
+        ----------\n
 
         The rest of the text should be kept as is.
+        
         Important:
         - Return only the formatted text.
         - Do not include the base prompt in the response.
