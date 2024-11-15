@@ -66,12 +66,6 @@ for root, _, files in os.walk(directory_path):
           if word_count_less_than(chunk, 3):
             continue
 
-          # chunk_validation_response = ChunkValidator(chunk).run()
-          # print(f"Chunk: {chunk}\n")
-          # print(f"======>>>: {chunk_validation_response}")
-          # if "No" in chunk_validation_response.strip():
-          #   continue
-
           datadata_responses = MetadataExtractor(chunk).run()
           metadatas = [metadata for metadata in datadata_responses.split("VNLPAGL") if len(metadata) > 10]
           metadatas = remove_duplicated(metadatas)
