@@ -44,7 +44,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     embedding = CreateEmbedding(line).run()
                     embedding_metadata = CreateEmbedding(metadata).run()
                     supabase.insert_embedding(text=line, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
-                    print(f"File {file_index}/{len(files)} - Line {line_index} - {file_path} \n")
+                    print(f"File {file_index}/{len(files)} - Line {line_index} - {file_path}\noooooooooooooooooooo \n\n\n\n\n")
                     line_index += 1
 
         file_index += 1
