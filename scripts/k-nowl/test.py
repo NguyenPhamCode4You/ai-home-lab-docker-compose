@@ -4,7 +4,7 @@ import pandas as pd
 import os
 
 from DataPreProcessing import DataPreProcessing
-from ProcessMarkdownHeader import ProcessMarkdownHeader
+from Helper import SplitByMarkdownHeader
 
 paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1250, chunk_overlap=0)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
@@ -14,19 +14,15 @@ document_path = './Sedna.md'
 
 formatted_chunks = []
 
-loader = TextLoader(document_path)
-documents = loader.load()
-documents = paragraph_splitter.split_documents(documents)
+# loader = TextLoader(document_path)
+# documents = loader.load()
+# documents = paragraph_splitter.split_documents(documents)
 
-for document in documents:
-    if isinstance(document, str):
-        document = document
-    else:
-        document = document.page_content
+# Read the document using io
+with open(document_path, 'r') as file:
+    document = file.read()
 
-    document = ProcessMarkdownHeader(document).run()
-    sections = [section for section in document.split("VNLPAGL") if len(section) > 0]
-
+    sections = SplitByMarkdownHeader(document)
     for section in sections:
         # section = DataPreProcessing(section).run()
         print(section)
