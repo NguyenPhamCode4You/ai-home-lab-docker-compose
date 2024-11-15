@@ -29,15 +29,13 @@ class DataPreProcessing:
         Product C: Price $15, Rating 4.2, Good value for the price.
 
         3. For code blocks, api urls or json object:
-        - Keep them untouched, put all in 01 line, wrap them in a <code> block.
+        - Keep them untouched, put all in 01 line.
         
         Example:
-        ```
         def hello_world():
             print("Hello, world!")
-        ```
 
-        Output: <code>def hello_world(): print("Hello, world!")</code>
+        Output: def hello_world(): print("Hello, world!")
 
         4. For sentences or lines with words counts less then 5:
         - Combine them into a single line, reduce number of line breaks.
