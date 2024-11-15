@@ -26,10 +26,6 @@ for root, _, files in os.walk(f"./{document_path}"):
             for section in sections:
                 section_parts = [section]
                 
-                # if len(section) > section_max_length:
-                #     print(f"Section too long: {len(section)}")
-                #     section_parts = RecursiveSplitSentences(section, section_max_length)
-
                 for section in section_parts:
                     section = DataPreProcessing(section).run()
                     print(section)
