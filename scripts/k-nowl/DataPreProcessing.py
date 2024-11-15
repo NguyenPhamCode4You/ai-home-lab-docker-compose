@@ -13,7 +13,7 @@ class DataPreProcessing:
 
         1. For tables:
         - Remove table formating
-        - Convert each table rows into lines with "comma" joined [column name]: [value]
+        - Describe each row in a single line.
         Example:
         ## Product Comparison
         | Product    | Price | Rating | Description                         |
@@ -24,9 +24,9 @@ class DataPreProcessing:
 
         Output:
         ## Product Comparison
-        Product: Product A, Price: $10, Rating: 4.5, Description: Affordable and high-quality.
-        Product: Product B, Price: $20, Rating: 4.8, Description: Premium quality with extra features.
-        Product: Product C, Price: $15, Rating: 4.2, Description: Good value for the price.
+        Product A: Price $10, Rating 4.5, Affordable and high-quality.
+        Product B: Price $20, Rating 4.8, Premium quality with extra features.
+        Product C: Price $15, Rating 4.2, Good value for the price.
 
         3. For code blocks, api urls:
         - Keep them untouched, but put in same line.
@@ -38,11 +38,12 @@ class DataPreProcessing:
         Output:
         ```python def hello_world(): print("Hello, world!")```
 
-        4. For sentences or lines with length < 10 chars:
-        - Combine them into a single line.
+        4. For sentences or lines with words counts less then 5:
+        - Combine them into a single line, reduce number of line breaks.
+        - Except for markdown headers, keep them as is.
         Example:
         ---
-        VOYAGE MANAGEMENT SYSTEM
+        # VOYAGE MANAGEMENT SYSTEM
 
         High Level Database Design Document
 
@@ -56,9 +57,10 @@ class DataPreProcessing:
         ---
 
         Output:
-        VOYAGE MANAGEMENT SYSTEM, High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information
+        # VOYAGE MANAGEMENT SYSTEM 
+        High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information
 
-        5. For repeated lines or tables:
+        5. For tables with repeated values
         - Remove the repeated values, make the unique values comma separated.
         - Remove numbers, special characters, formatting.
 
