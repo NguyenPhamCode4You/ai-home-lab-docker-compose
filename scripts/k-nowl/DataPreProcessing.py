@@ -29,9 +29,8 @@ class DataPreProcessing:
         Product C: Price $15, Rating 4.2, Good value for the price.
 
         3. For code blocks, api urls:
-        - Keep them untouched, but put in same line.
+        - Keep them untouched, but put all in 01 line.
         Example:
-
         def hello_world():
             print("Hello, world!")
 
@@ -62,17 +61,19 @@ class DataPreProcessing:
 
         5. For tables with repeated values
         - Remove the repeated values, make the unique values comma separated.
-        - Remove numbers, special characters, formatting, spaces issues.
+        - Remove numbers, special characters and formatting issues.
 
         Example:
+        ## Voyage Revenues
         | Voyage Revenues      | Voyage Revenues      | Voyage Revenues      | 1.345.150      |
         |----------------------|----------------------|----------------------|----------------|
-        | Freight              | Freight              | Freight              | 1.200.000      |
-        | Misc. Revenue        | Misc. Revenue        | Misc. Revenue        | 150            |
-        | Demurrage            | Demurrage            | Demurrage            | 26.000         |
+        | Freight              | Freight 12              | Freight              | 1.200.000      |
+        | Misc. Revenue        | Misc. Revenue        | Misc. Revenueqq        | 150            |
+        | Demurrage            | Demurrage sfe            | Demurrageddw            | 26.000         |
         | Despatch             | Despatch             | Despatch             | 21.500         |
 
         Output:
+        ## Voyage Revenues
         Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch
 
         The rest of the text should be kept as is.
