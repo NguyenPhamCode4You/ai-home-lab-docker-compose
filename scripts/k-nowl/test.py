@@ -9,6 +9,7 @@ paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1400, chunk_overl
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 document_path = './BVMS-1.md'
+document_path = './Sedna.md'
 
 loader = TextLoader(document_path)
 document = loader.load()
