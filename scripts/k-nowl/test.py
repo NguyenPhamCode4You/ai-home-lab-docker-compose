@@ -5,7 +5,7 @@ import os
 
 from DataPreProcessing import DataPreProcessing
 
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1400, chunk_overlap=50)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 document_path = './BVMS-1.md'
