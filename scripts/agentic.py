@@ -12,7 +12,7 @@ from TextFormater import TextFormater
 from TextSpliter import TextSpliter
 from Helper import word_count_less_than, remove_duplicated, clean_text
 
-paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=650, chunk_overlap=20)
+paragraph_splitter = RecursiveCharacterTextSplitter(chunk_size=1600, chunk_overlap=50)
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=0)
 
 directory_path = './documents'
