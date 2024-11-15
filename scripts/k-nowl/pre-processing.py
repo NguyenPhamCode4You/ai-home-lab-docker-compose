@@ -1,7 +1,7 @@
 import os
 
 from DataPreProcessing import DataPreProcessing
-from Helper import SplitByMarkdownHeader, RecursiveSplitSentences
+from Helper import SplitByMarkdownHeader
 
 document_path = 'documents'
 processed_prefix = 'processed'
