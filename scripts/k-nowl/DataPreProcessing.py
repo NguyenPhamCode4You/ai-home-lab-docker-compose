@@ -30,12 +30,15 @@ class DataPreProcessing:
 
         3. For code blocks, api urls:
         - Keep them untouched, but put all in 01 line.
+        - Wrap each code block betweem ``` and ```
         Example:
         def hello_world():
             print("Hello, world!")
 
         Output:
+        ```
         def hello_world(): print("Hello, world!")
+        ```
 
         4. For sentences or lines with words counts less then 5:
         - Combine them into a single line, reduce number of line breaks.
