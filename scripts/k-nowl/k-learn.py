@@ -28,9 +28,13 @@ for root, _, files in os.walk(f"./{document_path}"):
             for section in sections:
 
                 lines = LinesExtractor(section).run()
-                for line in lines.split("VNLPAGL\n"):
+                for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 10]:
                     print(f"............ Line: {line}\n")
-                    header, content = GetMarkdownHeaderAndContent(line)[0]
+                    try:
+                        header, content = GetMarkdownHeaderAndContent(line)[0]
+                    except:
+                        continue
+                    
                     sumarize = SentenceSummarizer(content).run()
                     metadata = f"{filename} / {header} - {sumarize}"
 
