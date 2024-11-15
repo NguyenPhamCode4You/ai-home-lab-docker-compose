@@ -9,13 +9,13 @@ processed_prefix = 'processed'
 section_max_length = 1400
 
 for root, _, files in os.walk(f"./{document_path}"):
+    processed_root = os.path.join(root, processed_prefix)
+    if not os.path.exists(processed_root):
+        os.makedirs(processed_root)
+
     for file in files:
         file_path = os.path.join(root, file)
         filename = os.path.splitext(file)[0]
-
-        processed_root = os.path.join(root, processed_prefix)
-        if not os.path.exists(processed_root):
-            os.makedirs(processed_root)
         
         processed_file_path = os.path.join(processed_root, f"{filename}.{processed_prefix}.md")
         if os.path.exists(processed_file_path):
