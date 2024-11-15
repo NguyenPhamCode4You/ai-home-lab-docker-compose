@@ -34,17 +34,15 @@ for root, _, files in os.walk(f"./{document_path}"):
                         header, content = GetMarkdownHeaderAndContent(line)[0]
                     except:
                         continue
-                    
+
                     sumarize = SentenceSummarizer(content).run()
                     metadata = f"{filename} / {header} - {sumarize}"
+                    print(f">>>>>>>>>>>> {metadata}\n")
 
                     embedding = CreateEmbedding(content).run()
                     embedding_metadata = CreateEmbedding(metadata).run()
                     supabase.insert_embedding(text=content, embedding=embedding, metadata=metadata, embedding2=embedding_metadata)
-                    print(f"............ {line}\n")
-                    print(f">>>>>>>>>>>> {metadata}\n")
                     print(f"File {file_index}/{len(files)} - Line {line_index}\n - [{file_path}]")
-
                     line_index += 1
 
         file_index += 1
