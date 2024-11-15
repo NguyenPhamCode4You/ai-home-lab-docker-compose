@@ -40,7 +40,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     sumarize = SentenceSummarizer(line).run()
                     keyword = KeywordExtraction(line).run()
                     filename = CleanText(filename.replace(document_path, ""))
-                    metadata = f"[f]={filename}/[t]={header}/[k]={keyword}"
+                    metadata = f"[f]={filename}\t[t]={header}\t[k]={keyword}"
 
                     embedding1 = CreateEmbedding(metadata).run()
                     print(f"Embedding1: {metadata}\n")
