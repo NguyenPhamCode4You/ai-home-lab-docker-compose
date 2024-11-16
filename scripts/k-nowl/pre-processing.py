@@ -11,7 +11,7 @@ from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 500
+section_max_length = 600
 
 for root, _, files in os.walk(f"./{document_path}"):
     processed_root = root.replace(document_path, f"{processed_prefix}")
@@ -41,7 +41,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     if header:
                         section = "##  " + header + "\n\n" + section
                     section = dataPreProcessor.run(section)
-                    section = section.replace('  ', '')
+                    section = RemoveExcessiveSpacing(section)
                     print(section)
                     formatted_chunks.append(section)
 
