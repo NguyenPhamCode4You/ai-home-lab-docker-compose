@@ -1,6 +1,11 @@
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
+
 from DataPreProcessing import DataPreProcessing
+dataPreProcessor = DataPreProcessing()
+
 from Helper import SplitByMarkdownHeader
 
 document_path = 'documents'
@@ -34,7 +39,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                 for section in section_parts:
                     if header:
                         section = "##  " + header + "\n\n" + section
-                    section = DataPreProcessing(section).run()
+                    section = dataPreProcessor.run(section)
                     section = section.replace('  ', '')
                     print(section)
                     formatted_chunks.append(section)

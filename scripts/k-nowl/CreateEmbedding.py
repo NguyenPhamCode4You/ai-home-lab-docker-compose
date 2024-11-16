@@ -1,17 +1,15 @@
 import requests
 
-ollama_embeding_url = "http://10.13.13.4:11434/api/embed"
-ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
-
 class CreateEmbedding:
-    def __init__(self, message: str):
-        self.message = str(message)
+    def __init__(self, model: str = 'nomic-embed-text:137m-v1.5-fp16', url: str = 'http://localhost:11434/api/embed'):
+        self.model = model
+        self.url = url
     
-    def run(self):
+    def run(self, message: str) -> list:
         # Send the request to the Ollama API
         response = requests.post(
-            ollama_embeding_url,
-            json={"model": ollama_embeding_model, "input": self.message}
+            self.url,
+            json={"model": self.model, "input": str(message)}
         )
         
         # Check if the response is successful

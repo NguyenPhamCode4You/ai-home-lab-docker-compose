@@ -1,11 +1,9 @@
 import requests
 
-ollama_instruct_url = "http://10.13.13.4:11434/api/generate"
-ollama_instruct_model = "gemma2:9b-instruct-q8_0"
-
 class DataPreProcessing:
-    def __init__(self, message: str):
-        self.message = str(message)
+    def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
+        self.url = url
+        self.model = model
         self.base_prompt = """
         You are an expert at re-formatting markdown text for further processing.
 
@@ -80,11 +78,11 @@ class DataPreProcessing:
         Now, please re-format the following text: 
         """
 
-    def run(self):
+    def run(self, message: str) -> str:
         # Send the request to the Ollama API
         response = requests.post(
-            ollama_instruct_url,
-            json={"model": ollama_instruct_model, "prompt": self.base_prompt + self.message, "stream": False}
+            url=self.url,
+            json={"model": self.model, "prompt": self.base_prompt + str(message), "stream": False}
         )
         
         # Check if the response is successful

@@ -8,7 +8,7 @@ class SupabaseVectorStore:
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.token}",
-            "apikey": self.token  # Supabase requires both Authorization and apikey headers
+            "apikey": self.token
         }
 
     def insert_embedding(self, text: str, embedding: list[float], metadata: str = "", embedding2: list[float] = []):
