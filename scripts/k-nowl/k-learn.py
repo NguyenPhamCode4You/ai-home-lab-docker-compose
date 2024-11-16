@@ -35,6 +35,8 @@ for root, _, files in os.walk(f"./{document_path}"):
             document = file.read()
 
             sections = SplitByMarkdownHeader(document)
+            section_index = 1
+
             for section in sections:
 
                 try:
@@ -62,7 +64,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     print(f"Content: {content}\n")
 
                     supabase.insert_embedding(text=content, embedding=embedding1, metadata=metadata, embedding2=embedding2)
-                    print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
+                    print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
                     line_index += 1
-
+                section_index += 1
         file_index += 1
