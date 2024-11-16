@@ -62,6 +62,10 @@ def RemoveExcessiveSpacing(text):
         text = text.replace("  ", " ")
     while "\n\n" in text:
         text = text.replace("\n\n", "\n")
+    while "...." in text:
+        text = text.replace("....", "")
+    while "----" in text:
+        text = text.replace("----", "")
     return text
 
 def RecursiveSplitSentences(document: str, limit: int = 1000):
