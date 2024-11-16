@@ -50,9 +50,10 @@ for root, _, files in os.walk(f"./{document_path}"):
                     section = RemoveExcessiveSpacing(section)
                     print(section)
                     formatted_chunks.append(section)
-                    section_index += 1
                     print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
-
+                
+                section_index += 1
+        
         with open(processed_file_path, 'w') as f:
             f.write('\n'.join(formatted_chunks))
 
