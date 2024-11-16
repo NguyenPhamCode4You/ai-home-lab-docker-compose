@@ -6,12 +6,12 @@ load_dotenv()
 from DataPreProcessing import DataPreProcessing
 dataPreProcessor = DataPreProcessing()
 
-from Helper import SplitByMarkdownHeader
+from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader
 
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 2500
+section_max_length = 1200
 
 for root, _, files in os.walk(f"./{document_path}"):
     processed_root = root.replace(document_path, f"{processed_prefix}")
@@ -29,6 +29,7 @@ for root, _, files in os.walk(f"./{document_path}"):
             document = file.read()
             sections = SplitByMarkdownHeader(document)
             for section in sections:
+                section = RemoveExcessiveSpacing(section)
                 section_parts = [section]
                 header = False
                 if len(section) > section_max_length:

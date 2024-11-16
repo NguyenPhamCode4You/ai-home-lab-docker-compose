@@ -57,6 +57,10 @@ def CleanText(text):
 
   return cleaned_text
 
+def RemoveExcessiveSpacing(text):
+    while "  " in text:
+        text = text.replace("  ", " ")
+
 def RecursiveSplitSentences(document: str, limit: int = 1000):
     # Split the document into sentences
     sentences = document.split(".")
