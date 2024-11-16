@@ -11,7 +11,7 @@ from KeywordExtraction import KeywordExtraction
 linesExtractor = LinesExtractor()
 sentenceSummarizer = SentenceSummarizer()
 embedder = CreateEmbedding()
-keywordExtractor = KeywordExtraction()
+keywordExtractor = KeywordExtraction().set_keywords_count(25)
 
 from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 
