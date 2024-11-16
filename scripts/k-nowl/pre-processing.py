@@ -35,13 +35,15 @@ for root, _, files in os.walk(f"./{document_path}"):
                 section = RemoveExcessiveSpacing(section)
                 section_parts = [section]
                 header = False
-                
+
                 if len(section) > section_max_length:
                     from Helper import ExtractMarkdownHeadersAndContent, RecursiveSplitSentences
                     header, section = ExtractMarkdownHeadersAndContent(section)[0]
                     section_parts = RecursiveSplitSentences(section, section_max_length)
                 
                 for section in section_parts:
+                    if len(section) == 0:
+                        continue
                     if header:
                         section = "##  " + header + "\n\n" + section
                     section = dataPreProcessor.run(section)
