@@ -8,6 +8,7 @@ class KeywordExtraction:
 
     def set_keywords_count(self, keywords_count: int = 10):
         self.keywords_count = keywords_count
+        return self
 
     def get_prompt(self):
         return f"""
