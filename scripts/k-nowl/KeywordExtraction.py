@@ -4,17 +4,23 @@ class KeywordExtraction:
     def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
-        self.base_prompt = """
+        self.keywords_count = 10
+
+    def set_keywords_count(self, keywords_count: int = 10):
+        self.keywords_count = keywords_count
+
+    def get_prompt(self):
+        return f"""
         Your task is to extract important keywords from the text below.
         1. Keywords should be the main entities that text is about, or refering to
-        2. Should not have more than 10 keywords per text, ordered by importance
-        3. Sometime keywords can be verbs, adjectives, or adverbs
+        2. Should not have more than {self.keywords_count} keywords per text, ordered by importance
+        3. Sometime keywords can be verbs, adjectives, or adverbs, put them at the beginning
 
         Example:
         How to Calculate P&L Summaries (v1.0): I. Calculation Rules & Factors: Item: Voyage Revenues, Sub-Item: Freight, Calculation Rule & Factor: Freight Rate (L) + Freight Rate (F) x Quantity.
 
         Output:
-        Calculate, P&L Summaries, Calculation Rules & Factors, Voyage Revenues, Freight, Calculation Rule, Factor, Freight Rate, Quantity
+        Calculate, Summarize, P&L Summaries, Calculation Rules & Factors, Voyage Revenues, Freight, Calculation Rule, Factor, Freight Rate, Quantity
 
         3. For code, use the name of functions, classes, or variables as keywords.
         4. For documents, use the title, author, or main subject as keywords.
@@ -27,15 +33,16 @@ class KeywordExtraction:
         - Do not include the base prompt in the response.
         - Do not include the input text in the response.
         - Do not include any additional information.
+        - No more than {self.keywords_count} keywords per text.
 
-        Now, please extract the keywords from the following text:
+        Now, please extract the keywords from the following text: 
         """
 
     def run(self, message: str) -> str:
         # Send the request to the Ollama API
         response = requests.post(
             url=self.url,
-            json={"model": self.model, "prompt": self.base_prompt + str(message), "stream": False}
+            json={"model": self.model, "prompt": self.get_prompt() + str(message), "stream": False}
         )
         
         # Check if the response is successful
