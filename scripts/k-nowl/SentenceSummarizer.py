@@ -1,6 +1,6 @@
 import requests
 
-ollama_instruct_url = "http://localhost:11434/api/generate"
+ollama_instruct_url = "http://10.13.13.4:11434/api/generate"
 ollama_instruct_model = "gemma2:9b-instruct-q8_0"
 
 class SentenceSummarizer:

@@ -1,6 +1,6 @@
 import requests
 
-ollama_embeding_url = "http://localhost:11434/api/embed"
+ollama_embeding_url = "http://10.13.13.4:11434/api/embed"
 ollama_embeding_model = "nomic-embed-text:137m-v1.5-fp16"
 
 class CreateEmbedding:

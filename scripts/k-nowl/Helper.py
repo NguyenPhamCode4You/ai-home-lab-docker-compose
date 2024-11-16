@@ -67,14 +67,14 @@ def RecursiveSplitSentences(document: str, limit: int = 1000):
     while len(sentences) > 0:
         sentence = sentences.pop(0)
         if len(paragraph) + len(sentence) < limit:
-            paragraph += f"{sentence.strip()}. "
+            paragraph += f"{sentence}. "
         else:
-            paragraphs.append(paragraph.strip())
-            paragraph = f"{sentence.strip()}. "
+            paragraphs.append(paragraph)
+            paragraph = f"{sentence}. "
 
     # Add the last paragraph
     if len(paragraph) > 0:
-        paragraphs.append(paragraph.strip())
+        paragraphs.append(paragraph)
 
     return paragraphs
 
