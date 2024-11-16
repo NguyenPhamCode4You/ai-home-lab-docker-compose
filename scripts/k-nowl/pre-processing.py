@@ -11,7 +11,7 @@ from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 1200
+section_max_length = 500
 
 for root, _, files in os.walk(f"./{document_path}"):
     processed_root = root.replace(document_path, f"{processed_prefix}")
