@@ -1,5 +1,13 @@
 import json
 import os
+import requests
+
+def load_swagger_file_from_url(url, local_file_path):
+    """Downloads the Swagger JSON file from a URL and saves it locally."""
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an error for HTTP issues
+    with open(local_file_path, 'w') as file:
+        file.write(response.text)
 
 def load_swagger_file(file_path):
     """Loads the Swagger JSON file."""
@@ -51,14 +59,19 @@ def parse_schema_object(schema, indent=0):
 
     return markdown
 
-    # File paths
-swagger_file_path = "./bvms-master.json"  # Update with your Swagger JSON file path
-output_file = os.path.splitext(swagger_file_path)[0] + ".md"  # Use the same name with .md extension
+# URL of the Swagger JSON file
+swagger_url = "https://bvms-master-api-test.azurewebsites.net/swagger/v1/swagger.json"  # Replace with the actual URL
+local_swagger_file = "./bvms-master.json"  # Local file path for saving the Swagger file
+output_file = os.path.splitext(local_swagger_file)[0] + ".md"  # Output Markdown file name
 
-# Load Swagger file
-swagger_data = load_swagger_file(swagger_file_path)
+# Download Swagger JSON file
+load_swagger_file_from_url(swagger_url, local_swagger_file)
+
+# Load Swagger data
+swagger_data = load_swagger_file(local_swagger_file)
 
 # Generate Markdown file
 create_entity_markdown(swagger_data, output_file)
 
 print(f"Markdown file has been generated: '{output_file}'")
+
