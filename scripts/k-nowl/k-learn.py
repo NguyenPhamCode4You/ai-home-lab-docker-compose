@@ -11,14 +11,14 @@ from KeywordExtraction import KeywordExtraction
 linesExtractor = LinesExtractor()
 sentenceSummarizer = SentenceSummarizer()
 embedder = CreateEmbedding()
-keywordExtractor = KeywordExtraction().set_keywords_count(25)
+keywordExtractor = KeywordExtraction().set_keywords_count(10)
 
 from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 
 from SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_ebook"
+TABLE_NAME = "n8n_documents_bbc_bvms"
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
 document_path = 'processed'
@@ -45,8 +45,12 @@ for root, _, files in os.walk(f"./{document_path}"):
                     print(f"Error: {e}")
                     header, content = "", section
 
-                lines = content
-                # lines = linesExtractor.run(content)
+                ## Use the entire chunk as one line
+                # lines = content
+
+                ## Use lines by lines using the extractor
+                lines = linesExtractor.run(content)
+                
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
                     sumarize = sentenceSummarizer.run(line)

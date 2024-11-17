@@ -11,7 +11,7 @@ from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 680
+section_max_length = 10000
 
 file_index = 1
 section_index = 1
@@ -46,8 +46,8 @@ for root, _, files in os.walk(f"./{document_path}"):
                         continue
                     if header:
                         section = "##  " + header + "\n\n" + section
-                    section = dataPreProcessor.run(section)
                     section = RemoveExcessiveSpacing(section)
+                    section = dataPreProcessor.run(section)
                     print(section)
                     formatted_chunks.append(section)
                     print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")

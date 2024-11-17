@@ -1,6 +1,0 @@
-langchain
-langchain-core
-langchain-community
-requests
-pandas
-docling
