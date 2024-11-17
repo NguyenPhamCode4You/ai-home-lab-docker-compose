@@ -11,7 +11,7 @@ from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader
 document_path = 'documents'
 processed_prefix = 'processed'
 
-section_max_length = 10000
+section_max_length = 600
 
 file_index = 1
 section_index = 1
