@@ -16,30 +16,32 @@ def load_swagger_file(file_path):
 
 def create_simple_markdown(api_details, output_file):
     """Generates a simplified Markdown file for API endpoints."""
-    content = f"# API Documentation\n\n"
-
+    api_urls = []
+    content = ""
     for path, methods in api_details['paths'].items():
         for method, details in methods.items():
-            content += f"## {path}\n"
-            content += f"- **Method:** {method.upper()}\n"
-
+            api_url = f"{method.upper()} {path}\n"
+            api_urls.append(api_url)
+            content += f"## {api_url}"
             # Request body
             request_body = details.get('requestBody', {}).get('content', {})
-            content += "- **Request:** "
+            content += "1. Request: "
             if request_body:
                 content += parse_data_structure(request_body, api_details)
             else:
-                content += "No request body.\n"
+                content += "None\n"
 
             # Response data
             responses = details.get('responses', {})
-            content += "- **Response:** "
+            content += "2. Response: "
             if responses:
                 content += parse_response_structure(responses, api_details)
             else:
-                content += "No responses provided.\n"
+                content += "None\n"
 
-            content += "\n---\n\n"
+            content += "\n"
+
+    content = f"## Endpoints:\n{"".join(api_urls)}{content}"
 
     # Write to file
     with open(output_file, 'w') as file:
@@ -50,17 +52,17 @@ def parse_data_structure(content, api_details):
     for media_type, details in content.items():
         schema = details.get('schema', {})
         return resolve_and_parse_schema(schema, api_details)
-    return "No schema provided.\n"
+    return "None\n"
 
 def parse_response_structure(responses, api_details):
     """Parses and formats the response structure recursively."""
     for status_code, response in responses.items():
-        description = response.get('description', 'No description provided.')
+        description = response.get('description', 'None')
         content = response.get('content', {})
         for media_type, details in content.items():
             schema = details.get('schema', {})
             return resolve_and_parse_schema(schema, api_details)
-    return "No schema provided.\n"
+    return "None\n"
 
 def resolve_and_parse_schema(schema, api_details, visited_entities=None):
     """Resolves schema references and parses the schema object recursively."""
@@ -112,19 +114,26 @@ def parse_schema_properties(schema, api_details, visited_entities):
             fields.append(f"{field_name}:{field_type}")
     return fields
 
-# URL of the Swagger JSON file
-swagger_url = "https://bvms-master-api-test.azurewebsites.net/swagger/v1/swagger.json"  # Replace with the actual URL
-local_swagger_file = "./swagger.json"  # Local file path for saving the Swagger file
-output_file = os.path.splitext(local_swagger_file)[0] + "_simple.md"  # Output Markdown file name
+# URLs of Swagger JSON files and corresponding output names
+swagger_urls = [
+    ("https://bvms-master-api-test.azurewebsites.net/swagger/v1/swagger.json", "master-data-api"),
+    ("https://bvms-voyage-api-test.azurewebsites.net/swagger/v1/swagger.json", "voyage-api"),
+]
 
-# Download Swagger JSON file
-load_swagger_file_from_url(swagger_url, local_swagger_file)
+# Process each Swagger URL
+for swagger_url, output_name in swagger_urls:
+    # Local file name for temporary Swagger JSON storage
+    local_swagger_file = f"{output_name}.json"
+    output_file = f"{output_name}.md"  # Output Markdown file name
 
-# Load Swagger data
-swagger_data = load_swagger_file(local_swagger_file)
+    # Download Swagger JSON file
+    load_swagger_file_from_url(swagger_url, local_swagger_file)
 
-# Generate Markdown file
-create_simple_markdown(swagger_data, output_file)
+    # Load Swagger data
+    swagger_data = load_swagger_file(local_swagger_file)
 
-print(f"Markdown file has been generated: '{output_file}'")
+    # Generate Markdown file
+    create_simple_markdown(swagger_data, output_file)
+
+    print(f"Markdown file generated: {output_file}")
 
