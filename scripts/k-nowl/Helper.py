@@ -68,6 +68,24 @@ def RemoveExcessiveSpacing(text):
         text = text.replace("----", "")
     return text
 
+def HardSplitSentences(document: str, limit: int = 1000):
+    # Hard split mode: enforce character limit strictly
+    paragraphs = []
+    while len(document) > limit:
+        # Find the last possible split point within the limit
+        split_index = document[:limit].rfind(" ")
+        if split_index == -1:
+            # No spaces found; force a hard split at the limit
+            split_index = limit
+        paragraphs.append(document[:split_index].strip())
+        document = document[split_index:].strip()
+
+    # Add the remaining text
+    if document:
+        paragraphs.append(document)
+
+    return paragraphs
+
 def RecursiveSplitSentences(document: str, limit: int = 1000):
     # Split the document into sentences
     sentences = document.split(".")
