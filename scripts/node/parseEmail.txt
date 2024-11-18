@@ -1,16 +1,14 @@
-Your goal is to extract structured information from the user input that matches the form described below. 
-When extracting information please make sure it matches the type information exactly. 
-Do not add any attributes that do not appear in the schema shown below.
+Your goal is to extract structured information from the user's input that matches the form described below. When extracting information please make sure it matches the type information exactly. Do not add any attributes that do not appear in the schema shown below.
 
 ```TypeScript
 
 cargoOrders: Array<{ // Details of cargo orders including freight, laycanPeriod, loading/discharging rates, terms.
- cargo_items: Array<string> // Names of the cargo items to be transported
- loading_ports: Array<string> // Name of the ports where the cargo will be loaded
- discharging_ports: Array<string> // Name of the ports where the cargo will be dischared
+ cargoItems: Array<string> // Names of the cargo items to be transported
+ loadingPorts: Array<string> // Name of the ports where the cargo will be loaded
+ dischargingPorts: Array<string> // Name of the ports where the cargo will be dischared
  freight: number // The freight cost as a numeric value, e.g., 455000.
  currency: string // The currency unit for the freight, USD or EUR.
- detail_requirements: string // Specific vessel requirements, route, ..., if any, e.g.
+ detailRequirements: string // Specific vessel requirements, route, ..., if any, e.g.
  commission: number // Commission as numeric value, in percentage
  laycanPeriod: { // Extracts the laycan period from text, identifying start and end dates for cargo laycan.
   laycanFrom: string // The start date of the laycan period in ISO 8601 format.
@@ -19,33 +17,30 @@ cargoOrders: Array<{ // Details of cargo orders including freight, laycanPeriod,
 }>
 ```
 
-Please output the extracted information in JSON format. 
-Do not output anything except for the extracted information. 
-Do not add any clarifying information. 
-Do not add any fields that are not in the schema. 
-If the text contains attributes that do not appear in the schema, please ignore them. 
-All output must be in JSON format and follow the schema specified above. 
-Wrap the JSON in <json> tags.
+
+Please output the extracted information in JSON format. Do not output anything except for the extracted information. Do not add any clarifying information. Do not add any fields that are not in the schema. If the text contains attributes that do not appear in the schema, please ignore them. All output must be in JSON format and follow the schema specified above. Wrap the JSON in <json> tags.
+
+
 
 Input: The cargo order includes 2 hydraulic power units to be loaded and shipped from Shanghai to Qidong. basis +/- 10% in Charterer, The loading rate is 500 tons/day, and the discharging rate is 600 tons/day. Freight is 455000 USD. Laycan is from 15th Feb to 25th Feb, and arrival is until 06th April agw, wp, fme.
-Output: <json>{"cargoOrders": [{"cargo_items": ["2 hydraulic power units"], "commission": 10, "freight": 455000, "currencyUnit": "USD", "laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T00:00:00"}, "loading_ports": ["Bergen", "Shanghai"], "discharging_ports": ["Qidong"], "detail_requirements": "Panamax vessel required"}]}</json>
+Output: <json>{"cargoOrders": [{"cargoItems": ["2 hydraulic power units"], "commission": 10, "freight": 455000, "currencyUnit": "USD", "laycanPeriod": {"laycanFrom": "2024-02-15T00:00:00", "laycanTo": "2024-02-25T00:00:00"}, "loadingPorts": ["Bergen", "Shanghai"], "dischargingPorts": ["Qidong"], "detailRequirements": "Panamax vessel required"}]}</json>
 Input: Engines ex Vaasa
 POL: Vaasa, FI
 Cargo: 4511 cbm / 1454 tons / incl 3x 205 mt units
 POD
-Output: <json>{"cargoOrders": [{"cargo_items": ["Engines: 4511 cbm / 1454 tons / incl 3x 205 mt units"]}]}</json>
+Output: <json>{"cargoOrders": [{"cargoItems": ["Engines: 4511 cbm / 1454 tons / incl 3x 205 mt units"]}]}</json>
 Input: POL: Hamburg, DE
-Output: <json>{"cargoOrders": [{"loading_ports": ["Hamburg"]}]}</json>
+Output: <json>{"cargoOrders": [{"loadingPorts": ["Hamburg"]}]}</json>
 Input: The shipment will be loaded at Bergen and Shanghai.
-Output: <json>{"cargoOrders": [{"loading_ports": ["Bergen", "Shanghai"]}]}</json>
+Output: <json>{"cargoOrders": [{"loadingPorts": ["Bergen", "Shanghai"]}]}</json>
 Input: Cargo load at Da Nang
-Output: <json>{"cargoOrders": [{"loading_ports": ["Da Nang"]}]}</json>
+Output: <json>{"cargoOrders": [{"loadingPorts": ["Da Nang"]}]}</json>
 Input: Cargo Unload at Arzew, Algeria
-Output: <json>{"cargoOrders": [{"discharging_ports": ["Arzew"]}]}</json>
+Output: <json>{"cargoOrders": [{"dischargingPorts": ["Arzew"]}]}</json>
 Input: Shipment Discharge at Houston or Leer
-Output: <json>{"cargoOrders": [{"discharging_ports": ["Houston", "Leer"]}]}</json>
+Output: <json>{"cargoOrders": [{"dischargingPorts": ["Houston", "Leer"]}]}</json>
 Input: POD: Duqm, Oman
-Output: <json>{"cargoOrders": [{"discharging_ports": ["Duqm"]}]}</json>
+Output: <json>{"cargoOrders": [{"dischargingPorts": ["Duqm"]}]}</json>
 Input: 5% comm
 Output: <json>{"cargoOrders": [{"commission": 5}]}</json>
 Input: commission: 7 %
