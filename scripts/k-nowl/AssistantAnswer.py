@@ -31,9 +31,15 @@ class AssistantAnswer:
 
         context = ""
         for title in unique_titles:
-            context += f"{title}: \n"
-            docs = [f"{document['content']}" for document in documents if f"{document['content']}".split(":")[0] == title]
-            context += "\n".join(docs)
+            context += f"# {title}:\n"
+            # Filter and process documents matching the title
+            docs = [
+                document["content"].replace(title, "").strip()
+                for document in documents
+                if document["content"].split(":")[0] == title
+            ]
+            # Join the processed docs with newline and "-" separator
+            context += "\n- ".join(docs) + "\n"
 
         print(f"Context: {context}")
 
