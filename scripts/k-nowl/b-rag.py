@@ -13,7 +13,7 @@ evaluator = DocumentEvaluator()
 assistant = AssistantAnswer()
 assistant.set_embedder(embedder).set_vector_store(vector_store).set_evaluator(evaluator)
 
-print(assistant.run("What is this knowledge base about?"))
+# print(assistant.run("What is this knowledge base about?"))
 
 print(assistant.run("""If I have a cargo freight of 250,000 USD, I need to hire BBC amber to deliver the cargo. The voyage is 10 days, the bunker cost for each ton is 720. Is this voyage a loss or a profit? Given the hire rate of BBC Amber is 16,000 USD per day, and BBC Amber is traveling at 17 knots. 
 Calculate the total bunker cost by the consumption rate per day x days. Other expenses are set = 0
