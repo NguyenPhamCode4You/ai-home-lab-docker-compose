@@ -44,13 +44,14 @@ class AssistantAnswer:
             ]
             # Join the processed docs with newline and "-" separator
             section += "".join(docs)
-            print(f"Section: {section}")
+            context += section
+            # print(f"Section: {section}")
 
-            eval_result = self.evaluator.run(section, question)
-            print(f"\n\n\nEval Result: {eval_result}")
+            # eval_result = self.evaluator.run(section, question)
+            # print(f"\n\n\nEval Result: {eval_result}")
 
-            if "yes" in eval_result:
-                context += section
+            # if "yes" in eval_result:
+            #     context += section
 
         print(f"Context: {context}")
 
