@@ -46,7 +46,7 @@ class AssistantAnswer:
             section += "".join(docs)
 
             eval_result = self.evaluator.run(section, question)
-            if eval_result.contains("yes"):
+            if "yes" in eval_result:
                 context += section
 
         print(f"Context: {context}")
