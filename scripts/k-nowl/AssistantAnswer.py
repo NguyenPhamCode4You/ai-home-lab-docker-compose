@@ -22,6 +22,10 @@ class AssistantAnswer:
     def set_vector_store(self, vector_store):
         self.vector_store = vector_store
         return self
+    
+    def set_evaluator(self, evaluator):
+        self.evaluator = evaluator
+        return self
 
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
@@ -40,7 +44,10 @@ class AssistantAnswer:
             ]
             # Join the processed docs with newline and "-" separator
             section += "".join(docs)
-            context += section
+
+            eval_result = self.evaluator.run(section, question)
+            if eval_result.contains("yes"):
+                context += section
 
         print(f"Context: {context}")
 
