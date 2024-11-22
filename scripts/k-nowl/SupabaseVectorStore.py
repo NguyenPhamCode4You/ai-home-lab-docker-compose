@@ -10,6 +10,34 @@ class SupabaseVectorStore:
             "Authorization": f"Bearer {self.token}",
             "apikey": self.token
         }
+    
+    def query_documents(self, query_embedding: list[float], match_count: int = 20, filter: dict = {}, function: str = "match_n8n_documents_bbc_bvms"):
+        """
+        Calls the function via Supabase RPC.
+
+        :param query_embedding: A list of floats (size 768) representing the query embedding.
+        :param match_count: Number of results to return.
+        :param filter: A JSON object for metadata filtering.
+        :return: A list of matching records.
+        """
+        rpc_endpoint = f"{self.url}/rest/v1/rpc/{function}"
+
+        payload = {
+            "query_embedding": query_embedding,
+            "match_count": match_count,
+            "filter": filter
+        }
+
+        response = requests.post(
+            rpc_endpoint,
+            headers=self.headers,
+            json=payload
+        )
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to execute RPC: {response.status_code}, {response.text}")
+
+        return response.json()
 
     def insert_embedding(self, text: str, embedding: list[float], metadata: str = "", embedding2: list[float] = []):
         """
