@@ -26,7 +26,16 @@ class AssistantAnswer:
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=32)
-        context = "\n".join([f"{doc['content']}" for doc in documents])
+        titles = [f"{document['content']}".split(":")[0] for document in documents]
+        unique_titles = list(set(titles))
+
+        context = ""
+        for title in unique_titles:
+            context += f"{title}: \n"
+            docs = [f"{document['content']}" for document in documents if f"{document['content']}".split(":")[0] == title]
+            context += "\n".join(docs)
+
+        print(f"Context: {context}")
 
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
