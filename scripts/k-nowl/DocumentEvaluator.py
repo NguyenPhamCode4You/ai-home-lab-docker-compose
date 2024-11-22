@@ -5,7 +5,7 @@ class DocumentEvaluator:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an expert at evaluating whether a document could be useful for answering a question.
+        You are an expert at evaluating whether a document is related to a question.
         Simply answer yes or no to the following questions based on the document content.
         """
 
