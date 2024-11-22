@@ -25,7 +25,7 @@ class AssistantAnswer:
 
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
-        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=25)
+        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=32)
         context = "\n".join([f"{doc['content']}" for doc in documents])
 
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
