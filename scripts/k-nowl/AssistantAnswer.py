@@ -34,12 +34,12 @@ class AssistantAnswer:
             context += f"# {title}:\n"
             # Filter and process documents matching the title
             docs = [
-                document["content"].replace(title, "").strip()
+                document["content"].replace(title, "").replace(":", "").strip()
                 for document in documents
                 if document["content"].split(":")[0] == title
             ]
             # Join the processed docs with newline and "-" separator
-            context += "\n- ".join(docs) + "\n"
+            context += ", ".join(docs) + "\n"
 
         print(f"Context: {context}")
 
