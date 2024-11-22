@@ -31,7 +31,7 @@ class AssistantAnswer:
 
         context = ""
         for title in unique_titles:
-            context += f"# {title}:\n"
+            section = f"\n#{title}:"
             # Filter and process documents matching the title
             docs = [
                 f"\n-{document["content"].replace(title, "").replace(":", "").strip()}"
@@ -39,7 +39,8 @@ class AssistantAnswer:
                 if document["content"].split(":")[0] == title
             ]
             # Join the processed docs with newline and "-" separator
-            context += "".join(docs) + "\n"
+            section += "".join(docs)
+            context += section
 
         print(f"Context: {context}")
 
