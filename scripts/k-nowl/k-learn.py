@@ -53,22 +53,23 @@ for root, _, files in os.walk(f"./{document_path}"):
                 
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
+                    line = line.strip()
                     summarize = sentenceSummarizer.run(line)
                     keyword = keywordExtractor.run(line)
                     filename = CleanText(filename.replace(document_path, ""))
                     metadata = {"f": filename, "k": keyword, "h": header}
 
                     embedding = embedder.run(metadata)
-                    print(f"Embedding1: {metadata}\n")
+                    print(f"\nEmbedding1: {metadata}")
 
                     embedding2 = embedder.run(summarize)
-                    print(f"Embedding2: {summarize}\n")
+                    print(f"\nEmbedding2: {summarize}")
 
                     content = f"{header}: {line}"
-                    print(f"Content: {content}\n")
+                    print(f"\nContent: {content}")
 
                     supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
-                    print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
+                    print(f"\noooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo")
                     line_index += 1
                 section_index += 1
         file_index += 1
