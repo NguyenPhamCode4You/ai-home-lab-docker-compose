@@ -7,8 +7,10 @@ processed_prefix = 'processed'
 from SentenceSummarizer import SentenceSummarizer
 from CreateEmbedding import CreateEmbedding
 from KeywordExtraction import KeywordExtraction
+from DataPreProcessing import DataPreProcessing
 
 embedder = CreateEmbedding()
+dataPreProcessor = DataPreProcessing()
 sentenceSummarizer = SentenceSummarizer()
 keywordExtractor = KeywordExtraction().set_keywords_count(25)
 
@@ -53,6 +55,7 @@ for root, _, files in os.walk(f"./{document_path}"):
                     if header:
                         section = "##  " + header + "\n\n" + section
                     section = RemoveExcessiveSpacing(section)
+                    section = dataPreProcessor.run(section)
                     print(section)
                     formatted_chunks.append(section)
                     print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
