@@ -20,7 +20,7 @@ class SentenceSummarizer:
         - Bunker ROB at Departure = Bunker ROB at Arrival - Bunker Consumption at Port + Bunker Received
         - Bunker Consumption at Port = Bunker Consumption (Idle) + Bunker Consumption (Working) + Bunker Consumption (Intra Port)
 
-        Sumarize: This text describe the bunker planning formular. It includes the calculation for Bunker ROB at Arrival, Bunker Consumption at Sea, Total Sea Days, Bunker ROB at Departure, and Bunker Consumption at Port.
+        Sumarize: Formular for bunker planning. It includes the calculation for Bunker ROB at Arrival, Bunker Consumption at Sea, Total Sea Days, Bunker ROB at Departure, and Bunker Consumption at Port.
 
         Example:
         ## Event Stream API End Point
@@ -28,14 +28,14 @@ class SentenceSummarizer:
         Get basic event metadata $atts = $data['attributes']; $time = $atts['time']; $eventType = $atts['eventType']; //Only deal with incoming messages using the below //if ($eventType <> 'event. message. received') continue; //Get the message subject $msg\_id = $data['relationships']['message']['data']['id']; $msg = $this->get\_message($msg\_id); $subject = $msg['data']['attributes']['subject']; echo "$time $eventType $id $subject "; } $last\_id = $id; $url = $r['links']['next']; sleep($loop\_wait); } while (true); }
         ``` 
 
-        Sumarize: This text describes the Event Stream API End Point. It includes the code snippet for getting basic event metadata and the message subject.
+        Sumarize: Code example of Event Stream API End Point. It includes the code snippet for getting basic event metadata and the message subject.
 
         Example:
         ## Vessels Information
         1. Vessel Type: 14K-800A, Purpose: General Cargo, Dead weight (tons): 14360, Build year: 2010, Hire cost (USD/day): 12000
         2. Vessel Type: 24K-200A, Purpose: Multipurpose Tweendecker, Dead weight (tons): 24964, Build year: 2012, Hire cost (USD/day): 12000
 
-        Sumarize: This text describes the Vessels Information, including details of two vessels with Vessel Type, Purpose, Dead weight, Build year, and Hire cost.
+        Sumarize: Vessels Information including details of two vessels with Vessel Type, Purpose, Dead weight, Build year, and Hire cost.
 
         Example:
         ## Logics for calculate ETS factor
@@ -44,7 +44,7 @@ class SentenceSummarizer:
         3. For each pair of load/discharge port: looking at their country codes to see if they are from EU
         4. If both are not from EU: then both of them and all middle ports have factor = 0
 
-        Sumarize: This text describes the logiccal steps for calculating the ETS factor, including determining the consecutive loading/discharging ports, middle ports, and country codes to see if they are from EU.
+        Sumarize: Logical steps for calculating the ETS factor. Steps include determining the consecutive loading/discharging ports, middle ports, and country codes to see if they are from EU.
 
         Important:
         - Return only the formatted summarize text.
