@@ -20,7 +20,7 @@ class SentenceSummarizer:
         - Bunker ROB at Departure = Bunker ROB at Arrival - Bunker Consumption at Port + Bunker Received
         - Bunker Consumption at Port = Bunker Consumption (Idle) + Bunker Consumption (Working) + Bunker Consumption (Intra Port)
 
-        Sumarize: This text describe the bunker planning formular for a ship. It includes the calculation for Bunker ROB at Arrival, Bunker Consumption at Sea, Total Sea Days, Bunker ROB at Departure, and Bunker Consumption at Port.
+        Sumarize: This text describe the bunker planning formular. It includes the calculation for Bunker ROB at Arrival, Bunker Consumption at Sea, Total Sea Days, Bunker ROB at Departure, and Bunker Consumption at Port.
 
         Important:
         - Return only the formatted summarize text.
