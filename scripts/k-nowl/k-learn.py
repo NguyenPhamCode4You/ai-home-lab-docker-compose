@@ -46,10 +46,10 @@ for root, _, files in os.walk(f"./{document_path}"):
                     header, content = "", section
 
                 ## Use the entire chunk as one line
-                # lines = content
+                lines = content
 
                 ## Use lines by lines using the extractor
-                lines = linesExtractor.run(content)
+                # lines = linesExtractor.run(content)
                 
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
