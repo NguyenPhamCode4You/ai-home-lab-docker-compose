@@ -10,6 +10,11 @@ class AssistantAnswer:
         self.embedder = None
         self.vector_store = None
         self.base_prompt = base_prompt_default
+        self.match_count = 32
+    
+    def set_match_count(self, match_count: int):
+        self.match_count = match_count
+        return self
 
     def set_embedder(self, embedder):
         self.embedder = embedder
@@ -29,7 +34,7 @@ class AssistantAnswer:
 
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
-        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=32)
+        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
         titles = [f"{document['content']}".split(":")[0] for document in documents]
         unique_titles = list(set(titles))
 
