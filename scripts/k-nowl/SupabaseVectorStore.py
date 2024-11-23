@@ -39,6 +39,23 @@ class SupabaseVectorStore:
 
         return response.json()
 
+    def insert_document(self, data: dict):
+        """
+        Inserts whole document into the Supabase Postgres database.
+        """
+        
+        response = requests.post(
+            f"{self.url}/rest/v1/{self.table_name}",
+            headers=self.headers,
+            json=data
+        )
+
+        # Check if the insertion was successful
+        if response.status_code != 201:
+            raise Exception(f"Failed to insert document: {response.status_code}, {response.text}")
+        
+        return True
+
     def insert_embedding(self, text: str, embedding: list[float], metadata: str = "", embedding2: list[float] = []):
         """
         Inserts an embedding into the Supabase Postgres database.

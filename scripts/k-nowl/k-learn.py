@@ -11,14 +11,14 @@ from KeywordExtraction import KeywordExtraction
 linesExtractor = LinesExtractor()
 sentenceSummarizer = SentenceSummarizer()
 embedder = CreateEmbedding()
-keywordExtractor = KeywordExtraction().set_keywords_count(10)
+keywordExtractor = KeywordExtraction().set_keywords_count(25)
 
 from Helper import SplitByMarkdownHeader, ExtractMarkdownHeadersAndContent, CleanText
 
 from SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL = "http://localhost:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_bbc_bvms"
+TABLE_NAME = "n8n_documents_net_micro"
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
 document_path = 'processed'
@@ -53,21 +53,21 @@ for root, _, files in os.walk(f"./{document_path}"):
                 
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
-                    sumarize = sentenceSummarizer.run(line)
+                    summarize = sentenceSummarizer.run(line)
                     keyword = keywordExtractor.run(line)
                     filename = CleanText(filename.replace(document_path, ""))
-                    metadata = f"[f]={filename}\t[t]={header}\t[k]={keyword}"
+                    metadata = {"f": filename, "k": keyword, "h": header}
 
-                    embedding1 = embedder.run(metadata)
+                    embedding = embedder.run(metadata)
                     print(f"Embedding1: {metadata}\n")
 
-                    embedding2 = embedder.run(sumarize)
-                    print(f"Embedding2: {sumarize}\n")
+                    embedding2 = embedder.run(summarize)
+                    print(f"Embedding2: {summarize}\n")
 
                     content = f"{header}: {line}"
                     print(f"Content: {content}\n")
 
-                    supabase.insert_embedding(text=content, embedding=embedding1, metadata=metadata, embedding2=embedding2)
+                    supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
                     print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
                     line_index += 1
                 section_index += 1

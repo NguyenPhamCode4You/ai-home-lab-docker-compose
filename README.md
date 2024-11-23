@@ -65,41 +65,14 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Create a table to store your documents
 create table n8n_documents_norm (
   id bigserial primary key,
-  content text, -- corresponds to Document.pageContent
-  metadata jsonb, -- corresponds to Document.metadata
-  embedding vector(768) -- 1536 works for openai embeddings, change if needed
+  content text,
+  summarize text,
+  metadata jsonb,
+  embedding vector(768),
+  embedding2 vector(768)
 );
 
 -- Create a function to search for documents
-create function match_n8n_documents_norm (
-  query_embedding vector(768),
-  match_count int default null,
-  filter jsonb DEFAULT '{}'
-) returns table (
-  id bigint,
-  content text,
-  metadata jsonb,
-  similarity float
-)
-language plpgsql
-as $$
-#variable_conflict use_column
-begin
-  return query
-  select
-    id,
-    content,
-    metadata,
-    1 - (n8n_documents_norm.embedding <=> query_embedding) as similarity
-  from n8n_documents_norm
-  where metadata @> filter
-  order by n8n_documents_norm.embedding <=> query_embedding
-  limit match_count;
-end;
-$$;
-```
-
-```sql
 CREATE FUNCTION match_n8n_documents_bbc_bvms (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
