@@ -5,15 +5,25 @@ class SentenceSummarizer:
         self.url = url
         self.model = model
         self.base_prompt = """
-        Your task is to produce 01 summarize to the text below.
+        Your task is to summarize the given markdown text with 1-3 sentences.
 
         Sumarize: 
-        - Should be concise, clear, and informative, less than 100 characters.
-        - Should mention the main topic, keyword of the text.
-        - Sumarize should be a complete sentence, shorter than the original text.
+        - Should be concise, clear, and informative, less than 300 words.
+        - Should mention the main header of the text, with topic and subtopic if available.
+        - Sumarize should contain complete sentences, and should be shorter than the original text.
+
+        Example:
+        ## Bunker Planning - Formular:
+        - Bunker ROB at Arrival = Bunker ROB at Departure - Bunker Consumption at Sea
+        - Bunker Consumption at Sea = Bunker Consumption Rate at Sea Per day * Total Sea Days
+        - Total Sea Days = Distance : Speed + Extra Sea Days
+        - Bunker ROB at Departure = Bunker ROB at Arrival - Bunker Consumption at Port + Bunker Received
+        - Bunker Consumption at Port = Bunker Consumption (Idle) + Bunker Consumption (Working) + Bunker Consumption (Intra Port)
+
+        Sumarize: This text describe the bunker planning formular for a ship. It includes the calculation for Bunker ROB at Arrival, Bunker Consumption at Sea, Total Sea Days, Bunker ROB at Departure, and Bunker Consumption at Port.
 
         Important:
-        - Return only the formatted text.
+        - Return only the formatted summarize text.
         - Do not include the base prompt in the response.
         - Do not include the input text in the response.
         - Do not include any additional information.
