@@ -53,7 +53,6 @@ for root, _, files in os.walk(f"./{document_path}"):
                 
                 for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
 
-                    line = line.strip()
                     summarize = sentenceSummarizer.run(line)
                     keyword = keywordExtractor.run(line)
                     filename = CleanText(filename.replace(document_path, ""))
