@@ -1,5 +1,5 @@
 import os
-from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader, HardSplitSentences, ExtractMarkdownHeadersAndContent, CleanText
+from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader, HardSplitSentences, ExtractMarkdownHeadersAndContent, CleanText, RecursiveSplitSentences
 
 document_path = 'documents'
 processed_prefix = 'processed'
@@ -47,8 +47,9 @@ for root, _, files in os.walk(f"./{document_path}"):
 
                 if len(section) > section_max_length:
                     header, section = ExtractMarkdownHeadersAndContent(section)[0]
-                    section_parts = HardSplitSentences(section, section_max_length)
-                
+                    # section_parts = HardSplitSentences(section, section_max_length)
+                    section_parts = RecursiveSplitSentences(section, section_max_length)
+
                 for section in section_parts:
                     if len(section) == 0:
                         continue
