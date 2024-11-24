@@ -81,8 +81,9 @@ class AssistantAnswer:
         for question in questions:
             print(f"Question: {question}")
             response = self.run(question)
-            print(f"Response: {response}")
-            context += f"\n{response}"
+            section = f"\n# Question: {question}\nResponse: {response}"
+            context += section
+            print(f"section: {section}")
 
         context = context[:self.max_promp_tokens]
         
@@ -103,15 +104,14 @@ class AssistantAnswer:
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
+        context = ""
 
         sections = self.organize_documents(documents)
-        context = ""
         for section in sections:
             print(f"Title: {section["title"]}, Counts: {section["counts"]}")
-            context += f"""
-            \n# {section["title"]}:
-            \n{section['context']}
-            """
+            context += f"""\n# {section["title"]}:\n{section['context']}"""
+
+        # context = "\n".join([document["content"] for document in documents if len(document["content"]) > 6])
 
         context = context[:self.max_promp_tokens]
         # print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
