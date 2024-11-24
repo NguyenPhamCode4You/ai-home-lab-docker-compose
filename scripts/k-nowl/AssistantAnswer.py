@@ -108,7 +108,7 @@ class AssistantAnswer:
 
         sections = self.organize_documents(documents)
         for section in sections:
-            print(f"Title: {section["title"]}, Counts: {section["counts"]}")
+            print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
 
         # context = "\n".join([document["content"] for document in documents if len(document["content"]) > 6])
