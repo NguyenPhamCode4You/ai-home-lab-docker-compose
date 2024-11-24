@@ -10,7 +10,8 @@ class AssistantAnswer:
         self.embedder = None
         self.vector_store = None
         self.base_prompt = base_prompt_default
-        self.match_count = 32
+        self.match_count = 100
+        self.max_promp_tokens = 6000
     
     def set_match_count(self, match_count: int):
         self.match_count = match_count
@@ -31,35 +32,48 @@ class AssistantAnswer:
     def set_evaluator(self, evaluator):
         self.evaluator = evaluator
         return self
+    
+    def organize_documents(self, documents):
+        # Extract titles from the document contents
+        titles = [document["content"].split(":")[0] for document in documents]
+        unique_titles = list(dict.fromkeys(titles))
+
+        # Create sections for each unique title
+        sections = []
+        for title in unique_titles:
+            counts = len([doc for doc in documents if doc["content"].split(":")[0] == title])
+            
+            # Collect document contents for the current title
+            docs = [
+                document["content"].replace(title, "", 1).replace(":", "", 1).strip()
+                for document in documents
+                if document["content"].split(":")[0] == title
+            ]
+            context = "\n".join(docs)
+
+            # Add section with title, counts, and context
+            sections.append({"title": title, "counts": counts, "context": context})
+
+        # Order the sections by counts (descending order)
+        # sections = sorted(sections, key=lambda x: x["counts"], reverse=True)
+        return sections
+
 
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
-        titles = [f"{document['content']}".split(":")[0] for document in documents]
-        unique_titles = list(set(titles))
 
+        sections = self.organize_documents(documents)
         context = ""
-        for title in unique_titles:
-            section = f"\n#{title}:"
-            # Filter and process documents matching the title
-            docs = [
-                f"\n-{document["content"].replace(title, "").replace(":", "").strip()}"
-                for document in documents
-                if document["content"].split(":")[0] == title
-            ]
-            # Join the processed docs with newline and "-" separator
-            section += "".join(docs)
-            context += section
-            # print(f"Section: {section}")
+        for section in sections:
+            print(f"Title: {section["title"]}, Counts: {section["counts"]}")
+            context += f"""
+            \n# {section["title"]}:
+            \n{section['context']}
+            """
 
-            # eval_result = self.evaluator.run(section, question)
-            # print(f"\n\n\nEval Result: {eval_result}")
-
-            # if "yes" in eval_result:
-            #     context += section
-
-        print(f"Context: {context}")
-
+        context = context[:self.max_promp_tokens]
+        print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
         response = requests.post(

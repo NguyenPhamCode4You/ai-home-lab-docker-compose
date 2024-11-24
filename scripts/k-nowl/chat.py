@@ -15,7 +15,6 @@ assistant = AssistantAnswer(url='http://10.13.13.4:11434/api/generate')
 assistant.set_embedder(embedder)
 assistant.set_vector_store(vector_store)
 assistant.set_evaluator(evaluator)
-assistant.set_match_count(32)
 
 # Streamlit App
 import streamlit as st
