@@ -79,11 +79,12 @@ class AssistantAnswer:
         questions = [question for question in questions.split("VNLPAGL\n") if len(question) > 0]
         context = ""
         for question in questions:
+            print(f"Question: {question}")
             response = self.run(question)
+            print(f"Response: {response}")
             context += f"\n{response}"
 
         context = context[:self.max_promp_tokens]
-        print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
         
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
@@ -113,7 +114,7 @@ class AssistantAnswer:
             """
 
         context = context[:self.max_promp_tokens]
-        print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
+        # print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
 
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
