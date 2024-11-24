@@ -10,9 +10,14 @@ class AssistantAnswer:
         self.embedder = None
         self.vector_store = None
         self.execution_strategy = None
+        self.question_rewrite = None
         self.base_prompt = base_prompt_default
         self.match_count = 100
         self.max_promp_tokens = 6000
+
+    def set_question_rewrite(self, question_rewrite):
+        self.question_rewrite = question_rewrite
+        return self
 
     def set_execution_strategy(self, execution_strategy):
         self.execution_strategy = execution_strategy
@@ -62,7 +67,37 @@ class AssistantAnswer:
         # Order the sections by counts (descending order)
         # sections = sorted(sections, key=lambda x: x["counts"], reverse=True)
         return sections
+    
+    def reasoning(self, question: str) -> str:
+        if self.question_rewrite is None:
+            return self.run(question)
+        
+        questions = self.question_rewrite.run(question)
+        if not questions:
+            return self.run(question)
+        
+        questions = [question for question in questions.split("VNLPAGL\n") if len(question) > 0]
+        context = ""
+        for question in questions:
+            response = self.run(question)
+            context += f"\n{response}"
 
+        context = context[:self.max_promp_tokens]
+        print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
+        
+        prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
+        # Send the request to the Ollama API
+        response = requests.post(
+            url=self.url,
+            json={"model": self.model, "prompt": prompt, "stream": False}
+        )
+        
+        # Check if the response is successful
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        # Clean and format the JSON response
+        return self._clean_json_response(response.json())
 
     def run(self, question: str) -> str:
         question_embedding = self.embedder.run(question)
