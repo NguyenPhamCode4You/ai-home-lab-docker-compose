@@ -9,9 +9,14 @@ class AssistantAnswer:
         self.model = model
         self.embedder = None
         self.vector_store = None
+        self.execution_strategy = None
         self.base_prompt = base_prompt_default
         self.match_count = 100
         self.max_promp_tokens = 6000
+
+    def set_execution_strategy(self, execution_strategy):
+        self.execution_strategy = execution_strategy
+        return self
     
     def set_match_count(self, match_count: int):
         self.match_count = match_count
@@ -74,6 +79,7 @@ class AssistantAnswer:
 
         context = context[:self.max_promp_tokens]
         print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
+
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
         response = requests.post(

@@ -2,6 +2,7 @@ from CreateEmbedding import CreateEmbedding
 from SupabaseVectorStore import SupabaseVectorStore
 from AssistantAnswer import AssistantAnswer
 from DocumentEvaluator import DocumentEvaluator
+from ExecutionStrategy import ExecutionStrategy
 
 SUPABASE_URL = "http://10.13.13.4:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
@@ -10,11 +11,13 @@ vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
 embedder = CreateEmbedding(url='http://10.13.13.4:11434/api/embed')
 evaluator = DocumentEvaluator(url='http://10.13.13.4:11434/api/generate')
+stratergy = ExecutionStrategy(url='http://10.13.13.4:11434/api/generate')
 
 assistant = AssistantAnswer(url='http://10.13.13.4:11434/api/generate')
 assistant.set_embedder(embedder)
 assistant.set_vector_store(vector_store)
 assistant.set_evaluator(evaluator)
+assistant.set_execution_strategy(stratergy)
 
 # Streamlit App
 import streamlit as st
