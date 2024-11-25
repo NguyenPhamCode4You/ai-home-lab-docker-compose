@@ -1,4 +1,6 @@
+import json
 import requests
+from Helper import RecursiveSplitSentences
 
 class JsonExtractor:
     def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
@@ -62,21 +64,39 @@ class JsonExtractor:
       return self
 
     def run(self, data: str) -> str:
-        # Send the request to the Ollama API
-        prompt = self.prompt + f"\nNow extract from this text: {data}\nOutput: "
-        response = requests.post(
-            url=self.url,
-            json={"model": self.model, "prompt": str(prompt), "stream": False}
-        )
+        chunks = RecursiveSplitSentences(data, limit=5000, overlap=0)
+        chunks = [chunk for chunk in chunks if len(chunk) > 0]
+        current = 1
+        total = len(chunks)
+        extracted_items = []
+
+        for chunk in chunks:
+            print(f"Extracting chunk: {current}/{total}")
+            prompt = self.prompt + f"\nNow extract from this text: {chunk}\nOutput: "
+            response = requests.post(
+                url=self.url,
+                json={"model": self.model, "prompt": str(prompt), "stream": False}
+            )
         
-        # Check if the response is successful
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        
-        # Clean and format the JSON response
-        return self._clean_json_response(response.json())
+            # Check if the response is successful
+            if response.status_code != 200:
+                print(f"Failed to extract chunk {current}/{total}.")
+            else:
+                try:
+                    items = self._clean_json_response(response.json())
+                    extracted_items.extend(items)
+                    print(f"Successfully - found {len(items)} items in chunk {current}/{total}.")
+
+                except Exception as e:
+                    print(f"Failed to parse chunk {current}/{total}. Error: {e}")
+            
+            current += 1
+
+        print(f"Extraction complete. Total items extracted: {len(extracted_items)}")
+        return extracted_items
 
     def _clean_json_response(self, response_data):
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
-        return response
+        response = response.replace("<json>", "").replace("</json>", "")
+        return json.loads(response)

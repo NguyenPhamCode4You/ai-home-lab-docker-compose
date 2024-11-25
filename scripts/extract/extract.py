@@ -20,12 +20,6 @@ def extract_from_schema():
         # Dynamically create the schema
         extractor = JsonExtractor(url=ollama_url)
         response = extractor.set_schema(schema).run(user_input)
-
-        # Remove <json> tags
-        response = response.replace("<json>", "").replace("</json>", "")
-        response = json.loads(response)
-
-        # Return the parsed response
         return jsonify({"response": response}), 200
 
     except Exception as e:
@@ -63,6 +57,7 @@ def extract_from_file():
 
         # Convert the file to text
         content = file_handler.convert_file_to_text()
+        print(content)
 
         # Cleanup the temporary file
         file_handler.cleanup()
@@ -70,11 +65,6 @@ def extract_from_file():
         # Dynamically create the schema
         extractor = JsonExtractor(url=ollama_url)
         response = extractor.set_schema(schema).run(content)
-
-        # Remove <json> tags
-        response = response.replace("<json>", "").replace("</json>", "")
-        response = json.loads(response)
-        # Return the parsed response
         return jsonify({"response": response}), 200
     
     except Exception as e:
