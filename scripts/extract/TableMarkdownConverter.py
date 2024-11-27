@@ -1,6 +1,6 @@
 import json
 import requests
-from Helper import RecursiveSplitSentences
+from Helper import RecursiveSplitSentences, RemoveExcessiveSpacing, csv_text_to_formatted_rows
 
 class TableMarkdownConverter:
     def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
@@ -52,6 +52,7 @@ class TableMarkdownConverter:
         """
 
     def run(self, message: str) -> str:
+        message = RemoveExcessiveSpacing(message)
         chunks = RecursiveSplitSentences(message, limit=4000, overlap=0)
         chunks = [chunk for chunk in chunks if len(chunk) > 0]
         current = 1
@@ -72,6 +73,10 @@ class TableMarkdownConverter:
         
             # Clean and format the JSON response
             response = self._clean_json_response(response.json())
+            print(f"Converted chunk {current}/{total}.")
+            print(response)
+            response = csv_text_to_formatted_rows(response)
+            print(response)
             result += response + "\n"
             current += 1
 

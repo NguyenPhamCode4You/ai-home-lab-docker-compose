@@ -9,6 +9,7 @@ from TableMarkdownConverter import TableMarkdownConverter
 
 ollama_url="http://10.13.13.4:11434/api/generate"
 table_formatter = TableMarkdownConverter(url=ollama_url)
+extractor = JsonExtractor(url=ollama_url)
 
 @app.route('/extract-from-schema', methods=['POST'])
 def extract_from_schema():
@@ -60,7 +61,6 @@ def extract_from_file():
         # Convert the file to text
         content = file_handler.convert_file_to_text()
         content = table_formatter.run(content)
-        print(content)
 
         # Cleanup the temporary file
         file_handler.cleanup()
