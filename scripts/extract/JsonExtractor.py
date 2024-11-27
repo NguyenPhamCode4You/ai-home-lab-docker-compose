@@ -64,7 +64,7 @@ class JsonExtractor:
       return self
 
     def run(self, data: str) -> str:
-        chunks = RecursiveSplitSentences(data, limit=5000, overlap=0)
+        chunks = RecursiveSplitSentences(data, limit=4000, overlap=0)
         chunks = [chunk for chunk in chunks if len(chunk) > 0]
         current = 1
         total = len(chunks)
