@@ -5,7 +5,11 @@ from FileHandler import FileHandler
 app = Flask(__name__)
 
 from JsonExtractor import JsonExtractor
+from DataPreProcessing import DataPreProcessing
+
 ollama_url="http://10.13.13.4:11434/api/generate"
+preprocessor = DataPreProcessing(url=ollama_url)
+extractor = JsonExtractor(url=ollama_url)
 
 @app.route('/extract-from-schema', methods=['POST'])
 def extract_from_schema():
@@ -18,7 +22,6 @@ def extract_from_schema():
             return jsonify({"error": "Invalid input. Expected 'schema' to be a list of field objects."}), 400
 
         # Dynamically create the schema
-        extractor = JsonExtractor(url=ollama_url)
         response = extractor.set_schema(schema).run(user_input)
         return jsonify({"response": response}), 200
 
@@ -56,14 +59,13 @@ def extract_from_file():
         file_handler.save_temp_file()
 
         # Convert the file to text
-        content = file_handler.convert_file_to_text()
-        print(content)
+        # content = file_handler.convert_file_to_text()
+        content = file_handler.convert_file_to_table()
 
         # Cleanup the temporary file
         file_handler.cleanup()
 
         # Dynamically create the schema
-        extractor = JsonExtractor(url=ollama_url)
         response = extractor.set_schema(schema).run(content)
         return jsonify({"response": response}), 200
     

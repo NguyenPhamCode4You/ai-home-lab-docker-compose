@@ -1,13 +1,14 @@
 import json
 import requests
-from Helper import RecursiveSplitSentences
+from Helper import RecursiveSplitSentences, RemoveExcessiveSpacing
 
 class JsonExtractor:
     def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
         self.prompt = None
-
+        self.preprocessor = None
+    
     def set_schema(self, schema_fields):
       schema_description = (
           "Your goal is to extract structured information from the user's input that matches the form described below. "
@@ -64,7 +65,8 @@ class JsonExtractor:
       return self
 
     def run(self, data: str) -> str:
-        chunks = RecursiveSplitSentences(data, limit=5000, overlap=0)
+        data = RemoveExcessiveSpacing(data.strip())
+        chunks = RecursiveSplitSentences(data, limit=2500, overlap=0)
         chunks = [chunk for chunk in chunks if len(chunk) > 0]
         current = 1
         total = len(chunks)
@@ -72,6 +74,7 @@ class JsonExtractor:
 
         for chunk in chunks:
             print(f"Extracting chunk: {current}/{total}")
+            print(chunk)
             prompt = self.prompt + f"\nNow extract from this text: {chunk}\nOutput: "
             response = requests.post(
                 url=self.url,
@@ -99,4 +102,7 @@ class JsonExtractor:
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
         response = response.replace("<json>", "").replace("</json>", "")
+        response = response.replace("<pre>", "").replace("</pre>", "")
+        response = response.replace("```", "").replace("json", "")
+        print('.......' + response)
         return json.loads(response)
