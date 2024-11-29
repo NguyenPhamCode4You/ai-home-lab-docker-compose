@@ -8,8 +8,10 @@ from JsonExtractor import JsonExtractor
 from PackingListParser import PackingListParser
 
 ollama_url="http://10.13.13.4:11434/api/generate"
-extractor = JsonExtractor(url=ollama_url)
-packingListParser = PackingListParser(url=ollama_url)
+model="qwen2.5-coder:14b-instruct-q6_K"
+# model="gemma2:9b-instruct-q8_0"
+extractor = JsonExtractor(url=ollama_url, model=model)
+packingListParser = PackingListParser(url=ollama_url, model=model)
 
 @app.route('/extract-from-schema', methods=['POST'])
 def extract_from_schema():
