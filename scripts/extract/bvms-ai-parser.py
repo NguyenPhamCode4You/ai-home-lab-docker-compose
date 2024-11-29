@@ -7,7 +7,7 @@ app = Flask(__name__)
 from JsonExtractor import JsonExtractor
 from PackingListParser import PackingListParser
 
-ollama_url="http://10.13.13.4:11434/api/generate"
+ollama_url="http://localhost:11434/api/generate"
 model="qwen2.5-coder:14b-instruct-q6_K"
 # model="gemma2:9b-instruct-q8_0"
 extractor = JsonExtractor(url=ollama_url, model=model)
