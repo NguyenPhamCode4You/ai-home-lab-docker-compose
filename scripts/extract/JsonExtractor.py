@@ -87,9 +87,9 @@ class JsonExtractor:
         print(f"Extracted JSON: {response}")
         response = response.replace("<json>", "").replace("</json>", "")
         response = response.replace("```", "").replace("json", "")
-        print(f"Extracted JSON: {response}")
+        print(f"Formated JSON: {response}")
         try:
             return json.loads(response)
         except Exception as e:
-            print(f"Failed to parse chunk {response}")
+            print(f"Failed to parse JSON {response}")
             return []
