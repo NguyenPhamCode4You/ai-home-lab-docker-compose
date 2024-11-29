@@ -8,8 +8,8 @@ from JsonExtractor import JsonExtractor
 from PackingListParser import PackingListParser
 
 ollama_url="http://localhost:11434/api/generate"
-model="qwen2.5-coder:14b-instruct-q6_K"
-# model="gemma2:9b-instruct-q8_0"
+# model="qwen2.5-coder:14b-instruct-q6_K"
+model="gemma2:9b-instruct-q8_0"
 extractor = JsonExtractor(url=ollama_url, model=model)
 packingListParser = PackingListParser(url=ollama_url, model=model)
 with open('./order-schema.json', 'r', encoding='utf-8') as file:
