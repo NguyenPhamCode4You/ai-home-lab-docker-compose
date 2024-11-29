@@ -56,6 +56,7 @@ class JsonExtractor:
           "Do not output anything except for the extracted information. "
           "Do not add any clarifying information. "
           "Do not add any fields that are not in the schema. "
+          "Do not use triple quotes or any other formatting in the output. "
           "If the text contains attributes that do not appear in the schema, please ignore them. "
           "All output must be in JSON format and follow the schema specified above. Wrap the JSON in <json> tags.\n\n"
       )
@@ -67,44 +68,26 @@ class JsonExtractor:
     def run(self, data: str) -> str:
         if data is None or len(data) == 0:
             return []
-        data = RemoveExcessiveSpacing(data.strip())
-        chunks = RecursiveSplitSentences(data, limit=4000, overlap=0)
-        chunks = [chunk for chunk in chunks if len(chunk) > 0]
-        current = 1
-        total = len(chunks)
-        extracted_items = []
-
-        for chunk in chunks:
-            print(f"Extracting chunk: {current}/{total}")
-            print(chunk)
-            prompt = self.prompt + f"\nNow extract from this text: {chunk}\nOutput: "
-            response = requests.post(
-                url=self.url,
-                json={"model": self.model, "prompt": str(prompt), "stream": False}
-            )
         
-            # Check if the response is successful
-            if response.status_code != 200:
-                print(f"Failed to extract chunk {current}/{total}.")
-            else:
-                try:
-                    items = self._clean_json_response(response.json())
-                    extracted_items.extend(items)
-                    print(f"Successfully - found {len(items)} items in chunk {current}/{total}.")
-
-                except Exception as e:
-                    print(f"Failed to parse chunk {current}/{total}. Error: {e}")
-            
-            current += 1
-
-        print(f"Extraction complete. Total items extracted: {len(extracted_items)}")
-        return extracted_items
+        prompt = self.prompt + f"\nNow extract from this text: {data}\nOutput: "
+        response = requests.post(
+            url=self.url,
+            json={"model": self.model, "prompt": str(prompt), "stream": False}
+        )
+    
+        if response.status_code != 200:
+            print(f"Failed to extract chunk ")
+            return []
+        
+        return self._clean_json_response(response.json())
 
     def _clean_json_response(self, response_data):
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
         response = response.replace("<json>", "").replace("</json>", "")
-        response = response.replace("<pre>", "").replace("</pre>", "")
-        response = response.replace("```", "").replace("json", "")
-        print('.......' + response)
-        return json.loads(response)
+        print(f"Extracted JSON: {response}")
+        try:
+            return json.loads(response)
+        except Exception as e:
+            print(f"Failed to parse chunk {response}")
+            return []

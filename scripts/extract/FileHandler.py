@@ -2,7 +2,26 @@ import os
 from datetime import datetime
 from docling.document_converter import DocumentConverter
 import pandas as pd
+from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.base_models import InputFormat
 
+pipeline_options_PDF = PdfPipelineOptions()
+pipeline_options_PDF.do_ocr = False
+pipeline_options_PDF.do_table_structure = True
+pipeline_options_PDF.table_structure_options.do_cell_matching = True
+
+pipeline_options_IMAGE = PdfPipelineOptions()
+pipeline_options_IMAGE.do_ocr = True
+pipeline_options_IMAGE.do_table_structure = False
+pipeline_options_IMAGE.table_structure_options.do_cell_matching = False
+
+# converter = DocumentConverter(
+#     format_options={
+#         InputFormat.IMAGE: PdfFormatOption(pipeline_options=pipeline_options_IMAGE),
+#         InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options_PDF),
+#     }
+# )
 converter = DocumentConverter()
 
 class FileHandler:
@@ -31,44 +50,6 @@ class FileHandler:
         self.file_stream.save(self.temp_file_path)
         return self
     
-    def convert_file_to_table(self):
-        """
-        Converts the saved file to a table using the docling library.
-        Supported formats: CSV, Excel, and HTML.
-        :return: The extracted table content.
-        """
-        if not self.temp_file_path:
-            raise ValueError("File must be saved before conversion.")
-
-        file_extension = os.path.splitext(self.temp_file_path)[1].lower()
-        try:
-            if file_extension in ['.pdf', '.md', '.doc', '.docx', '.ppt', '.html']:
-                # Use docling to extract content
-                conv_res = converter.convert(self.temp_file_path)
-                # Export tables
-                tables_text = ""
-                for table_ix, table in enumerate(conv_res.document.tables):
-                    table_df: pd.DataFrame = table.export_to_dataframe()
-                    formatted_rows = table_df.apply(lambda row: ', '.join([f"{col}: {row[col]}" for col in table_df.columns]), axis=1)
-                    tables_text += '\n'.join(formatted_rows)
-
-                    # tables_text += table.export_to_html()
-                return tables_text
-
-            elif file_extension in ['.csv', '.xls', '.xlsx']:
-                # Read the table from the file
-                if file_extension == '.csv':
-                    table_df = pd.read_csv(self.temp_file_path)
-                else:
-                    table_df = pd.read_excel(self.temp_file_path)
-                return table_df.to_markdown()
-            
-            else:
-                raise ValueError(f"Unsupported file extension: {file_extension}")
-            
-        except Exception as e:
-            raise ValueError(f"Error converting file: {e}")
-
     def convert_file_to_text(self):
         """
         Converts the saved file to text using the docling library.
@@ -80,12 +61,11 @@ class FileHandler:
 
         file_extension = os.path.splitext(self.temp_file_path)[1].lower()
         try:
-            if file_extension in ['.pdf', '.md', '.doc', '.docx', '.ppt', '.html']:
-                # Use docling to extract content
+            if file_extension in ['.pdf', '.doc', '.docx', '.ppt', '.html', '.jpg', '.png', '.jpeg']:
                 result = converter.convert(self.temp_file_path)
                 return result.document.export_to_markdown()
             
-            elif file_extension in ['.txt', '.xml']:
+            elif file_extension in ['.txt', '.xml', '.md']:
                 with open(self.temp_file_path, 'r', encoding='utf-8') as file:
                     return file.read()
                 

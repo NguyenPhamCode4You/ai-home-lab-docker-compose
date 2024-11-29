@@ -46,30 +46,3 @@ def RemoveExcessiveSpacing(text):
     while "||" in text:
         text = text.replace("||", "")
     return text
-
-import pandas as pd
-from io import StringIO
-
-def csv_text_to_formatted_rows(csv_text):
-    """
-    Converts a CSV string into rows with columnName: value pairs.
-    
-    Parameters:
-    csv_text (str): CSV content as a string.
-    
-    Returns:
-    list: A list of strings, each representing a row with columnName: value pairs.
-    """
-    # Use StringIO to simulate a file object from the string
-    csv_data = StringIO(csv_text)
-    
-    # Load the CSV into a DataFrame
-    df = pd.read_csv(csv_data)
-    
-    # Handle missing values by filling them with empty strings
-    df = df.fillna('')
-
-    # Convert each row to the desired format
-    formatted_rows = df.apply(lambda row: ', '.join([f"{col} = {row[col]}" for col in df.columns]), axis=1)
-
-    return formatted_rows.tolist()  # Return as a list of strings
