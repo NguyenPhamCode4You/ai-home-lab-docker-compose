@@ -1,0 +1,87 @@
+[
+    {
+        "fieldName": "cargoItems",
+        "description": "Names of the cargo items to be transported",
+        "dataType": "Array<string>",
+        "examples": [
+            {
+                "text": "The cargo includes 2 hydraulic power units.",
+                "output": [
+                    "2 hydraulic power units"
+                ]
+            }
+        ]
+    },
+    {
+        "fieldName": "loadingPorts",
+        "description": "Name of the ports where the cargo will be loaded",
+        "dataType": "Array<string>",
+        "examples": [
+            {
+                "text": "POL: Hamburg, DE",
+                "output": [
+                    "Hamburg"
+                ]
+            },
+            {
+                "text": "Shipment/Cargo will be loaded at Bergen and Shanghai.",
+                "output": [
+                    "Bergen",
+                    "Shanghai"
+                ]
+            }
+        ]
+    },
+    {
+        "fieldName": "dischargingPorts",
+        "description": "Name of the ports where the cargo will be dischared",
+        "dataType": "Array<string>",
+        "examples": [
+            {
+                "text": "POD: Hamburg, DE",
+                "output": [
+                    "Hamburg"
+                ]
+            },
+            {
+                "text": "Shipment/Cargo will be discharged at Bergen and Shanghai.",
+                "output": [
+                    "Bergen",
+                    "Shanghai"
+                ]
+            }
+        ]
+    },
+    {
+        "fieldName": "freight",
+        "description": "The freight cost as a numeric value, e.g., 455000.",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "currency",
+        "description": "The currency unit for the freight, USD or EUR.",
+        "dataType": "string"
+    },
+    {
+        "fieldName": "laycanFrom",
+        "description": "The start date of the laycan period in ISO 8601 format: YYYY-MM-DD",
+        "dataType": "string",
+        "examples": [
+            {
+                "text": "Laycan is from 15th Feb to 25th Feb.",
+                "output": "2024-02-15"
+            }
+        ]
+    },
+    {
+        "fieldName": "laycanTo",
+        "description": "The end date of the laycan period in ISO 8601 format: YYYY-MM-DD",
+        "dataType": "string",
+        "examples": [
+            {
+                "text": "Laycan is from 15th Feb to 25th Feb.",
+                "output": "2024-02-25"
+            }
+        ]
+    }
+]

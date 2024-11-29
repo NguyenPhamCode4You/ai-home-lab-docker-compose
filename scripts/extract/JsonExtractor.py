@@ -52,13 +52,10 @@ class JsonExtractor:
       # Combine everything into the prompt
       prompt = f"{schema_description}\n\n{schema_representation}\n\n"
       prompt += (
-          "Please output the extracted information in JSON format. "
-          "Do not output anything except for the extracted information. "
-          "Do not add any clarifying information. "
           "Do not add any fields that are not in the schema. "
           "Do not use triple quotes or any other formatting in the output. "
-          "If the text contains attributes that do not appear in the schema, please ignore them. "
-          "All output must be in JSON format and follow the schema specified above. Wrap the JSON in <json> tags.\n\n"
+          "Return only the json structure, no additional information, no triple quotes, no formatting, no explanations."
+          "Wrap the json structure in <json> tags.\n\n"
       )
       prompt += "\n".join(examples)
 

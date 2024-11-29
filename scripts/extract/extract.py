@@ -74,28 +74,6 @@ def extract_from_file():
     except Exception as e:
         file_handler.cleanup()
         return f"Failed to process file: {e}", 500
-    
-@app.route('/extract-packing-items', methods=['POST'])
-def extract_packing_items():
-    content = request.form.get('data')
-    file = request.files['file']
-
-    if not content and not file:
-        return jsonify({'error': 'Both file and input is missing'}), 400
-    
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    
-    if file:
-        file_handler = FileHandler(file)
-        # Save the file
-        file_handler.save_temp_file()
-        # Convert the file to text
-        content = file_handler.convert_file_to_text()
-        file_handler.cleanup()
-
-    items = packingListParser.run(content)
-    return jsonify({"response": items}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
