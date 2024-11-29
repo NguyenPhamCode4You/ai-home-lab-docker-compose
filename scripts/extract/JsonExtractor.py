@@ -85,6 +85,7 @@ class JsonExtractor:
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
         response = response.replace("<json>", "").replace("</json>", "")
+        response = response.replace("```", "").replace("json", "")
         print(f"Extracted JSON: {response}")
         try:
             return json.loads(response)
