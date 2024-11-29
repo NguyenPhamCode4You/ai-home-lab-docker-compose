@@ -84,6 +84,7 @@ class JsonExtractor:
     def _clean_json_response(self, response_data):
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
+        print(f"Extracted JSON: {response}")
         response = response.replace("<json>", "").replace("</json>", "")
         response = response.replace("```", "").replace("json", "")
         print(f"Extracted JSON: {response}")
