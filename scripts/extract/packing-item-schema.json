@@ -1,0 +1,30 @@
+[
+    {
+        "fieldName": "item_name",
+        "dataType": "string"
+    },
+    {
+        "fieldName": "width",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "height",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "length",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "weight",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "volume",
+        "dataType": "number"
+    },
+    {
+        "fieldName": "quantity",
+        "dataType": "number"
+    }
+]

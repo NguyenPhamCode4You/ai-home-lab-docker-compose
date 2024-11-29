@@ -21,7 +21,10 @@ class JsonExtractor:
       schema_representation += "dataOutput: Array<{ // Details of items to be extracted.\n"
 
       for field in schema_fields:
-          field_line = f" {field['fieldName']}: {field['dataType']} // {field['description']}\n"
+          field_name = field.get("fieldName", "")
+          field_type = field.get("dataType", "")
+          field_description = field.get("description", "")
+          field_line = f" {field_name}: {field_type} // {field_description}\n"
           schema_representation += field_line
 
       schema_representation += "}>\n```"

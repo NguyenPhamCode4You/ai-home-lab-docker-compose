@@ -61,7 +61,6 @@ def extract_from_file():
         file_handler.save_temp_file()
         # Convert the file to text
         content = file_handler.convert_file_to_text()
-        content = packingListParser.run(content)
         print(f"Extracted content: {content}")
 
         # Cleanup the temporary file
