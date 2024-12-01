@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Generator, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from AssistantAnswer import AssistantAnswer
@@ -19,7 +19,7 @@ assistant.set_embedder(embedder)
 assistant.set_vector_store(vector_store)
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 # Initialize FastAPI
 app = FastAPI()
@@ -69,6 +69,35 @@ async def get_answer_for_question(request: CompletionRequest):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/answer/stream")
+async def get_answer_for_question_stream(request: CompletionRequest):
+    try:
+        user_question = get_last_user_question(request.messages)
+        history = [message for message in request.messages or []]
+        history = history[:-1]  # Remove the last user question from history
+
+        # Define a generator for streaming response
+        def response_generator() -> Generator[str, None, None]:
+            try:
+                # Use a regular generator to stream responses
+                for chunk in assistant.stream(user_question, history):
+                    yield chunk
+            except Exception as e:
+                # Log the error and yield an error message
+                print(f"Error during stream generation: {e}")
+                yield f"Error: {str(e)}"
+
+        # Return a StreamingResponse with the generator
+        return StreamingResponse(
+            response_generator(),
+            media_type="text/plain",
+        )
+
+    except Exception as e:
+        print(f"Error handling request: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Run the FastAPI app
 if __name__ == "__main__":

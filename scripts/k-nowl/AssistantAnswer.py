@@ -1,3 +1,5 @@
+import json
+import httpx
 import requests
 from typing import List, Optional
 
@@ -80,9 +82,40 @@ class AssistantAnswer:
             print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
-
-    # Run the assistant to answer the question
+    
     def run(self, question: str, messages: List[Message] = None) -> str:
+        prompt = self.get_final_prompt(question, messages)
+
+        response = requests.post(
+            url=self.url,
+            json={"model": self.model, "prompt": prompt, "stream": False}
+        )
+        
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        return self._clean_json_response(response.json())
+    
+    def stream(self, question: str, messages: List[Message] = None) -> str:
+        prompt = self.get_final_prompt(question, messages)
+        
+        # Send request with streaming enabled
+        with httpx.Client() as client:
+            response = client.post(
+                url=self.url,
+                json={"model": self.model, "prompt": prompt, "stream": True},
+                timeout=None,
+            )
+            if response.status_code != 200:
+                raise Exception(f"Failed to connect: {response.status_code}")
+            
+            # Iterate over the response lines
+            for line in response.iter_lines():
+                if line:
+                    yield line  # Directly yield the line (which is already a string)
+    
+    # Run the assistant to answer the question
+    def get_final_prompt(self, question: str, messages: List[Message] = None) -> str:
         histories = ""
         if messages and len(messages) > 0:
             histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
@@ -98,18 +131,8 @@ class AssistantAnswer:
             .replace("{histories}", histories)
         )
 
-        print(f"Prompt: {prompt}")
-        
-        response = requests.post(
-            url=self.url,
-            json={"model": self.model, "prompt": prompt, "stream": False}
-        )
-        
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        
-        return self._clean_json_response(response.json())
-
+        return prompt
+    
     # Clean the API response
     def _clean_json_response(self, response_data: dict) -> str:
         return response_data.get("response", "")
