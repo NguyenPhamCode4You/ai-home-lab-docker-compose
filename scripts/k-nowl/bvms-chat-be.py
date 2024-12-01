@@ -54,10 +54,11 @@ async def get_documents_from_question(request: CompletionRequest):
 @app.post("/api/answer")
 async def get_answer_for_question(request: CompletionRequest):
     try:
-
         user_question = get_last_user_question(request.messages)
-        response = assistant.run(user_question)
-        print(f"Answer: {response}")
+        history = [message for message in request.messages or []]
+        # Remove last user question from history
+        history = history[:-1]
+        response = assistant.run(user_question, history)
         # Return the response
         return JSONResponse(
             content={

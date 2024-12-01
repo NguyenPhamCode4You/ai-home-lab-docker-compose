@@ -1,28 +1,31 @@
 import requests
+from typing import List, Optional
 
+# Load default base prompt
 with open("./prompts/BVMS-Rag-Prompt.txt", "r", encoding="utf-8") as file:
     base_prompt_default = file.read()
 
+class Message():
+    role: str  # e.g., "user", "assistant"
+    content: str  # Message text
+
+# Main assistant class
 class AssistantAnswer:
-    def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
+    def __init__(
+        self,
+        url: str = "http://localhost:11434/api/generate",
+        model: str = "gemma2:9b-instruct-q8_0"
+    ):
         self.url = url
         self.model = model
-        self.embedder = None
-        self.vector_store = None
-        self.execution_strategy = None
-        self.question_rewrite = None
+        self.embedder = None                    # Placeholder for an embedding function or model
+        self.vector_store = None                # Placeholder for a vector database
         self.base_prompt = base_prompt_default
         self.match_count = 100
-        self.max_promp_tokens = 4000
+        self.max_context_tokens_length = 5500   # 5500 is the best length for the context tokens, for typescript & PL questions
+        self.max_history_tokens_length = 500    # 6000 is the maximum length, thus 6000 - 5500 = 500 for the history tokens
 
-    def set_question_rewrite(self, question_rewrite):
-        self.question_rewrite = question_rewrite
-        return self
-
-    def set_execution_strategy(self, execution_strategy):
-        self.execution_strategy = execution_strategy
-        return self
-    
+    # Setters to customize the instance
     def set_match_count(self, match_count: int):
         self.match_count = match_count
         return self
@@ -34,26 +37,24 @@ class AssistantAnswer:
     def set_base_prompt(self, base_prompt: str):
         self.base_prompt = base_prompt
         return self
-    
+
     def set_vector_store(self, vector_store):
         self.vector_store = vector_store
         return self
-    
+
     def set_evaluator(self, evaluator):
         self.evaluator = evaluator
         return self
-    
-    def organize_documents(self, documents):
-        # Extract titles from the document contents
+
+    # Organize retrieved documents into structured sections
+    def organize_documents(self, documents: List[dict]) -> List[dict]:
+        # Extract titles and organize by unique titles
         titles = [document["content"].split(":")[0] for document in documents]
         unique_titles = list(dict.fromkeys(titles))
 
-        # Create sections for each unique title
         sections = []
         for title in unique_titles:
             counts = len([doc for doc in documents if doc["content"].split(":")[0] == title])
-            
-            # Collect document contents for the current title
             docs = [
                 document["content"].replace(title, "", 1).replace(":", "", 1).strip()
                 for document in documents
@@ -61,43 +62,54 @@ class AssistantAnswer:
             ]
             context = "\n".join(docs)
 
-            # Add section with title, counts, and context
             sections.append({"title": title, "counts": counts, "context": context})
 
-        # Order the sections by counts (descending order)
-        # sections = sorted(sections, key=lambda x: x["counts"], reverse=True)
         return sections
-    
-    def retrieve_documents(self, question: str):
+
+    # Retrieve documents relevant to the question
+    def retrieve_documents(self, question: str) -> str:
+        if not self.embedder or not self.vector_store:
+            raise ValueError("Embedder and vector store must be set before retrieving documents.")
+        
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
-        context = ""
 
         sections = self.organize_documents(documents)
+        context = ""
         for section in sections:
             print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
-
-        context = context[:self.max_promp_tokens]
         return context
 
-    def run(self, question: str) -> str:
+    # Run the assistant to answer the question
+    def run(self, question: str, messages: List[Message] = None) -> str:
+        histories = ""
+        if messages and len(messages) > 0:
+            histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
+            histories = histories[-self.max_history_tokens_length:]
+        
         context = self.retrieve_documents(question)
-        prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
-        # Send the request to the Ollama API
+        context = context[:self.max_context_tokens_length]
+
+        prompt = (
+            self.base_prompt
+            .replace("{context}", context)
+            .replace("{question}", question)
+            .replace("{histories}", histories)
+        )
+
+        print(f"Prompt: {prompt}")
+        
         response = requests.post(
             url=self.url,
             json={"model": self.model, "prompt": prompt, "stream": False}
         )
         
-        # Check if the response is successful
         if response.status_code != 200:
             raise Exception(f"Failed to connect: {response.status_code}")
         
-        # Clean and format the JSON response
         return self._clean_json_response(response.json())
 
-    def _clean_json_response(self, response_data):
-        # Assuming the API response has a 'response' field with the raw JSON text
-        response = response_data.get("response", "")
-        return response
+    # Clean the API response
+    def _clean_json_response(self, response_data: dict) -> str:
+        return response_data.get("response", "")
