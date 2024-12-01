@@ -42,7 +42,6 @@ def submit_message():
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         # Get response from the assistant (mock response for illustration)
-        # response = assistant.reasoning(user_input)
         response = assistant.run(user_input)
         st.session_state.messages.append({"role": "assistant", "content": response})
 

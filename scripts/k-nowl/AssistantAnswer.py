@@ -13,7 +13,7 @@ class AssistantAnswer:
         self.question_rewrite = None
         self.base_prompt = base_prompt_default
         self.match_count = 100
-        self.max_promp_tokens = 6000
+        self.max_promp_tokens = 4000
 
     def set_question_rewrite(self, question_rewrite):
         self.question_rewrite = question_rewrite
@@ -68,40 +68,7 @@ class AssistantAnswer:
         # sections = sorted(sections, key=lambda x: x["counts"], reverse=True)
         return sections
     
-    def reasoning(self, question: str) -> str:
-        if self.question_rewrite is None:
-            return self.run(question)
-        
-        questions = self.question_rewrite.run(question)
-        if not questions:
-            return self.run(question)
-        
-        questions = [question for question in questions.split("VNLPAGL\n") if len(question) > 0]
-        context = ""
-        for question in questions:
-            print(f"Question: {question}")
-            response = self.run(question)
-            section = f"\n# Question: {question}\nResponse: {response}"
-            context += section
-            print(f"section: {section}")
-
-        context = context[:self.max_promp_tokens]
-        
-        prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
-        # Send the request to the Ollama API
-        response = requests.post(
-            url=self.url,
-            json={"model": self.model, "prompt": prompt, "stream": False}
-        )
-        
-        # Check if the response is successful
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        
-        # Clean and format the JSON response
-        return self._clean_json_response(response.json())
-
-    def run(self, question: str) -> str:
+    def retrieve_documents(self, question: str):
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
         context = ""
@@ -111,11 +78,11 @@ class AssistantAnswer:
             print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
 
-        # context = "\n".join([document["content"] for document in documents if len(document["content"]) > 6])
-
         context = context[:self.max_promp_tokens]
-        # print(f"Context: \nooooooooooooooooooooooooo\n{context}\nnooooooooooooooooooooooooo")
+        return context
 
+    def run(self, question: str) -> str:
+        context = self.retrieve_documents(question)
         prompt = self.base_prompt.replace("{context}", context).replace("{question}", question)
         # Send the request to the Ollama API
         response = requests.post(
