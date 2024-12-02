@@ -76,23 +76,7 @@ async def get_answer_for_question_stream(request: CompletionRequest):
         user_question = get_last_user_question(request.messages)
         history = [message for message in request.messages or []]
         history = history[:-1]  # Remove the last user question from history
-
-        # Define a generator for streaming response
-        def response_generator() -> Generator[str, None, None]:
-            try:
-                # Use a regular generator to stream responses
-                for chunk in assistant.stream(user_question, history):
-                    yield chunk
-            except Exception as e:
-                # Log the error and yield an error message
-                print(f"Error during stream generation: {e}")
-                yield f"Error: {str(e)}"
-
-        # Return a StreamingResponse with the generator
-        return StreamingResponse(
-            response_generator(),
-            media_type="text/plain",
-        )
+        return StreamingResponse(assistant.stream(user_question, history), media_type="application/json")
 
     except Exception as e:
         print(f"Error handling request: {e}")

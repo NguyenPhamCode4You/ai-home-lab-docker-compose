@@ -26,8 +26,6 @@ class Pipe:
         async with httpx.AsyncClient() as client:
             async with client.stream("POST", self.valves.bvms_rag_url, json={"messages": messages}) as response:
                 response.raise_for_status()  # Raise exception for HTTP errors
-                # Streaming and yielding each line or chunk of response
-                # Stream the response and yield each chunk as decoded JSON
                 async for chunk in response.aiter_bytes():
                     if chunk:
                         try:
@@ -38,14 +36,7 @@ class Pipe:
                             # # Extract the desired part of the JSON, e.g., 'response'
                             response_text = json_chunk.get("response", "")
                             yield response_text
-                            # done = json_chunk.get("done", False)
                             
-                            # # Yield the response text
-                            # yield response_text
-                            
-                            # # If 'done' is True, stop yielding
-                            # if done:
-                            #     return  # End the generator execution
                         except json.JSONDecodeError as e:
                             # yield f"Error parsing chunk: {str(e)}"
                             yield f""

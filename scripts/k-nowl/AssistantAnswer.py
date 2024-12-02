@@ -96,23 +96,14 @@ class AssistantAnswer:
         
         return self._clean_json_response(response.json())
     
-    def stream(self, question: str, messages: List[Message] = None) -> str:
+    async def stream(self, question: str, messages: List[Message] = None):
         prompt = self.get_final_prompt(question, messages)
         
-        # Send request with streaming enabled
-        with httpx.Client() as client:
-            response = client.post(
-                url=self.url,
-                json={"model": self.model, "prompt": prompt, "stream": True},
-                timeout=None,
-            )
-            if response.status_code != 200:
-                raise Exception(f"Failed to connect: {response.status_code}")
-            
-            # Iterate over the response lines
-            for line in response.iter_lines():
-                if line:
-                    yield line  # Directly yield the line (which is already a string)
+        async with httpx.AsyncClient() as client:
+        # Send streaming request to Ollama
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
     
     # Run the assistant to answer the question
     def get_final_prompt(self, question: str, messages: List[Message] = None) -> str:
