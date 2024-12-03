@@ -1,17 +1,18 @@
 import requests
 
 class SupabaseVectorStore:
-    def __init__(self, url: str, token: str, table_name: str):
+    def __init__(self, url: str, token: str, table_name: str, function_name: str = "match_n8n_documents_bbc_bvms"):
         self.url = url
         self.token = token
         self.table_name = table_name
+        self.function_name = function_name
         self.headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.token}",
             "apikey": self.token
         }
     
-    def query_documents(self, query_embedding: list[float], match_count: int = 20, filter: dict = {}, function: str = "match_n8n_documents_bbc_bvms"):
+    def query_documents(self, query_embedding: list[float], match_count: int = 20, filter: dict = {}):
         """
         Calls the function via Supabase RPC.
 
@@ -20,7 +21,7 @@ class SupabaseVectorStore:
         :param filter: A JSON object for metadata filtering.
         :return: A list of matching records.
         """
-        rpc_endpoint = f"{self.url}/rest/v1/rpc/{function}"
+        rpc_endpoint = f"{self.url}/rest/v1/rpc/{self.function_name}"
 
         payload = {
             "query_embedding": query_embedding,

@@ -4,8 +4,7 @@ import requests
 from typing import List, Optional
 
 # Load default base prompt
-with open("./prompts/BVMS-Rag-Prompt.txt", "r", encoding="utf-8") as file:
-    base_prompt_default = file.read()
+
 
 class Message():
     role: str  # e.g., "user", "assistant"
@@ -22,10 +21,22 @@ class AssistantAnswer:
         self.model = model
         self.embedder = None                    # Placeholder for an embedding function or model
         self.vector_store = None                # Placeholder for a vector database
-        self.base_prompt = base_prompt_default
+        self.base_prompt = None
         self.match_count = 100
         self.max_context_tokens_length = 5500   # 5500 is the best length for the context tokens, for typescript & PL questions
         self.max_history_tokens_length = 500    # 6000 is the maximum length, thus 6000 - 5500 = 500 for the history tokens
+    
+    def set_max_context_tokens_length(self, max_context_tokens_length: int):
+        self.max_context_tokens_length = max_context_tokens_length
+        return self
+    
+    def set_max_history_tokens_length(self, max_history_tokens_length: int):
+        self.max_history_tokens_length = max_history_tokens_length
+        return self
+
+    def set_base_prompt(self, base_prompt: str):
+        self.base_prompt = base_prompt
+        return self
 
     # Setters to customize the instance
     def set_match_count(self, match_count: int):
@@ -121,6 +132,8 @@ class AssistantAnswer:
             .replace("{question}", question)
             .replace("{histories}", histories)
         )
+
+        print(f"Prompt: {prompt}")
 
         return prompt
     
