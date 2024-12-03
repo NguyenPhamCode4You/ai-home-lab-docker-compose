@@ -17,7 +17,7 @@ embedder = CreateEmbedding(url=EMBEDING_URL, model=EMBEDING_MODEL)
 codeExplainer = CodeExplainer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeBlockExtractor = CodeBlockExtractor(url=OLLAMA_URL, model=OLLAMA_MODEL)
 folderStructureExplain = FolderStructureExplain(url=OLLAMA_URL, model=OLLAMA_MODEL)
-keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(10)
+keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(25)
 
 SUPABASE_URL = "http://10.13.13.4:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
@@ -67,7 +67,7 @@ with open(project_structure_file_path, "w", encoding="utf-8") as folder_structur
                 continue
             if dir_path not in dirs_list:
                 folder_structure.write(f"{dir_path}\n")
-        # Process files in the current directory
+        
         for file in files:
             file_path = os.path.join(root, file)
             if not is_allowed_file(file_path):
@@ -116,49 +116,66 @@ for file_path in files_list:
     except Exception as e:
         print(f"Error reading file {file_path}: {e}")
 
-    processed_folder_path = os.path.join(output_path, folder_path)
-    processed_file_name = CleanText(filename.replace(document_path, ""))
-    processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
-    
-    if not os.path.exists(processed_folder_path):
-        os.makedirs(processed_folder_path)
+    explanation = codeExplainer.run(file_content)
+    keyword = keywordExtractor.run(file_content)
 
-    code_blocks = codeBlockExtractor.run(file_content)
-    code_blocks = code_blocks.split("VNLPAGL\n")
+    print(f"Code Block: {file_content}")
+    print(f"Explanation: {explanation}")
+    print(f"Keyword: {keyword}")
 
-    document_content = f""
-    line_index = 1
+    header = f"{folder_path}\{filename}"
+    metadata = {"f": filename, "h": file_path, "k": keyword}
 
-    for code_block in code_blocks:
-        if len(code_block) == 0:
-            continue
+    content = f"{file_path}"
+    embedding = embedder.run(metadata)
+    embedding2 = embedder.run(explanation)
 
-        explanation = codeExplainer.run(code_block)
-        keyword = keywordExtractor.run(code_block)
-
-        print(f"Code Block: {code_block}")
-        print(f"Explanation: {explanation}")
-        print(f"Keyword: {keyword}")
-
-        header = f"{folder_path}\{filename}"
-        metadata = {"f": processed_file_name, "h": header, "k": keyword}
-
-        content = f"{header}: {code_block}"
-        embedding = embedder.run(metadata)
-        embedding2 = embedder.run(explanation)
-
-        supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
-        line_index += 1
-
-        document_content += f"\n{code_block}"
-        document_content += f"\nExplain: {explanation}"
-        document_content += f"\nKeyword: {keyword}"
-
-        print(f"oooooooooooooooooooo File {file_index}/{len(files_list)} - Line {line_index}/{len(code_blocks)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
-        
-        line_index += 1
-
-    with open(processed_file_path, 'w') as f:
-        f.write(document_content)
-
+    supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
     file_index += 1
+
+    # processed_folder_path = os.path.join(output_path, folder_path)
+    # processed_file_name = CleanText(filename.replace(document_path, ""))
+    # processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
+    
+    # if not os.path.exists(processed_folder_path):
+    #     os.makedirs(processed_folder_path)
+
+    # code_blocks = codeBlockExtractor.run(file_content)
+    # code_blocks = code_blocks.split("VNLPAGL\n")
+
+    # document_content = f""
+    # line_index = 1
+
+    # for code_block in code_blocks:
+    #     if len(code_block) == 0:
+    #         continue
+
+    #     explanation = codeExplainer.run(code_block)
+    #     keyword = keywordExtractor.run(code_block)
+
+    #     print(f"Code Block: {code_block}")
+    #     print(f"Explanation: {explanation}")
+    #     print(f"Keyword: {keyword}")
+
+    #     header = f"{folder_path}\{filename}"
+    #     metadata = {"f": processed_file_name, "h": header, "k": keyword}
+
+    #     content = f"{header}: {code_block}"
+    #     embedding = embedder.run(metadata)
+    #     embedding2 = embedder.run(explanation)
+
+    #     supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
+    #     line_index += 1
+
+    #     document_content += f"\n{code_block}"
+    #     document_content += f"\nExplain: {explanation}"
+    #     document_content += f"\nKeyword: {keyword}"
+
+    #     print(f"oooooooooooooooooooo File {file_index}/{len(files_list)} - Line {line_index}/{len(code_blocks)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
+        
+    #     line_index += 1
+
+    # with open(processed_file_path, 'w') as f:
+    #     f.write(document_content)
+
+    # file_index += 1

@@ -54,9 +54,9 @@ class AssistantAnswer:
     def set_vector_store(self, vector_store):
         self.vector_store = vector_store
         return self
-
-    def set_evaluator(self, evaluator):
-        self.evaluator = evaluator
+    
+    def set_code_block_finder(self, code_block_finder):
+        self.code_block_finder = code_block_finder
         return self
 
     # Organize retrieved documents into structured sections
@@ -93,6 +93,58 @@ class AssistantAnswer:
             print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
+    
+    async def stream_answer_from_files(self, question: str, messages: List[Message] = None):
+        if not self.embedder or not self.vector_store:
+            raise ValueError("Embedder and vector store must be set before retrieving documents.")
+        
+        question_embedding = self.embedder.run(question)
+        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
+
+        file_paths = [document["content"] for document in documents]
+        if len(file_paths) == 0:
+            raise ValueError("No files found or smart file picker not set.")
+        
+        async with httpx.AsyncClient() as client:
+            context = ""
+            for file_path in file_paths:
+                try:
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        content = file.read()
+                        if self.code_block_finder:
+                            content = self.code_block_finder.run(question, content)
+
+                        file_content = f"\n# {file_path}:\n{content}"
+                        max_token_length_per_file = 4000
+                        if len(file_content) > max_token_length_per_file:
+                            file_content = file_content[:max_token_length_per_file]
+                        context += file_content
+                        print(f"Found content:\n {file_content}")
+                        
+                except Exception as e:
+                    print(f"Error reading file: {file_path}, {e}")
+                    continue
+
+            context = context[:self.max_context_tokens_length]
+            print(f"Context: {context}")
+
+            histories = ""
+            if messages and len(messages) > 0:
+                histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
+                histories = histories[-self.max_history_tokens_length:]
+
+            prompt = (
+                self.base_prompt
+                .replace("{context}", context)
+                .replace("{question}", question)
+                .replace("{histories}", histories)
+            )
+
+        # Send streaming request to Ollama
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
+        
     
     def run(self, question: str, messages: List[Message] = None) -> str:
         prompt = self.get_final_prompt(question, messages)
