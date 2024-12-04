@@ -5,19 +5,32 @@ class RelevantCodeBlockFinder:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer that can analyze and identity most important code lines from a given code file.
+        You are an experienced software developer and you are asked to extract code blocks that contains important business logics.
         Important: 
-        - Important code lines usually holds the key logic or the main functionality of the entire code file, or having important business logic.
-        - Important code lines can be a single line or multiple lines of code, but no more than 10 lines of code.
-        - Code should be returned as is, wrapped in a code block of the programming language.
-        - Do not include any additional information, no explaination needed.
-        - If the entire code file is completely irrelevant or unimportant, return "No relevant code found."
-        - ALWAYS Seperate code lines using "VNLPAGL\n"
+        1. Dont inlcude library imports or setup code, only include code that contains business logic.
+        2. Each code block should contains at least 3 lines of code, but no more than 10 lines, total length from 300 to 1000 characters.
+        3. Extracted code blocks should be separated by "VNLPAGL\n".
+        4. Do not include any additional information, no explaination, just return the code blocks as plain text.
 
-        Code To Analyze:
+        Now extract business related code blocks from the below document.
+        Remeber to return code blocks as is, no modification, no explaination, separated by "VNLPAGL\n".
         {document}
-        Now return the most important code lines.
         """
+
+        # self.base_prompt = """
+        # You are an experienced software developer that can analyze and identity most important code lines from a given code file.
+        # Important: 
+        # - Important code lines usually holds the key logic or the main functionality of the entire code file, or having important business logic.
+        # - Important code lines need to be between 3 to 10 lines of code.
+        # - Code should be returned as is, wrapped in a code block of the programming language.
+        # - Do not include any additional information, no explaination needed.
+        # - If the entire code file is completely irrelevant or unimportant, return "No relevant code found."
+        # - ALWAYS Seperate code lines using "VNLPAGL\n"
+
+        # Code To Analyze:
+        # {document}
+        # Now return the most important code lines.
+        # """
 
         # self.base_prompt = """
         # You are an experienced software developer that can analyze and identity most important code blocks from a given code file.

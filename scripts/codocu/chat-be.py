@@ -19,7 +19,8 @@ FUNCTION = "match_n8n_documents_ebook_neo"
 vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME, FUNCTION)
 
 OLLAMA_URL = "http://10.13.13.4:11434"
-OLLAMA_MODEL = "qwen2.5-coder:14b-instruct-q6_K"
+# OLLAMA_MODEL = "qwen2.5-coder:14b-instruct-q6_K"
+OLLAMA_MODEL = "gemma2:9b-instruct-q8_0"
 
 prompt_path = os.path.join(os.path.dirname(__file__), "Rag-Prompt.txt")
 with open(prompt_path, "r", encoding="utf-8") as file:
@@ -37,7 +38,7 @@ assistant.set_base_prompt(base_prompt_default)
 assistant.set_code_block_finder(codeBlockFinder)
 assistant.set_code_block_extractor(codeBlockExtractor)
 assistant.set_file_prioritizer(filePrioritizer)
-assistant.set_max_context_tokens_length(5600)
+assistant.set_max_context_tokens_length(5000)
 assistant.set_max_history_tokens_length(200)
 assistant.set_match_count(20)
 

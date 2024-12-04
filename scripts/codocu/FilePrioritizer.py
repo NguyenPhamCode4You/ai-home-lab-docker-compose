@@ -7,18 +7,18 @@ class FilePrioritizer:
         self.base_prompt = """
         You are an expert at analyzing a list of files and their description and re-ordering them based on their important to a given question.
         Important:
-        - File that have the exact name or keywords mentioned in the question should be most important, and the shorter the file name, the more important it is.
-        - File that have name similar to the keywords mentioned in the question should be less important.
-        - File that have name contains terms related to the question should be lesser important.
+        - File that have description highly relevance to the question should be most important, and the shorter the file name, the more important it is.
+        - File that have description contains keywords mentioned in the question should be lesser important.
+        - File that have description contains terms related to the question should be even lesser important.
+        - Return only file names without any modification, as plain text, seperated by a newline character, dont wrap the file names in code block.
         - Do not include any additional information, no explaination needed, do not wrap the file names in code block.
-        - File names should be returned as is, as plain text, seperated by a newline character.
 
         Example:
         Files:
-        EstimateShipmentPriceBasic.py
-        EstimateShipmentPriceAdvanced.py
-        EstimateShipmentPrice.py
-        EstimateCostOfTravelOfShipment.py
+        EstimateShipmentPriceBasic.py: This code contains the basic logic to estimate the price of a shipment.
+        EstimateShipmentPriceAdvanced.py: This code contains the advanced logic to estimate the price of a shipment.
+        EstimateShipmentPrice.py: This code contains the fundamental logic to estimate the price of a shipment.
+        EstimateCostOfTravelOfShipment.py: This code contains the logic to estimate the cost of travel of a shipment.
         Question: How to estimate the cost of a shipment?
 
         Result:
@@ -26,7 +26,6 @@ class FilePrioritizer:
         EstimateShipmentPriceBasic.py
         EstimateShipmentPriceAdvanced.py
         EstimateCostOfTravelOfShipment.py
-
 
         Now for this list of Files:
         {document}
