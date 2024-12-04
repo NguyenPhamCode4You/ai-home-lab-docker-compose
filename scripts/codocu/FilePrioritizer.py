@@ -1,3 +1,4 @@
+import httpx
 import requests
 
 class FilePrioritizer:
@@ -32,6 +33,13 @@ class FilePrioritizer:
         Question: {question}
         Return the list of files in the most relevant order.
         """
+
+    async def stream(self, question: str, document: str):
+        prompt = self.base_prompt.format(document=document, question=question)
+        async with httpx.AsyncClient() as client:
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
 
     def run(self, question: str, document: str) -> str:
         prompt = self.base_prompt.format(document=document, question=question)

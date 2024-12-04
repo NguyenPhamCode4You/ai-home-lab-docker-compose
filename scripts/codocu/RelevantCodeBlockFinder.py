@@ -1,3 +1,4 @@
+import httpx
 import requests
 
 class RelevantCodeBlockFinder:
@@ -5,14 +6,13 @@ class RelevantCodeBlockFinder:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer and you are asked to extract main code blocks from a given code.
-        1. Dont inlcude library imports or initialize code, only include the main function or lines of codes containing the important business logic.
-        2. Each main block should contains at least 10 lines of code, but no more than 20 lines, total length from 500 to 1200 characters.
+        You are an experienced software developer and you are asked to extract the main code block from a given code.
+        1. Main code block should not inlcude library imports or initialization code.
+        2. Main code block should includes lines of codes containing main logic of the entire file or the important business logics.
+        3. Main block should contains at least 10 lines of code, but should not exceed 1500 characters.
         Important: 
-        - Return code blocks seperated by "VNLPAGL\n"
         - Do not explain code, no formatting, no wrapping, just return code as is.
-        Now extract main code blocks from the below document.
-        Code To Analyze:
+        Now extract the main code block from the this code file:
         {document}
         """
 
@@ -59,6 +59,13 @@ class RelevantCodeBlockFinder:
         # Question: {question}
         # Now return the relevant code blocks.
         # """
+
+    async def stream(self, question: str, document: str):
+        prompt = self.base_prompt.format(document=document, question=question)
+        async with httpx.AsyncClient() as client:
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
 
     def run(self, question: str, document: str) -> str:
         prompt = self.base_prompt.format(document=document, question=question)

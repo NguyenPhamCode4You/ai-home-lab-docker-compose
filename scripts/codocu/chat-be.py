@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from .RelevantCodeBlockFinder import RelevantCodeBlockFinder
 from .CodeBlockExtractor import CodeBlockExtractor
 from .FilePrioritizer import FilePrioritizer
+from .CodeExplainer import CodeExplainer
 
 from ..knowl.AssistantAnswer import AssistantAnswer
 from ..knowl.CreateEmbedding import CreateEmbedding
@@ -18,31 +19,17 @@ TABLE_NAME = "n8n_documents_ebook"
 FUNCTION = "match_n8n_documents_ebook_neo"
 vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME, FUNCTION)
 
-# 3090
-# OLLAMA_URL_1 = "http://10.13.13.5:11434"
-# OLLAMA_MODEL_1 = "gemma2:27b-instruct-q5_1"
-
-OLLAMA_URL_1 = "http://10.13.13.4:11434"
-OLLAMA_MODEL_1 = "qwen2.5-coder:14b-instruct-q6_K"
-
-# 4080
-OLLAMA_URL_2 = "http://10.13.13.4:11434"
-OLLAMA_MODEL_2 = "gemma2:9b-instruct-q8_0"
-
-EMBEDING_URL = "http://10.13.13.4:11434"
-EMBEDING_MODEL = "nomic-embed-text:137m-v1.5-fp16"
-
 prompt_path = os.path.join(os.path.dirname(__file__), "Rag-Prompt.txt")
 with open(prompt_path, "r", encoding="utf-8") as file:
     base_prompt_default = file.read()
 
-assistant = AssistantAnswer(url=f'{OLLAMA_URL_1}/api/generate', model=OLLAMA_MODEL_1)
-embedder = CreateEmbedding(url=f'{EMBEDING_URL}/api/embed', model=EMBEDING_MODEL)
+assistant = AssistantAnswer(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+embedder = CreateEmbedding(url=f'http://10.13.13.4:11434/api/embed', model='nomic-embed-text:137m-v1.5-fp16')
 
-filePrioritizer = FilePrioritizer(url=f'{OLLAMA_URL_2}/api/generate', model=OLLAMA_MODEL_2)
-
-codeBlockFinder = RelevantCodeBlockFinder(url=f'{OLLAMA_URL_1}/api/generate', model=OLLAMA_MODEL_1)
-codeBlockExtractor = CodeBlockExtractor(url=f'{OLLAMA_URL_1}/api/generate', model=OLLAMA_MODEL_1)
+filePrioritizer = FilePrioritizer(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
+codeExplainer = CodeExplainer(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+codeBlockFinder = RelevantCodeBlockFinder(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+codeBlockExtractor = CodeBlockExtractor(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
 
 assistant.set_embedder(embedder)
 assistant.set_vector_store(vector_store)
@@ -50,8 +37,9 @@ assistant.set_base_prompt(base_prompt_default)
 assistant.set_code_block_finder(codeBlockFinder)
 assistant.set_code_block_extractor(codeBlockExtractor)
 assistant.set_file_prioritizer(filePrioritizer)
-assistant.set_max_context_tokens_length(5000)
-assistant.set_max_history_tokens_length(200)
+assistant.set_code_explainer(codeExplainer)
+assistant.set_max_context_tokens_length(5600)
+assistant.set_max_history_tokens_length(10)
 assistant.set_match_count(20)
 
 from fastapi import FastAPI

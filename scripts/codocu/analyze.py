@@ -1,6 +1,6 @@
 import os
 from .CodeBlockExtractor import CodeBlockExtractor
-from .CodeExplainer import CodeExplainer
+from .CodeSummarizer import CodeSummarizer
 from .FolderStructureExplain import FolderStructureExplain
 from ..knowl.CreateEmbedding import CreateEmbedding
 from ..knowl.KeywordExtraction import KeywordExtraction
@@ -14,7 +14,7 @@ EMBEDING_URL = "http://10.13.13.4:11434/api/embed"
 EMBEDING_MODEL = "nomic-embed-text:137m-v1.5-fp16"
 
 embedder = CreateEmbedding(url=EMBEDING_URL, model=EMBEDING_MODEL)
-codeExplainer = CodeExplainer(url=OLLAMA_URL, model=OLLAMA_MODEL)
+codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeBlockExtractor = CodeBlockExtractor(url=OLLAMA_URL, model=OLLAMA_MODEL)
 folderStructureExplain = FolderStructureExplain(url=OLLAMA_URL, model=OLLAMA_MODEL)
 keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(20)
@@ -116,7 +116,7 @@ for file_path in files_list:
     except Exception as e:
         print(f"Error reading file {file_path}: {e}")
 
-    explanation = codeExplainer.run(file_content)
+    explanation = codeSummarizer.run(file_content)
     keyword = keywordExtractor.run(file_content)
 
     print(f"Code Block: {file_content}")
