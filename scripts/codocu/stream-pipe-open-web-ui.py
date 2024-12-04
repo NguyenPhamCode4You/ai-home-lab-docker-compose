@@ -6,7 +6,7 @@ import httpx
 class Pipe:
     class Valves(BaseModel):
         bvms_rag_url: str = Field(
-            default="http://10.13.13.2:8002/api/answer/stream",
+            default="http://10.13.13.2:8000/api/answer/stream",
         )
 
     def __init__(self):
@@ -23,7 +23,14 @@ class Pipe:
         __event_call__: Optional[Callable[[dict], Awaitable[dict]]] = None,
     ) -> AsyncGenerator[str, None]:
         messages = body.get("messages", [])
-        async with httpx.AsyncClient() as client:
+        # Set a custom timeout value
+        timeout = httpx.Timeout(
+            connect=20.0,  # Maximum time to establish a connection (in seconds)
+            read=80.0,     # Maximum time to read data from the connection (in seconds)
+            write=30.0,    # Maximum time to write data to the connection (in seconds)
+            pool=60.0,     # Maximum time for acquiring a connection from the pool (in seconds)
+        )
+        async with httpx.AsyncClient(timeout=timeout) as client:
             async with client.stream("POST", self.valves.bvms_rag_url, json={"messages": messages}) as response:
                 response.raise_for_status()  # Raise exception for HTTP errors
                 async for chunk in response.aiter_bytes():

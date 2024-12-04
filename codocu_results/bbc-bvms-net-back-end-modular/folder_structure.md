@@ -68,5 +68,5 @@ C:\Users\niche\gitlab\bbc-bvms-net-back-end-modular\ExternalClients\MicrosoftGra
 C:\Users\niche\gitlab\bbc-bvms-net-back-end-modular\ExternalClients\RoutingEngineClient
 C:\Users\niche\gitlab\bbc-bvms-net-back-end-modular\ExternalClients\SednaClient
 
-Explain: This folder structure follows a modular architecture, separating concerns into distinct layers: API (API.MasterData and API.OrderRequest), Business logic (Core.Business), Domain models (Core.Domain), and Infrastructure (Core.Infrastructure). Each layer has sub-folders for specific features or components. This separation promotes maintainability, scalability, and adheres to design patterns like Domain-Driven Design and Separation of Concerns.
-Keyword: Folder structure, modular architecture, API, Business logic, Domain models, Infrastructure, API.MasterData, API.OrderRequest, Core.Business, Core.Domain, Core.Infrastructure, Maintainability, Scalability, Domain-Driven Design, Separation of Concerns
+Explain: This folder structure follows the Hexagonal Architecture pattern, separating concerns into API, Business Logic, Domain, Infrastructure, and External Clients. It promotes modularity, reusability, and maintainability by organizing code logically. Each module handles specific functionalities, ensuring a clean separation of responsibilities.
+Keyword: Hexagonal Architecture, API, Business Logic, Domain, Infrastructure, External Clients, modularity, reusability, maintainability, code organization, logical separation, module functionality, responsibility separation

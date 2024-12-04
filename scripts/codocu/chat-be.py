@@ -1,9 +1,12 @@
 from typing import Generator, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from .RelevantCodeBlockFinder import RelevantCodeBlockFinder
-from ..knowl.AssistantAnswer import AssistantAnswer
 
+from .RelevantCodeBlockFinder import RelevantCodeBlockFinder
+from .CodeBlockExtractor import CodeBlockExtractor
+from .FilePrioritizer import FilePrioritizer
+
+from ..knowl.AssistantAnswer import AssistantAnswer
 from ..knowl.CreateEmbedding import CreateEmbedding
 from ..knowl.SupabaseVectorStore import SupabaseVectorStore
 from ..knowl.AssistantAnswer import AssistantAnswer
@@ -12,7 +15,7 @@ import os
 SUPABASE_URL = "http://10.13.13.4:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 TABLE_NAME = "n8n_documents_ebook"
-FUNCTION = "match_n8n_documents_ebook3"
+FUNCTION = "match_n8n_documents_ebook_neo"
 vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME, FUNCTION)
 
 OLLAMA_URL = "http://10.13.13.4:11434"
@@ -25,14 +28,18 @@ with open(prompt_path, "r", encoding="utf-8") as file:
 embedder = CreateEmbedding(url=f'{OLLAMA_URL}/api/embed')
 assistant = AssistantAnswer(url=f'{OLLAMA_URL}/api/generate', model=OLLAMA_MODEL)
 codeBlockFinder = RelevantCodeBlockFinder(url=f'{OLLAMA_URL}/api/generate', model=OLLAMA_MODEL)
+codeBlockExtractor = CodeBlockExtractor(url=f'{OLLAMA_URL}/api/generate', model=OLLAMA_MODEL)
+filePrioritizer = FilePrioritizer(url=f'{OLLAMA_URL}/api/generate', model=OLLAMA_MODEL)
 
 assistant.set_embedder(embedder)
 assistant.set_vector_store(vector_store)
 assistant.set_base_prompt(base_prompt_default)
 assistant.set_code_block_finder(codeBlockFinder)
-assistant.set_max_context_tokens_length(5800)
+assistant.set_code_block_extractor(codeBlockExtractor)
+assistant.set_file_prioritizer(filePrioritizer)
+assistant.set_max_context_tokens_length(5600)
 assistant.set_max_history_tokens_length(200)
-assistant.set_match_count(3)
+assistant.set_match_count(20)
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse

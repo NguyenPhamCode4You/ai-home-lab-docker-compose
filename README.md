@@ -73,13 +73,14 @@ create table n8n_documents_norm (
 );
 
 -- Create a function to search for documents
-CREATE FUNCTION match_n8n_documents_bbc_bvms (
+CREATE FUNCTION match_n8n_documents_ebook_neo (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
   filter JSONB DEFAULT '{}'
 ) RETURNS TABLE (
   id BIGINT,
   content TEXT,
+  summarize TEXT,
   metadata JSONB,
   similarity FLOAT
 )
@@ -91,9 +92,10 @@ BEGIN
   SELECT
     id,
     content,
+    summarize,
     metadata,
-    2 - ((n8n_documents_bbc_bvms.embedding <=> query_embedding) + (n8n_documents_bbc_bvms.embedding2 <=> query_embedding)) AS similarity
-  FROM n8n_documents_bbc_bvms
+    2 - ((n8n_documents_ebook.embedding <=> query_embedding) + (n8n_documents_ebook.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_ebook
   WHERE metadata @> filter
   ORDER BY similarity DESC
   LIMIT match_count;

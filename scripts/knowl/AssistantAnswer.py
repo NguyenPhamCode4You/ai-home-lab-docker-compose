@@ -1,3 +1,4 @@
+import asyncio
 import json
 import httpx
 import requests
@@ -58,6 +59,14 @@ class AssistantAnswer:
     def set_code_block_finder(self, code_block_finder):
         self.code_block_finder = code_block_finder
         return self
+    
+    def set_code_block_extractor(self, code_block_extractor):
+        self.code_block_extractor = code_block_extractor
+        return self
+    
+    def set_file_prioritizer(self, file_prioritizer):
+        self.file_prioritizer = file_prioritizer
+        return self
 
     # Organize retrieved documents into structured sections
     def organize_documents(self, documents: List[dict]) -> List[dict]:
@@ -99,34 +108,102 @@ class AssistantAnswer:
             raise ValueError("Embedder and vector store must be set before retrieving documents.")
         
         question_embedding = self.embedder.run(question)
-        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
+        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=20)
 
-        file_paths = [document["content"] for document in documents]
-        if len(file_paths) == 0:
-            raise ValueError("No files found or smart file picker not set.")
+        if len(documents) == 0:
+            yield json.dumps({"error": "No files found or smart file picker not set."})
+            return
+        
+        def format_file_name(file_name: str, url: str) -> str:
+            return f"*[{file_name}]({url})*"
+        
+        current_file_index = 1
         
         async with httpx.AsyncClient() as client:
+            yield json.dumps({"response": f"🤖 Analyzing question: {question}\n\n"})
+            if self.file_prioritizer:
+                # Extract file names from the documents
+                file_names = [doc["metadata"]["f"] for doc in documents]
+                yield json.dumps({"response": f"📚 Found {len(documents)} relevant files: {', '.join(file_names)}...\n\n"})
+                yield json.dumps({"response": f"📚 Prioritizing those files based on relevance...\n\n"})
+
+                # Use file_prioritizer to prioritize files
+                prioritized_file_names = await asyncio.to_thread(self.file_prioritizer.run, question, '\n'.join(file_names))
+                prioritized_file_names = [
+                    name for name in prioritized_file_names.split("\n") if name.strip()
+                ]
+
+                # Reorder documents based on the prioritized list
+                if len(prioritized_file_names) > 0:
+                    reordered_documents = []
+                    for file_name_index, prioritized_name in enumerate(prioritized_file_names):
+                        for doc in documents:
+                            if doc["metadata"]["f"] in prioritized_name:
+                                reordered_documents.append(doc)
+                                summarize = doc["summarize"]
+                                file_path = doc["content"]
+                                yield json.dumps({"response": f"📚 #{file_name_index + 1}: `{format_file_name(prioritized_name, file_path)}` - {summarize[:100]}\n"})
+                                break
+
+                    # Update the original documents list
+                    documents = reordered_documents
+
+                    # Format top 5 file names for response
+                    # top_file_names = ", ".join([f"__{doc["metadata"]["f"]}__" for doc in documents[:10]])
+                    # yield json.dumps({"response": f"📚 Done! Top 10 most relevant files: {top_file_names}\n\n"})
+
             context = ""
-            for file_path in file_paths:
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        content = file.read()
-                        if self.code_block_finder:
-                            content = self.code_block_finder.run(question, content)
+            # for index, document in enumerate(documents):
+            #     if current_file_index > self.match_count:
+            #         break
+            #     if len(context) > self.max_context_tokens_length:
+            #         break
+            #     try:
+            #         file_path = document["content"]
+            #         file_name = document["metadata"]["f"]
+            #         file_name = f"__{file_name}__"
+            #         with open(file_path, "r", encoding="utf-8") as file:
+            #             content = file.read()
+            #             relevant_contents = []
+            #             if self.code_block_finder and len(content) > 1000:
+            #                 yield json.dumps({"response": f"\n🕑 Mem: {len(context)}/{self.max_context_tokens_length} tokens - Iterations: {current_file_index}.{self.match_count}.L{index + 1}. Analyzing file: {file_name} 👀 \n\n"})
 
-                        file_content = f"\n# {file_path}:\n{content}"
-                        max_token_length_per_file = 4000
-                        if len(file_content) > max_token_length_per_file:
-                            file_content = file_content[:max_token_length_per_file]
-                        context += file_content
-                        print(f"Found content:\n {file_content}")
+            #                 code_blocks = await asyncio.to_thread(self.code_block_finder.run, question, content)
+            #                 code_blocks = [code_block for code_block in code_blocks.split("VNLPAGL\n") if len(code_block) > 10]
+
+            #                 for code_block_index, code_block in enumerate(code_blocks):
+            #                     if "No relevant code" in code_block:
+            #                         yield json.dumps({"response": f"\n⛔️ {file_name} - Part: {code_block_index + 1}/{len(code_blocks)}. Not relevant.\n"})
+            #                     else:
+            #                         relevant_contents.append(code_block)
+            #                         yield json.dumps({"response": f"\n✅ {file_name} - Part: {code_block_index + 1}/{len(code_blocks)}. Adding relevant {len(code_block)} chars\n\n"})
+            #                         if "```csharp" in code_block:
+            #                             yield json.dumps({"response": f"\n{code_block}\n\n"})
+            #                         print(f"ooooooooooooooooooooooooo relevant ooooooooooooooooooooooooo")
+            #             else:
+            #                 relevant_contents.append(content)
+            #                 yield json.dumps({"response": f"\n✅ Read all {len(content)} codes in file {file_name}\n\n"})
+            #                 if "```csharp" in content:
+            #                     yield json.dumps({"response": f"\n{content}\n\n"})
+            #                 print(f"Code Block: {content}")
+            #                 print(f"ooooooooooooooooooooooooo ADDED RAW ooooooooooooooooooooooooo")
+
+            #             if len(relevant_contents) == 0:
+            #                 continue
                         
-                except Exception as e:
-                    print(f"Error reading file: {file_path}, {e}")
-                    continue
+            #             context_new_part = f"\n{file_name}:\n{'\n'.join(relevant_contents)}"
+            #             print(f"{context_new_part}")
+            #             max_token_length_per_file = 4000
+            #             if len(context_new_part) > max_token_length_per_file:
+            #                 context_new_part = context_new_part[:max_token_length_per_file]
+            #             context += context_new_part
+            #             current_file_index += 1
 
-            context = context[:self.max_context_tokens_length]
-            print(f"Context: {context}")
+            #     except Exception as e:
+            #         yield json.dumps({"response": f"\n⛔️ Error reading file: {file_name}, {str(e)}"})
+            #         continue
+
+            # context = context[:self.max_context_tokens_length]
 
             histories = ""
             if messages and len(messages) > 0:
@@ -139,7 +216,9 @@ class AssistantAnswer:
                 .replace("{question}", question)
                 .replace("{histories}", histories)
             )
-
+            
+            yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(context)}/{self.max_context_tokens_length} 👀 \n\n"})
+            yield json.dumps({"response": "\n## 🎯 Generating final response...\n\n"})
         # Send streaming request to Ollama
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():

@@ -6,9 +6,9 @@ class CodeExplainer:
         self.model = model
         self.base_prompt = """
         You are an experienced software developer and you are asked to explain a code block.
-        1. Explain should include the purpose of the code block and how it works.
+        1. Explain should include the purpose of the code block and how it works, mention any important details.
         2. Should be clear and concise, but detailed enough to be understood by a junior developer.
-        3. Total explanation should be no longer than 500 characters.
+        3. Total explanation should be no longer than 200 characters.
         Important: Just return the explanation, do not include any additional information, no code, no prompt.
         Explain the code block.
         Code Block:
