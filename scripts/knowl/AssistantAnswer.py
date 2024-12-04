@@ -125,16 +125,34 @@ class AssistantAnswer:
             file_url = urllib.parse.quote(file_url, safe=':/')
 
             # Return the correctly formatted Markdown link
-            return f"**[{file_name}]({file_url})**"
+            return f"[{file_name}]({file_url})"
+        
+        def RecursiveSplitCodeLines(document: str, limit: int = 4000):
+            # Split the document into sentences
+            lines = document.split("\n")
+            
+            # Recursively split long sentences
+            paragraphs = []
+            paragraph = ""
+            while len(lines) > 0:
+                line = lines.pop(0)
+                if len(paragraph) + len(line) < limit:
+                    paragraph += f"{line}\n"
+                else:
+                    paragraphs.append(paragraph)
+                    paragraph = f"{line}\n"
+
+            # Add the last paragraph
+            if len(paragraph) > 0:
+                paragraphs.append(paragraph)
+
+            return paragraphs
         
         current_file_index = 1
         
         async with httpx.AsyncClient() as client:
             if self.file_prioritizer:
-                # Extract file names from the documents
-                file_names = [doc["metadata"]["f"] for doc in documents]
-                yield json.dumps({"response": f"📚 Relevant files: {', '.join(file_names[:10])}...\n\n"})
-                yield json.dumps({"response": f"📚 Prioritizing those files based on relevance...\n\n"})
+                yield json.dumps({"response": f"📚 Ranking {len(documents)} documents basing on relevance level ...\n\n"})
 
                 # Use file_prioritizer to prioritize files
                 documents_to_analyze = [f"{doc["metadata"]["f"]}: {doc["summarize"][:200]}" for doc in documents]
@@ -150,7 +168,6 @@ class AssistantAnswer:
                         for doc in documents:
                             if doc["metadata"]["f"] in prioritized_name:
                                 reordered_documents.append(doc)
-                                summarize = doc["summarize"]
                                 file_path = doc["content"]
                                 if file_name_index < 10:
                                     yield json.dumps({"response": f"📌 Rank {file_name_index + 1}: {format_file_name(prioritized_name, file_path)}\n"})
@@ -159,61 +176,83 @@ class AssistantAnswer:
                     # Update the original documents list
                     documents = reordered_documents
 
-            yield json.dumps({"response": f"\n\n## 🤖 Start learning... \n\n\n"})
-            context = ""
+            yield json.dumps({"response": f"\n\n## 🤖 Start the learning process... \n\n\n"})
+            await asyncio.sleep(2)
+
+            knowledge_context = ""
             for index, document in enumerate(documents):
                 if current_file_index > self.match_count:
                     break
-                if len(context) > self.max_context_tokens_length:
+                if len(knowledge_context) >= self.max_context_tokens_length:
                     break
+                file_path = document["content"]
+                file_name = document["metadata"]["f"]
+                file_name = format_file_name(file_name, file_path)
+                summarize = document["summarize"]
+                yield json.dumps({"response": f"\n🕑 **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens - Iterations: {current_file_index}.{self.match_count}.L{index + 1}. Reading file: {file_name} 👀 \n\n"})
+                await asyncio.sleep(2)
                 try:
-                    file_path = document["content"]
-                    file_name = document["metadata"]["f"]
-                    file_name = f"__{file_name}__"
+                    await asyncio.sleep(2)
+                    yield json.dumps({"response": f"\n\n**Summary**: {summarize}\n\n"})
+                    await asyncio.sleep(2)
                     with open(file_path, "r", encoding="utf-8") as file:
                         content = file.read()
-                        relevant_contents = []
-                        if self.code_block_finder and len(content) > 1000:
-                            yield json.dumps({"response": f"\n🕑 Mem: {len(context)}/{self.max_context_tokens_length} tokens - Iterations: {current_file_index}.{self.match_count}.L{index + 1}. Reading file: {file_name} 👀 \n\n"})
 
-                            code_blocks = await asyncio.to_thread(self.code_block_finder.run, question, content)
-                            code_blocks = [code_block.strip() for code_block in code_blocks.split("VNLPAGL") if len(code_block) > 20]
+                        chunks = [content]
+                        if len(content) > 6000:
+                            chunks = RecursiveSplitCodeLines(content, 6000)
 
-                            for code_block_index, code_block in enumerate(code_blocks):
-                                if "No relevant code" in code_block:
-                                    yield json.dumps({"response": f"\n⛔️ {file_name} - Part: {code_block_index + 1}/{len(code_blocks)}. No relevant context found.\n"})
-                                else:
-                                    relevant_contents.append(code_block)
-                                    yield json.dumps({"response": f"\n✅ {file_name} - Part: {code_block_index + 1}/{len(code_blocks)}. Found relevant {len(code_block)} context tokens \n\n"})
-                                    if "```" not in code_block:
+                        for chunk_index, content in enumerate(chunks):
+                            
+                            relevant_contents = []
+                            
+                            if self.code_block_finder and len(content) > 1000:
+                                
+                                await asyncio.sleep(2)
+                                yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 ... \n\n"} )
+                                code_blocks = await asyncio.to_thread(self.code_block_finder.run, question, content)
+                                code_blocks = [code_block.strip() for code_block in code_blocks.split("VNLPAGL") if len(code_block) > 25]
+
+                                for code_block_index, code_block in enumerate(code_blocks):
+                                    if "No relevant code" in code_block:
+                                        yield json.dumps({"response": f"\n⛔️ {file_name} - Chunk: {chunk_index + 1}/{len(chunks)} - Part: {code_block_index + 1}/{len(code_blocks)}. No relevant context found.\n"})
+                                    else:
+                                        await asyncio.sleep(3)
+                                        yield json.dumps({"response": f"\n✅ {file_name} - Chunk: {chunk_index + 1}/{len(chunks)} - Part: {code_block_index + 1}/{len(code_blocks)}. Found relevant {len(code_block)} context tokens, lets take a look 👀 \n\n"})
+                                        code_block = code_block.replace("csharp", "").replace("`", "").replace("'''", "").replace('"""', '').strip()
+                                        relevant_contents.append(code_block)
                                         code_block = f"\n\n```csharp\n{code_block}\n```\n\n"
-                                    yield json.dumps({"response": f"\n{code_block}\n"})
-                                    print(f"ooooooooooooooooooooooooo relevant ooooooooooooooooooooooooo")
-                        else:
-                            relevant_contents.append(content)
-                            yield json.dumps({"response": f"\n✅ Read all {len(content)} codes in file {file_name}\n\n"})
-                            if "```" not in content:
+                                        await asyncio.sleep(3)
+                                        yield json.dumps({"response": f"\n{code_block}\n"})
+                                        await asyncio.sleep(3)
+                                        print(f"ooooooooooooooooooooooooo relevant ooooooooooooooooooooooooo")
+                            else:
+                                relevant_contents.append(content)
+                                await asyncio.sleep(3)
+                                yield json.dumps({"response": f"\n✅ Read all {len(content)} codes in file {file_name}\n\n"})
                                 content = f"\n```csharp\n{content}\n```\n\n"
-                            yield json.dumps({"response": f"\n{content}\n"})
-                            print(f"Code Block: {content}")
-                            print(f"ooooooooooooooooooooooooo ADDED RAW ooooooooooooooooooooooooo")
+                                await asyncio.sleep(3)
+                                yield json.dumps({"response": f"\n{content}\n"})
+                                print(f"Code Block: {content}")
+                                print(f"ooooooooooooooooooooooooo ADDED RAW ooooooooooooooooooooooooo")
 
-                        if len(relevant_contents) == 0:
-                            continue
+                            context_new_part = f"\n{file_name}:\n{'\n'.join(relevant_contents)}"
+                            knowledge_context += context_new_part
+                            
+                            yield json.dumps({"response": f"\n📩 **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens reached after reading {file_name} 👀 \n\n"})
                         
-                        context_new_part = f"\n{file_name}:\n{'\n'.join(relevant_contents)}"
-                        print(f"{context_new_part}")
-                        max_token_length_per_file = 4000
-                        if len(context_new_part) > max_token_length_per_file:
-                            context_new_part = context_new_part[:max_token_length_per_file]
-                        context += context_new_part
                         current_file_index += 1
+
+                        if len(knowledge_context) >= self.max_context_tokens_length:
+                            break
 
                 except Exception as e:
                     yield json.dumps({"response": f"\n⛔️ Error reading file: {file_name}, {str(e)}"})
                     continue
 
-            context = context[:self.max_context_tokens_length]
+            await asyncio.sleep(2)
+            knowledge_context = knowledge_context[:self.max_context_tokens_length]
+            await asyncio.sleep(2)
 
             histories = ""
             if messages and len(messages) > 0:
@@ -222,12 +261,14 @@ class AssistantAnswer:
 
             prompt = (
                 self.base_prompt
-                .replace("{context}", context)
                 .replace("{question}", question)
                 .replace("{histories}", histories)
+                .replace("{context}", knowledge_context)
             )
             
-            yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(context)}/{self.max_context_tokens_length} 👀 \n\n"})
+            yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(knowledge_context)}/{self.max_context_tokens_length} 👀 \n\n"})
+            print(f"knowledge_context: {knowledge_context}\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>") 
+            await asyncio.sleep(2)
             yield json.dumps({"response": "\n## 🎯 Generating final response...\n\n"})
         # Send streaming request to Ollama
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:

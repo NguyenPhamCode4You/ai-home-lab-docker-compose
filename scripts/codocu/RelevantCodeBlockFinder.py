@@ -5,15 +5,14 @@ class RelevantCodeBlockFinder:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer and you are asked to extract code blocks that contains important business logics.
+        You are an experienced software developer and you are asked to extract main code blocks from a given code.
+        1. Dont inlcude library imports or initialize code, only include the main function or lines of codes containing the important business logic.
+        2. Each main block should contains at least 10 lines of code, but no more than 20 lines, total length from 500 to 1200 characters.
         Important: 
-        1. Dont inlcude library imports or setup code, only include code that contains business logic.
-        2. Each code block should contains at least 3 lines of code, but no more than 10 lines, total length from 300 to 1000 characters.
-        3. Extracted code blocks should be separated by "VNLPAGL\n".
-        4. Do not include any additional information, no explaination, just return the code blocks as plain text.
-
-        Now extract business related code blocks from the below document.
-        Remeber to return code blocks as is, no modification, no explaination, separated by "VNLPAGL\n".
+        - Return code blocks seperated by "VNLPAGL\n"
+        - Do not explain code, no formatting, no wrapping, just return code as is.
+        Now extract main code blocks from the below document.
+        Code To Analyze:
         {document}
         """
 
