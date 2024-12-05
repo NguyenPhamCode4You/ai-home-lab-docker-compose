@@ -1,13 +1,13 @@
 import os
-
-from Helper import CleanText
-from CodeBlockExtractor import CodeBlockExtractor
+from agents.CodeBlockExtractor import CodeBlockExtractor
 # from CodeSummarizer import CodeSummarizer
-from CodeExplainer import CodeExplainer
-from FolderStructureExplain import FolderStructureExplain
-from CreateEmbedding import CreateEmbedding
-from KeywordExtraction import KeywordExtraction
-from SupabaseVectorStore import SupabaseVectorStore
+from agents.CodeExplainer import CodeExplainer
+from agents.FolderStructureExplain import FolderStructureExplain
+from agents.KeywordExtraction import KeywordExtraction
+
+from tools.Helper import CleanText
+from tools.CreateEmbedding import CreateEmbedding
+from tools.SupabaseVectorStore import SupabaseVectorStore
 
 OLLAMA_URL = "http://10.13.13.4:11434/api/generate"
 OLLAMA_MODEL = "qwen2.5-coder:14b-instruct-q6_K"

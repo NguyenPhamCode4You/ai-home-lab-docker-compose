@@ -2,14 +2,14 @@ from typing import Generator, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from RelevantCodeBlockFinder import RelevantCodeBlockFinder
-from CodeBlockExtractor import CodeBlockExtractor
-from FilePrioritizer import FilePrioritizer
-from CodeExplainer import CodeExplainer
-from AssistantAnswer import AssistantAnswer
-from CreateEmbedding import CreateEmbedding
-from SupabaseVectorStore import SupabaseVectorStore
-from AssistantAnswer import AssistantAnswer
+from agents.RelevantCodeBlockFinder import RelevantCodeBlockFinder
+from agents.CodeBlockExtractor import CodeBlockExtractor
+from agents.FilePrioritizer import FilePrioritizer
+from agents.CodeExplainer import CodeExplainer
+from agents.AssistantAnswer import AssistantAnswer
+
+from tools.CreateEmbedding import CreateEmbedding
+from tools.SupabaseVectorStore import SupabaseVectorStore
 import os
 
 SUPABASE_URL = "http://10.13.13.4:8000"
@@ -18,7 +18,7 @@ TABLE_NAME = "n8n_documents_ebook"
 FUNCTION = "match_n8n_documents_ebook_neo"
 vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME, FUNCTION)
 
-prompt_path = os.path.join(os.path.dirname(__file__), "Rag-Prompt.txt")
+prompt_path = os.path.join(os.path.dirname(__file__), "prompts/Rag-Prompt.txt")
 with open(prompt_path, "r", encoding="utf-8") as file:
     base_prompt_default = file.read()
 
