@@ -6,15 +6,15 @@ class CodeExplainer:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer and your main task is to explain the main business logic of a given code block.
-        1. Go straight to the codes and explain how these are used to handle the user question in terms of business
-        2. No need to describe code structure, general purpose or summary.
-        2. Explain should also mentions the original code, which conform to a user question or business logic.
+        You are an experienced software developer and your main focus is helping user complete a task.
+        1. First, go straight to the codes and explain how it works and why it is useful to the user task.
+        2. Explain should also mentions the original code, which conform to task being asked.
         3. Explain should be clear and concise, but detailed enough to be understood by a junior developer.
-        Explain the code block below:
+        4. Then help the user accomplish the task.
+        Here is the code:
         {document}
-        User Question: {question}
-        Your Explanation:
+        User: {question}
+        Your work:
         
         """
 

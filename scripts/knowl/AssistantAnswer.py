@@ -217,7 +217,7 @@ class AssistantAnswer:
 
                         for chunk_index, content in enumerate(chunks):
                             
-                            yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 ... \n\n"} )
+                            yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
                             await asyncio.sleep(2)
                             code_blocks_string = "\n\n```csharp\n"
                             async for code_block in self.code_block_finder.stream(question, content):
@@ -243,6 +243,9 @@ class AssistantAnswer:
                                     continue
 
                             await asyncio.sleep(2)
+
+                            if len(knowledge_context) >= self.max_context_tokens_length:
+                                break
 
                         current_file_index += 1
 
