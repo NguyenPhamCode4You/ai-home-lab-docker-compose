@@ -201,17 +201,17 @@ class AssistantAnswer:
                 file_path = document["content"]
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
-                # summarize = document["summarize"]
+                summarize = document["summarize"]
                 # yield json.dumps({"response": f"\n🕑 **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens - Iterations: {current_file_index}.{self.match_count}.L{index + 1}. Reading file: {file_name} 👀 \n\n"})
                 yield json.dumps({"response": f"\n✏️ Start Reading file: {file_name} 👀 \n\n"})
                 await asyncio.sleep(2)
                 try:
                     # yield json.dumps({"response": f"\n\n**Summary**: {summarize}\n\n"})
-                    # await asyncio.sleep(len(summarize) / 200)
+                    await asyncio.sleep(len(summarize) / 200)
                     with open(file_path, "r", encoding="utf-8") as file:
                         content = file.read()
 
-                        if len(content) == 0 or len(content) > 10000:
+                        if len(content) == 0 or len(content) > 20000:
                             continue
 
                         chunks = [content]
