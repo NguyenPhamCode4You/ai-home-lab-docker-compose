@@ -1,9 +1,9 @@
 import os
-from agents.CodeBlockExtractor import CodeBlockExtractor
+from jobs.CodeBlockExtractor import CodeBlockExtractor
+from jobs.CodeExplainer import CodeExplainer
+from jobs.FolderStructureExplain import FolderStructureExplain
+from jobs.KeywordExtraction import KeywordExtraction
 # from CodeSummarizer import CodeSummarizer
-from agents.CodeExplainer import CodeExplainer
-from agents.FolderStructureExplain import FolderStructureExplain
-from agents.KeywordExtraction import KeywordExtraction
 
 from tools.Helper import CleanText
 from tools.CreateEmbedding import CreateEmbedding
@@ -16,11 +16,11 @@ EMBEDING_URL = "http://10.13.13.4:11434/api/embed"
 EMBEDING_MODEL = "nomic-embed-text:137m-v1.5-fp16"
 
 embedder = CreateEmbedding(url=EMBEDING_URL, model=EMBEDING_MODEL)
-# codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeSummarizer = CodeExplainer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeBlockExtractor = CodeBlockExtractor(url=OLLAMA_URL, model=OLLAMA_MODEL)
 folderStructureExplain = FolderStructureExplain(url=OLLAMA_URL, model=OLLAMA_MODEL)
 keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(20)
+# codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 
 SUPABASE_URL = "http://10.13.13.4:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"

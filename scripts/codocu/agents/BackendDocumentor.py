@@ -9,7 +9,7 @@ class Message():
     content: str  # Message text
 
 # Main assistant class
-class AssistantAnswer:
+class BackendDocumentor:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",
@@ -57,10 +57,6 @@ class AssistantAnswer:
         self.code_block_finder = code_block_finder
         return self
     
-    def set_code_block_extractor(self, code_block_extractor):
-        self.code_block_extractor = code_block_extractor
-        return self
-    
     def set_file_prioritizer(self, file_prioritizer):
         self.file_prioritizer = file_prioritizer
         return self
@@ -104,7 +100,7 @@ class AssistantAnswer:
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
     
-    async def stream_answer_from_files(self, question: str, messages: List[Message] = None):
+    async def stream(self, question: str, messages: List[Message] = None):
         if not self.embedder or not self.vector_store:
             raise ValueError("Embedder and vector store must be set before retrieving documents.")
         
@@ -283,7 +279,6 @@ class AssistantAnswer:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
-        
     
     def run(self, question: str, messages: List[Message] = None) -> str:
         prompt = self.get_final_prompt(question, messages)
@@ -297,15 +292,6 @@ class AssistantAnswer:
             raise Exception(f"Failed to connect: {response.status_code}")
         
         return self._clean_json_response(response.json())
-    
-    async def stream(self, question: str, messages: List[Message] = None):
-        prompt = self.get_final_prompt(question, messages)
-        
-        async with httpx.AsyncClient() as client:
-        # Send streaming request to Ollama
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    yield chunk
     
     # Run the assistant to answer the question
     def get_final_prompt(self, question: str, messages: List[Message] = None) -> str:
