@@ -6,3 +6,7 @@ jellyfin
 node_modules
 
 __pycache__
+
+codocu_results
+
+temp

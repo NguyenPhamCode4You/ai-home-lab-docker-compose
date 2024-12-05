@@ -25,13 +25,14 @@ pipeline_options_IMAGE.table_structure_options.do_cell_matching = False
 converter = DocumentConverter()
 
 class FileHandler:
-
-    def __init__(self, file_stream):
+    def __init__(self, file_stream, filename):
         """
-        Initializes the FileHandler class with a file stream.
-        :param file_stream: File stream object from a Flask request
+        Initializes the FileHandler class with a file stream and filename.
+        :param file_stream: File stream object from FastAPI UploadFile
+        :param filename: The original filename of the uploaded file
         """
         self.file_stream = file_stream
+        self.filename = filename
         self.temp_file_path = None
 
     def save_temp_file(self):
@@ -40,14 +41,15 @@ class FileHandler:
         :return: The file path of the saved temporary file.
         """
         timestamp = datetime.now().strftime('%Y.%m.%d-%H.%M.%S')
-        filename = f"{timestamp}-{self.file_stream.filename}"
-        self.temp_file_path = os.path.join(os.getcwd(), 'temp', filename)
+        filename_with_timestamp = f"{timestamp}-{self.filename}"
+        self.temp_file_path = os.path.join(os.getcwd(), 'temp', filename_with_timestamp)
 
         # Ensure the temp directory exists
         os.makedirs(os.path.dirname(self.temp_file_path), exist_ok=True)
 
-        # Save the file
-        self.file_stream.save(self.temp_file_path)
+        # Save the file to the temporary path
+        with open(self.temp_file_path, 'wb') as f:
+            f.write(self.file_stream.read())  # Read file stream and save as a byte stream
         return self
     
     def convert_file_to_text(self):

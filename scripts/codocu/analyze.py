@@ -1,10 +1,13 @@
 import os
-from .CodeBlockExtractor import CodeBlockExtractor
-from .CodeSummarizer import CodeSummarizer
-from .FolderStructureExplain import FolderStructureExplain
-from .CreateEmbedding import CreateEmbedding
-from .KeywordExtraction import KeywordExtraction
-from .SupabaseVectorStore import SupabaseVectorStore
+
+from Helper import CleanText
+from CodeBlockExtractor import CodeBlockExtractor
+# from CodeSummarizer import CodeSummarizer
+from CodeExplainer import CodeExplainer
+from FolderStructureExplain import FolderStructureExplain
+from CreateEmbedding import CreateEmbedding
+from KeywordExtraction import KeywordExtraction
+from SupabaseVectorStore import SupabaseVectorStore
 
 OLLAMA_URL = "http://10.13.13.4:11434/api/generate"
 OLLAMA_MODEL = "qwen2.5-coder:14b-instruct-q6_K"
@@ -13,7 +16,8 @@ EMBEDING_URL = "http://10.13.13.4:11434/api/embed"
 EMBEDING_MODEL = "nomic-embed-text:137m-v1.5-fp16"
 
 embedder = CreateEmbedding(url=EMBEDING_URL, model=EMBEDING_MODEL)
-codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
+# codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
+codeSummarizer = CodeExplainer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeBlockExtractor = CodeBlockExtractor(url=OLLAMA_URL, model=OLLAMA_MODEL)
 folderStructureExplain = FolderStructureExplain(url=OLLAMA_URL, model=OLLAMA_MODEL)
 keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(20)
@@ -24,7 +28,8 @@ TABLE_NAME = "n8n_documents_ebook"
 supabase = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, TABLE_NAME)
 
 allowed_file_extensions = {".cs"}
-# allowed_file_extensions = {".py"}
+
+max_file_tokens = 10000
 
 ignored_file_pattern = {".Test", ".UnitTest", ".csproj", "Debug", "net7.0", "Migrations", "Snapshot", "bin", "obj", ".git", "log", ".vs", "SednaIntegrationService"}
 
@@ -112,69 +117,46 @@ for file_path in files_list:
     try:
         with open(file_path, 'r') as file:
             file_content = file.read()
+            if len(file_content) > max_file_tokens:
+                print(f"File {file_path} is too large: {len(file_content)} tokens")
+                continue
+
     except Exception as e:
         print(f"Error reading file {file_path}: {e}")
 
-    explanation = codeSummarizer.run(file_content)
+    question = "Analyze and describe the importance logics of this code block."
+    explanation = codeSummarizer.run(question, file_content)
     keyword = keywordExtractor.run(file_content)
 
-    print(f"Code Block: {file_content}")
-    print(f"Explanation: {explanation}")
-    print(f"Keyword: {keyword}")
 
-    header = f"{folder_path}\{filename}"
-    metadata = {"f": filename, "k": keyword}
 
-    content = f"{file_path}"
-    embedding = embedder.run(metadata)
-    embedding2 = embedder.run(explanation)
+    # print(f"Code Block: {file_content}")
+    # print(f"Explanation: {explanation}")
+    # print(f"Keyword: {keyword}")
 
-    supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
-    file_index += 1
+    # header = f"{folder_path}\{filename}"
+    # metadata = {"f": filename, "k": keyword}
 
-    # processed_folder_path = os.path.join(output_path, folder_path)
-    # processed_file_name = CleanText(filename.replace(document_path, ""))
-    # processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
-    
-    # if not os.path.exists(processed_folder_path):
-    #     os.makedirs(processed_folder_path)
+    # content = f"{file_path}"
+    # embedding = embedder.run(metadata)
+    # embedding2 = embedder.run(explanation)
 
-    # code_blocks = codeBlockExtractor.run(file_content)
-    # code_blocks = code_blocks.split("VNLPAGL\n")
-
-    # document_content = f""
-    # line_index = 1
-
-    # for code_block in code_blocks:
-    #     if len(code_block) == 0:
-    #         continue
-
-    #     explanation = codeExplainer.run(code_block)
-    #     keyword = keywordExtractor.run(code_block)
-
-    #     print(f"Code Block: {code_block}")
-    #     print(f"Explanation: {explanation}")
-    #     print(f"Keyword: {keyword}")
-
-    #     header = f"{folder_path}\{filename}"
-    #     metadata = {"f": processed_file_name, "h": header, "k": keyword}
-
-    #     content = f"{header}: {code_block}"
-    #     embedding = embedder.run(metadata)
-    #     embedding2 = embedder.run(explanation)
-
-    #     supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
-    #     line_index += 1
-
-    #     document_content += f"\n{code_block}"
-    #     document_content += f"\nExplain: {explanation}"
-    #     document_content += f"\nKeyword: {keyword}"
-
-    #     print(f"oooooooooooooooooooo File {file_index}/{len(files_list)} - Line {line_index}/{len(code_blocks)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
-        
-    #     line_index += 1
-
-    # with open(processed_file_path, 'w') as f:
-    #     f.write(document_content)
-
+    # supabase.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": explanation})
     # file_index += 1
+
+
+    processed_folder_path = os.path.join(output_path, folder_path)
+    processed_file_name = CleanText(filename.replace(document_path, ""))
+    processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
+    
+    if not os.path.exists(processed_folder_path):
+        os.makedirs(processed_folder_path)
+
+    with open(processed_file_path, 'w') as f:
+        f.write(f"# {filename}\n\n")
+        f.write(f"Path: `{file_path}`\n\n")
+        f.write(f"## Keyword:\n{keyword}\n\n")
+        f.write(f"## Summary:\n{explanation}\n\n")
+        print(f"File Analyzed: {file_path}")
+
+    file_index += 1
