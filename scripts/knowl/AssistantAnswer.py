@@ -211,6 +211,9 @@ class AssistantAnswer:
                     with open(file_path, "r", encoding="utf-8") as file:
                         content = file.read()
 
+                        if len(content) == 0 or len(content) > 10000:
+                            continue
+
                         chunks = [content]
                         if len(content) > 6000:
                             chunks = RecursiveSplitCodeLines(content, 5000)
