@@ -233,16 +233,16 @@ class AssistantAnswer:
 
                             knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
                             await asyncio.sleep(2)
-                            yield json.dumps({"response": f"\n\n### 🤖 Start explaining ... \n\n\n"})
-                            await asyncio.sleep(1)
-                            async for chunk_object in self.code_explainer.stream(question, code_blocks_string):
-                                try:
-                                    yield chunk_object
-                                except Exception as e:
-                                    yield ""
-                                    continue
+                            # yield json.dumps({"response": f"\n\n### 🤖 Start explaining ... \n\n\n"})
+                            # await asyncio.sleep(1)
+                            # async for chunk_object in self.code_explainer.stream(question, code_blocks_string):
+                            #     try:
+                            #         yield chunk_object
+                            #     except Exception as e:
+                            #         yield ""
+                            #         continue
 
-                            await asyncio.sleep(2)
+                            # await asyncio.sleep(2)
 
                             if len(knowledge_context) >= self.max_context_tokens_length:
                                 break
