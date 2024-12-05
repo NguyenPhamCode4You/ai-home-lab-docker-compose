@@ -6,11 +6,10 @@ from .RelevantCodeBlockFinder import RelevantCodeBlockFinder
 from .CodeBlockExtractor import CodeBlockExtractor
 from .FilePrioritizer import FilePrioritizer
 from .CodeExplainer import CodeExplainer
-
-from ..knowl.AssistantAnswer import AssistantAnswer
-from ..knowl.CreateEmbedding import CreateEmbedding
-from ..knowl.SupabaseVectorStore import SupabaseVectorStore
-from ..knowl.AssistantAnswer import AssistantAnswer
+from .AssistantAnswer import AssistantAnswer
+from .CreateEmbedding import CreateEmbedding
+from .SupabaseVectorStore import SupabaseVectorStore
+from .AssistantAnswer import AssistantAnswer
 import os
 
 SUPABASE_URL = "http://10.13.13.4:8000"
