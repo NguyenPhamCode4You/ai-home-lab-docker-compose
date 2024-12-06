@@ -8,7 +8,7 @@ Knowledge:
 {context}
 -------
 
-Step 3. Use the retrieved information above to generate a WELL-STRUCTURED, BULLET-POINT, CONCISE, ACCURATE response. Enhance your response with factual support when possible.
+Step 3. Use the retrieved information above to generate a WELL-STRUCTURED, BULLET-POINT, CONCISE, ACCURATE but DETAILED response. Enhance your response with factual support when possible.
 Step 4. If the query goes beyond retrieved knowledge, just answer that you dont have information about this topics. Dont make up answers.
 Here is the question, Remember HUMAN ask questions always according the the knowledge base above.
 

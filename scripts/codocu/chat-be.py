@@ -44,8 +44,8 @@ documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_finder(codeBlockFinder)
 documentor.set_file_prioritizer(filePrioritizer)
 documentor.set_code_explainer(codeExplainer)
-documentor.set_max_context_tokens_length(6000)
-documentor.set_max_history_tokens_length(10)
+documentor.set_max_context_tokens_length(5500)
+documentor.set_max_history_tokens_length(200)
 documentor.set_match_count(20)
 
 bvms_answer = BvmsKnowledgeBase(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
@@ -53,12 +53,20 @@ bvms_answer.set_embedder(embedder)
 bvms_answer.set_vector_store(bvms_vector_store)
 bvms_answer.set_base_prompt(bvms_prompt)
 bvms_answer.set_max_context_tokens_length(6000)
-bvms_answer.set_max_history_tokens_length(100)
+bvms_answer.set_max_history_tokens_length(10)
 documentor.set_match_count(200)
 
 orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
-orchesrea.add_agent("Code Documentor", "This agent can answer codes related questions about BVMS Backend software, which is built using .NET", documentor)
-orchesrea.add_agent("BVMS General", "This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. It also contains some api informations about sedna.", bvms_answer)
+orchesrea.add_agent("BVMS General", """
+This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. 
+It also contains some api informations about Sedna & DA Desk.
+It knows about the business logics of cargo planner software.
+""", bvms_answer)
+
+orchesrea.add_agent("BVMS Backend Document", """
+This agent can provide code snippets and documentations about BVMS Backend source code, which is built using .NET
+However, it should not be used for debugging or fixing code issues, or writing new code.
+""", documentor)
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, StreamingResponse

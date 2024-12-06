@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import httpx
 import requests
 from typing import List, Optional
@@ -15,21 +16,24 @@ class AssistantOrchestra:
         url: str = "http://localhost:11434/api/generate",
         model: str = "gemma2:9b-instruct-q8_0"
     ):
-        
         self.url = url
         self.model = model
         self.agents = {}
         self.base_prompt = """
-        You are an intelligent assistant that can help with a variety of tasks.
-        You have access to the following agents:
+        You are an intelligent assistant that can help user complete complex tasks.
+        To archeive this, you have access to the following agents:
         -----
         {agents}
         -----
-        When you receive a question, you should anaylzye the question to determine if you should forward it to the appropriate agent.
-        Read the description of each agent to determine which one to use, base on user's question.
+        When you receive a question, you should anaylzye the question to determine which agents you should forward the question to.
+        Read the description of each agent to determine the right ones to use, you can also paraphrase the question to better match the agent's expertise.
+
+        Follow the structure below to forward the question to an agent:
+        👋 **[agent_name_1]**: [question 1] 👀
+        👋 **[agent_name_2]**: [question 2] 👀
         
-        If an agent should be use, include the agent's name in your answer.
-        If user asks a question that is not related to any agent, you can answer the question yourself
+        You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
+        If user asks a question that is not related to any agent, then you can answer the question yourself.
 
         Now, let's get started!
         -----
@@ -57,8 +61,6 @@ class AssistantOrchestra:
     async def stream(self, question: str, messages: List[Message] = None):
         prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question)
 
-        print(f"Prompt: {prompt}")
-
         accumulated_response  = ""
         
         async with httpx.AsyncClient() as client:
@@ -73,20 +75,45 @@ class AssistantOrchestra:
                         yield ""
                         continue
 
-                for agent_name, details in self.agents.items():
-                    if agent_name in accumulated_response:
-                        yield json.dumps({"response": f"\n\n### 🤖 {agent_name} agent answering ... \n\n\n"} )
-                        await asyncio.sleep(1)
-                        agent = details.get("agent")  # Safely get the agent object
-                        if not agent:
-                            yield ""  # If agent is missing, yield an empty string and continue
-                            continue
-                        
-                        try:
-                            async for agent_chunk in agent.stream(question, messages):
-                                yield agent_chunk
-                        except Exception as e:
-                            yield ""  # Log or handle the exception if needed
-                            continue
+                # Split the response by the delimiter
+                chunks = accumulated_response.split("👀")
+                agent_questions = []
+                for chunk in chunks:
+                    if ":" in chunk:  # Ensure the chunk contains an agent and a question
+                        parts = chunk.split(":", 1)  # Split into two parts: agent name and question
+                        agent_name = parts[0].strip()  # Strip whitespace from the agent name
+                        question = parts[1].strip()   # Strip whitespace from the question
+
+                        for aname, adetails in self.agents.items():
+                            if aname in agent_name:
+                                agent_name = aname
+                                agent_questions.append((agent_name, question))
+                                break
+
+                print(f"Agent questions: {agent_questions}")
+                
+                # Identify agent responses in accumulated_response
+                for agent_name, agent_question in agent_questions:
+                    agent_details = self.agents.get(agent_name, {})
+                    agent = agent_details.get("agent")
+                    
+                    if not agent:
+                        yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
+                        continue
+
+                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {agent_question} ...\n\n"})
+                    await asyncio.sleep(1)
+
+                    try:
+                        async for agent_chunk in agent.stream(agent_question, messages):
+                            yield agent_chunk
+                    
+                    except Exception as e:
+                        print(f"Error streaming from agent '{agent_name}': {e}")
+                        yield f"\n\n### ⚠️ Error while '{agent_name}' was responding.\n\n"
+                    
+                    except Exception as e:
+                        print(f"Error in main stream method: {e}")
+                        yield ""
                     
                 
