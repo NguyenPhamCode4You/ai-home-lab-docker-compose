@@ -5,16 +5,16 @@ class RelevantCodeBlockFinder:
     def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
-        self.base_prompt = """
-        You are an experienced software developer and you are asked to extract the main code block from a given code.
-        1. Main code block should not inlcude library imports or initialization code.
-        2. Main code block should includes lines of codes containing main logic of the entire file or the important business logics.
-        3. Main block should contains at least 10 lines of code, but should not exceed 1500 characters.
-        Important: 
-        - Do not explain code, no formatting, no wrapping, just return code as is.
-        Now extract the main code block from the this code file:
-        {document}
-        """
+        # self.base_prompt = """
+        # You are an experienced software developer and you are asked to extract the main code block from a given code.
+        # 1. Main code block should not inlcude library imports or initialization code.
+        # 2. Main code block should includes lines of codes containing main logic of the entire file or the important business logics.
+        # 3. Main block should contains at least 10 lines of code, but should not exceed 1500 characters.
+        # Important: 
+        # - Do not explain code, no formatting, no wrapping, just return code as is.
+        # Now extract the main code block from the this code file:
+        # {document}
+        # """
 
         # self.base_prompt = """
         # You are an experienced software developer that can analyze and identity most important code lines from a given code file.
@@ -45,20 +45,20 @@ class RelevantCodeBlockFinder:
         # Now return the most important code blocks.
         # """
 
-        # self.base_prompt = """
-        # You are an experienced software developer that can analyze and identity relevant code blocks that can help answer the question.
-        # Important: 
-        # - Relevant code block usually contains the answer to the question, or having keyword mentioned in the question.
-        # - Code block should be returned as is, each has no more than 10 lines of code, wrapped in a code block of the programming language.
-        # - Do not include any additional information, no explaination needed.
-        # - If the entire code file is completely irrelevant, return "No relevant code found."
-        # - ALWAYS Seperate code blocks using "VNLPAGL\n"
+        self.base_prompt = """
+        You are an experienced software developer that can skim through a code document and identify the relevant code blocks based on a given question.
+        Important: 
+        - Relevant code blocks usually have the markdown header that is highly related to the question or topic of the question.
+        - All relevant code blocks should be combined into one single final code block, returned as is, not wrapped in a code block, just plain text.
+        - Do not include any additional information, no explaination needed.
+        - If the entire file does not have any relevant code blocks, return "No relevant code found."
 
-        # Code To Analyze:
-        # {document}
-        # Question: {question}
-        # Now return the relevant code blocks.
-        # """
+        Code To Analyze:
+        {document}
+        Question: {question}
+        Your answer:
+
+        """
 
     async def stream(self, question: str, document: str):
         prompt = self.base_prompt.format(document=document, question=question)

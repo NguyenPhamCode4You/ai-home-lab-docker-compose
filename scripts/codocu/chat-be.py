@@ -9,7 +9,6 @@ from agents.AssistantOrchestra import AssistantOrchestra
 
 from jobs.RelevantCodeBlockFinder import RelevantCodeBlockFinder
 from jobs.FilePrioritizer import FilePrioritizer
-from jobs.CodeExplainer import CodeExplainer
 
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
@@ -34,7 +33,6 @@ with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r
 
 embedder = CreateEmbedding(url=f'http://10.13.13.4:11434/api/embed', model='nomic-embed-text:137m-v1.5-fp16')
 filePrioritizer = FilePrioritizer(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
-codeExplainer = CodeExplainer(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
 codeBlockFinder = RelevantCodeBlockFinder(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
 
 documentor = BackendDocumentor(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
@@ -43,7 +41,6 @@ documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_finder(codeBlockFinder)
 documentor.set_file_prioritizer(filePrioritizer)
-documentor.set_code_explainer(codeExplainer)
 documentor.set_max_context_tokens_length(5500)
 documentor.set_max_history_tokens_length(200)
 documentor.set_match_count(20)

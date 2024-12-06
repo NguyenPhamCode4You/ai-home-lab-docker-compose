@@ -61,10 +61,6 @@ class BackendDocumentor:
         self.file_prioritizer = file_prioritizer
         return self
     
-    def set_code_explainer(self, code_explainer):
-        self.code_explainer = code_explainer
-        return self
-
     # Organize retrieved documents into structured sections
     def organize_documents(self, documents: List[dict]) -> List[dict]:
         # Extract titles and organize by unique titles
@@ -195,6 +191,8 @@ class BackendDocumentor:
                     break
 
                 file_path = document["content"]
+                file_path = file_path.replace("C:\\Users\\niche\\gitlab\\bbc-bvms-net-back-end-modular", "C:\\Users\\niche\\ai-home-lab-docker-compose\\scripts\\codocu\\codocu_results\\bbc-bvms-net-back-end-modular")
+                file_path += ".md"
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
                 summarize = document["summarize"]
@@ -228,20 +226,13 @@ class BackendDocumentor:
                                     continue
 
                             code_blocks_string += "\n```\n\n"
+
+                            if "No relevant code" in code_blocks_string:
+                                continue
                             # yield json.dumps({"response": f"\n✅ {file_name} - Chunk: {chunk_index + 1}/{len(chunks)} analyzed - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens reached 👀 \n\n"})
 
                             knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
                             await asyncio.sleep(2)
-                            # yield json.dumps({"response": f"\n\n### 🤖 Start explaining ... \n\n\n"})
-                            # await asyncio.sleep(1)
-                            # async for chunk_object in self.code_explainer.stream(question, code_blocks_string):
-                            #     try:
-                            #         yield chunk_object
-                            #     except Exception as e:
-                            #         yield ""
-                            #         continue
-
-                            # await asyncio.sleep(2)
 
                             if len(knowledge_context) >= self.max_context_tokens_length:
                                 break
