@@ -6,19 +6,51 @@ class CodeBlockExtractor:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer that can skim through a code document and identify the relevant code blocks based on a given question.
-        Important: 
-        - Relevant code blocks usually have the markdown header that is highly related to the question or topic of the question.
-        - All relevant code blocks should be combined into one single final code block, returned as is, not wrapped in a code block, just plain text.
-        - Do not include any additional information, no explaination needed.
-        - If the entire file does not have any relevant code blocks, return "No relevant code found."
+        You are a specialized agent that can identity if a given header is related to a user question.
+        Criteria for relevance:
+        1. If the header contains words related to the topic of the question, then it is relevant.
+        2. If main topic of question can be found in the header, then it is relevant.
+        3. If the header is too generic, then it is not relevant.
+        4. Otherwise, it is not relevant.
+        5. If no headers are relevant, then return "No relevant information found."
 
-        Code To Analyze:
+        Return the list of headers that are relevant to the question, seperated by a newline character, follow this pattern:
+        [Numbering]. [header1]: [explaination why this header is selected, maximum 50 words]
+
+        Important: 
+        - DO NOT modify the headers, return them as is, do not wrap them in code block.
+        - DO NOT include any additional information.
+
+        Now, let's start:
+        Here are the list of headers:
         {document}
-        Question: {question}
+        User Question: {question}
         Your answer:
 
         """
+
+        # self.base_prompt = """
+        # You are an experienced software developer that can extract code block useful for answering a question.
+        
+        # Each code block in the document follow the pattern:
+        # ## [Business purpose in 5 words max]
+        # [code_block]
+        # [Explaination]
+
+        # If the header mentions words related to topic of question, then include the code block in your final answer.
+        # All relevant code blocks should be combined into one single final code block, returned as is, not wrapped in a code block, just return plain text.
+        
+        # Important:
+        # - Do not include any additional information, no explaination needed, code block should be returned as is, no wrapping in code block.
+        # - If the entire document does not have any header that is relevant to the question, return "No relevant code found."
+        # - Dont include the summary and keywords section of the document.
+
+        # Document To Analyze:
+        # {document}
+        # Question: {question}
+        # Your answer:
+
+        # """
 
     async def stream(self, question: str, document: str):
         prompt = self.base_prompt.format(document=document, question=question)

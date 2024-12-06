@@ -8,9 +8,9 @@ class FilePrioritizer:
         self.base_prompt = """
         You are an expert at analyzing a list of files and their description and re-ordering them based on their important to a given question.
         Important:
-        - File that have description highly relevance to the question should be most important, and the shorter the file name, the more important it is.
-        - File that have description contains keywords mentioned in the question should be lesser important.
-        - File that have description contains terms related to the question should be even lesser important.
+        - File that have name contains the exact keywords mentioned in the question should be most important.
+        - File that have description have keywords mentioned in the question to the question should also be important.
+        - File that have description contains terms related to the question should be lesser important.
         - Return only file names without any modification, as plain text, seperated by a newline character, dont wrap the file names in code block.
         - Do not include any additional information, no explaination needed, do not wrap the file names in code block.
 
@@ -27,6 +27,8 @@ class FilePrioritizer:
         EstimateShipmentPriceBasic.py
         EstimateShipmentPriceAdvanced.py
         EstimateCostOfTravelOfShipment.py
+
+        Most important: always return back the full list of files with the most important file at the top and the least important at the bottom.
 
         Now for this list of Files:
         {document}

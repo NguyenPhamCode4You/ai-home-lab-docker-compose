@@ -82,12 +82,12 @@ class AssistantOrchestra:
                     if ":" in chunk:  # Ensure the chunk contains an agent and a question
                         parts = chunk.split(":", 1)  # Split into two parts: agent name and question
                         agent_name = parts[0].strip()  # Strip whitespace from the agent name
-                        question = parts[1].strip()   # Strip whitespace from the question
+                        agent_question = parts[1].strip()   # Strip whitespace from the question
 
                         for aname, adetails in self.agents.items():
                             if aname in agent_name:
                                 agent_name = aname
-                                agent_questions.append((agent_name, question))
+                                agent_questions.append((agent_name, agent_question))
                                 break
 
                 print(f"Agent questions: {agent_questions}")
@@ -102,6 +102,7 @@ class AssistantOrchestra:
                         continue
 
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {agent_question} ...\n\n"})
+                    # yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {question} ...\n\n"})
                     await asyncio.sleep(1)
 
                     try:

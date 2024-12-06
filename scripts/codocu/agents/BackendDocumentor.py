@@ -1,8 +1,33 @@
 import asyncio
 import json
+import re
 import httpx
 import requests
 from typing import List, Optional
+
+markdown_header_pattern = r"^(#+[ ]*.+)$"
+def SplitByMarkdownHeader(message: str):
+    """
+    Splits a Markdown message into chunks by headers and their associated content.
+
+    Args:
+        message (str): The Markdown message.
+
+    Returns:
+        list: List of chunks, where each chunk contains a header and its content.
+    """
+    parts = re.split(markdown_header_pattern, message, flags=re.MULTILINE)
+    
+    # Reconstruct chunks with headers and associated content
+    chunks = []
+    for i in range(1, len(parts), 2):  # Headers are in odd indices
+        header = parts[i].strip()  # Strip unnecessary whitespace
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ""
+        chunks.append(f"{header}\n{content}")
+    return chunks
+
+def RemoveSpecialCharacters(text: str) -> str:
+    return re.sub(r"[^a-zA-Z]+", "", text)
 
 class Message():
     role: str  # e.g., "user", "assistant"
@@ -57,10 +82,6 @@ class BackendDocumentor:
         self.code_block_extractor = code_block_extractor
         return self
     
-    def set_file_prioritizer(self, file_prioritizer):
-        self.file_prioritizer = file_prioritizer
-        return self
-    
     # Organize retrieved documents into structured sections
     def organize_documents(self, documents: List[dict]) -> List[dict]:
         # Extract titles and organize by unique titles
@@ -101,7 +122,7 @@ class BackendDocumentor:
             raise ValueError("Embedder and vector store must be set before retrieving documents.")
         
         question_embedding = self.embedder.run(question)
-        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=20)
+        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
         if len(documents) == 0:
             yield json.dumps({"error": "No files found or smart file picker not set."})
             return
@@ -122,53 +143,17 @@ class BackendDocumentor:
             # Return the correctly formatted Markdown link
             return f"[{file_name}]({file_url})"
         
-        def RecursiveSplitCodeLines(document: str, limit: int = 4000):
-            # Split the document into sentences
-            lines = document.split("\n")
-            
-            # Recursively split long sentences
-            paragraphs = []
-            paragraph = ""
-            while len(lines) > 0:
-                line = lines.pop(0)
-                if len(paragraph) + len(line) < limit:
-                    paragraph += f"{line}\n"
-                else:
-                    paragraphs.append(paragraph)
-                    paragraph = f"{line}\n"
-
-            # Add the last paragraph
-            if len(paragraph) > 0:
-                paragraphs.append(paragraph)
-
-            return paragraphs
-        
         current_file_index = 1
         
         async with httpx.AsyncClient() as client:
-            yield json.dumps({"response": f"📚 Ranking {len(documents)} documents basing on relevance level ...\n\n"})
-
-            # Use file_prioritizer to prioritize files
-            documents_to_analyze = [f"{doc["metadata"]["f"]}: {doc["summarize"][:200]}" for doc in documents]
-            prioritized_file_names = await asyncio.to_thread(self.file_prioritizer.run, question, '\n'.join(documents_to_analyze))
-            prioritized_file_names = [
-                name for name in prioritized_file_names.split("\n") if name.strip()
-            ]
-
-            # Reorder documents based on the prioritized list
-            if len(prioritized_file_names) > 0:
-                reordered_documents = []
-                for file_name_index, prioritized_name in enumerate(prioritized_file_names):
-                    for doc in documents:
-                        if doc["metadata"]["f"] in prioritized_name:
-                            reordered_documents.append(doc)
-                            file_path = doc["content"]
-                            if file_name_index < 10:
-                                yield json.dumps({"response": f"📌 Rank {file_name_index + 1}: {format_file_name(prioritized_name, file_path)}\n"})
-                            break
-
-                # Update the original documents list
-                documents = reordered_documents
+            yield json.dumps({"response": f"📚 Finding top {len(documents)} documents basing on relevance level ...\n\n"})
+            await asyncio.sleep(2)
+            for index, document in enumerate(documents):
+                file_path = document["content"]
+                file_name = document["metadata"]["f"]
+                file_name = format_file_name(file_name, file_path)
+                yield json.dumps({"response": f"📌 Document {index + 1}: {file_name}\n"})
+                await asyncio.sleep(0.7)
 
             yield json.dumps({"response": f"\n\n### 🤖 Start the learning process... \n\n\n"})
             await asyncio.sleep(2)
@@ -183,46 +168,88 @@ class BackendDocumentor:
                 file_path = document["content"]
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
-                summarize = document["summarize"]
-                # yield json.dumps({"response": f"\n🕑 **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens - Iterations: {current_file_index}.{self.match_count}.L{index + 1}. Reading file: {file_name} 👀 \n\n"})
+
                 yield json.dumps({"response": f"\n✏️ Start Reading file: {file_name} 👀 \n\n"})
                 await asyncio.sleep(2)
                 try:
-                    # yield json.dumps({"response": f"\n\n**Summary**: {summarize}\n\n"})
-                    await asyncio.sleep(len(summarize) / 200)
                     with open(file_path, "r", encoding="utf-8") as file:
                         content = file.read()
 
-                        if len(content) == 0 or len(content) > 20000:
-                            continue
+                        chunks = SplitByMarkdownHeader(content)
+                        headers_list = []
+                        for chunk in chunks:
+                            header = chunk.split("\n")[0].replace("#", "").strip()
+                            content = chunk.split("\n", 1)[1]
 
-                        chunks = [content]
-                        if len(content) > 6000:
-                            chunks = RecursiveSplitCodeLines(content, 5000)
-
-                        for chunk_index, content in enumerate(chunks):
-                            
-                            yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
-                            await asyncio.sleep(2)
-                            code_blocks_string = "\n\n```csharp\n"
-                            async for code_block in self.code_block_extractor.stream(question, content):
-                                try:
-                                    code_blocks_string += json.loads(code_block)["response"]
-                                    yield code_block
-                                except Exception as e:
-                                    yield ""
-                                    continue
-
-                            code_blocks_string += "\n```\n\n"
-
-                            if "No relevant code" in code_blocks_string:
+                            if len(content) < 100:
                                 continue
 
-                            knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
-                            await asyncio.sleep(2)
+                            if "example" in header or "test" in header or "demo" in header or "keyword" in header or "summary" in header or "note" in header or "general purpose" in header or "business logic" in header:
+                                continue
+
+                            headers_list.append(header)
+
+                        header_block_string = ""
+                        async for header_block in self.code_block_extractor.stream(question, "\n".join(headers_list)):
+                            try:
+                                header_block_string += json.loads(header_block)["response"]
+                                yield header_block
+                            except Exception as e:
+                                yield ""
+                                continue
+
+                        headers_list = [header for header in header_block_string.split("\n") if len(header) > 0]
+
+                        for chunk in chunks:
+                            original_header = chunk.split("\n")[0].strip().lower()
+                            original_header = original_header.replace("#", "").strip()
+                            header_1 = RemoveSpecialCharacters(original_header)
+                            if len(header_1) == 0:
+                                continue
+
+                            for header_line in headers_list:
+                                header_extracted = header_line.split(":")[0].strip().lower()
+                                header_extracted = header_extracted.replace("#", "").strip()
+                                header_2 = RemoveSpecialCharacters(header_extracted)
+                                if len(header_2) == 0:
+                                    continue
+
+                                print(header_1)
+                                print(header_2)
+
+                                if header_1 in header_2 or header_2 in header_1:
+                                    knowledge_context += f"\n{file_name}:\n{chunk}"
+                                    yield json.dumps({"response": f"\n✅ Added Chunk: {file_name} - **{original_header}** - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
+                                    await asyncio.sleep(3)
+                                    break
 
                             if len(knowledge_context) >= self.max_context_tokens_length:
                                 break
+
+                        # for chunk_index, content in enumerate(chunks):
+                        #     await asyncio.sleep(2)
+                        #     yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
+                        #     await asyncio.sleep(2)
+
+                        #     code_blocks_string = "\n\n```csharp\n"
+                        #     async for code_block in self.code_block_extractor.stream(question, content):
+                        #         try:
+                        #             code_blocks_string += json.loads(code_block)["response"]
+                        #             yield code_block
+                        #         except Exception as e:
+                        #             yield ""
+                        #             continue
+
+                        #     code_blocks_string += "\n```\n\n"
+
+                        #     if "Seems not relevant" in code_blocks_string:
+                        #         continue
+
+                        #     knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
+                        #     await asyncio.sleep(2)
+
+                        #     if len(knowledge_context) >= self.max_context_tokens_length:
+                        #         break
 
                         current_file_index += 1
 
@@ -230,6 +257,7 @@ class BackendDocumentor:
                             break
 
                 except Exception as e:
+                    print(f"Error reading file: {file_name}, {str(e)}")
                     yield json.dumps({"response": f"\n⛔️ Error reading file: {file_name}, {str(e)}"})
                     continue
 
