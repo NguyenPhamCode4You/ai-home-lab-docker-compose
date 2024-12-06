@@ -1,4 +1,5 @@
 import json
+import os
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
 from FileHandler import FileHandler
@@ -7,8 +8,12 @@ from PackingListParser import PackingListParser
 
 app = FastAPI()
 
-ollama_url = "http://10.13.13.4:11434/api/generate"
-model = "qwen2.5-coder:14b-instruct-q6_K"
+from dotenv import load_dotenv
+load_dotenv()
+
+ollama_base_url = os.getenv("OLLAMA_BASE_URL") or "http://localhost:11434"
+ollama_url =  f"{ollama_base_url}/api/generate"
+model = os.getenv("OLLAMA_MODEL") or "qwen2.5-coder:14b-instruct-q6_K"
 
 extractor = JsonExtractor(url=ollama_url, model=model)
 packingListParser = PackingListParser(url=ollama_url, model=model)
