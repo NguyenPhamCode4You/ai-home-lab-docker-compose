@@ -214,9 +214,6 @@ class BackendDocumentor:
                                 if len(header_2) == 0:
                                     continue
 
-                                print(header_1)
-                                print(header_2)
-
                                 if header_1 in header_2 or header_2 in header_1:
                                     knowledge_context += f"\n{file_name}:\n{chunk}"
                                     yield json.dumps({"response": f"\n✅ Added Chunk: {file_name} - **{original_header}** - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
@@ -225,31 +222,6 @@ class BackendDocumentor:
 
                             if len(knowledge_context) >= self.max_context_tokens_length:
                                 break
-
-                        # for chunk_index, content in enumerate(chunks):
-                        #     await asyncio.sleep(2)
-                        #     yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
-                        #     await asyncio.sleep(2)
-
-                        #     code_blocks_string = "\n\n```csharp\n"
-                        #     async for code_block in self.code_block_extractor.stream(question, content):
-                        #         try:
-                        #             code_blocks_string += json.loads(code_block)["response"]
-                        #             yield code_block
-                        #         except Exception as e:
-                        #             yield ""
-                        #             continue
-
-                        #     code_blocks_string += "\n```\n\n"
-
-                        #     if "Seems not relevant" in code_blocks_string:
-                        #         continue
-
-                        #     knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
-                        #     await asyncio.sleep(2)
-
-                        #     if len(knowledge_context) >= self.max_context_tokens_length:
-                        #         break
 
                         current_file_index += 1
 
