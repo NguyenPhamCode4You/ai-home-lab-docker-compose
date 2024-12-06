@@ -1,19 +1,19 @@
 import requests
 
-class FolderStructureExplain:
+class ProjectStructureExplainer:
     def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
         self.base_prompt = """
         You are an experienced software developer and you are asked to explain a folder structure.
-        1. Explain should include the purpose of the folder structure and how it works.
-        2. Should be clear and concise, but detailed enough to be understood by a junior developer.
-        3. Explain should also take into account design patterns and best practices.
-        4. Total explanation should be no longer than 400 characters.
-
-        Important: Just return the explanation, do not include any additional information, no code, no prompt.
-        Explain the folder structure:
+        Follow the following template:
+        1. Explain should outline the folder structure in a clear and concise manner, can be in diagram or text format.
+        2. Explain should explain the source pattern and architecture of the project.
+        3. Explain should explain the purpose of each folder and the relationship between them.
         
+        Now, let's start:
+        {document}
+        Your answer:
         """
 
     def run(self, message: str) -> str:

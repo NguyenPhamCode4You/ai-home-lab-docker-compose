@@ -1,3 +1,4 @@
+import httpx
 import requests
 
 class CodeBlockExtractor:
@@ -5,21 +6,33 @@ class CodeBlockExtractor:
         self.url = url
         self.model = model
         self.base_prompt = """
-        You are an experienced software developer and you are asked to extract code blocks from a document.
-        1. Extracted code blocks should be separated by "VNLPAGL\n"
-        2. Each code block should contains at least 3 lines of code, but no more than 5 lines.
-        3. Code lines should be related to each other, total length of code block should not exceed 500 characters.
-        Important: Just return code blocks seperated by "VNLPAGL\n", do not include any additional information, no explaination, no prompt.
-        Extract the code blocks from the document.
-        Document:
+        You are an experienced software developer that can skim through a code document and identify the relevant code blocks based on a given question.
+        Important: 
+        - Relevant code blocks usually have the markdown header that is highly related to the question or topic of the question.
+        - All relevant code blocks should be combined into one single final code block, returned as is, not wrapped in a code block, just plain text.
+        - Do not include any additional information, no explaination needed.
+        - If the entire file does not have any relevant code blocks, return "No relevant code found."
+
+        Code To Analyze:
+        {document}
+        Question: {question}
+        Your answer:
 
         """
 
-    def run(self, message: str) -> str:
+    async def stream(self, question: str, document: str):
+        prompt = self.base_prompt.format(document=document, question=question)
+        async with httpx.AsyncClient() as client:
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk in response.aiter_bytes():
+                    yield chunk
+
+    def run(self, question: str, document: str) -> str:
+        prompt = self.base_prompt.format(document=document, question=question)
         # Send the request to the Ollama API
         response = requests.post(
             url=self.url,
-            json={"model": self.model, "prompt": self.base_prompt + str(message), "stream": False}
+            json={"model": self.model, "prompt": str(prompt), "stream": False}
         )
         
         # Check if the response is successful

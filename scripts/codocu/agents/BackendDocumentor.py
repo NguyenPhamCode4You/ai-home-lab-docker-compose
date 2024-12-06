@@ -53,8 +53,8 @@ class BackendDocumentor:
         self.vector_store = vector_store
         return self
     
-    def set_code_block_finder(self, code_block_finder):
-        self.code_block_finder = code_block_finder
+    def set_code_block_extractor(self, code_block_extractor):
+        self.code_block_extractor = code_block_extractor
         return self
     
     def set_file_prioritizer(self, file_prioritizer):
@@ -152,15 +152,6 @@ class BackendDocumentor:
             # Use file_prioritizer to prioritize files
             documents_to_analyze = [f"{doc["metadata"]["f"]}: {doc["summarize"][:200]}" for doc in documents]
             prioritized_file_names = await asyncio.to_thread(self.file_prioritizer.run, question, '\n'.join(documents_to_analyze))
-
-            # async for chunk_object in self.file_prioritizer.stream(question, '\n'.join(documents_to_analyze)):
-            #     try:
-            #         prioritized_file_names += json.loads(chunk_object)["response"]
-            #         yield chunk_object
-            #     except Exception as e:
-            #         yield ""
-            #         continue
-
             prioritized_file_names = [
                 name for name in prioritized_file_names.split("\n") if name.strip()
             ]
@@ -191,8 +182,6 @@ class BackendDocumentor:
                     break
 
                 file_path = document["content"]
-                file_path = file_path.replace("C:\\Users\\niche\\gitlab\\bbc-bvms-net-back-end-modular", "C:\\Users\\niche\\ai-home-lab-docker-compose\\scripts\\codocu\\codocu_results\\bbc-bvms-net-back-end-modular")
-                file_path += ".md"
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
                 summarize = document["summarize"]
@@ -217,7 +206,7 @@ class BackendDocumentor:
                             yield json.dumps({"response": f"\n🔍 Analyzing Chunk: {chunk_index + 1}/{len(chunks)} of {file_name} for relevant codes 👀 - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
                             await asyncio.sleep(2)
                             code_blocks_string = "\n\n```csharp\n"
-                            async for code_block in self.code_block_finder.stream(question, content):
+                            async for code_block in self.code_block_extractor.stream(question, content):
                                 try:
                                     code_blocks_string += json.loads(code_block)["response"]
                                     yield code_block
@@ -229,7 +218,6 @@ class BackendDocumentor:
 
                             if "No relevant code" in code_blocks_string:
                                 continue
-                            # yield json.dumps({"response": f"\n✅ {file_name} - Chunk: {chunk_index + 1}/{len(chunks)} analyzed - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens reached 👀 \n\n"})
 
                             knowledge_context += f"\n{file_name}:\n{code_blocks_string}"
                             await asyncio.sleep(2)

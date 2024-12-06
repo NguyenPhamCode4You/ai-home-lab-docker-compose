@@ -107,4 +107,20 @@ def RecursiveSplitSentences(document: str, limit: int = 1000):
 
     return paragraphs
 
+def RecursiveSplitLines(document: str, limit: int = 1000):
+    lines = document.split("\n")
+    paragraphs = []
+    paragraph = ""
+    for line in lines:
+        if len(paragraph) + len(line) < limit:
+            paragraph += f"{line}\n"
+        else:
+            paragraphs.append(paragraph)
+            paragraph = f"{line}\n"
+
+    if len(paragraph) > 0:
+        paragraphs.append(paragraph)
+
+    return paragraphs
+
     
