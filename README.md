@@ -73,7 +73,7 @@ create table n8n_documents_norm (
 );
 
 -- Create a function to search for documents
-CREATE FUNCTION match_n8n_documents_ebook_neo (
+CREATE FUNCTION match_n8n_documents_net_micro_neo (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
   filter JSONB DEFAULT '{}'
@@ -94,8 +94,8 @@ BEGIN
     content,
     summarize,
     metadata,
-    2 - ((n8n_documents_ebook.embedding <=> query_embedding) + (n8n_documents_ebook.embedding2 <=> query_embedding)) AS similarity
-  FROM n8n_documents_ebook
+    2 - ((n8n_documents_net_micro.embedding <=> query_embedding) + (n8n_documents_net_micro.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_net_micro
   WHERE metadata @> filter
   ORDER BY similarity DESC
   LIMIT match_count;

@@ -102,7 +102,6 @@ class BackendDocumentor:
         
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=20)
-
         if len(documents) == 0:
             yield json.dumps({"error": "No files found or smart file picker not set."})
             return
