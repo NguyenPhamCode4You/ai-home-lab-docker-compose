@@ -113,7 +113,6 @@ class BackendDocumentor:
         sections = self.organize_documents(documents)
         context = ""
         for section in sections:
-            print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
     
@@ -155,7 +154,7 @@ class BackendDocumentor:
                 yield json.dumps({"response": f"📌 Document {index + 1}: {file_name}\n"})
                 await asyncio.sleep(0.7)
 
-            yield json.dumps({"response": f"\n\n### 🤖 Start the learning process... \n\n\n"})
+            yield json.dumps({"response": f"\n\n### 🤖 Start the reading process... \n\n\n"})
             await asyncio.sleep(2)
 
             knowledge_context = ""
@@ -169,7 +168,7 @@ class BackendDocumentor:
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
 
-                yield json.dumps({"response": f"\n✏️ Start Reading file: {file_name} 👀 \n\n"})
+                yield json.dumps({"response": f"\n📖✏️  Reading file: {file_name} 👀 - File: **{current_file_index}**/**{len(documents)}** \n\n"})
                 await asyncio.sleep(2)
                 try:
                     with open(file_path, "r", encoding="utf-8") as file:
@@ -201,22 +200,22 @@ class BackendDocumentor:
                         headers_list = [header for header in header_block_string.split("\n") if len(header) > 0]
 
                         for chunk in chunks:
-                            original_header = chunk.split("\n")[0].strip().lower()
+                            original_header = chunk.split("\n")[0].strip()
                             original_header = original_header.replace("#", "").strip()
                             header_1 = RemoveSpecialCharacters(original_header)
                             if len(header_1) == 0:
                                 continue
 
                             for header_line in headers_list:
-                                header_extracted = header_line.split(":")[0].strip().lower()
+                                header_extracted = header_line.split(":")[0].strip()
                                 header_extracted = header_extracted.replace("#", "").strip()
                                 header_2 = RemoveSpecialCharacters(header_extracted)
                                 if len(header_2) == 0:
                                     continue
 
-                                if header_1 in header_2 or header_2 in header_1:
+                                if header_1.lower() in header_2.lower() or header_2.lower() in header_1.lower():
                                     knowledge_context += f"\n{file_name}:\n{chunk}"
-                                    yield json.dumps({"response": f"\n✅ Added Chunk: {file_name} - **{original_header}** - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
+                                    yield json.dumps({"response": f"\n- Added ✅ **{original_header}** in {file_name} - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
                                     await asyncio.sleep(3)
                                     break
 
@@ -229,7 +228,6 @@ class BackendDocumentor:
                             break
 
                 except Exception as e:
-                    print(f"Error reading file: {file_name}, {str(e)}")
                     yield json.dumps({"response": f"\n⛔️ Error reading file: {file_name}, {str(e)}"})
                     continue
 
@@ -249,7 +247,6 @@ class BackendDocumentor:
             )
             
             yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(knowledge_context)}/{self.max_context_tokens_length} 👀 \n\n"})
-            print(f"knowledge_context: {knowledge_context}\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>") 
             await asyncio.sleep(2)
             yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: {question} ...\n\n"})
             await asyncio.sleep(1)
@@ -287,8 +284,6 @@ class BackendDocumentor:
             .replace("{question}", question)
             .replace("{histories}", histories)
         )
-
-        print(f"Prompt: {prompt}")
 
         return prompt
     

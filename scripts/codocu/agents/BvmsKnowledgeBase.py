@@ -82,7 +82,6 @@ class BvmsKnowledgeBase:
         sections = self.organize_documents(documents)
         context = ""
         for section in sections:
-            print(f"""Title: {section["title"]}, Counts: {section["counts"]}""")
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
     
@@ -124,8 +123,6 @@ class BvmsKnowledgeBase:
             .replace("{question}", question)
             .replace("{histories}", histories)
         )
-
-        print(f"Prompt: {prompt}")
 
         return prompt
     

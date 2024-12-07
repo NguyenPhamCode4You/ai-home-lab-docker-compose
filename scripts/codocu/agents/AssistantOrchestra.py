@@ -36,7 +36,7 @@ class AssistantOrchestra:
         You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
         If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
 
-        Here are the previous questions and answers, latest first:
+        Here are the previous questions and answers:
         {histories}
 
         Now, let's get started!
@@ -60,16 +60,24 @@ class AssistantOrchestra:
     
     def get_chat_history_string(self, histories: List[Message] = None) -> str:
         """
-        Returns a string representation of the chat history, limited to the max token length.
-        Each entry includes the role and the first 2000 characters of content.
+        Returns a string representation of the chat history, limited to the last N tokens.
+        Each entry includes the role and the first 1800 characters of content.
         """
-        histories = histories or []
-        reversed_history = list(reversed(histories))
+        histories = histories or []  # Use an empty list if histories is None
 
-        formatted_history = [
-            f"\n{message.role}: {message.content[:2000]}\n" for message in reversed_history
-        ]
-        return "".join(formatted_history[:self.max_history_tokens_length])
+        # Calculate how many tokens we can extract starting from the end
+        accumulated_tokens = 0
+        selected_messages = []
+        for message in reversed(histories):  # Start from the last message
+            content_length = len(message.content[:1800])  # Restrict each message to 1800 characters
+            if accumulated_tokens + content_length > self.max_history_tokens_length:
+                break  # Stop adding messages when the limit is reached
+
+            selected_messages.append(f"\n >> {message.role}: {message.content[:1800]}\n\n")
+            accumulated_tokens += content_length
+
+        # Reverse again to preserve the original chronological order
+        return "".join(reversed(selected_messages))
     
     async def stream(self, question: str, messages: List[Message] = None):
         histories = self.get_chat_history_string(messages)
@@ -86,7 +94,6 @@ class AssistantOrchestra:
                         accumulated_response += json.loads(chunk_str)["response"]
                         yield chunk
                     except Exception as e:
-                        print(f"Error parsing chunk: {str(e)}")
                         yield ""
                         continue
 
@@ -105,8 +112,6 @@ class AssistantOrchestra:
                                 agent_questions.append((agent_name, agent_question))
                                 break
 
-                print(f"Agent questions: {agent_questions}")
-                
                 # Identify agent responses in accumulated_response
                 for agent_name, agent_question in agent_questions:
                     agent_details = self.agents.get(agent_name, {})
@@ -125,11 +130,4 @@ class AssistantOrchestra:
                             yield agent_chunk
                     
                     except Exception as e:
-                        print(f"Error streaming from agent '{agent_name}': {e}")
-                        yield f"\n\n### ⚠️ Error while '{agent_name}' was responding.\n\n"
-                    
-                    except Exception as e:
-                        print(f"Error in main stream method: {e}")
                         yield ""
-
-                print(f"Final response: {accumulated_response}")
