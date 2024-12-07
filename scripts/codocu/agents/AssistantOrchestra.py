@@ -105,11 +105,12 @@ class AssistantOrchestra:
                 agent_questions = []
 
                 for agent_name, agent_details in self.agents.items():
-                    agent_mention_index = accumulated_response.find(f"{agent_name}")
+                    agent_name_formated = f"**{agent_name}**"
+                    agent_mention_index = accumulated_response.find(agent_name_formated)
                     if agent_mention_index == -1:
                         continue
 
-                    agent_question = accumulated_response.split(f"{agent_name}")[-1].split("👀")[0]
+                    agent_question = accumulated_response.split(agent_name_formated)[-1].split("👀")[0]
                     if ":" not in agent_question or "?" not in agent_question:
                         continue
 
@@ -120,6 +121,7 @@ class AssistantOrchestra:
 
                 # Identify agent responses in accumulated_response
                 for agent_name, agent_question, agent_mention_index in agent_questions:
+                    await asyncio.sleep(3)
                     agent_details = self.agents.get(agent_name, {})
                     agent = agent_details.get("agent")
                     agent_response_len = 0
@@ -141,22 +143,24 @@ class AssistantOrchestra:
                     except Exception as e:
                         yield ""
 
+                await asyncio.sleep(3) # Wait for the agents to respond completely
+
                 conversation_content = "".join(conversation_content)
 
-                if len(conversation_content) > 500:
+                if len(conversation_content) > 100:
                     final_thought_prompt = """
-                    You are a final thought generator that validates wether the agents have answered the user's question correctly.
-                    Dont need to give feedback on agent response structure, focus on validating the usefulness of the response.
-                    User: {question}
-                    Agents answer: {answers}
-                    1. If the agents have answered the question correctly:
-                    - Then you should provide a final thought to summarize the answers, no more than 150 words
+                    Your previous reasoning as follow:
+                    {your_questions}
+                    Now, You are a final thought that validates if the agents have answered the user's question.
+                    Agents Responses: {answers}
+                    User Question: {question}
+                    1. If the agents have completely answered the question:
+                    - Then you should provide a summarize for the answers, but the summarize need to be less than 150 words!
                     - Be clear and concise in your response
-                    2. f agents is not able to answer the question:
-                    - You need to take responsibility and apologize to the user.
-                    - Then go head and try to answer the question yourself.
+                    2. If agents is NOT able to answer the question:
+                    - Combine knowledge provided by the agent responses, you need to answer the question yourself! NO limits on the length of the response applied!
                     Your response:
-                    """.format(question=question, answers=conversation_content)
+                    """.format(question=question, answers=conversation_content, your_questions=accumulated_response)
 
                     print(conversation_content)
 
