@@ -101,7 +101,6 @@ class BvmsKnowledgeBase:
     
     async def stream(self, question: str, messages: List[Message] = None):
         prompt = self.get_final_prompt(question, messages)
-        print(f"Prompt: {prompt}")
         
         async with httpx.AsyncClient() as client:
         # Send streaming request to Ollama

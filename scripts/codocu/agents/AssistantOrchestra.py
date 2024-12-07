@@ -18,6 +18,7 @@ class AssistantOrchestra:
     ):
         self.url = url
         self.model = model
+        self.max_history_tokens_length = 6000
         self.agents = {}
         self.base_prompt = """
         You are an intelligent assistant that can help user complete complex tasks.
@@ -25,7 +26,7 @@ class AssistantOrchestra:
         -----
         {agents}
         -----
-        When you receive a question, you should anaylzye the question to determine which agents you should forward the question to.
+        When you receive a question, you should anaylzye the question to determine wether you should forward the question to the agents or answer it yourself.
         Read the description of each agent to determine the right ones to use, you can also paraphrase the question to better match the agent's expertise.
 
         Follow the structure below to forward the question to an agent:
@@ -33,7 +34,10 @@ class AssistantOrchestra:
         👋 **[agent_name_2]**: [question 2] 👀
         
         You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
-        If user asks a question that is not related to any agent, then you can answer the question yourself.
+        If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
+
+        Here are the previous questions and answers, latest first:
+        {histories}
 
         Now, let's get started!
         -----
@@ -41,25 +45,36 @@ class AssistantOrchestra:
         -----
 
         """
+    def set_max_history_tokens_length(self, max_history_tokens_length: int):
+        self.max_history_tokens_length = max_history_tokens_length
+        return self
 
     def add_agent(self, agent_name: str, agent_description: str, agent):
         self.agents[agent_name] = {"description": agent_description, "agent": agent}
+        return self
 
     def get_agents_description(self):
         return "\n".join(
             [f"\n{agent_name}: {details['description']}\n" for agent_name, details in self.agents.items()]
         )
     
-    async def stream(self, question: str, messages: List[Message] = None):
-        prompt = self.get_final_prompt(question, messages)
-        
-        async with httpx.AsyncClient() as client:
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    yield chunk
+    def get_chat_history_string(self, histories: List[Message] = None) -> str:
+        """
+        Returns a string representation of the chat history, limited to the max token length.
+        Each entry includes the role and the first 2000 characters of content.
+        """
+        histories = histories or []
+        reversed_history = list(reversed(histories))
 
+        formatted_history = [
+            f"\n{message.role}: {message.content[:2000]}\n" for message in reversed_history
+        ]
+        return "".join(formatted_history[:self.max_history_tokens_length])
+    
     async def stream(self, question: str, messages: List[Message] = None):
-        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question)
+        histories = self.get_chat_history_string(messages)
+        print(f"Chat history: {histories}")
+        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
 
         accumulated_response  = ""
         
@@ -102,11 +117,11 @@ class AssistantOrchestra:
                         continue
 
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {agent_question} ...\n\n"})
-                    # yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {question} ...\n\n"})
                     await asyncio.sleep(1)
 
                     try:
                         async for agent_chunk in agent.stream(agent_question, messages):
+                            accumulated_response += json.loads(agent_chunk)["response"]
                             yield agent_chunk
                     
                     except Exception as e:
@@ -116,5 +131,5 @@ class AssistantOrchestra:
                     except Exception as e:
                         print(f"Error in main stream method: {e}")
                         yield ""
-                    
-                
+
+                print(f"Final response: {accumulated_response}")
