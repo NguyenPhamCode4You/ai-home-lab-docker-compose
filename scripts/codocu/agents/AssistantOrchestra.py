@@ -113,23 +113,55 @@ class AssistantOrchestra:
                     agent_questions.append((agent_name, agent_question, agent_mention_index))
                 
                 agent_questions = sorted(agent_questions, key=lambda x: x[2])
+                conversation_content = ""
 
                 # Identify agent responses in accumulated_response
                 for agent_name, agent_question, agent_mention_index in agent_questions:
                     agent_details = self.agents.get(agent_name, {})
                     agent = agent_details.get("agent")
+                    agent_response_len = 0
                     
                     if not agent:
                         yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
                         continue
 
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name}: {agent_question} ...\n\n"})
+                    conversation_content += f"\n\n### 🤖 {agent_name}: "
                     await asyncio.sleep(1)
 
                     try:
                         async for agent_chunk in agent.stream(agent_question, messages):
-                            accumulated_response += json.loads(agent_chunk)["response"]
+                            agent_response_len += len(json.loads(agent_chunk)["response"])
+                            conversation_content += json.loads(agent_chunk)["response"]
                             yield agent_chunk
                     
                     except Exception as e:
                         yield ""
+
+                if len(conversation_content) > 500:
+                    final_thought_prompt = """
+                    You are a final thought generator that validates wether the agents have answered the user's question correctly.
+                    Dont need to give feedback on agent response structure, focus on validating the usefulness of the response.
+                    User: {question}
+                    Agents answer: {answers}
+                    1. If the agents have answered the question correctly:
+                    - Then you should provide a final thought to summarize the answers, no more than 150 words
+                    - Be clear and concise in your response
+                    2. f agents is not able to answer the question:
+                    - You need to take responsibility and apologize to the user.
+                    - Then go head and try to answer the question yourself.
+                    Your response:
+                    """.format(question=question, answers=conversation_content)
+
+                    print(conversation_content)
+
+                    await asyncio.sleep(2)
+                    agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
+                    yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
+                    await asyncio.sleep(1)
+
+                    async with httpx.AsyncClient() as client:
+                        async with client.stream("POST", self.url, json={"model": self.model, "prompt": final_thought_prompt}) as response:
+                            async for chunk in response.aiter_bytes():
+                                yield chunk
+

@@ -38,7 +38,7 @@ documentor.set_embedder(embedder)
 documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
-documentor.set_max_context_tokens_length(6000)
+documentor.set_max_context_tokens_length(5600)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
 
@@ -46,11 +46,12 @@ bvms_answer = RagKnowledgeBase(url=f'http://10.13.13.4:11434/api/generate', mode
 bvms_answer.set_embedder(embedder)
 bvms_answer.set_vector_store(bvms_vector_store)
 bvms_answer.set_base_prompt(bvms_prompt)
-bvms_answer.set_max_context_tokens_length(6000)
+bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
 orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
+orchesrea.set_max_history_tokens_length(5000)
 orchesrea.add_agent("BVMS KnowledgeBase", """
 This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. 
 It also contains some api informations about Sedna & DA Desk.
