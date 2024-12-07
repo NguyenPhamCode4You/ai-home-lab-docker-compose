@@ -34,7 +34,7 @@ class Message():
     content: str  # Message text
 
 # Main assistant class
-class BackendDocumentor:
+class CodeDocumentor:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",
@@ -148,11 +148,13 @@ class BackendDocumentor:
             yield json.dumps({"response": f"📚 Finding top {len(documents)} documents basing on relevance level ...\n\n"})
             await asyncio.sleep(2)
             for index, document in enumerate(documents):
+                if (index + 1) > 10:
+                    break
                 file_path = document["content"]
                 file_name = document["metadata"]["f"]
                 file_name = format_file_name(file_name, file_path)
                 yield json.dumps({"response": f"📌 Document {index + 1}: {file_name}\n"})
-                await asyncio.sleep(0.7)
+                await asyncio.sleep(0.25)
 
             yield json.dumps({"response": f"\n\n### 🤖 Start the reading process... \n\n\n"})
             await asyncio.sleep(2)

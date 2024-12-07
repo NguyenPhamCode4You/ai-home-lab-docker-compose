@@ -7,7 +7,7 @@ class Message():
     content: str  # Message text
 
 # Main assistant class
-class BvmsKnowledgeBase:
+class RagKnowledgeBase:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",

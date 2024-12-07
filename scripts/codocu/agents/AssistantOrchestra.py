@@ -39,12 +39,18 @@ class AssistantOrchestra:
         Here are the previous questions and answers:
         {histories}
 
+        Important:
+        - Make sure to keep the conversation engaging and informative.
+        - Always mention agent name EXACTLY when forwarding questions.
+
         Now, let's get started!
         -----
         User question: {question}
         -----
 
         """
+        # Given the above context of previous QAs, you can also perform reasoning to break down the question into sub-questions and forward each of them to the appropriate agent. Remember to mention their name correctly.
+
     def set_max_history_tokens_length(self, max_history_tokens_length: int):
         self.max_history_tokens_length = max_history_tokens_length
         return self
@@ -81,7 +87,6 @@ class AssistantOrchestra:
     
     async def stream(self, question: str, messages: List[Message] = None):
         histories = self.get_chat_history_string(messages)
-        print(f"Chat history: {histories}")
         prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
 
         accumulated_response  = ""
@@ -97,23 +102,20 @@ class AssistantOrchestra:
                         yield ""
                         continue
 
-                # Split the response by the delimiter
-                chunks = accumulated_response.split("👀")
                 agent_questions = []
-                for chunk in chunks:
-                    if ":" in chunk:  # Ensure the chunk contains an agent and a question
-                        parts = chunk.split(":", 1)  # Split into two parts: agent name and question
-                        agent_name = parts[0].strip()  # Strip whitespace from the agent name
-                        agent_question = parts[1].strip()   # Strip whitespace from the question
 
-                        for aname, adetails in self.agents.items():
-                            if aname in agent_name:
-                                agent_name = aname
-                                agent_questions.append((agent_name, agent_question))
-                                break
+                for agent_name, agent_details in self.agents.items():
+                    agent_mention_index = accumulated_response.find(f"{agent_name}")
+                    if agent_mention_index == -1:
+                        continue
+
+                    agent_question = accumulated_response.split(f"{agent_name}")[-1].split("👀")[0]
+                    agent_questions.append((agent_name, agent_question, agent_mention_index))
+                
+                agent_questions = sorted(agent_questions, key=lambda x: x[2])
 
                 # Identify agent responses in accumulated_response
-                for agent_name, agent_question in agent_questions:
+                for agent_name, agent_question, agent_mention_index in agent_questions:
                     agent_details = self.agents.get(agent_name, {})
                     agent = agent_details.get("agent")
                     
@@ -121,7 +123,7 @@ class AssistantOrchestra:
                         yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
                         continue
 
-                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name} answering to: {agent_question} ...\n\n"})
+                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name}: {agent_question} ...\n\n"})
                     await asyncio.sleep(1)
 
                     try:
