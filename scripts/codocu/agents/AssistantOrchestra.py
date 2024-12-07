@@ -30,8 +30,8 @@ class AssistantOrchestra:
         Read the description of each agent to determine the right ones to use, you can also paraphrase the question to better match the agent's expertise.
 
         Follow the structure below to forward the question to an agent:
-        👋 **[agent_name_1]**: [question 1] 👀
-        👋 **[agent_name_2]**: [question 2] 👀
+        👋 **[agent_name_1]**: [question 1]? 👀
+        👋 **[agent_name_2]**: [question 2]? 👀
         
         You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
         If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
@@ -110,10 +110,13 @@ class AssistantOrchestra:
                         continue
 
                     agent_question = accumulated_response.split(f"{agent_name}")[-1].split("👀")[0]
+                    if ":" not in agent_question or "?" not in agent_question:
+                        continue
+
                     agent_questions.append((agent_name, agent_question, agent_mention_index))
                 
                 agent_questions = sorted(agent_questions, key=lambda x: x[2])
-                conversation_content = ""
+                conversation_content = []
 
                 # Identify agent responses in accumulated_response
                 for agent_name, agent_question, agent_mention_index in agent_questions:
@@ -126,17 +129,19 @@ class AssistantOrchestra:
                         continue
 
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name}: {agent_question} ...\n\n"})
-                    conversation_content += f"\n\n### 🤖 {agent_name}: "
+                    conversation_content.append(f"\n\n### 🤖 {agent_name}: ")
                     await asyncio.sleep(1)
 
                     try:
                         async for agent_chunk in agent.stream(agent_question, messages):
                             agent_response_len += len(json.loads(agent_chunk)["response"])
-                            conversation_content += json.loads(agent_chunk)["response"]
+                            conversation_content.append(json.loads(agent_chunk)["response"])
                             yield agent_chunk
                     
                     except Exception as e:
                         yield ""
+
+                conversation_content = "".join(conversation_content)
 
                 if len(conversation_content) > 500:
                     final_thought_prompt = """

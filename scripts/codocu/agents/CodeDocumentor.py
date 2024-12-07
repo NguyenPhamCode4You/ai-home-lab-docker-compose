@@ -217,7 +217,7 @@ class CodeDocumentor:
 
                                 if header_1.lower() in header_2.lower() or header_2.lower() in header_1.lower():
                                     knowledge_context += f"\n{file_name}:\n{chunk}"
-                                    yield json.dumps({"response": f"\n- Learned ✅ **{original_header}** into - **Mem**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
+                                    yield json.dumps({"response": f"\n- Learned ✅ **{original_header}** into **Memmory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
                                     await asyncio.sleep(3)
                                     break
 
