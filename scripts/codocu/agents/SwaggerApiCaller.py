@@ -80,7 +80,6 @@ class SwaggerApiCaller:
             method, api_path, request_body = self.get_request_configuration(question, api_path)
             method = clean_config_string(method)
             api_path = clean_config_string(api_path)
-            request_body = clean_config_string(request_body)
             yield json.dumps({"response": f"2. `{method.upper()}` - `{api_path}` - Body: `{request_body}`\n\n"})
             await asyncio.sleep(1)
             try:
@@ -115,8 +114,7 @@ class SwaggerApiCaller:
         response = self.get_raw_json_response(question)
 
         prompt = f"""
-        Given the following API response as json, describe in plain text format.
-        Be concise, accurate and produce a well-structured response with bullet points.
+        Given the following API response, produce a well-structured markdown table to demonstrate the response.
         API Response: {json.dumps(response)}
         User Question: {question}
         Your Response:
@@ -212,6 +210,8 @@ class SwaggerApiCaller:
         Return the correct api path (1st) and request body (2nd) in json format, reperated by new line.
         Both api apth and request body should be plain text, in single line. Do not wrap in quotes or code blocks.
         For search related APIs, the keyword to search should NOT be modified, and should be less than 3 words.
+        - if the search keyword is "port hamburg", use "hamburg" only
+        - if the search keyword is "vessel BBC Hamburg", use "BBC Hamburg" only
         If body is not required, return empty object.
         Always use double quotes for keys and values.
         Example:
