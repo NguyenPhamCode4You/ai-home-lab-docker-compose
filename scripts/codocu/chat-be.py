@@ -54,8 +54,12 @@ bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
+with open(os.path.join(os.path.dirname(__file__), "swagger.json"), "r", encoding="utf-8") as file:
+    swagger_json = file.read()
+
 master_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
-master_data.set_swagger_url("https://bvms-master-api-dev-cphya2dafue0hbce.germanywestcentral-01.azurewebsites.net/swagger/v1/swagger.json")
+master_data.set_api_url("https://bvms-master-api-dev-cphya2dafue0hbce.germanywestcentral-01.azurewebsites.net")
+master_data.set_swagger_json(swagger_json)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
     "/Vessels/Search",

@@ -22,10 +22,13 @@ class SwaggerApiCaller:
         self.model = model
         self.max_history_tokens_length = 6000
         self.swagger_json = None
-        self.swagger_url = None
         self.api_url = None
         self.bearer_token = None
         self.allowed_api_paths = []
+
+    def set_swagger_json(self, swagger_json: str):
+        self.swagger_json = json.loads(swagger_json)
+        return self
 
     def set_allowed_api_paths(self, allowed_api_paths: List[str]):
         self.allowed_api_paths = allowed_api_paths
@@ -35,45 +38,40 @@ class SwaggerApiCaller:
         self.bearer_token = bearer_token
         return self
 
-    def set_swagger_url(self, swagger_url: str):
-        response = requests.get(swagger_url)
-        self.swagger_json = response.json()
-        self.swagger_url = swagger_url
-        self.api_url = re.sub(r"/swagger/v1/swagger.json", "", swagger_url)
+    def set_api_url(self, api_url: str):
+        self.api_url = api_url
         return self
     
     async def stream(self, question: str, messages: List[Message] = None):
         async with httpx.AsyncClient() as client:
-            yield json.dumps({"response": f"🔎 Searching for relevant APIs ...\n\n"})
+            yield json.dumps({"response": f"🎯 Looking up for the correct API to call ...\n\n"})
             api_path = self.get_swagger_api_to_call(question)
-            yield json.dumps({"response": f"1. Creating request body for API: **{api_path}** ...\n\n"})
-            request_body = self.get_request_body(question, api_path)
-            yield json.dumps({"response": f"2. Request body: `{request_body}`\n\n"})
-            for method, details in self.swagger_json["paths"].get(api_path).items():
-                api_method = method
-                print(api_method)
-
-            print(f"{self.api_url}{api_path}")
-            print(json.loads(request_body))
-            print(f"Bearer {self.bearer_token}")
-
-            response = requests.request(
-                method=api_method,
-                url=f"{self.api_url}{api_path}",
-                headers={"Authorization": f"Bearer {self.bearer_token}"},
-                json=json.loads(request_body)
-            )
-            print(response.json())
-            yield json.dumps({"response": f"3. API Response: \n```json\n{response.json()}\n```\n\n"})
-
+            yield json.dumps({"response": f"1. Creating request body for API: `{self.api_url}{api_path}`\n\n"})
+            request_body, method = self.get_request_body(question, api_path)
+            yield json.dumps({"response": f"2. **`{method.upper()}`** - Request body: `{request_body}`\n\n"})
+            try:
+                response = await client.request(
+                    method=method,
+                    url=f"{self.api_url}{api_path}",
+                    headers={"Authorization": f"Bearer {self.bearer_token}"},
+                    json=json.loads(request_body)
+                )
+                response.raise_for_status()  # Raise an error for HTTP 4xx/5xx responses
+            except httpx.HTTPStatusError as e:
+                yield json.dumps({"response": f"❌ API call failed: {e.response.text}\n\n"})
+                return
+            except Exception as e:
+                yield json.dumps({"response": f"❌ Unexpected error: {str(e)}\n\n"})
+                return
+            yield json.dumps({"response": f"✅ API call successful! Parsing response...\n\n"})
+            api_response = response.json()
             prompt = f"""
             Given the following API response as json, describe in plain text format.
             Be concise, accurate and produce a well-structured response with bullet points.
-            API Response: {response.json()}
+            API Response: {api_response}
             User Question: {question}
             Your Response:
             """
-
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
@@ -98,12 +96,9 @@ class SwaggerApiCaller:
     
     def get_raw_json_response(self, question: str):
         api_path = self.get_swagger_api_to_call(question)
-        for method, details in self.swagger_json["paths"].get(api_path).items():
-            api_method = method
-
-        request_body = self.get_request_body(question, api_path)
+        request_body, method = self.get_request_body(question, api_path)
         response = requests.request(
-            method=api_method,
+            method=method,
             url=f"{self.api_url}{api_path}",
             headers={"Authorization": f"Bearer {self.bearer_token}"},
             json=json.loads(request_body)
@@ -150,6 +145,8 @@ class SwaggerApiCaller:
             raise ValueError(f"API path '{api_path}' not found in the Swagger JSON.")
         
         api_params = self.swagger_json["paths"][api_path]
+        method = list(api_params.keys())[0]
+        print(f"Method: {method}")
         
         # Ensure that the get_schema_object_names_for_api_path method is implemented properly
         schema_object_names = self.get_schema_object_names_for_api_path(api_path)
@@ -179,9 +176,10 @@ class SwaggerApiCaller:
         Question: {question}
         Return only the body as plain text, no explanation, in single line. Do not wrap in quotes or code blocks.
         The params inside the request body should contains MAXIMUM 01 most important word for each key.
+        Always use double quotes for keys and values.
         Example:
         Question: What is the detailed information about port hamburg including country, city, and port code?
-        Result: {{'search': 'hamburg'}}
+        Result: {{"search": "hamburg"}}
         Request Body: 
         """
         
@@ -197,7 +195,7 @@ class SwaggerApiCaller:
         
         # Get the clean response and append the Bearer Token
         cmd = self._clean_json_response(response.json())
-        return cmd
+        return cmd, method
     
     def set_max_history_tokens_length(self, max_history_tokens_length: int):
         self.max_history_tokens_length = max_history_tokens_length
