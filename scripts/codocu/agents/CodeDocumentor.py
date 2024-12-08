@@ -256,7 +256,7 @@ class CodeDocumentor:
             
             yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(knowledge_context)}/{self.max_context_tokens_length} 👀 \n\n"})
             await asyncio.sleep(1)
-            yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: {question} ...\n\n"})
+            yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: ...\n\n"})
             await asyncio.sleep(1)
             # Send streaming request to Ollama
             

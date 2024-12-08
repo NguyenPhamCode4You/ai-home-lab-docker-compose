@@ -139,12 +139,19 @@ class AssistantOrchestra:
                         yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
                         continue
 
+                    real_agent_question = agent_question
+                    
+                    if len(conversation_content) > 0:
+                        additional_agent_context = "".join(conversation_content)
+                        real_agent_question = f"**Addtional context that might be useful:**\n{additional_agent_context}\n**Finally, here is your question:** {real_agent_question}"
+                        print(real_agent_question)
+                    
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"})
-                    conversation_content.append(f"\n\n### 🤖 {agent_name} ")
-                    await asyncio.sleep(1)
+                    conversation_content.append(f"\n### 🤖 {agent_name} ")
+                    await asyncio.sleep(3)
 
                     try:
-                        async for agent_chunk in agent.stream(agent_question, messages):
+                        async for agent_chunk in agent.stream(real_agent_question, messages):
                             agent_response_len += len(json.loads(agent_chunk)["response"])
                             conversation_content.append(json.loads(agent_chunk)["response"])
                             yield agent_chunk
