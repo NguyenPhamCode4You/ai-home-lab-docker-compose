@@ -73,10 +73,6 @@ class CodeDocumentor:
         self.embedder = embedder
         return self
 
-    def set_base_prompt(self, base_prompt: str):
-        self.base_prompt = base_prompt
-        return self
-
     def set_vector_store(self, vector_store):
         self.vector_store = vector_store
         return self
