@@ -258,7 +258,8 @@ class CodeDocumentor:
             await asyncio.sleep(1)
             yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: {question} ...\n\n"})
             await asyncio.sleep(1)
-        # Send streaming request to Ollama
+            # Send streaming request to Ollama
+            
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

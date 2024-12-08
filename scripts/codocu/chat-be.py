@@ -2,10 +2,13 @@ import os
 from typing import Generator, List, Optional
 from pydantic import BaseModel
 
+from dotenv import load_dotenv
+load_dotenv()
 
 from agents.CodeDocumentor import CodeDocumentor
 from agents.RagKnowledgeBase import RagKnowledgeBase
 from agents.AssistantOrchestra import AssistantOrchestra
+from agents.SwaggerApiCaller import SwaggerApiCaller
 
 from jobs.CodeBlockExtractor import CodeBlockExtractor
 
@@ -51,8 +54,20 @@ bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
+master_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+master_data.set_swagger_url("https://bvms-master-api-dev-cphya2dafue0hbce.germanywestcentral-01.azurewebsites.net/swagger/v1/swagger.json")
+master_data.set_bearer_token(os.getenv("API_TOKEN"))
+master_data.set_allowed_api_paths([
+    "/Vessels/Search",
+    "/BunkerTypes/Search",
+    "/Ports/Search",
+])
+# print(master_data.get_raw_json_response("what is the information about vessel BBC Amber?"))
+# print(master_data.run("Can you provide me informarion about Port Hamburg?"))
+
 orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
 orchesrea.set_max_history_tokens_length(5000)
+
 orchesrea.add_agent("BVMS KnowledgeBase", """
 This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. 
 It also contains some api informations about Sedna & DA Desk.
@@ -63,6 +78,10 @@ orchesrea.add_agent("BVMS Code Document", """
 This agent can provide code snippets and documentations about BVMS Backend source code, which is built using .NET
 However, it should not be used for debugging or fixing code issues, or writing new code.
 """, documentor)
+
+orchesrea.add_agent("Master Data API", """
+This agent can provide detailed information about BVMS Vessels, Bunker Types and Ports information by calling HTTP APIs.
+""", master_data)
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
