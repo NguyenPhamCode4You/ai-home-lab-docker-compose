@@ -9,6 +9,7 @@ from agents.CodeDocumentor import CodeDocumentor
 from agents.RagKnowledgeBase import RagKnowledgeBase
 from agents.AssistantOrchestra import AssistantOrchestra
 from agents.SwaggerApiCaller import SwaggerApiCaller
+from agents.ChartVisualizer import ChartVisualizer
 
 from jobs.CodeBlockExtractor import CodeBlockExtractor
 
@@ -85,6 +86,22 @@ voyage_data.set_allowed_api_paths([
 orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
 orchesrea.set_max_history_tokens_length(5000)
 
+from fastapi import FastAPI, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+import markdown
+
+# Initialize FastAPI
+app = FastAPI()
+# Serve the 'Coducu result' directory at '/public'
+app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
+
+temp_file_path = os.path.join(os.path.dirname(__file__), "codocu_results")
+charter = ChartVisualizer(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+charter.set_temp_file_path(temp_file_path)
+charter.set_host_url("http://10.13.13.2:8000/public")
+
 orchesrea.add_agent("BVMS KnowledgeBase", """
 This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. 
 It also contains some api informations about Sedna & DA Desk.
@@ -104,14 +121,9 @@ orchesrea.add_agent("Voyage Data API", """
 This agent can provide detailed information about BVMS Estimates, Shipments, and WorkSheet by making API calls. However, it should not be used for business related questions.
 """, voyage_data)
 
-from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
-from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-import markdown
-
-# Initialize FastAPI
-app = FastAPI()
+orchesrea.add_agent("Chart Visualizer", """
+This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.
+""", charter)
 
 # Define a model for the input specific to /api/chat
 class Message(BaseModel):
@@ -136,9 +148,6 @@ async def get_answer_for_question_stream(request: CompletionRequest):
     except Exception as e:
         print(f"Error handling request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-# Serve the 'Coducu result' directory at '/public'
-app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
 
 @app.get("/markdown-viewer", response_class=HTMLResponse)
 async def render_markdown(

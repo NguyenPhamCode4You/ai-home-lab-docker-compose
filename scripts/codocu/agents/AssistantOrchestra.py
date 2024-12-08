@@ -145,7 +145,9 @@ class AssistantOrchestra:
                     if len(conversation_content) > 0:
                         additional_agent_context = "".join(conversation_content)
                         real_agent_question = f"**Addtional context that might be useful:**\n{additional_agent_context}\n**Finally, here is your question:** {real_agent_question}"
-                        print(real_agent_question)
+                    else:
+                        additional_agent_context = "".join(accumulated_response)
+                        real_agent_question = f"**Addtional context that might be useful:**\n{additional_agent_context}\n**Finally, here is your question:** {real_agent_question}"
                     
                     yield json.dumps({"response": f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"})
                     conversation_content.append(f"\n### 🤖 {agent_name} ")
