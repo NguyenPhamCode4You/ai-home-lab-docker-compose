@@ -1,7 +1,7 @@
 import os
 from typing import Generator, List, Optional
-from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
 
 from agents.CodeDocumentor import CodeDocumentor
 from agents.RagKnowledgeBase import RagKnowledgeBase
@@ -38,6 +38,7 @@ documentor.set_embedder(embedder)
 documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
+documentor.set_be_host_url("http://10.13.13.2:8000")
 documentor.set_max_context_tokens_length(5600)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
@@ -63,8 +64,11 @@ This agent can provide code snippets and documentations about BVMS Backend sourc
 However, it should not be used for debugging or fixing code issues, or writing new code.
 """, documentor)
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import FastAPI, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+import markdown
 
 # Initialize FastAPI
 app = FastAPI()
@@ -92,6 +96,36 @@ async def get_answer_for_question_stream(request: CompletionRequest):
     except Exception as e:
         print(f"Error handling request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Serve the 'Coducu result' directory at '/public'
+app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
+
+@app.get("/markdown-viewer", response_class=HTMLResponse)
+async def render_markdown(
+    path: str = Query(..., description="Path to the markdown file"),
+    highlight: str = Query(None, description="Text to highlight in the markdown")
+):
+    
+    # Check if the file exists and is a Markdown file
+    if not os.path.exists(path) or not path.endswith(".md"):
+        raise HTTPException(status_code=404, detail="Markdown file not found or invalid file type")
+
+    # Read and convert the Markdown file to HTML
+    try:
+        with open('markdown-html.txt', "r", encoding="utf-8") as file:
+            markdown_html = file.read()
+        
+        with open(path, "r", encoding="utf-8") as md_file:
+            markdown_content = md_file.read()
+
+        html_content = markdown.markdown(markdown_content)
+
+        # Basic HTML template
+        html_template = markdown_html.replace("{html_content}", html_content).replace("{highlight}", highlight or "")
+        return HTMLResponse(content=html_template)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error rendering file: {e}")
 
 
 # Run the FastAPI app

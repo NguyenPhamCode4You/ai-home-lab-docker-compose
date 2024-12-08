@@ -1,6 +1,8 @@
 import asyncio
 import json
 import re
+from shlex import quote
+from fastapi import Request
 import httpx
 import requests
 from typing import List, Optional
@@ -45,6 +47,7 @@ class CodeDocumentor:
         self.embedder = None                    # Placeholder for an embedding function or model
         self.vector_store = None                # Placeholder for a vector database
         self.base_prompt = None
+        self.be_host_url = None
         self.match_count = 100
         self.max_context_tokens_length = 5500   # 5500 is the best length for the context tokens, for typescript & PL questions
         self.max_history_tokens_length = 500    # 6000 is the maximum length, thus 6000 - 5500 = 500 for the history tokens
@@ -80,6 +83,10 @@ class CodeDocumentor:
     
     def set_code_block_extractor(self, code_block_extractor):
         self.code_block_extractor = code_block_extractor
+        return self
+    
+    def set_be_host_url(self, be_host_url: str):
+        self.be_host_url = be_host_url
         return self
     
     # Organize retrieved documents into structured sections
@@ -126,21 +133,23 @@ class CodeDocumentor:
             yield json.dumps({"error": "No files found or smart file picker not set."})
             return
         
-        import urllib.parse
-
-        def format_file_name(file_name: str, path: str) -> str:
-            # Strip any leading/trailing spaces from file_name and path
+        def format_file_name(file_name: str, path: str, highlight: str = None) -> str:
+            # Strip leading/trailing spaces
             file_name = file_name.strip()
             path = path.strip()
 
-            # Replace backslashes with forward slashes to make it URL-compatible
-            file_url = f"file:///{path.replace('\\', '/')}"
+            # Ensure the path uses forward slashes
+            relative_path = path.replace("\\", "/")
 
-            # Encode the URL to handle any special characters
-            file_url = urllib.parse.quote(file_url, safe=':/')
+            # Build the Markdown Viewer URL
+            markdown_viewer_url = f"markdown-viewer?path={relative_path}"
+            if self.be_host_url:
+                markdown_viewer_url = f"{self.be_host_url}/{markdown_viewer_url}"
+            if highlight:
+                markdown_viewer_url += f"&highlight={quote(highlight)}"
 
-            # Return the correctly formatted Markdown link
-            return f"[{file_name}]({file_url})"
+            # Return the formatted Markdown link
+            return f"[{file_name}]({markdown_viewer_url})"
         
         current_file_index = 1
         
@@ -217,7 +226,8 @@ class CodeDocumentor:
 
                                 if header_1.lower() in header_2.lower() or header_2.lower() in header_1.lower():
                                     knowledge_context += f"\n{file_name}:\n{chunk}"
-                                    yield json.dumps({"response": f"\n- Learned ✅ **{original_header}** into **Memmory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
+                                    original_header_url = format_file_name(original_header, file_path, highlight="")
+                                    yield json.dumps({"response": f"\n- Learned ✅ **{original_header_url}** into **Memmory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
                                     await asyncio.sleep(3)
                                     break
 

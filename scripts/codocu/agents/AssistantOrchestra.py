@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+from fastapi import Request
 import httpx
 import requests
 from typing import List, Optional
@@ -104,17 +105,25 @@ class AssistantOrchestra:
 
                 agent_questions = []
 
+                def remove_special_chars(text):
+                    return re.sub(r"[^a-zA-Z]+", ' ', text)
+
                 for agent_name, agent_details in self.agents.items():
-                    agent_name_formated = f"**{agent_name}**"
-                    agent_mention_index = accumulated_response.find(agent_name_formated)
-                    if agent_mention_index == -1:
-                        continue
-
-                    agent_question = accumulated_response.split(agent_name_formated)[-1].split("👀")[0]
-                    if ":" not in agent_question or "?" not in agent_question:
-                        continue
-
-                    agent_questions.append((agent_name, agent_question, agent_mention_index))
+                    agent_name_formated = f"**{remove_special_chars(agent_name)}**"
+                    
+                    # Find all occurrences of agent_name_formated in accumulated_response
+                    for match in re.finditer(re.escape(agent_name_formated), accumulated_response):
+                        agent_mention_index = match.start()
+                        
+                        # Extract the part of the text after the agent's mention
+                        agent_question_part = accumulated_response[agent_mention_index + len(agent_name_formated):]
+                        
+                        # Extract the question until the first occurrence of "👀" or end of string
+                        agent_question = agent_question_part.split("👀")[0]
+                        
+                        # Check if the extracted text qualifies as a valid question
+                        if ":" in agent_question and "?" in agent_question:
+                            agent_questions.append((agent_name, agent_question.strip(), agent_mention_index))
                 
                 agent_questions = sorted(agent_questions, key=lambda x: x[2])
                 conversation_content = []
@@ -130,8 +139,8 @@ class AssistantOrchestra:
                         yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
                         continue
 
-                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name}: {agent_question} ...\n\n"})
-                    conversation_content.append(f"\n\n### 🤖 {agent_name}: ")
+                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"})
+                    conversation_content.append(f"\n\n### 🤖 {agent_name} ")
                     await asyncio.sleep(1)
 
                     try:
@@ -149,16 +158,19 @@ class AssistantOrchestra:
 
                 if len(conversation_content) > 100:
                     final_thought_prompt = """
-                    Your previous reasoning as follow:
+                    You are a final thought that validates if the agents have answered the user's question.
+                    Your previous reasoning to the agents are as follow:
                     {your_questions}
-                    Now, You are a final thought that validates if the agents have answered the user's question.
-                    Agents Responses: {answers}
-                    User Question: {question}
+                    Then, the Agents Responses: {answers}
+                    User's original Question: {question}
+                    Follow the instructions below to provide a final thought:
                     1. If the agents have completely answered the question:
                     - Then you should provide a summarize for the answers, but the summarize need to be less than 150 words!
                     - Be clear and concise in your response
                     2. If agents is NOT able to answer the question:
-                    - Combine knowledge provided by the agent responses, you need to answer the question yourself! NO limits on the length of the response applied!
+                    - Combine knowledge provided by the agent responses, you need to answer the question yourself!
+                    - Pay careful attention to the user's question and the agent responses
+                    - NO limits on the length of the response applied!
                     Your response:
                     """.format(question=question, answers=conversation_content, your_questions=accumulated_response)
 
