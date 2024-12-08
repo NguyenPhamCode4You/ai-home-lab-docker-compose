@@ -54,20 +54,33 @@ bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
-with open(os.path.join(os.path.dirname(__file__), "swagger.json"), "r", encoding="utf-8") as file:
-    swagger_json = file.read()
+with open(os.path.join(os.path.dirname(__file__), "swagger.master.json"), "r", encoding="utf-8") as file:
+    swagger_json_master = file.read()
 
 master_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
-master_data.set_api_url("https://bvms-master-api-dev-cphya2dafue0hbce.germanywestcentral-01.azurewebsites.net")
-master_data.set_swagger_json(swagger_json)
+master_data.set_api_url("https://bvms-master-api-test.azurewebsites.net")
+master_data.set_swagger_json(swagger_json_master)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
     "/Vessels/Search",
+    "/Vessels/{vesselId}",
     "/BunkerTypes/Search",
     "/Ports/Search",
+    "/Offices/Search",
 ])
-# print(master_data.get_raw_json_response("what is the information about vessel BBC Amber?"))
-# print(master_data.run("Can you provide me informarion about Port Hamburg?"))
+
+with open(os.path.join(os.path.dirname(__file__), "swagger.voyage.json"), "r", encoding="utf-8") as file:
+    swagger_json_voyage = file.read()
+
+voyage_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+voyage_data.set_api_url("https://bvms-voyage-api-test.azurewebsites.net")
+voyage_data.set_swagger_json(swagger_json_voyage)
+voyage_data.set_bearer_token(os.getenv("API_TOKEN"))
+voyage_data.set_allowed_api_paths([
+    "/Estimates/Search",
+    "/WorkSheet/Search",
+    "/Shipments/Search",
+])
 
 orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
 orchesrea.set_max_history_tokens_length(5000)
@@ -84,8 +97,12 @@ However, it should not be used for debugging or fixing code issues, or writing n
 """, documentor)
 
 orchesrea.add_agent("Master Data API", """
-This agent can provide detailed information about BVMS Vessels, Bunker Types and Ports information by calling HTTP APIs.
+This agent can provide detailed information about BVMS Vessels, Bunker Types, Ports and Offices by making API calls.
 """, master_data)
+
+orchesrea.add_agent("Voyage Data API", """
+This agent can provide detailed information about BVMS Estimates, Shipments, and WorkSheet by making API calls. However, it should not be used for business related questions.
+""", voyage_data)
 
 from fastapi import FastAPI, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse

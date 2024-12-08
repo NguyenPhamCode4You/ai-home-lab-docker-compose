@@ -174,8 +174,6 @@ class AssistantOrchestra:
                     Your response:
                     """.format(question=question, answers=conversation_content, your_questions=accumulated_response)
 
-                    print(conversation_content)
-
                     await asyncio.sleep(2)
                     agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
                     yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
