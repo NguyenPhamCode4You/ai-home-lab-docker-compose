@@ -93,6 +93,7 @@ class AssistantOrchestra:
         accumulated_response  = ""
         
         async with httpx.AsyncClient() as client:
+            # yield json.dumps({"response": f"![Generated Image](https://sandrasoft.app/banner.png)"})
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     try:
