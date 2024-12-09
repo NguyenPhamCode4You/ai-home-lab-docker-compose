@@ -2,10 +2,8 @@ import asyncio
 import json
 import re
 from shlex import quote
-from fastapi import Request
 import httpx
-import requests
-from typing import List, Optional
+from typing import List
 
 markdown_header_pattern = r"^(#+[ ]*.+)$"
 
@@ -240,7 +238,6 @@ class CodeDocumentor:
             .replace("{histories}", histories)
             .replace("{context}", knowledge_context)
         )
-
         # ---------------------------------------
         # 6. Stream final explanation for the question
         # ----------------------------------------
@@ -253,39 +250,3 @@ class CodeDocumentor:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
-    
-    def run(self, question: str, messages: List[Message] = None) -> str:
-        prompt = self.get_final_prompt(question, messages)
-
-        response = requests.post(
-            url=self.url,
-            json={"model": self.model, "prompt": prompt, "stream": False}
-        )
-        
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        
-        return self._clean_json_response(response.json())
-    
-    # Run the assistant to answer the question
-    def get_final_prompt(self, question: str, messages: List[Message] = None) -> str:
-        histories = ""
-        if messages and len(messages) > 0:
-            histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
-            histories = histories[-self.max_history_tokens_length:]
-        
-        context = self.retrieve_documents(question)
-        context = context[:self.max_context_tokens_length]
-
-        prompt = (
-            self.base_prompt
-            .replace("{context}", context)
-            .replace("{question}", question)
-            .replace("{histories}", histories)
-        )
-
-        return prompt
-    
-    # Clean the API response
-    def _clean_json_response(self, response_data: dict) -> str:
-        return response_data.get("response", "")
