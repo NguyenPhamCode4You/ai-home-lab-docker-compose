@@ -22,6 +22,7 @@ class ChartVisualizer:
         self.model = model
         self.temp_file_path = None
         self.host_url = None
+        self.max_history_tokens_length = 10000
 
     def set_host_url(self, host_url: str):
         self.host_url = host_url
@@ -32,6 +33,9 @@ class ChartVisualizer:
         return self
 
     async def stream(self, question: str, messages: List[Message] = None):
+        history_string = self.get_chat_history_string(messages)
+        full_conversation_context = f"Conversation history: {history_string}\n\n" if history_string else ""
+        full_conversation_context += f"User question: {question}"
         # Format datetime as a string suitable for filenames
         filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
@@ -41,13 +45,14 @@ class ChartVisualizer:
 
         prompt = """
         You are an intelligent matplotlib python assistant that can help user create simple charts basing on a given data.
-        Context: {question}
+        Full Conversation: {full_conversation_context}
         Save path: {file_path}
         Provide the code to create a chart that best answers the user question, in python using matplotlib.
         DO NOT include plt.show() in the code.
+        TRY to be as simple in your code as possible.
         Return code wrapped in ```python ``` block, no explaination needed
         Your code:
-        """.format(question=question, file_path=file_path)
+        """.format(full_conversation_context=full_conversation_context, file_path=file_path)
 
         async with httpx.AsyncClient() as client:
             python_code = ""
@@ -97,6 +102,27 @@ class ChartVisualizer:
                 yield json.dumps({"response": f"\n\n❌ An unexpected error occurred during execution: {str(e)}\n\n"})
             
             yield json.dumps({"response": f"![Generated Chart]({image_host_url})"})
+
+    def get_chat_history_string(self, histories: List[Message] = None) -> str:
+        """
+        Returns a string representation of the chat history, limited to the last N tokens.
+        Each entry includes the role and the first 1800 characters of content.
+        """
+        histories = histories or []  # Use an empty list if histories is None
+
+        # Calculate how many tokens we can extract starting from the end
+        accumulated_tokens = 0
+        selected_messages = []
+        for message in reversed(histories):  # Start from the last message
+            content_length = len(message.content[:6000])  # Restrict each message to 1800 characters
+            if accumulated_tokens + content_length > self.max_history_tokens_length:
+                break  # Stop adding messages when the limit is reached
+
+            selected_messages.append(f"\n >> {message.role}: {message.content[:1800]}\n\n")
+            accumulated_tokens += content_length
+
+        # Reverse again to preserve the original chronological order
+        return "".join(reversed(selected_messages))
                 
         
 

@@ -1,15 +1,15 @@
 import asyncio
-from http import client
 import json
-import re
-from fastapi import Request
 import httpx
 import requests
-from typing import List, Optional
+from typing import List
 
 class Message():
     role: str  # e.g., "user", "assistant"
     content: str  # Message text
+
+def clean_config_string(config_string: str) -> str:
+    return config_string.strip().replace("\n", "").replace("\r", "").replace(" ", "")
 
 # Main assistant class
 class SwaggerApiCaller:
@@ -70,8 +70,6 @@ class SwaggerApiCaller:
 
     
     async def stream(self, question: str, messages: List[Message] = None):
-        def clean_config_string(config_string: str) -> str:
-            return config_string.strip().replace("\n", "").replace("\r", "").replace(" ", "")
         async with httpx.AsyncClient() as client:
             yield json.dumps({"response": f"🧮 Looking up for the correct API to call ...\n\n"})
             api_path = self.get_swagger_api_to_call(question)
@@ -100,44 +98,25 @@ class SwaggerApiCaller:
             api_response = response.json()
             response_markdown = self.convert_json_into_markdown(api_response)
             prompt = f"""
-            Given the following API response as json, describe in plain text format.
-            Be concise, accurate and produce a well-structured response with bullet points.
-            API Response: {response_markdown}
-            User Question: {question}
-            Your Response:
+            Given the following API response: 
+            -------------------
+            {response_markdown}
+            -------------------
+
+
+            User Question: 
+            -------------------
+            {question}
+            -------------------
+
+            Describe the response in plain text format, conform to the user's question. Provide minimal details and avoid verbosity if required by user.
+            Be concise, accurate and produce a well-structured response with bullet points or markdown tables.
+
             """
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
 
-    def run(self, question: str) -> str:
-        response = self.get_raw_json_response(question)
-
-        prompt = f"""
-        Given the following API response, produce a well-structured markdown table to demonstrate the response.
-        API Response: {json.dumps(response)}
-        User Question: {question}
-        Your Response:
-        """
-        response = requests.post(
-            url=self.url,
-            json={"model": self.model, "prompt": prompt, "stream": False}
-        )
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        return self._clean_json_response(response.json())
-    
-    def get_raw_json_response(self, question: str):
-        api_path = self.get_swagger_api_to_call(question)
-        request_body, method = self.get_request_configuration(question, api_path)
-        response = requests.request(
-            method=method,
-            url=f"{self.api_url}{api_path}",
-            headers={"Authorization": f"Bearer {self.bearer_token}"},
-            json=json.loads(request_body)
-        )
-        return response.json()
-    
     def get_swagger_api_to_call(self, question: str):
         prompt = f"""
         Given the following API paths, please select 01 api that best matches the question:

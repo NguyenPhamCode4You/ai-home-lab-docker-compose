@@ -186,7 +186,7 @@ class AssistantOrchestra:
         accumulated_tokens = 0
         selected_messages = []
         for message in reversed(histories):  # Start from the last message
-            content_length = len(message.content[:1800])  # Restrict each message to 1800 characters
+            content_length = len(message.content[:6000])  # Restrict each message to 1800 characters
             if accumulated_tokens + content_length > self.max_history_tokens_length:
                 break  # Stop adding messages when the limit is reached
 
