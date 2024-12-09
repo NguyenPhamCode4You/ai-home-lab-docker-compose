@@ -31,7 +31,7 @@ EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 # CODE_MODEL      = "gemma2:27b-instruct-q5_1"
 # GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
-CODE_MODEL      = "qwen2.5:14b-instruct-q8_0"
+CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
 GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 HOSTING_URL     = "http://10.13.13.2:8000"
