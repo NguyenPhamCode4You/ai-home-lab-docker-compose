@@ -75,7 +75,7 @@ master_data.set_swagger_json(swagger_json_master)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
     ("/Vessels/Search", "Search for vessels using keywords, but cannot search for GUID"),
-    ("/Vessels/{vesselId}", "Get vessel details by vessel GUID, this also contains the vessel's bunkers. However, ONLY allow GUID, normal text not allowed"),
+    # ("/Vessels/{vesselId}", "Get vessel details by vessel GUID, this also contains the vessel's bunkers. However, ONLY allow GUID, normal text not allowed"),
     ("/Offices/Search", "Search for offices using keywords, but cannot search for ID"),
     ("/Ports/Search", "Search for ports using keywords, but cannot search for ID"),
 ])
