@@ -46,9 +46,9 @@ with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r
     bvms_prompt = file.read()
 
 embedder = CreateEmbedding(url=f'{OLLAMA_URL}/api/embed', model=EMBEDING_MODEL)
-codeBlockExtractor = CodeBlockExtractor(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
+codeBlockExtractor = CodeBlockExtractor(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 
-documentor = CodeDocumentor(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
+documentor = CodeDocumentor(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 documentor.set_embedder(embedder)
 documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)

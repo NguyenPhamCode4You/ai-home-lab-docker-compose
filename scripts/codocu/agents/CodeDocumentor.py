@@ -8,28 +8,53 @@ import requests
 from typing import List, Optional
 
 markdown_header_pattern = r"^(#+[ ]*.+)$"
-def SplitByMarkdownHeader(message: str):
-    """
-    Splits a Markdown message into chunks by headers and their associated content.
 
-    Args:
-        message (str): The Markdown message.
-
-    Returns:
-        list: List of chunks, where each chunk contains a header and its content.
-    """
-    parts = re.split(markdown_header_pattern, message, flags=re.MULTILINE)
+def read_file_content(file_path):
+    """Reads content from a file."""
+    with open(file_path, "r", encoding="utf-8") as file:
+        return file.read()
     
-    # Reconstruct chunks with headers and associated content
-    chunks = []
+def convert_paragraphs_for_validation(paragraphs):
+    """Extracts and validates headers from file chunks."""
+    result = []
+    for header, content in paragraphs:
+        if len(content) >= 100 and not any(
+            kw in header.lower() for kw in ["example", "test", "summary", "keyword", "general"]
+        ):
+            if "Explanation" in content:
+                explanation = content.split("Explanation", 1)[1]
+            else:
+                explanation = content
+            result.append((f"**{header.strip()}**", explanation[:250].strip()))
+    return result
+
+def format_document_url(document, highlight: str = None, host_url: str = None) -> str:
+    relative_path = document["content"].strip().replace("\\", "/")
+    file_name = RemoveSpecialCharacters(document["metadata"]["f"])
+    document_url = f"markdown-viewer?path={relative_path}"
+    if host_url:
+        document_url = f"{host_url}/{document_url}"
+    if highlight:
+        document_url += f"&highlight={quote(highlight)}"
+    return f"[{file_name}]({document_url})"
+
+def ExtractMarkdownHeadersAndContent(text):
+    # Split the text into parts based on headers
+    parts = re.split(markdown_header_pattern, text, flags=re.MULTILINE)
+    # Group headers with their associated content
+    header_content_pairs = []
     for i in range(1, len(parts), 2):  # Headers are in odd indices
-        header = parts[i].strip()  # Strip unnecessary whitespace
-        content = parts[i + 1].strip() if i + 1 < len(parts) else ""
-        chunks.append(f"{header}\n{content}")
-    return chunks
+        header = parts[i].strip()  # Strip whitespace from the header
+        header = header.replace("#", " ")  # Replace newline characters with spaces
+        header = header.replace("  ", "")  # Replace newline characters with spaces
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ""  # Get content after the header
+        header_content_pairs.append((header, content))
+    
+    return header_content_pairs
 
 def RemoveSpecialCharacters(text: str) -> str:
-    return re.sub(r"[^a-zA-Z]+", "", text)
+    text = re.sub(r"[^a-zA-Z]+", "", text)
+    return text
 
 class Message():
     role: str  # e.g., "user", "assistant"
@@ -120,146 +145,111 @@ class CodeDocumentor:
         return context
     
     async def stream(self, question: str, messages: List[Message] = None):
-        if not self.embedder or not self.vector_store:
-            raise ValueError("Embedder and vector store must be set before retrieving documents.")
-        
+        yield json.dumps({"response": f"📚 Finding top {self.match_count} documents basing on relevance level ...\n\n"})
         question_embedding = self.embedder.run(question)
         documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
-        if len(documents) == 0:
-            yield json.dumps({"error": "No files found or smart file picker not set."})
-            return
+        # ---------------------------------------
+        # 1.Verbosely list the documents
+        # ----------------------------------------
+        for file_index, document in enumerate(documents):
+            file_link = format_document_url(document, host_url=self.be_host_url)
+            yield json.dumps({"response": f"📌 Document {file_index + 1}: {file_link}\n"})
+            await asyncio.sleep(0.25)
         
-        def format_file_name(file_name: str, path: str, highlight: str = None) -> str:
-            # Strip leading/trailing spaces
-            file_name = file_name.strip()
-            path = path.strip()
+        yield json.dumps({"response": f"\n\n### 🤖 Start the reading process... \n\n\n"})
+        knowledge_context = ""
+        # ---------------------------------------
+        # 2. Iterate through each document...
+        # ----------------------------------------
+        for file_index, document in enumerate(documents):
+            file_link = format_document_url(document, host_url=self.be_host_url)
+            if len(knowledge_context) >= self.max_context_tokens_length: 
+                break
+            try:
+                file_context = read_file_content(document["content"])
+            except Exception as e:
+                print(f"Error reading file: {file_link}, {str(e)}")
+                yield json.dumps({"response": f"\n\n ❌ Error reading file: {file_link} 👀 - File: **{file_index + 1}**/**{len(documents)}**\n\n"})
+                continue
+            
+            try:
+                original_paragraphs = ExtractMarkdownHeadersAndContent(file_context)
+                yield json.dumps({"response": f"\n\n 📖 Reading file: {file_link} 👀 - File: **{file_index + 1}**/**{len(documents)}** - Found **{len(original_paragraphs)}** paragraphs...\n\n"})
 
-            # Ensure the path uses forward slashes
-            relative_path = path.replace("\\", "/")
+                paragraphs_to_validate = convert_paragraphs_for_validation(original_paragraphs)
+                paragraphs_validation_string = "\n\n".join([f"{header}: {content}" for header, content in paragraphs_to_validate])
 
-            # Build the Markdown Viewer URL
-            markdown_viewer_url = f"markdown-viewer?path={relative_path}"
-            if self.be_host_url:
-                markdown_viewer_url = f"{self.be_host_url}/{markdown_viewer_url}"
-            if highlight:
-                markdown_viewer_url += f"&highlight={quote(highlight)}"
+                validation_result = ""
+            except Exception as e:
+                print(f"Error extracting file: {file_link}, {str(e)}")
+                yield json.dumps({"response": f"❌ Error in extracting file: {file_link}, {str(e)}"})
+                continue
+            
+            await asyncio.sleep(1)
 
-            # Return the formatted Markdown link
-            return f"[{file_name}]({markdown_viewer_url})"
-        
-        current_file_index = 1
-        
-        async with httpx.AsyncClient() as client:
-            yield json.dumps({"response": f"📚 Finding top {len(documents)} documents basing on relevance level ...\n\n"})
-            await asyncio.sleep(2)
-            for index, document in enumerate(documents):
-                if (index + 1) > 10:
-                    break
-                file_path = document["content"]
-                file_name = document["metadata"]["f"]
-                file_name = format_file_name(file_name, file_path)
-                yield json.dumps({"response": f"📌 Document {index + 1}: {file_name}\n"})
-                await asyncio.sleep(0.25)
+            try:
+                async for blob_extractor in self.code_block_extractor.stream(question, paragraphs_validation_string):
+                    if (len(blob_extractor) > 1000):
+                        continue
+                    validation_result += json.loads(blob_extractor)["response"]
+                    yield blob_extractor
+            
+            except Exception as e:
+                print(f"Error in calling validation method: {str(e)}")
+                yield json.dumps({"response": f"❌ Error in calling validation method: {str(e)}"})
+                continue
 
-            yield json.dumps({"response": f"\n\n### 🤖 Start the reading process... \n\n\n"})
-            await asyncio.sleep(2)
+            try:
+                validated_headers = [
+                    header.split(":", 1)[0].strip()
+                    for header in validation_result.split("\n")
+                    if ":" in header
+                ]
 
-            knowledge_context = ""
-            for index, document in enumerate(documents):
-                if current_file_index > self.match_count:
-                    break
+                for validated_header in validated_headers:
+                    header1 = RemoveSpecialCharacters(validated_header).replace(" ", "").lower()
+                    for original_header, paragraph_content in original_paragraphs:
+                        header2 = RemoveSpecialCharacters(original_header).replace(" ", "").lower()
+                        if header1 != header2:
+                            continue
+                        knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
+                        yield json.dumps({"response": f"\n- Learned ✅ **{original_header.strip()}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
+                        await asyncio.sleep(2)
+                        break
+
                 if len(knowledge_context) >= self.max_context_tokens_length:
                     break
 
-                file_path = document["content"]
-                file_name = document["metadata"]["f"]
-                file_name = format_file_name(file_name, file_path)
+            except Exception as e:
+                print(f"Error in combining headers: {str(e)}")
+                yield json.dumps({"response": f"❌ Error in combining headers: {str(e)}"})
+                continue
 
-                yield json.dumps({"response": f"\n📖✏️  Reading file: {file_name} 👀 - File: **{current_file_index}**/**{len(documents)}** \n\n"})
-                await asyncio.sleep(2)
-                try:
-                    with open(file_path, "r", encoding="utf-8") as file:
-                        content = file.read()
+        await asyncio.sleep(1)
+        knowledge_context = knowledge_context[:self.max_context_tokens_length]
+        await asyncio.sleep(1)
 
-                        chunks = SplitByMarkdownHeader(content)
-                        headers_list = []
-                        for chunk in chunks:
-                            header = chunk.split("\n")[0].replace("#", "").strip()
-                            content = chunk.split("\n", 1)[1]
+        histories = ""
+        if messages and len(messages) > 0:
+            histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
+            histories = histories[-self.max_history_tokens_length:]
 
-                            if len(content) < 100:
-                                continue
+        prompt = (
+            self.base_prompt
+            .replace("{question}", question)
+            .replace("{histories}", histories)
+            .replace("{context}", knowledge_context)
+        )
 
-                            if "example" in header or "test" in header or "demo" in header or "keyword" in header or "summary" in header or "note" in header or "general purpose" in header or "business logic" in header:
-                                continue
-
-                            headers_list.append(header)
-
-                        header_block_string = ""
-                        async for header_block in self.code_block_extractor.stream(question, "\n".join(headers_list)):
-                            try:
-                                header_block_string += json.loads(header_block)["response"]
-                                yield header_block
-                            except Exception as e:
-                                yield ""
-                                continue
-
-                        headers_list = [header for header in header_block_string.split("\n") if len(header) > 0]
-
-                        for chunk in chunks:
-                            original_header = chunk.split("\n")[0].strip()
-                            original_header = original_header.replace("#", "").strip()
-                            header_1 = RemoveSpecialCharacters(original_header)
-                            if len(header_1) == 0:
-                                continue
-
-                            for header_line in headers_list:
-                                header_extracted = header_line.split(":")[0].strip()
-                                header_extracted = header_extracted.replace("#", "").strip()
-                                header_2 = RemoveSpecialCharacters(header_extracted)
-                                if len(header_2) == 0:
-                                    continue
-
-                                if header_1.lower() in header_2.lower() or header_2.lower() in header_1.lower():
-                                    knowledge_context += f"\n{file_name}:\n{chunk}"
-                                    original_header_url = format_file_name(original_header, file_path, highlight="")
-                                    yield json.dumps({"response": f"\n- Learned ✅ **{original_header_url}** into **Memmory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"} )
-                                    await asyncio.sleep(3)
-                                    break
-
-                            if len(knowledge_context) >= self.max_context_tokens_length:
-                                break
-
-                        current_file_index += 1
-
-                        if len(knowledge_context) >= self.max_context_tokens_length:
-                            break
-
-                except Exception as e:
-                    yield json.dumps({"response": f"\n⛔️ Error reading file: {file_name}, {str(e)}"})
-                    continue
-
-            knowledge_context = knowledge_context[:self.max_context_tokens_length]
-            await asyncio.sleep(1)
-
-            histories = ""
-            if messages and len(messages) > 0:
-                histories = "\n".join([f"{message.role}: {message.content}" for message in messages or []])
-                histories = histories[-self.max_history_tokens_length:]
-
-            prompt = (
-                self.base_prompt
-                .replace("{question}", question)
-                .replace("{histories}", histories)
-                .replace("{context}", knowledge_context)
-            )
-            
-            yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(knowledge_context)}/{self.max_context_tokens_length} 👀 \n\n"})
-            await asyncio.sleep(1)
-            yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: ...\n\n"})
-            await asyncio.sleep(1)
-            # Send streaming request to Ollama
-            
+        # ---------------------------------------
+        # 6. Stream final explanation for the question
+        # ----------------------------------------
+        yield json.dumps({"response": f"\n ✨ Total relevant tokens: {len(knowledge_context)}/{self.max_context_tokens_length} 👀 \n\n"})
+        await asyncio.sleep(1)
+        yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: ...\n\n"})
+        await asyncio.sleep(1)
+        
+        async with httpx.AsyncClient() as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
