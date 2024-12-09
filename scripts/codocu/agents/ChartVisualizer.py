@@ -1,16 +1,11 @@
 import asyncio
 from asyncio import subprocess
-import contextlib
 from datetime import datetime
-import io
 import json
 import os
-import re
 import sys
-from fastapi import Request
 import httpx
-import requests
-from typing import List, Optional
+from typing import List
 
 class Message():
     role: str  # e.g., "user", "assistant"
@@ -53,17 +48,19 @@ class ChartVisualizer:
         Return code wrapped in ```python ``` block, no explaination needed
         Your code:
         """.format(question=question, file_path=file_path)
+
         async with httpx.AsyncClient() as client:
             python_code = ""
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    try:
-                        chunk_str = chunk.decode("utf-8")
+            try:
+                async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                    async for chunk_str in response.aiter_bytes():
+                        if (len(chunk_str) > 1000):
+                            continue
                         python_code += json.loads(chunk_str)["response"]
-                        yield chunk
-                    except Exception as e:
-                        yield ""
-                        continue
+                        yield chunk_str
+            except Exception as e:
+                yield json.dumps({"response": f"\n\n❌ Error generating Python code: {e}\n\n"})
+                return
             
             await asyncio.sleep(1) # Wait for the agents to respond completely
             python_code = python_code.strip().replace("```python", "").replace("```", "")
@@ -75,16 +72,13 @@ class ChartVisualizer:
                     python_file.write(python_code)
             
             except Exception as e:
-                yield json.dumps({"response": f"❌ Error saving Python code to file: {e}\n\n"})
+                yield json.dumps({"response": f"\n\n❌ Error saving Python code to file: {e}\n\n"})
                 return
             
             await asyncio.sleep(1)  # Wait for the file to be saved
-            print(f"Python code saved to: {python_file_path}")
-            
             # Step 3: Execute the Python file
             try:
                 python_path = sys.executable
-
                 process = await asyncio.create_subprocess_exec(
                     python_path, python_file_path,
                     stdout=asyncio.subprocess.PIPE,
@@ -92,14 +86,15 @@ class ChartVisualizer:
                 )
                 stdout, stderr = await process.communicate()
                 if stdout:
-                    yield json.dumps({"response": f"✅ Execution Output: {stdout.decode()}"})
+                    yield json.dumps({"response": f"\n\n✅ Execution Output: {stdout.decode()}"})
                 if stderr:
-                    yield json.dumps({"response": f"❌ Execution Error: {stderr.decode()}"})
+                    yield json.dumps({"response": f"\n\n❌ Execution Error: {stderr.decode()}"})
             
             except subprocess.CalledProcessError as e:
-                yield json.dumps({"response": f"❌ Execution failed: {e.stderr}\n\n"})
+                yield json.dumps({"response": f"\n\n❌ Execution failed: {e.stderr}\n\n"})
+
             except Exception as e:
-                yield json.dumps({"response": f"❌ An unexpected error occurred during execution: {str(e)}\n\n"})
+                yield json.dumps({"response": f"\n\n❌ An unexpected error occurred during execution: {str(e)}\n\n"})
             
             yield json.dumps({"response": f"![Generated Chart]({image_host_url})"})
                 
