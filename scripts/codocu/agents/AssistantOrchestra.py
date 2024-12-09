@@ -10,6 +10,9 @@ class Message():
     role: str  # e.g., "user", "assistant"
     content: str  # Message text
 
+def remove_special_chars(text):
+    return re.sub(r"[^a-zA-Z]+", ' ', text)
+
 # Main assistant class
 class AssistantOrchestra:
     def __init__(
@@ -65,6 +68,113 @@ class AssistantOrchestra:
             [f"\n{agent_name}: {details['description']}\n" for agent_name, details in self.agents.items()]
         )
     
+    async def stream(self, question: str, messages: List[Message] = None):
+        histories = self.get_chat_history_string(messages)
+        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
+        
+        agent_self_questions  = ""
+        
+        async with httpx.AsyncClient() as client:
+            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                async for chunk_str in response.aiter_bytes():
+                    if (len(chunk_str) > 1000):
+                        continue
+                    agent_self_questions += json.loads(chunk_str)["response"]
+                    yield chunk_str
+
+                agent_questions = []
+                # ---------------------------------------
+                # 1. Find all agents mentioned and their questions
+                # ----------------------------------------
+                for agent_name, agent_details in self.agents.items():
+                    agent_name_formated = f"**{remove_special_chars(agent_name)}**"
+                    
+                    for match in re.finditer(re.escape(agent_name_formated), agent_self_questions):
+                        agent_mention_index = match.start()
+                        
+                        # Extract the part of the text after the agent's mention
+                        agent_question_part = agent_self_questions[agent_mention_index + len(agent_name_formated):]
+                        
+                        # Extract the question until the first occurrence of "👀" or end of string
+                        agent_question = agent_question_part.split("👀")[0]
+                        
+                        # Check if the extracted text qualifies as a valid question
+                        if ":" in agent_question and "?" in agent_question:
+                            agent_questions.append((agent_name, agent_question.strip(), agent_mention_index))
+                # ---------------------------------------
+                # 2. Order the agents based on their mention index
+                # ----------------------------------------
+                agent_questions = sorted(agent_questions, key=lambda x: x[2])
+                conversation_content = []
+                # ---------------------------------------
+                # 3. Execute the agents in the order of their mention
+                # ----------------------------------------
+                for agent_name, agent_question, agent_mention_index in agent_questions:
+                    await asyncio.sleep(2)
+                    agent_details = self.agents.get(agent_name, {})
+                    agent = agent_details.get("agent")
+                    
+                    if not agent:
+                        yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
+                        continue
+                    
+                    if (len(conversation_content) > 0):
+                        additional_context = "".join(conversation_content)
+                    else:
+                        additional_context = "".join(agent_self_questions)
+
+                    real_agent_question = f"**Addtional context that might be useful:**\n{additional_context}\n**Finally, here is your question:** {agent_question}"
+                    
+                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"})
+                    conversation_content.append(f"\n### 🤖 {agent_name} ")
+                    await asyncio.sleep(2)
+                    # ---------------------------------------
+                    # 4. Excetute the agent and stream the response
+                    # ----------------------------------------
+                    try:
+                        async for agent_chunk in agent.stream(real_agent_question, messages):
+                            if (len(agent_chunk) > 1000):
+                                continue
+                            agent_response = json.loads(agent_chunk)["response"]
+                            conversation_content.append(agent_response)
+                            yield agent_chunk
+                    
+                    except Exception as e:
+                        yield ""
+
+                await asyncio.sleep(3) # Wait for the agents to respond completely
+
+                conversation_content = "".join(conversation_content)
+                # ---------------------------------------
+                # 5. Final thought prompt to wrap up the conversation
+                # ----------------------------------------
+                final_thought_prompt = """
+                You are a final thought that validates if the agents have answered the user's question.
+                Your previous reasoning to the agents are as follow:
+                {agent_self_questions}
+                Then, the Agents Responses: {agents_answers}
+                User's original Question: {user_question}
+                Follow the instructions below to provide a final thought:
+                1. If the agents have completely answered the question:
+                - Then you should provide a summarize for the answers, but the summarize need to be less than 150 words!
+                - Be clear and concise in your response
+                2. If agents is NOT able to answer the question:
+                - Combine knowledge provided by the agent responses, you need to answer the question yourself!
+                - Pay careful attention to the user's question and the agent responses
+                - NO limits on the length of the response applied!
+                Your response:
+                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions)
+
+                await asyncio.sleep(2)
+                agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
+                yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
+                await asyncio.sleep(1)
+
+                async with httpx.AsyncClient() as client:
+                    async with client.stream("POST", self.url, json={"model": self.model, "prompt": final_thought_prompt}) as response:
+                        async for final_thought_chunk in response.aiter_bytes():
+                            yield final_thought_chunk
+
     def get_chat_history_string(self, histories: List[Message] = None) -> str:
         """
         Returns a string representation of the chat history, limited to the last N tokens.
@@ -85,112 +195,3 @@ class AssistantOrchestra:
 
         # Reverse again to preserve the original chronological order
         return "".join(reversed(selected_messages))
-    
-    async def stream(self, question: str, messages: List[Message] = None):
-        histories = self.get_chat_history_string(messages)
-        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
-
-        accumulated_response  = ""
-        
-        async with httpx.AsyncClient() as client:
-            # yield json.dumps({"response": f"![Generated Image](https://sandrasoft.app/banner.png)"})
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    try:
-                        chunk_str = chunk.decode("utf-8")
-                        accumulated_response += json.loads(chunk_str)["response"]
-                        yield chunk
-                    except Exception as e:
-                        yield ""
-                        continue
-
-                agent_questions = []
-
-                def remove_special_chars(text):
-                    return re.sub(r"[^a-zA-Z]+", ' ', text)
-
-                for agent_name, agent_details in self.agents.items():
-                    agent_name_formated = f"**{remove_special_chars(agent_name)}**"
-                    
-                    # Find all occurrences of agent_name_formated in accumulated_response
-                    for match in re.finditer(re.escape(agent_name_formated), accumulated_response):
-                        agent_mention_index = match.start()
-                        
-                        # Extract the part of the text after the agent's mention
-                        agent_question_part = accumulated_response[agent_mention_index + len(agent_name_formated):]
-                        
-                        # Extract the question until the first occurrence of "👀" or end of string
-                        agent_question = agent_question_part.split("👀")[0]
-                        
-                        # Check if the extracted text qualifies as a valid question
-                        if ":" in agent_question and "?" in agent_question:
-                            agent_questions.append((agent_name, agent_question.strip(), agent_mention_index))
-                
-                agent_questions = sorted(agent_questions, key=lambda x: x[2])
-                conversation_content = []
-
-                # Identify agent responses in accumulated_response
-                for agent_name, agent_question, agent_mention_index in agent_questions:
-                    await asyncio.sleep(3)
-                    agent_details = self.agents.get(agent_name, {})
-                    agent = agent_details.get("agent")
-                    agent_response_len = 0
-                    
-                    if not agent:
-                        yield f"\n\n### ⚠️ Agent '{agent_name}' not found or unavailable.\n\n"
-                        continue
-
-                    real_agent_question = agent_question
-                    
-                    if len(conversation_content) > 0:
-                        additional_agent_context = "".join(conversation_content)
-                        real_agent_question = f"**Addtional context that might be useful:**\n{additional_agent_context}\n**Finally, here is your question:** {real_agent_question}"
-                    else:
-                        additional_agent_context = "".join(accumulated_response)
-                        real_agent_question = f"**Addtional context that might be useful:**\n{additional_agent_context}\n**Finally, here is your question:** {real_agent_question}"
-                    
-                    yield json.dumps({"response": f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"})
-                    conversation_content.append(f"\n### 🤖 {agent_name} ")
-                    await asyncio.sleep(3)
-
-                    try:
-                        async for agent_chunk in agent.stream(real_agent_question, messages):
-                            agent_response_len += len(json.loads(agent_chunk)["response"])
-                            conversation_content.append(json.loads(agent_chunk)["response"])
-                            yield agent_chunk
-                    
-                    except Exception as e:
-                        yield ""
-
-                await asyncio.sleep(3) # Wait for the agents to respond completely
-
-                conversation_content = "".join(conversation_content)
-
-                if len(conversation_content) > 100:
-                    final_thought_prompt = """
-                    You are a final thought that validates if the agents have answered the user's question.
-                    Your previous reasoning to the agents are as follow:
-                    {your_questions}
-                    Then, the Agents Responses: {answers}
-                    User's original Question: {question}
-                    Follow the instructions below to provide a final thought:
-                    1. If the agents have completely answered the question:
-                    - Then you should provide a summarize for the answers, but the summarize need to be less than 150 words!
-                    - Be clear and concise in your response
-                    2. If agents is NOT able to answer the question:
-                    - Combine knowledge provided by the agent responses, you need to answer the question yourself!
-                    - Pay careful attention to the user's question and the agent responses
-                    - NO limits on the length of the response applied!
-                    Your response:
-                    """.format(question=question, answers=conversation_content, your_questions=accumulated_response)
-
-                    await asyncio.sleep(2)
-                    agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
-                    yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
-                    await asyncio.sleep(1)
-
-                    async with httpx.AsyncClient() as client:
-                        async with client.stream("POST", self.url, json={"model": self.model, "prompt": final_thought_prompt}) as response:
-                            async for chunk in response.aiter_bytes():
-                                yield chunk
-

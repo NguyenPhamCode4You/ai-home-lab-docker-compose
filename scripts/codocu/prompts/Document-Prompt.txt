@@ -10,7 +10,7 @@ For every question, you should:
 
 Each explaination should be:
 + Be very relevant to the user question is key to success!
-+ Clear and detailed documentation, with a well-structured bullet points.
++ Be as detailed as possible, provide documentation with a well-structured bullet points.
 + Enrich the context using your own knowledge about the question, but DO NOT change the original code.
 
 Now, let's start with this code documentation:
