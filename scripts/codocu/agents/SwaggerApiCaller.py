@@ -29,7 +29,7 @@ class SwaggerApiCaller:
         self.swagger_json = json.loads(swagger_json)
         return self
 
-    def set_allowed_api_paths(self, allowed_api_paths: List[str]):
+    def set_allowed_api_paths(self, allowed_api_paths):
         self.allowed_api_paths = allowed_api_paths
         return self
 
@@ -110,6 +110,7 @@ class SwaggerApiCaller:
             -------------------
 
             Describe the response in plain text format, conform to the user's question. Provide minimal details and avoid verbosity if required by user.
+            However, always include the GUIDs, IDs, and other unique identifiers if available.
             Be concise, accurate and produce a well-structured response with bullet points or markdown tables.
 
             """
@@ -117,10 +118,49 @@ class SwaggerApiCaller:
                 async for chunk in response.aiter_bytes():
                     yield chunk
 
+
+    def get_reflection_result(self, question: str, your_response: str):
+        api_definition = [f"{path}: {details}" for path, details in self.allowed_api_paths]
+
+        reflection_prompt = """
+        You are the reflection step to determine your response have answered the user's question.
+        Here is the user's question:
+        -------------------
+        {question}
+        -------------------
+
+        Here is your response:
+        -------------------
+        {your_response}
+        -------------------
+
+        If the response answered the user's question, please return "taskcompleted".
+        If the user's required information is not available in the response, please provide the next question to ask yourself base on the documentation below, in less than 100 words.
+        -------------------
+        {api_definition}
+        -------------------
+
+        """.format(question=question, your_response=your_response, api_definition="\n".join(api_definition))
+
+        print(reflection_prompt)
+
+        response = requests.post(
+            url=self.url,
+            json={"model": "gemma2:9b-instruct-q8_0", "prompt": reflection_prompt, "stream": False}
+        )
+
+        if response.status_code != 200:
+            raise Exception(f"Failed to connect: {response.status_code}")
+        
+        reflection_result = self._clean_json_response(response.json())
+        return reflection_result
+
+
     def get_swagger_api_to_call(self, question: str):
+        api_definition = [f"{path}: {details}" for path, details in self.allowed_api_paths]
         prompt = f"""
         Given the following API paths, please select 01 api that best matches the question:
-        {'\n'.join(self.allowed_api_paths)}
+        {'\n'.join(api_definition)}
         Question: {question}
         Return only the selected API path as plain text, no code or formatting, no explanation.
         Example: /Vessel/Search

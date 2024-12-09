@@ -26,10 +26,16 @@ class AssistantOrchestra:
         self.agents = {}
         self.base_prompt = """
         You are an intelligent assistant that can help user complete complex tasks.
-        To archeive this, you have access to the following agents:
+        Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
+        -----
+        {histories}
+        -----
+
+        You have complete access to the following agents:
         -----
         {agents}
         -----
+        
         When you receive a question, you should anaylzye the question to determine wether you should forward the question to the agents or answer it yourself.
         Read the description of each agent to determine the right ones to use, you can also paraphrase the question to better match the agent's expertise.
 
@@ -39,9 +45,6 @@ class AssistantOrchestra:
         
         You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
         If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
-
-        Here are the previous questions and answers:
-        {histories}
 
         Important:
         - Make sure to keep the conversation engaging and informative.
@@ -149,21 +152,33 @@ class AssistantOrchestra:
                 # 5. Final thought prompt to wrap up the conversation
                 # ----------------------------------------
                 final_thought_prompt = """
-                You are a final thought that validates if the agents have answered the user's question.
-                Your previous reasoning to the agents are as follow:
+                You are a final reflection that validates if the user's question have been answered correctly or not.
+                Here are your previous conversations with user:
+                -------------------------
+                {histories}
+                -------------------------
+
+
+                Here are your questions to the agents:
+                -------------------------
                 {agent_self_questions}
-                Then, the Agents Responses: {agents_answers}
-                User's original Question: {user_question}
-                Follow the instructions below to provide a final thought:
-                1. If the agents have completely answered the question:
-                - Then you should provide a summarize for the answers, but the summarize need to be less than 150 words!
-                - Be clear and concise in your response
-                2. If agents is NOT able to answer the question:
-                - Combine knowledge provided by the agent responses, you need to answer the question yourself!
-                - Pay careful attention to the user's question and the agent responses
-                - NO limits on the length of the response applied!
-                Your response:
-                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions)
+                -------------------------
+
+
+                Here are the knowledge the agents provided: 
+                -------------------------
+                {agents_answers}
+                -------------------------
+
+
+                User's original Question: 
+                -------------------------
+                {user_question}
+                -------------------------
+
+                - Combine knowledge provided by the agent responses, you need to provide a final answer the user's question.
+                - Pay careful attention to the user's question and the agent responses, and provide a complete and accurate answer to the user's question.
+                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions, histories=histories)
 
                 await asyncio.sleep(2)
                 agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])

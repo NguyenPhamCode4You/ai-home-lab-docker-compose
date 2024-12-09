@@ -74,9 +74,10 @@ master_data.set_api_url("https://bvms-master-api-test.azurewebsites.net")
 master_data.set_swagger_json(swagger_json_master)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
-    "/Vessels/Search",
-    "/Ports/Search",
-    "/Offices/Search",
+    ("/Vessels/Search", "Search for vessels using keywords, but cannot search for GUID"),
+    ("/Vessels/{vesselId}", "Get vessel details by vessel GUID, this also contains the vessel's bunkers. However, ONLY allow GUID, normal text not allowed"),
+    ("/Offices/Search", "Search for offices using keywords, but cannot search for ID"),
+    ("/Ports/Search", "Search for ports using keywords, but cannot search for ID"),
 ])
 
 with open(os.path.join(os.path.dirname(__file__), "swagger.voyage.json"), "r", encoding="utf-8") as file:
@@ -87,9 +88,8 @@ voyage_data.set_api_url("https://bvms-voyage-api-test.azurewebsites.net")
 voyage_data.set_swagger_json(swagger_json_voyage)
 voyage_data.set_bearer_token(os.getenv("API_TOKEN"))
 voyage_data.set_allowed_api_paths([
-    "/Estimates/Search",
-    "/WorkSheet/Search",
-    "/Shipments/Search",
+    ("/Estimates/Search", "Search for estimates using keywords, but cannot search for ID"),
+    ("/Shipments/Search", "Search for shipments using keywords, but cannot search for ID")
 ])
 
 charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
