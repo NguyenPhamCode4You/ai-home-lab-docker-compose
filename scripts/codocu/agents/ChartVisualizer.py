@@ -50,7 +50,7 @@ class ChartVisualizer:
         Save path: {file_path}
         Provide the code to create a chart that best answers the user question, in python using matplotlib.
         DO NOT include plt.show() in the code.
-        Return code as plain text, DO NOT wrapping in code blocks, no explaination.
+        Return code wrapped in ```python ``` block, no explaination needed
         Your code:
         """.format(question=question, file_path=file_path)
         async with httpx.AsyncClient() as client:

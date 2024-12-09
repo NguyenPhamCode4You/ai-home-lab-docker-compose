@@ -16,14 +16,25 @@ from jobs.CodeBlockExtractor import CodeBlockExtractor
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
 
-SUPABASE_URL = "http://10.13.13.4:8000"
-SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
+SUPABASE_URL    = "http://10.13.13.4:8000"
+SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
 DOCU_TABLE_NAME = "n8n_documents_net_micro"
-DPCU_FUNCTION = "match_n8n_documents_net_micro_neo"
+DPCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
 
 BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
-BVMS_FUNCTION = "match_n8n_documents_bbc_bvms"
+BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
+
+OLLAMA_URL      = "http://10.13.13.4:11434"
+EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
+# CODE_MODEL      = "codellama:34b-instruct-q4_1"
+# CODE_MODEL      = "gemma2:27b-instruct-q5_1"
+# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+
+CODE_MODEL      = "qwen2.5:14b-instruct-q8_0"
+GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+
+HOSTING_URL     = "http://10.13.13.2:8000"
 
 documentor_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, DOCU_TABLE_NAME, DPCU_FUNCTION)
 bvms_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, BVMS_TABLE_NAME, BVMS_FUNCTION)
@@ -34,20 +45,20 @@ with open(os.path.join(os.path.dirname(__file__), "prompts/Document-Prompt.txt")
 with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r", encoding="utf-8") as file:
     bvms_prompt = file.read()
 
-embedder = CreateEmbedding(url=f'http://10.13.13.4:11434/api/embed', model='nomic-embed-text:137m-v1.5-fp16')
-codeBlockExtractor = CodeBlockExtractor(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
+embedder = CreateEmbedding(url=f'{OLLAMA_URL}/api/embed', model=EMBEDING_MODEL)
+codeBlockExtractor = CodeBlockExtractor(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 
-documentor = CodeDocumentor(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+documentor = CodeDocumentor(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 documentor.set_embedder(embedder)
 documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
-documentor.set_be_host_url("http://10.13.13.2:8000")
+documentor.set_be_host_url(HOSTING_URL)
 documentor.set_max_context_tokens_length(5600)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
 
-bvms_answer = RagKnowledgeBase(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
+bvms_answer = RagKnowledgeBase(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 bvms_answer.set_embedder(embedder)
 bvms_answer.set_vector_store(bvms_vector_store)
 bvms_answer.set_base_prompt(bvms_prompt)
@@ -58,14 +69,12 @@ bvms_answer.set_match_count(200)
 with open(os.path.join(os.path.dirname(__file__), "swagger.master.json"), "r", encoding="utf-8") as file:
     swagger_json_master = file.read()
 
-master_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+master_data = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 master_data.set_api_url("https://bvms-master-api-test.azurewebsites.net")
 master_data.set_swagger_json(swagger_json_master)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
     "/Vessels/Search",
-    "/Vessels/{vesselId}",
-    "/BunkerTypes/Search",
     "/Ports/Search",
     "/Offices/Search",
 ])
@@ -73,7 +82,7 @@ master_data.set_allowed_api_paths([
 with open(os.path.join(os.path.dirname(__file__), "swagger.voyage.json"), "r", encoding="utf-8") as file:
     swagger_json_voyage = file.read()
 
-voyage_data = SwaggerApiCaller(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
+voyage_data = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 voyage_data.set_api_url("https://bvms-voyage-api-test.azurewebsites.net")
 voyage_data.set_swagger_json(swagger_json_voyage)
 voyage_data.set_bearer_token(os.getenv("API_TOKEN"))
@@ -83,24 +92,12 @@ voyage_data.set_allowed_api_paths([
     "/Shipments/Search",
 ])
 
-orchesrea = AssistantOrchestra(url=f'http://10.13.13.4:11434/api/generate', model='gemma2:9b-instruct-q8_0')
+charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
+charter.set_temp_file_path(os.path.join(os.path.dirname(__file__), "codocu_results"))
+charter.set_host_url(f"{HOSTING_URL}/public")
+
+orchesrea = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 orchesrea.set_max_history_tokens_length(5000)
-
-from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
-from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-import markdown
-
-# Initialize FastAPI
-app = FastAPI()
-# Serve the 'Coducu result' directory at '/public'
-app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
-
-temp_file_path = os.path.join(os.path.dirname(__file__), "codocu_results")
-charter = ChartVisualizer(url=f'http://10.13.13.4:11434/api/generate', model='qwen2.5-coder:14b-instruct-q6_K')
-charter.set_temp_file_path(temp_file_path)
-charter.set_host_url("http://10.13.13.2:8000/public")
 
 orchesrea.add_agent("BVMS KnowledgeBase", """
 This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. 
@@ -124,6 +121,17 @@ This agent can provide detailed information about BVMS Estimates, Shipments, and
 orchesrea.add_agent("Chart Visualizer", """
 This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.
 """, charter)
+
+from fastapi import FastAPI, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+import markdown
+
+# Initialize FastAPI
+app = FastAPI()
+# Serve the 'Coducu result' directory at '/public'
+app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
 
 # Define a model for the input specific to /api/chat
 class Message(BaseModel):
