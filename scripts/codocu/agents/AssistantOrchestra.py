@@ -24,6 +24,7 @@ class AssistantOrchestra:
         self.model = model
         self.max_history_tokens_length = 6000
         self.agents = {}
+        self.log_file = None
         self.base_prompt = """
         You are an intelligent assistant that can help user complete complex tasks.
         Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
@@ -57,7 +58,28 @@ class AssistantOrchestra:
         -----
 
         """
-        # Given the above context of previous QAs, you can also perform reasoning to break down the question into sub-questions and forward each of them to the appropriate agent. Remember to mention their name correctly.
+    def set_log_file(self, log_file: str):
+        self.log_file = log_file
+        return self
+    
+    async def write_analysis(self, question: str) -> None:
+        if not self.log_file:
+            return print("No log file specified. Please set a log file using the 'set_log_file' method.")
+        try:
+            with open(self.log_file, "w", encoding="utf-8") as file:
+                file.write(f"\n\n## User question: {question}\n\n\n")
+                async for agent_chunk in self.stream(question, []):
+                    if len(agent_chunk) > 1000:
+                        continue
+                    try:
+                        chunk = json.loads(agent_chunk).get("response", "")
+                        file.write(chunk)
+                        file.flush()  # Ensures real-time writing to the file
+                        print(chunk, end="", flush=True)  # Real-time console output
+                    except json.JSONDecodeError:
+                        print(f"Invalid JSON received: {agent_chunk}")
+        except Exception as e:
+            print(f"Error logging task: {e}")
 
     def set_max_history_tokens_length(self, max_history_tokens_length: int):
         self.max_history_tokens_length = max_history_tokens_length

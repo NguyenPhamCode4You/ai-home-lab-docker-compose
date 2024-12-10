@@ -193,37 +193,19 @@ async def render_markdown(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error rendering file: {e}")
     
-# import asyncio
-# import json
+import asyncio
 
-# async def write_analysis(question: str) -> None:
-#     """
-#     Asynchronously writes responses to a file and prints them to the console in real time.
-#     """
-#     try:
-#         with open('task-log.md', "w", encoding="utf-8") as file:
-#             async for agent_chunk in orchesrea.stream(question, []):
-#                 # Ignore large chunks
-#                 if len(agent_chunk) > 1000:
-#                     continue
-                
-#                 # Parse and process the chunk
-#                 try:
-#                     chunk = json.loads(agent_chunk).get("response", "")
-#                     file.write(chunk)
-#                     file.flush()  # Ensures real-time writing to the file
-#                     print(chunk, end="", flush=True)  # Real-time console output
-#                 except json.JSONDecodeError:
-#                     print(f"Invalid JSON received: {agent_chunk}")
-#     except Exception as e:
-#         print(f"Error logging task: {e}")
-
-# # Run the logging task
-# question = """
-# Can you explain the business logics of how BVMS calculate EU ETS?
-# Then ask the code documentor to provide code implementation and explanation for this topic.
-# """
-# asyncio.run(write_analysis(question))
+question = """
+I need you to write an analysis on how BVMS calculate EU ETS. To do that, follow the below steps:
+1. Ask BVMS KnowledgeBase to explain the business logics of how BVMS calculate Bunker consumption.
+2. Ask BVMS Code Document to provide code implementation and explanation for the topic of Bunker consumption.
+3. Ask BVMS KnowledgeBase to explain the business logics of how BVMS calculate EU ETS.
+4. Ask BVMS Code Document to provide code implementation and explanation for calculate EU ETS.
+Basing on the information you gather, write an analysis on how BVMS calculate EU ETS.
+Be prefessional and detailed in your analysis, provide code snippets and documentations as needed.
+"""
+orchesrea.set_log_file(os.path.join(os.path.dirname(__file__), "task-log.md"))
+asyncio.run(orchesrea.write_analysis(question))
 
 
 # Run the FastAPI app
