@@ -49,6 +49,7 @@ class AssistantOrchestra:
         Important:
         - Make sure to keep the conversation engaging and informative.
         - Always mention agent name EXACTLY when forwarding questions.
+        - Layout all the questions in your response since this is a ledger for the agents to follow.
 
         Now, let's get started!
         -----

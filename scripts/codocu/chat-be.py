@@ -70,9 +70,9 @@ vessel_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MO
 vessel_master.set_api_url("https://bvms-master-api-test.azurewebsites.net")
 vessel_master.set_bearer_token(os.getenv("API_TOKEN"))
 vessel_master.set_allowed_api_paths([
-    ("/Vessels/Search", "Method: POST, Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
+    ("/Vessels/Search", "Method: POST, Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
     ("/Vessels/{vesselId}", "Method: GET, Description: Get vessel details by vessel GUID. This include information about where the vessel is currently located, its current speed, and its current heading"),
-    ("/Vessels/{vesselId}/ConsumptionRates/Search", "Method: POST, Description: Search for vessel bunker or fuel consumption rate using vessel GUID. Body = {pageSize} with pageSize default = 3, max = 5"),
+    ("/Vessels/{vesselId}/ConsumptionRates/Search", "Method: POST, Description: Search for vessel bunker or fuel consumption rate using vessel GUID. Body = {pageSize} with pageSize default = 3, max = 5. No query in the URL."),
 ])
 vessel_master.set_instructions("""
 1a. If user asks for vessel bunker or fuel consumption:
@@ -85,15 +85,15 @@ port_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODE
 port_master.set_api_url("https://bvms-master-api-test.azurewebsites.net")
 port_master.set_bearer_token(os.getenv("API_TOKEN"))
 port_master.set_allowed_api_paths([
-    ("/Ports/Search", "Method: POST, Description: Search for ports using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
+    ("/Ports/Search", "Method: POST, Description: Search for ports using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
 ])
 
 voyage_data = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 voyage_data.set_api_url("https://bvms-voyage-api-test.azurewebsites.net")
 voyage_data.set_bearer_token(os.getenv("API_TOKEN"))
 voyage_data.set_allowed_api_paths([
-    ("/Estimates/Search", "Method: POST, Description: Search for estimates using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
-    ("/Shipments/Search", "Method: POST, Description: Search for shipments using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5")
+    ("/Estimates/Search", "Method: POST, Description: Search for estimates using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
+    ("/Shipments/Search", "Method: POST, Description: Search for shipments using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.")
 ])
 
 charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
