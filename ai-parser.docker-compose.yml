@@ -22,8 +22,6 @@ services:
     ports:
       - "11233:11233"
     restart: always
-    volumes:
-      - ./temp:/app/temp
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_MODEL=qwen2.5-coder:14b-instruct-q6_K

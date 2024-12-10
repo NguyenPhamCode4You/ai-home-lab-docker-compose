@@ -1,7 +1,6 @@
 fastapi
 uvicorn
 pydantic
-docling
 python-multipart
 python-dotenv
 markdown

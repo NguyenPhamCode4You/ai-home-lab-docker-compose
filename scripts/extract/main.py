@@ -2,7 +2,7 @@ import json
 import os
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from pydantic import BaseModel
-from FileHandler import FileHandler
+# from FileHandler import FileHandler
 from JsonExtractor import JsonExtractor
 from PackingListParser import PackingListParser
 
@@ -38,43 +38,43 @@ async def extract_from_schema(request_data: ExtractFromSchemaRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@app.post('/extract-from-file')
-async def extract_from_file(
-    file: UploadFile = File(...),
-    schema: str = Form(...)
-):
-    try:
-        # Parse schema from the form data
-        try:
-            parsed_schema = json.loads(schema)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid input. 'schema' must be a valid JSON string.")
+# @app.post('/extract-from-file')
+# async def extract_from_file(
+#     file: UploadFile = File(...),
+#     schema: str = Form(...)
+# ):
+#     try:
+#         # Parse schema from the form data
+#         try:
+#             parsed_schema = json.loads(schema)
+#         except json.JSONDecodeError:
+#             raise HTTPException(status_code=400, detail="Invalid input. 'schema' must be a valid JSON string.")
 
-        # Validate that the parsed schema is a list
-        if not isinstance(parsed_schema, list):
-            raise HTTPException(status_code=400, detail="Invalid input. Expected 'schema' to be a list of field objects.")
+#         # Validate that the parsed schema is a list
+#         if not isinstance(parsed_schema, list):
+#             raise HTTPException(status_code=400, detail="Invalid input. Expected 'schema' to be a list of field objects.")
 
-         # Get the file stream and filename directly from the UploadFile
-        file_stream = file.file
-        filename = file.filename  # Use the filename from UploadFile
+#          # Get the file stream and filename directly from the UploadFile
+#         file_stream = file.file
+#         filename = file.filename  # Use the filename from UploadFile
 
-        # Pass the stream and filename to FileHandler
-        file_handler = FileHandler(file_stream, filename)
+#         # Pass the stream and filename to FileHandler
+#         file_handler = FileHandler(file_stream, filename)
 
-        # Save the file temporarily and convert its content to text
-        file_handler.save_temp_file()
-        content = file_handler.convert_file_to_text()
-        print(f"Extracted content: {content}")
+#         # Save the file temporarily and convert its content to text
+#         file_handler.save_temp_file()
+#         content = file_handler.convert_file_to_text()
+#         print(f"Extracted content: {content}")
 
-        # Cleanup the temporary file
-        file_handler.cleanup()
+#         # Cleanup the temporary file
+#         file_handler.cleanup()
 
-        # Process the content with the schema
-        response = extractor.set_schema(parsed_schema).run(content)
-        return {"response": response}
+#         # Process the content with the schema
+#         response = extractor.set_schema(parsed_schema).run(content)
+#         return {"response": response}
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
     
 # Run the FastAPI app
 if __name__ == "__main__":
