@@ -1,6 +1,5 @@
 import json
 import requests
-from Helper import RecursiveSplitSentences, RemoveExcessiveSpacing
 
 class JsonExtractor:
     def __init__(self: str, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):

@@ -75,10 +75,17 @@ master_data.set_swagger_json(swagger_json_master)
 master_data.set_bearer_token(os.getenv("API_TOKEN"))
 master_data.set_allowed_api_paths([
     ("/Vessels/Search", "Search for vessels using keywords, but cannot search for GUID"),
-    # ("/Vessels/{vesselId}", "Get vessel details by vessel GUID, this also contains the vessel's bunkers. However, ONLY allow GUID, normal text not allowed"),
+    ("/Vessels/{vesselId}", "Get vessel details by vessel GUID. This include information about where the vessel is currently located, its current speed, and its current heading"),
+    ("/Vessels/{vesselId}/ConsumptionRates", "Search for vessel bunker or fuel consumption rate using vessel GUID."),
     ("/Offices/Search", "Search for offices using keywords, but cannot search for ID"),
     ("/Ports/Search", "Search for ports using keywords, but cannot search for ID"),
 ])
+master_data.set_instructions("""
+1a. If user asks for vessel bunker or fuel consumption:
+- First call /Vessels/Search to get the vessel GUID 
+- Then replace the vessel ID inside this API call /Vessels/{vesselId}/ConsumptionRates to get the vessel details.
+1b. Otherwise, only call /Vessels/Search.
+""")
 
 with open(os.path.join(os.path.dirname(__file__), "swagger.voyage.json"), "r", encoding="utf-8") as file:
     swagger_json_voyage = file.read()

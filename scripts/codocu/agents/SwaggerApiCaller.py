@@ -23,7 +23,12 @@ class SwaggerApiCaller:
         self.swagger_json = None
         self.api_url = None
         self.bearer_token = None
+        self.user_instructions = None
         self.allowed_api_paths = []
+
+    def set_instructions(self, instructions: str):
+        self.user_instructions = instructions
+        return self
 
     def set_swagger_json(self, swagger_json: str):
         self.swagger_json = json.loads(swagger_json)
@@ -67,104 +72,90 @@ class SwaggerApiCaller:
             else:
                 result += f"- {key}: {value}\n"
         return result
-
     
     async def stream(self, question: str, messages: List[Message] = None):
         async with httpx.AsyncClient() as client:
-            yield json.dumps({"response": f"🧮 Looking up for the correct API to call ...\n\n"})
-            api_path = self.get_swagger_api_to_call(question)
-            yield json.dumps({"response": f"1. Creating request body for API: `{self.api_url}{api_path}`\n\n"})
-            await asyncio.sleep(1)
-            method, api_path, request_body = self.get_request_configuration(question, api_path)
-            method = clean_config_string(method)
-            api_path = clean_config_string(api_path)
-            yield json.dumps({"response": f"2. `{method.upper()}` - `{api_path}` - Body: `{request_body}`\n\n"})
-            await asyncio.sleep(1)
-            try:
-                response = await client.request(
-                    method=method,
-                    url=f"{self.api_url}{api_path}",
-                    headers={"Authorization": f"Bearer {self.bearer_token}"},
-                    json=json.loads(request_body)
-                )
-                response.raise_for_status()  # Raise an error for HTTP 4xx/5xx responses
-            except httpx.HTTPStatusError as e:
-                yield json.dumps({"response": f"❌ API call failed: {e}\n\n"})
-                return
-            except Exception as e:
-                yield json.dumps({"response": f"❌ Unexpected error: {str(e)}\n\n"})
-                return
-            yield json.dumps({"response": f"✅ API call successful! Parsing response...\n\n"})
-            api_response = response.json()
-            response_markdown = self.convert_json_into_markdown(api_response)
-            prompt = f"""
-            Given the following API response: 
-            -------------------
-            {response_markdown}
-            -------------------
+            yield json.dumps({"response": f"\n\n🧮 Looking up for the correct API to call ...\n\n"})
+            api_paths = self.get_swagger_apis_to_call(question)
+            self_awareness_context = ""
+            for api_path in [api_path for api_path in api_paths.split("\n") if api_path.strip()]:
+                api_path = clean_config_string(api_path)
+                yield json.dumps({"response": f"\n\n1. Creating request body for API: `{self.api_url}{api_path}`\n\n"})
+                await asyncio.sleep(2)
+                final_question = f"Some additional context for the question: {self_awareness_context}\n\nFinal User Question: {question}"
+                method, api_path, request_body = self.get_request_configuration(final_question, api_path)
+                print(f"Method: {method}, API Path: {api_path}, Request Body: {request_body}")
+                method = clean_config_string(method)
+                api_path = clean_config_string(api_path)
+                yield json.dumps({"response": f"\n\n2. `{method.upper()}` - `{api_path}` - Body: `{request_body}`\n\n"})
+                await asyncio.sleep(1)
+                try:
+                    response = await client.request(
+                        method=method,
+                        url=f"{self.api_url}{api_path}",
+                        headers={"Authorization": f"Bearer {self.bearer_token}"},
+                        json=json.loads(request_body)
+                    )
+                    response.raise_for_status()  # Raise an error for HTTP 4xx/5xx responses
+                except httpx.HTTPStatusError as e:
+                    yield json.dumps({"response": f"\n\n❌ API call failed: {e}\n\n"})
+                    continue
+                except Exception as e:
+                    yield json.dumps({"response": f"\n\n❌ Unexpected error: {str(e)}\n\n"})
+                    continue
+                yield json.dumps({"response": f"\n\n✅ API call successful! Parsing response...\n\n"})
+                api_response = response.json()
+                response_markdown = self.convert_json_into_markdown(api_response)
+                prompt = f"""
+                Given the following API response: 
+                -------------------
+                {response_markdown}
+                -------------------
 
 
-            User Question: 
-            -------------------
-            {question}
-            -------------------
+                User Question: 
+                -------------------
+                {question}
+                -------------------
 
-            Describe the response in plain text format, conform to the user's question. Provide minimal details and avoid verbosity if required by user.
-            However, always include the GUIDs, IDs, and other unique identifiers if available.
-            Be concise, accurate and produce a well-structured response with bullet points or markdown tables.
+                Describe the response in plain text format, conform to the user's question. Provide minimal details and avoid verbosity if required by user.
+                Be concise, accurate and produce a well-structured response with bullet points or markdown tables.
+                Extremely Important:
+                - Always mentions the GUIDs or IDs of the records, this will help the user to identify the records and ease your next calls.
 
-            """
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    yield chunk
+                """
+                async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                    async for chunk in response.aiter_bytes():
+                        if (len(chunk) > 1000):
+                            continue
+                        self_awareness_context += json.loads(chunk)["response"]
+                        yield chunk
 
 
-    def get_reflection_result(self, question: str, your_response: str):
+    def get_swagger_apis_to_call(self, question: str):
         api_definition = [f"{path}: {details}" for path, details in self.allowed_api_paths]
+        prompt = f"""
+        Given the following API paths
+        -------------------
+        {'\n'.join(api_definition)}
+        -------------------
 
-        reflection_prompt = """
-        You are the reflection step to determine your response have answered the user's question.
-        Here is the user's question:
+        User instruction on how to use the API:
+        -------------------
+        {self.user_instructions}
+        -------------------
+
+        Please select the correct APIs to call based on the user's question.
         -------------------
         {question}
         -------------------
 
-        Here is your response:
-        -------------------
-        {your_response}
-        -------------------
+        Return only the selected APIs as plain text, in the right order to call, no code or formatting, no explanation.
+        Seperate multiple APIs with a new line.
+        Example: 
+        /Search1
+        /Search2
 
-        If the response answered the user's question, please return "taskcompleted".
-        If the user's required information is not available in the response, please provide the next question to ask yourself base on the documentation below, in less than 100 words.
-        -------------------
-        {api_definition}
-        -------------------
-
-        """.format(question=question, your_response=your_response, api_definition="\n".join(api_definition))
-
-        print(reflection_prompt)
-
-        response = requests.post(
-            url=self.url,
-            json={"model": "gemma2:9b-instruct-q8_0", "prompt": reflection_prompt, "stream": False}
-        )
-
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        
-        reflection_result = self._clean_json_response(response.json())
-        return reflection_result
-
-
-    def get_swagger_api_to_call(self, question: str):
-        api_definition = [f"{path}: {details}" for path, details in self.allowed_api_paths]
-        prompt = f"""
-        Given the following API paths, please select 01 api that best matches the question:
-        {'\n'.join(api_definition)}
-        Question: {question}
-        Return only the selected API path as plain text, no code or formatting, no explanation.
-        Example: /Vessel/Search
-        Selected API path:
         """
         response = requests.post(
             url=self.url,
@@ -173,9 +164,7 @@ class SwaggerApiCaller:
         if response.status_code != 200:
             raise Exception(f"Failed to connect: {response.status_code}")
         api_path = self._clean_json_response(response.json())
-        api_path = api_path.strip()
-        api_path = api_path.split("\n")[-1].replace(" ", "")
-        return api_path
+        return api_path.strip()
     
     def get_schema_object_names_for_api_path(self, api_path: str):
         path = self.swagger_json["paths"].get(api_path)
