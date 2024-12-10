@@ -4,6 +4,28 @@ import re
 from shlex import quote
 import httpx
 from typing import List
+from urllib.parse import urlencode, urljoin
+
+def add_query_param(base_url, param_name, param_value):
+    """
+    Add a query parameter to a URL.
+
+    :param base_url: The base URL (string).
+    :param param_name: The name of the query parameter (string).
+    :param param_value: The value of the query parameter (string).
+    :return: The full URL with the query parameter (string).
+    """
+    # Encode the query parameter
+    query = {param_name: param_value}
+    encoded_query = urlencode(query)
+    
+    # Join the base URL and the encoded query parameter
+    if "?" in base_url:
+        # If there are already query parameters, append using '&'
+        return f"{base_url}&{encoded_query}"
+    else:
+        # Otherwise, add the '?' and the parameter
+        return f"{base_url}?{encoded_query}"
 
 markdown_header_pattern = r"^(#+[ ]*.+)$"
 
@@ -33,7 +55,8 @@ def format_document_url(document, highlight: str = None, host_url: str = None) -
     if host_url:
         document_url = f"{host_url}/{document_url}"
     if highlight:
-        document_url += f"&highlight={quote(highlight)}"
+        highlight = highlight.replace("(", "").replace(")", "")
+        document_url = add_query_param(document_url, "highlight", highlight)
     return f"[{file_name}]({document_url})"
 
 def ExtractMarkdownHeadersAndContent(text):
@@ -211,7 +234,10 @@ class CodeDocumentor:
                         if header1 != header2:
                             continue
                         knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
-                        yield json.dumps({"response": f"\n- Learned ✅ **{original_header.strip()}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
+                        header_name_display = RemoveSpecialCharacters(original_header)
+                        header_document = {"content": document["content"], "metadata": {"f": header_name_display}}
+                        header_link = format_document_url(header_document, highlight=header_name_display, host_url=self.be_host_url)
+                        yield json.dumps({"response": f"\n- Learned ✅ **{header_link}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
                         await asyncio.sleep(2)
                         break
 

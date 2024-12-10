@@ -54,7 +54,7 @@ documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
 documentor.set_be_host_url(HOSTING_URL)
-documentor.set_max_context_tokens_length(12000)
+documentor.set_max_context_tokens_length(10000)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
 
