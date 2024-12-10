@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Generator, List, Optional
 from pydantic import BaseModel
@@ -191,6 +192,38 @@ async def render_markdown(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error rendering file: {e}")
+    
+# import asyncio
+# import json
+
+# async def write_analysis(question: str) -> None:
+#     """
+#     Asynchronously writes responses to a file and prints them to the console in real time.
+#     """
+#     try:
+#         with open('task-log.md', "w", encoding="utf-8") as file:
+#             async for agent_chunk in orchesrea.stream(question, []):
+#                 # Ignore large chunks
+#                 if len(agent_chunk) > 1000:
+#                     continue
+                
+#                 # Parse and process the chunk
+#                 try:
+#                     chunk = json.loads(agent_chunk).get("response", "")
+#                     file.write(chunk)
+#                     file.flush()  # Ensures real-time writing to the file
+#                     print(chunk, end="", flush=True)  # Real-time console output
+#                 except json.JSONDecodeError:
+#                     print(f"Invalid JSON received: {agent_chunk}")
+#     except Exception as e:
+#         print(f"Error logging task: {e}")
+
+# # Run the logging task
+# question = """
+# Can you explain the business logics of how BVMS calculate EU ETS?
+# Then ask the code documentor to provide code implementation and explanation for this topic.
+# """
+# asyncio.run(write_analysis(question))
 
 
 # Run the FastAPI app
