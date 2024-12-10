@@ -66,37 +66,34 @@ bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
-with open(os.path.join(os.path.dirname(__file__), "swagger.master.json"), "r", encoding="utf-8") as file:
-    swagger_json_master = file.read()
-
-master_data = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
-master_data.set_api_url("https://bvms-master-api-test.azurewebsites.net")
-master_data.set_swagger_json(swagger_json_master)
-master_data.set_bearer_token(os.getenv("API_TOKEN"))
-master_data.set_allowed_api_paths([
-    ("/Vessels/Search", "Search for vessels using keywords, but cannot search for GUID"),
-    ("/Vessels/{vesselId}", "Get vessel details by vessel GUID. This include information about where the vessel is currently located, its current speed, and its current heading"),
-    ("/Vessels/{vesselId}/ConsumptionRates", "Search for vessel bunker or fuel consumption rate using vessel GUID."),
-    ("/Offices/Search", "Search for offices using keywords, but cannot search for ID"),
-    ("/Ports/Search", "Search for ports using keywords, but cannot search for ID"),
+vessel_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
+vessel_master.set_api_url("https://bvms-master-api-test.azurewebsites.net")
+vessel_master.set_bearer_token(os.getenv("API_TOKEN"))
+vessel_master.set_allowed_api_paths([
+    ("/Vessels/Search", "Method: POST, Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
+    ("/Vessels/{vesselId}", "Method: GET, Description: Get vessel details by vessel GUID. This include information about where the vessel is currently located, its current speed, and its current heading"),
+    ("/Vessels/{vesselId}/ConsumptionRates/Search", "Method: POST, Description: Search for vessel bunker or fuel consumption rate using vessel GUID. Body = {pageSize} with pageSize default = 3, max = 5"),
 ])
-master_data.set_instructions("""
+vessel_master.set_instructions("""
 1a. If user asks for vessel bunker or fuel consumption:
 - First call /Vessels/Search to get the vessel GUID 
-- Then replace the vessel ID inside this API call /Vessels/{vesselId}/ConsumptionRates to get the vessel details.
-1b. Otherwise, only call /Vessels/Search.
+- Then replace the vessel ID inside this API call /Vessels/{vesselId}/ConsumptionRates/Search to get the vessel bunker details.
+1b. Otherwise, always call /Vessels/Search.
 """)
 
-with open(os.path.join(os.path.dirname(__file__), "swagger.voyage.json"), "r", encoding="utf-8") as file:
-    swagger_json_voyage = file.read()
+port_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
+port_master.set_api_url("https://bvms-master-api-test.azurewebsites.net")
+port_master.set_bearer_token(os.getenv("API_TOKEN"))
+port_master.set_allowed_api_paths([
+    ("/Ports/Search", "Method: POST, Description: Search for ports using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
+])
 
 voyage_data = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 voyage_data.set_api_url("https://bvms-voyage-api-test.azurewebsites.net")
-voyage_data.set_swagger_json(swagger_json_voyage)
 voyage_data.set_bearer_token(os.getenv("API_TOKEN"))
 voyage_data.set_allowed_api_paths([
-    ("/Estimates/Search", "Search for estimates using keywords, but cannot search for ID"),
-    ("/Shipments/Search", "Search for shipments using keywords, but cannot search for ID")
+    ("/Estimates/Search", "Method: POST, Description: Search for estimates using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5"),
+    ("/Shipments/Search", "Method: POST, Description: Search for shipments using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5")
 ])
 
 charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
@@ -117,13 +114,17 @@ This agent can provide code snippets and documentations about BVMS Backend sourc
 However, it should not be used for debugging or fixing code issues, or writing new code.
 """, documentor)
 
-orchesrea.add_agent("Master Data API", """
-This agent can provide detailed information about BVMS Vessels, Bunker Types, Ports and Offices by making API calls.
-""", master_data)
+orchesrea.add_agent("Vessel Master", """
+This agent can provide detailed information about Vessels of BBC by making API calls.
+""", vessel_master)
 
-orchesrea.add_agent("Voyage Data API", """
-This agent can provide detailed information about BVMS Estimates, Shipments, and WorkSheet by making API calls. However, it should not be used for business related questions.
+orchesrea.add_agent("Estimate Master", """
+This agent can provide detailed information about BVMS Estimates of Shipments (Order request) by making API calls.
 """, voyage_data)
+
+orchesrea.add_agent("Port Master", """
+This agent can provide detailed information about Marinetime Ports, by making API calls.
+""", port_master)
 
 orchesrea.add_agent("Chart Visualizer", """
 This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.
