@@ -55,7 +55,7 @@ documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
 documentor.set_be_host_url(HOSTING_URL)
-documentor.set_max_context_tokens_length(12000)
+documentor.set_max_context_tokens_length(8000)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
 
@@ -63,7 +63,7 @@ bvms_answer = RagKnowledgeBase(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_M
 bvms_answer.set_embedder(embedder)
 bvms_answer.set_vector_store(bvms_vector_store)
 bvms_answer.set_base_prompt(bvms_prompt)
-bvms_answer.set_max_context_tokens_length(8000)
+bvms_answer.set_max_context_tokens_length(5600)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
@@ -80,6 +80,21 @@ vessel_master.set_instructions("""
 - First call /Vessels/Search to get the vessel GUID 
 - Then replace the vessel ID inside this API call /Vessels/{vesselId}/ConsumptionRates/Search to get the vessel bunker details.
 1b. Otherwise, always call /Vessels/Search.
+""")
+
+outermost_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
+outermost_master.set_api_url("https://bvms-master-api-test.azurewebsites.net")
+outermost_master.set_bearer_token(os.getenv("API_TOKEN"))
+outermost_master.set_allowed_api_paths([
+    ("/Ports/Search", "Method: POST, Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
+])
+outermost_master.set_instructions("""
+Your task is to determine if a given marine time port name is an outermost port or not.
+First, ask the port master agent to get the "Country Code" and "UNLOCODE" of the given port name.
+Then, Check if its country code in [MF, GF, GP, MQ, YT, RE]. If yes, then its an outermost port of france.
+- If not, then get combination of country code + UNLOCDE and check if it is in [PTHOR, PTPDL, PTPRG, PTPRV, PTTER, PTFNC, ESSCT, ESLPA, ESFUE, ESSSG, ESLES, ESSPC, ESACE]
+- If yes, then its an outermost port of EU.
+Else, its not an outermost port.
 """)
 
 port_master = SwaggerApiCaller(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
@@ -101,6 +116,20 @@ charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 charter.set_temp_file_path(os.path.join(os.path.dirname(__file__), "codocu_results"))
 charter.set_host_url(f"{HOSTING_URL}/public")
 
+# outermost_master = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
+# outermost_master.set_max_history_tokens_length(5000)
+# outermost_master.add_agent("Port Master", """
+# This agent can provide detailed information about Marinetime Ports, by making API calls.
+# """, port_master)
+# outermost_master.set_user_instructions("""
+# Your task is to determine if a given marine time port name is an outermost port or not.
+# First, ask the port master agent to get the "Country Code" and "UNLOCODE" of the given port name.
+# Then, Check if its country code in [MF, GF, GP, MQ, YT, RE]. If yes, then its an outermost port of france.
+# - If not, then get combination of country code + UNLOCDE and check if it is in [PTHOR, PTPDL, PTPRG, PTPRV, PTTER, PTFNC, ESSCT, ESLPA, ESFUE, ESSSG, ESLES, ESSPC, ESACE]
+# - If yes, then its an outermost port of EU.
+# Else, its not an outermost port.
+# """)                             
+
 orchesrea = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 orchesrea.set_max_history_tokens_length(5000)
 
@@ -118,14 +147,17 @@ However, it should not be used for debugging or fixing code issues, or writing n
 orchesrea.add_agent("Vessel Master", """
 This agent can provide detailed information about Vessels of BBC by making API calls.
 """, vessel_master)
-
-orchesrea.add_agent("Estimate Master", """
-This agent can provide detailed information about BVMS Estimates of Shipments (Order request) by making API calls.
+orchesrea.add_agent("Shipment Master", """
+This agent can provide detailed information about BVMS Shipments and estimated voyages by making API calls.
 """, voyage_data)
 
 orchesrea.add_agent("Port Master", """
 This agent can provide detailed information about Marinetime Ports, by making API calls.
 """, port_master)
+
+orchesrea.add_agent("OuterMost Port Identity", """
+This agent can determine if a given marine time port name is an outermost port by making API calls.
+""", outermost_master)
 
 orchesrea.add_agent("Chart Visualizer", """
 This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.

@@ -115,6 +115,11 @@ class SwaggerApiCaller:
                 
                 {mention_id_prompt}
 
+                Instruction from user:
+                -------------------
+                {self.user_instructions}
+                -------------------
+
                 User Question: 
                 -------------------
                 {question}

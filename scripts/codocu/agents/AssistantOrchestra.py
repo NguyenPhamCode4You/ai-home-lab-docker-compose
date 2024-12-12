@@ -25,6 +25,7 @@ class AssistantOrchestra:
         self.max_history_tokens_length = 6000
         self.agents = {}
         self.log_file = None
+        self.user_instructions = ""
         self.base_prompt = """
         You are an intelligent assistant that can help user complete complex tasks.
         Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
@@ -35,6 +36,11 @@ class AssistantOrchestra:
         You have complete access to the following agents:
         -----
         {agents}
+        -----
+
+        Additional User Instructions:
+        -----
+        {user_instructions}
         -----
         
         When you receive a question, you should anaylzye the question to determine wether you should forward the question to the agents or answer it yourself.
@@ -60,6 +66,10 @@ class AssistantOrchestra:
         """
     def set_log_file(self, log_file: str):
         self.log_file = log_file
+        return self
+    
+    def set_user_instructions(self, user_instructions: str):
+        self.user_instructions = user_instructions
         return self
     
     async def write_analysis(self, question: str) -> None:
@@ -96,7 +106,7 @@ class AssistantOrchestra:
     
     async def stream(self, question: str, messages: List[Message] = None):
         histories = self.get_chat_history_string(messages)
-        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
+        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories, user_instructions=self.user_instructions)
         
         agent_self_questions  = ""
         
@@ -194,6 +204,12 @@ class AssistantOrchestra:
                 -------------------------
 
 
+                User's Instructions:
+                -------------------------
+                {user_instructions}
+                -------------------------
+
+
                 User's original Question: 
                 -------------------------
                 {user_question}
@@ -201,7 +217,7 @@ class AssistantOrchestra:
 
                 - Combine knowledge provided by the agent responses, you need to provide a final answer the user's question.
                 - Pay careful attention to the user's question and the agent responses, and provide a complete and accurate answer to the user's question.
-                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions, histories=histories)
+                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions, histories=histories, user_instructions=self.user_instructions)
 
                 await asyncio.sleep(2)
                 agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
