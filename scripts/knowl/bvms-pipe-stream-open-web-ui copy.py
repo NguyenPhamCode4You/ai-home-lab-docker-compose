@@ -23,7 +23,7 @@ class Pipe:
         __event_call__: Optional[Callable[[dict], Awaitable[dict]]] = None,
     ) -> AsyncGenerator[str, None]:
         messages = body.get("messages", [])
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.valves.bvms_rag_url, json={"messages": messages}) as response:
                 response.raise_for_status()  # Raise exception for HTTP errors
                 async for chunk in response.aiter_bytes():

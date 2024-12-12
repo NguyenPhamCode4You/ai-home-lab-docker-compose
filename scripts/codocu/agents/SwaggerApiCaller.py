@@ -69,7 +69,7 @@ class SwaggerApiCaller:
         return result
     
     async def stream(self, question: str, messages: List[Message] = None):
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             yield json.dumps({"response": f"\n\n🧮 Looking up for the correct API to call ...\n\n"})
             api_paths = self.get_swagger_apis_to_call(question)
             self_awareness_context = ""

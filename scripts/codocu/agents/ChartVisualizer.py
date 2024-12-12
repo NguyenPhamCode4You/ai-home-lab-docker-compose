@@ -54,7 +54,7 @@ class ChartVisualizer:
         Your code:
         """.format(full_conversation_context=full_conversation_context, file_path=file_path)
 
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             python_code = ""
             try:
                 async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:

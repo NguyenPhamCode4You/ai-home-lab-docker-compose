@@ -32,7 +32,7 @@ class CodeSummarizer:
     
     async def stream(self, message: str):
         prompt = self.base_prompt + str(message)
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

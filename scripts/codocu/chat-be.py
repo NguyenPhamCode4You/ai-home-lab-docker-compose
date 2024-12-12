@@ -26,15 +26,15 @@ DPCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
 BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
 BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
 
-OLLAMA_URL      = "http://10.13.13.4:11434"
-EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
-# CODE_MODEL      = "codellama:34b-instruct-q4_1"
+# OLLAMA_URL      = "http://10.13.13.5:11434"
 # CODE_MODEL      = "gemma2:27b-instruct-q5_1"
 # GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
+OLLAMA_URL      = "http://10.13.13.4:11434"
 CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
 GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
+EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
 
 documentor_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, DOCU_TABLE_NAME, DPCU_FUNCTION)
@@ -55,7 +55,7 @@ documentor.set_vector_store(documentor_vector_store)
 documentor.set_base_prompt(documentor_prompt)
 documentor.set_code_block_extractor(codeBlockExtractor)
 documentor.set_be_host_url(HOSTING_URL)
-documentor.set_max_context_tokens_length(10000)
+documentor.set_max_context_tokens_length(12000)
 documentor.set_max_history_tokens_length(10)
 documentor.set_match_count(15)
 
@@ -63,7 +63,7 @@ bvms_answer = RagKnowledgeBase(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_M
 bvms_answer.set_embedder(embedder)
 bvms_answer.set_vector_store(bvms_vector_store)
 bvms_answer.set_base_prompt(bvms_prompt)
-bvms_answer.set_max_context_tokens_length(5600)
+bvms_answer.set_max_context_tokens_length(8000)
 bvms_answer.set_max_history_tokens_length(10)
 bvms_answer.set_match_count(200)
 
@@ -159,7 +159,7 @@ async def get_answer_for_question_stream(request: CompletionRequest):
     try:
         user_question = get_last_user_question(request.messages)
         history = [message for message in request.messages or []]
-        history = history[:-1]  # Remove the last user question from history
+        # history = history[:-1]  # Remove the last user question from history
         return StreamingResponse(orchesrea.stream(user_question, history), media_type="application/json")
 
     except Exception as e:
@@ -211,4 +211,4 @@ async def render_markdown(
 # Run the FastAPI app
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)

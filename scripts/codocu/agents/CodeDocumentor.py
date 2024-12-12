@@ -228,25 +228,31 @@ class CodeDocumentor:
                 ]
 
                 for validated_header in validated_headers:
-                    header1 = RemoveSpecialCharacters(validated_header).replace(" ", "").lower()
-                    for original_header, paragraph_content in original_paragraphs:
-                        header2 = RemoveSpecialCharacters(original_header).replace(" ", "").lower()
-                        if header1 != header2:
-                            continue
-                        knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
-                        header_name_display = RemoveSpecialCharacters(original_header)
-                        header_document = {"content": document["content"], "metadata": {"f": header_name_display}}
-                        header_link = format_document_url(header_document, highlight=header_name_display, host_url=self.be_host_url)
-                        yield json.dumps({"response": f"\n- Learned ✅ **{header_link}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
-                        await asyncio.sleep(2)
-                        break
+                    try:
+                        header1 = RemoveSpecialCharacters(validated_header).replace(" ", "").lower()
+                        for original_header, paragraph_content in original_paragraphs:
+                            header2 = RemoveSpecialCharacters(original_header).replace(" ", "").lower()
+                            if header1 != header2:
+                                continue
+                            knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
+                            header_name_display = RemoveSpecialCharacters(original_header)
+                            header_document = {"content": document["content"], "metadata": {"f": header_name_display}}
+                            header_link = format_document_url(header_document, highlight=header_name_display, host_url=self.be_host_url)
+                            yield json.dumps({"response": f"\n- Learned ✅ **{header_link}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
+                            await asyncio.sleep(2)
+                            break
+                    
+                    except Exception as e:
+                        print(f"Error in combining headers: {str(e)}")
+                        yield json.dumps({"response": f"❌ Error in combining headers: {e}"})
+                        continue
 
                 if len(knowledge_context) >= self.max_context_tokens_length:
                     break
 
             except Exception as e:
                 print(f"Error in combining headers: {str(e)}")
-                yield json.dumps({"response": f"❌ Error in combining headers: {str(e)}"})
+                yield json.dumps({"response": f"❌ Error in validating documents headers: {e}"})
                 continue
 
         await asyncio.sleep(1)
@@ -272,7 +278,7 @@ class CodeDocumentor:
         yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: ...\n\n"})
         await asyncio.sleep(1)
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

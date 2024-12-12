@@ -100,7 +100,7 @@ class AssistantOrchestra:
         
         agent_self_questions  = ""
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk_str in response.aiter_bytes():
                     if (len(chunk_str) > 1000):
@@ -208,7 +208,7 @@ class AssistantOrchestra:
                 yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
                 await asyncio.sleep(1)
 
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
                     async with client.stream("POST", self.url, json={"model": self.model, "prompt": final_thought_prompt}) as response:
                         async for final_thought_chunk in response.aiter_bytes():
                             yield final_thought_chunk
