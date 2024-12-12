@@ -89,6 +89,7 @@ outermost_master.set_allowed_api_paths([
     ("/Ports/Search", "Method: POST, Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
 ])
 outermost_master.set_instructions("""
+Always provide Country Code and UNLOCODE of the port in your response.
 Your task is to determine if a given marine time port name is an outermost port or not.
 First, ask the port master agent to get the "Country Code" and "UNLOCODE" of the given port name.
 Then, Check if its country code in [MF, GF, GP, MQ, YT, RE]. If yes, then its an outermost port of france.
@@ -116,19 +117,26 @@ charter = ChartVisualizer(url=f'{OLLAMA_URL}/api/generate', model=CODE_MODEL)
 charter.set_temp_file_path(os.path.join(os.path.dirname(__file__), "codocu_results"))
 charter.set_host_url(f"{HOSTING_URL}/public")
 
-# outermost_master = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
-# outermost_master.set_max_history_tokens_length(5000)
-# outermost_master.add_agent("Port Master", """
-# This agent can provide detailed information about Marinetime Ports, by making API calls.
-# """, port_master)
-# outermost_master.set_user_instructions("""
-# Your task is to determine if a given marine time port name is an outermost port or not.
-# First, ask the port master agent to get the "Country Code" and "UNLOCODE" of the given port name.
-# Then, Check if its country code in [MF, GF, GP, MQ, YT, RE]. If yes, then its an outermost port of france.
-# - If not, then get combination of country code + UNLOCDE and check if it is in [PTHOR, PTPDL, PTPRG, PTPRV, PTTER, PTFNC, ESSCT, ESLPA, ESFUE, ESSSG, ESLES, ESSPC, ESACE]
-# - If yes, then its an outermost port of EU.
-# Else, its not an outermost port.
-# """)                             
+ets_port_factor = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
+ets_port_factor.set_max_history_tokens_length(5000)
+ets_port_factor.add_agent("Outermost Master", """
+Given a port name, this agent can provide "Country Code", "UNLOCODE" and wether it is an "OUTERMOST" port.
+""", outermost_master)
+ets_port_factor.set_user_instructions("""
+Your task is to determine if the ETS port factor for a pair of ports.
+First, ask 2 questions seleratedly to get the "Country Code", "UNLOCODE" and "OUTERMOST" of the given port names.
+Then, folow the below steps:
+Step 1: Check country codes of each port to see if they are from EU: [BE, BG, HR, CY, DK, EE, FI, FR, DE, GR, GP, IS, IE, IT, LV, LT, MT, MQ, NL, NO, PL, PT, RE, RO, ES, SE, MF, GF, YT, SI]
+- If both are not from EU, then the ETS port factor for each is 0%.
+- If one is from EU, then the ETS port factor for the EU port is 100% and the non-EU port is 0%.
+- If both are from EU, continue to step 2.    
+Step 2: Check weather are they comming from same country or not.
+- If they are NOT from same country, then the ETS port factor for each is 100%.
+- If they are from same country, continue to step 3.
+Step 3: Check if one of them is an outermost port.
+- If ATLEAST one of them is an outermost port, then the ETS port factor for BOTH is 0%.
+- If none of them is an outermost port, then the ETS port factor for each is 100%.
+""")                             
 
 orchesrea = AssistantOrchestra(url=f'{OLLAMA_URL}/api/generate', model=GENERAL_MODEL)
 orchesrea.set_max_history_tokens_length(5000)
@@ -147,6 +155,7 @@ However, it should not be used for debugging or fixing code issues, or writing n
 orchesrea.add_agent("Vessel Master", """
 This agent can provide detailed information about Vessels of BBC by making API calls.
 """, vessel_master)
+
 orchesrea.add_agent("Shipment Master", """
 This agent can provide detailed information about BVMS Shipments and estimated voyages by making API calls.
 """, voyage_data)
@@ -155,9 +164,9 @@ orchesrea.add_agent("Port Master", """
 This agent can provide detailed information about Marinetime Ports, by making API calls.
 """, port_master)
 
-orchesrea.add_agent("OuterMost Port Identity", """
-This agent can determine if a given marine time port name is an outermost port by making API calls.
-""", outermost_master)
+orchesrea.add_agent("Port Factor for ETS calculation", """
+This agent can determine the port factor for ETS calculation for a pair of ports. Should NOT be used for business related questions.
+""", ets_port_factor)
 
 orchesrea.add_agent("Chart Visualizer", """
 This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.
