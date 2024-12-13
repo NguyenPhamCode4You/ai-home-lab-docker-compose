@@ -16,31 +16,19 @@ class SwaggerApiCaller:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",
-        model: str = "gemma2:9b-instruct-q8_0"
+        model: str = "gemma2:9b-instruct-q8_0",
+        api_url: str = None,
+        bearer_token: str = None,
+        user_instructions: str = None,
+        allowed_api_paths: List[str] = [],
     ):
         self.url = url
         self.model = model
-        self.api_url = None
-        self.bearer_token = None
-        self.user_instructions = None
-        self.allowed_api_paths = []
-
-    def set_instructions(self, instructions: str):
-        self.user_instructions = instructions
-        return self
-
-    def set_allowed_api_paths(self, allowed_api_paths):
-        self.allowed_api_paths = allowed_api_paths
-        return self
-
-    def set_bearer_token(self, bearer_token: str):
-        self.bearer_token = bearer_token
-        return self
-
-    def set_api_url(self, api_url: str):
         self.api_url = api_url
-        return self
-    
+        self.bearer_token = bearer_token
+        self.user_instructions = user_instructions
+        self.allowed_api_paths = allowed_api_paths
+
     def convert_json_into_markdown(self, json_data: dict) -> str:
         result = ""
         for key, value in json_data.items():
@@ -139,7 +127,6 @@ class SwaggerApiCaller:
                             continue
                         self_awareness_context += json.loads(chunk)["response"]
                         yield chunk
-
 
     def get_swagger_apis_to_call(self, question: str):
         api_definitions = [f"{path}: {details}" for path, details in self.allowed_api_paths]

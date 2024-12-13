@@ -16,21 +16,16 @@ class ChartVisualizer:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",
-        model: str = "gemma2:9b-instruct-q8_0"
+        model: str = "gemma2:9b-instruct-q8_0",
+        hosting_url: str = "http://localhost:11434",
+        max_history_tokens_length: int = 10000,
+        temp_file_path: str = "temp",
     ):
         self.url = url
         self.model = model
-        self.temp_file_path = None
-        self.host_url = None
-        self.max_history_tokens_length = 10000
-
-    def set_host_url(self, host_url: str):
-        self.host_url = host_url
-        return self
-
-    def set_temp_file_path(self, file_path: str):
-        self.temp_file_path = file_path
-        return self
+        self.hosting_url = hosting_url
+        self.max_history_tokens_length = max_history_tokens_length
+        self.temp_file_path = temp_file_path
 
     async def stream(self, question: str, messages: List[Message] = None):
         history_string = self.get_chat_history_string(messages)
@@ -41,7 +36,7 @@ class ChartVisualizer:
         
         file_path = os.path.join(self.temp_file_path, f"{filename}.png")
         python_file_path = os.path.join(self.temp_file_path, f"{filename}.py")
-        image_host_url = f"{self.host_url}/{filename}.png"
+        image_hosting_url = f"{self.hosting_url}/{filename}.png"
 
         prompt = """
         You are an intelligent matplotlib python assistant that can help user create simple charts basing on a given data.
@@ -101,7 +96,7 @@ class ChartVisualizer:
             except Exception as e:
                 yield json.dumps({"response": f"\n\n❌ An unexpected error occurred during execution: {str(e)}\n\n"})
             
-            yield json.dumps({"response": f"![Generated Chart]({image_host_url})"})
+            yield json.dumps({"response": f"![Generated Chart]({image_hosting_url})"})
 
     def get_chat_history_string(self, histories: List[Message] = None) -> str:
         """

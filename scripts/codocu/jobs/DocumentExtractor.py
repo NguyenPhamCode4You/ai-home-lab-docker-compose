@@ -1,7 +1,7 @@
 import httpx
 import requests
 
-class CodeBlockExtractor:
+class DocumentExtractor:
     def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
