@@ -105,7 +105,7 @@ class CodeDocumentor:
             chunks = RecursiveSplitLines(file_content, 5000)
             document_content = ""
             document_summarize = ""
-            document_keywords = ""
+            document_keywords = set()  # Use a set to ensure uniqueness
 
             for chunk in chunks:
                 try:
@@ -132,16 +132,28 @@ class CodeDocumentor:
 
                     chunk_keywords = keyword_extractor.run(chunk)
                     print(chunk_keywords, end="", flush=True)  # Real-time console output
-                    document_keywords += ', ' + chunk_keywords
+                    chunk_keywords_set = {keyword.strip() for keyword in chunk_keywords.split(",")}
+                    document_keywords.update(chunk_keywords_set)
                 
                 except Exception as e:
                     print(f"Error processing file {file_path}: {e}")
                     continue
 
+            final_summary = document_summarize
+            if len(chunks) > 1:
+                print(f"\n\nooooooooo Write final Summzry for file {file_path} - Full Document: {len(document_summarize)} tokens \n\n")
+                async for blob_extractor in summarizer.stream(document_summarize):
+                    if (len(blob_extractor) > 1000):
+                        continue
+                    agent_response = json.loads(blob_extractor)["response"]
+                    final_summary += agent_response
+                    print(agent_response, end="", flush=True)
+
             # get unique keywords
-            document_keywords = ", ".join(list(set(document_keywords.split(","))))
-            document_content += f"\n\n#### Summary:\n {document_summarize}"
-            document_content += f"\n\n#### Keywords:\n {document_keywords}"
+            final_keywords = ", ".join(sorted(document_keywords))
+
+            document_content += f"\n\n#### Summary:\n {final_summary}"
+            document_content += f"\n\n#### Keywords:\n {final_keywords}"
 
             try:
                 processed_folder_path = os.path.join(output_path, folder_path)
@@ -159,23 +171,11 @@ class CodeDocumentor:
                 print(f"Error writing file {processed_file_path}: {e}")
                 continue
 
-            final_summary = document_summarize
-            if len(chunks) > 1:
-                print(f"\n\nooooooooo Finally Summarizing file {file_path} - Full Document: {len(document_summarize)} tokens \n\n")
-                async for blob_extractor in summarizer.stream(document_summarize):
-                    if (len(blob_extractor) > 1000):
-                        continue
-                    agent_response = json.loads(blob_extractor)["response"]
-                    final_summary += agent_response
-                    print(agent_response, end="", flush=True)
-
-            content = processed_file_path
-            metadata = {"f": filename, "p": processed_file_path, "k": document_keywords}
-
+            metadata = {"f": filename, "p": processed_file_path, "k": final_keywords}
             embedding = self.embedder.run(metadata)
             embedding2 = self.embedder.run(final_summary)
 
-            self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
+            self.vector_store.insert_document({"content": processed_file_path, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": final_summary})
             print(f"\n\n\n\nooooooooo Document inserted: {processed_file_path} ooooooooo\n\n\n\n")
             file_index += 1
         

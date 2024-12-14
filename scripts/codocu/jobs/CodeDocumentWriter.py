@@ -7,22 +7,22 @@ class CodeDocumentWriter:
         self.model = model
         self.base_prompt = """
         You are an experienced software developer and task is to write a document for a junior developer to understand the code.
-        Follow the following template:
-        
-        # General purpose
-        Describe the general purpose of the code, quickly explain what it does and the business value it provides.
+        First, write a general description using the following template:
+        ## General purpose
+        [Describe the general purpose of the code, quickly explain what it does and the business value it provides]
 
-        # Business logic
-        Seperate the codes into important blocks or functions and explain what each block does using the following template
-
+        Then, separate the codes into important blocks or functions and explain what each block does using the following template
         ## [Business purpose in 10 words max]
         [code_block]
-        [Explaination]
+        **Explanation:**
 
-        Each explaination should be:
+        Each Explanation should be:
         + Clear, consise but with good details in a Well-structured bullet points.
         + Supportive information with your own knowledge is possible.
         + Easy to understand even for a junior developer.
+
+        Important:
+        - Avoid insert full credentials, like api tokens, in code blocks.
 
         Now, let's start with the document:
         {document}
