@@ -157,13 +157,13 @@ class CodeDocumentor:
                 print(f"Error writing file {processed_file_path}: {e}")
                 continue
 
-            # content = processed_file_path
-            # metadata = {"f": filename, "k": keyword}
+            content = processed_file_path
+            metadata = {"f": filename, "k": keyword}
 
-            # embedding = self.embedder.run(metadata)
-            # embedding2 = self.embedder.run(summarize)
+            embedding = self.embedder.run(metadata)
+            embedding2 = self.embedder.run(summarize)
 
-            # self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
+            self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
             file_index += 1
         
     
