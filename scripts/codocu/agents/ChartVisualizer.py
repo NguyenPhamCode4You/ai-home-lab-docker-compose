@@ -68,7 +68,7 @@ class ChartVisualizer:
             
             try:
                 os.makedirs(self.temp_file_path, exist_ok=True)  # Ensure directory exists
-                with open(python_file_path, "w") as python_file:
+                with open(python_file_path, "w", encoding="utf-8") as python_file:
                     python_file.write(python_code)
             
             except Exception as e:

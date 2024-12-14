@@ -119,7 +119,7 @@ class RagKnowledgeBase:
 
                 formatted_file_path = os.path.join(formatted_folder_path, f"{filename}.md")
                 try:
-                    with open(formatted_file_path, 'w') as f:
+                    with open(formatted_file_path, 'w', encoding="utf-8") as f:
                         f.write('\n'.join(formatted_chunks))
                 except Exception as e:
                     print(f"Error: {e}")

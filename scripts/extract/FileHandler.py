@@ -48,7 +48,7 @@ class FileHandler:
         os.makedirs(os.path.dirname(self.temp_file_path), exist_ok=True)
 
         # Save the file to the temporary path
-        with open(self.temp_file_path, 'wb') as f:
+        with open(self.temp_file_path, 'wb', encoding="utf-8") as f:
             f.write(self.file_stream.read())  # Read file stream and save as a byte stream
         return self
     

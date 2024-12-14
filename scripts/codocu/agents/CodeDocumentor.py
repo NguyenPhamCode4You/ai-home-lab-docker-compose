@@ -139,7 +139,7 @@ class CodeDocumentor:
                     print(f"Error processing file {file_path}: {e}")
                     continue
 
-            final_summary = document_summarize
+            final_summary = ""
             if len(chunks) > 1:
                 print(f"\n\nooooooooo Write final Summzry for file {file_path} - Full Document: {len(document_summarize)} tokens \n\n")
                 async for blob_extractor in summarizer.stream(document_summarize):
@@ -148,10 +148,11 @@ class CodeDocumentor:
                     agent_response = json.loads(blob_extractor)["response"]
                     final_summary += agent_response
                     print(agent_response, end="", flush=True)
+            else:
+                final_summary = document_summarize
 
             # get unique keywords
             final_keywords = ", ".join(sorted(document_keywords))
-
             document_content += f"\n\n#### Summary:\n {final_summary}"
             document_content += f"\n\n#### Keywords:\n {final_keywords}"
 
@@ -163,7 +164,7 @@ class CodeDocumentor:
                 if not os.path.exists(processed_folder_path):
                     os.makedirs(processed_folder_path)
 
-                with open(processed_file_path, 'w') as f:
+                with open(processed_file_path, 'w', encoding="utf-8") as f:
                     f.write(document_content)
                     print(f"File Analyzed: {processed_file_path}")
             

@@ -12,7 +12,7 @@ class CodeDocumentWriter:
         [Describe the general purpose of the code, quickly explain what it does and the business value it provides]
 
         Then, separate the codes into important blocks or functions and explain what each block does using the following template
-        ## [Business purpose in 10 words max]
+        ### [Business purpose in 10 words max]
         [code_block]
         **Explanation:**
 
@@ -22,7 +22,9 @@ class CodeDocumentWriter:
         + Easy to understand even for a junior developer.
 
         Important:
-        - Avoid insert full credentials, like api tokens, in code blocks.
+        - DO NOT includes credentials, api tokens, or any sensitive information.
+        - DO NOT add ANY code that is NOT in the document.
+        - DO NOT include import statements.
 
         Now, let's start with the document:
         {document}
