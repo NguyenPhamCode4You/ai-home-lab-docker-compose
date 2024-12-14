@@ -47,16 +47,6 @@ def ExtractMarkdownHeadersAndContent(text):
     
     return header_content_pairs
 
-def CleanText(text):
-  # Remove newlines, tabs, and extra spaces
-  cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
-  cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
-  cleaned_text = cleaned_text.replace(" | ", "-")
-  cleaned_text = cleaned_text.replace("**", "").replace("--", "")
-  cleaned_text = cleaned_text.replace("-", " ")
-
-  return cleaned_text
-
 def RemoveExcessiveSpacing(text):
     while "  " in text:
         text = text.replace("  ", " ")

@@ -15,7 +15,7 @@ class CodeDocumentorWriter:
         # Business logic
         Seperate the codes into important blocks or functions and explain what each block does using the following template
 
-        ## [Business purpose in 5 words max]
+        ## [Business purpose in 10 words max]
         [code_block]
         [Explaination]
 

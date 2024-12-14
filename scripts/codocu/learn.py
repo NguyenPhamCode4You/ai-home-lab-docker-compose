@@ -66,7 +66,7 @@ async def example1():
         original_folder_path=code_folder_path,
         result_folder_path=code_document_folder_path,
         allowed_file_extensions=[".py"],
-        ignored_file_pattern=[],
+        ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
         code_documentor=CodeDocumentorWriter(
             url=OLLAMA_URL,
             model=CODE_MODEL,

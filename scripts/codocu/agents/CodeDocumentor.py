@@ -105,7 +105,7 @@ class CodeDocumentor:
                 print(f"Error reading file {file_path}: {e}")
                 continue
 
-            chunks = RecursiveSplitLines(file_content, 6000)
+            chunks = RecursiveSplitLines(file_content, 5000)
             final_content = ""
             summarize = ""
 
@@ -143,7 +143,7 @@ class CodeDocumentor:
 
             try:
                 processed_folder_path = os.path.join(output_path, folder_path)
-                processed_file_name = CleanText(filename.replace(original_folder_path, ""))
+                processed_file_name = filename.replace(original_folder_path, "")
                 processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
 
                 if not os.path.exists(processed_folder_path):
@@ -387,13 +387,3 @@ def RecursiveSplitLines(document: str, limit: int = 1000):
         paragraphs.append(paragraph)
 
     return paragraphs
-
-def CleanText(text):
-  # Remove newlines, tabs, and extra spaces
-  cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
-  cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
-  cleaned_text = cleaned_text.replace(" | ", "-")
-  cleaned_text = cleaned_text.replace("**", "").replace("--", "")
-  cleaned_text = cleaned_text.replace("-", " ")
-
-  return cleaned_text
