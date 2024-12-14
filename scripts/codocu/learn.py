@@ -80,22 +80,7 @@ async def example1():
             model=GENERAL_MODEL
         ),
     )
-    await knowledge_base.learn(
-        folder_path=code_document_folder_path,
-        line_extractor=DocumentLinesExtractor(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-        keyword_extractor=KeywordExtractor(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-        sentence_summarizer=SentenceSummarizer(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        )
-    )
-    async for agent_chunk in knowledge_base.stream("Can you explain how the agent named AssistantOrchestra works? Can you also provide code snippets of this agent?", []):
+    async for agent_chunk in code_documentor.stream("Can you explain how the agent named AssistantOrchestra works? Can you also provide code snippets of this agent?", []):
         if (len(agent_chunk) > 1000):
             continue
         agent_response = json.loads(agent_chunk)["response"]
