@@ -15,14 +15,14 @@ def clean_config_string(config_string: str) -> str:
 class SwaggerApiCaller:
     def __init__(
         self,
-        url: str = "http://localhost:11434/api/generate",
+        url: str = "http://localhost:11434",
         model: str = "gemma2:9b-instruct-q8_0",
         api_url: str = None,
         bearer_token: str = None,
         user_instructions: str = None,
         allowed_api_paths: List[str] = [],
     ):
-        self.url = url
+        self.url = f"{url}/api/generate"
         self.model = model
         self.api_url = api_url
         self.bearer_token = bearer_token

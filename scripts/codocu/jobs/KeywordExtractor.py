@@ -1,8 +1,8 @@
 import requests
 
-class KeywordExtraction:
-    def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
-        self.url = url
+class KeywordExtractor:
+    def __init__(self, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0'):
+        self.url = f"{url}/api/generate"
         self.model = model
         self.keywords_count = 10
 

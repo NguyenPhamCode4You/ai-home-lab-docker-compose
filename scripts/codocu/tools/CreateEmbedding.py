@@ -1,9 +1,9 @@
 import requests
 
 class CreateEmbedding:
-    def __init__(self, model: str = 'nomic-embed-text:137m-v1.5-fp16', url: str = 'http://localhost:11434/api/embed'):
+    def __init__(self, model: str = 'nomic-embed-text:137m-v1.5-fp16', url: str = 'http://localhost:11434'):
         self.model = model
-        self.url = url
+        self.url = f"{url}/api/embed"
     
     def run(self, message: str) -> list:
         # Send the request to the Ollama API

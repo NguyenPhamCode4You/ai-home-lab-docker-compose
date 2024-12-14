@@ -3,7 +3,7 @@ import os
 from jobs.CodeDocumentor import CodeDocumentor
 from jobs.CodeSummarizer import CodeSummarizer
 from jobs.ProjectStructureExplainer import ProjectStructureExplainer
-from jobs.KeywordExtraction import KeywordExtraction
+from jobs.KeywordExtractor import KeywordExtractor
 
 from tools.Helper import CleanText, RecursiveSplitLines
 from tools.CreateEmbedding import CreateEmbedding
@@ -19,7 +19,7 @@ embedder = CreateEmbedding(url=EMBEDING_URL, model=EMBEDING_MODEL)
 codeDocumentor = CodeDocumentor(url=OLLAMA_URL, model=OLLAMA_MODEL)
 codeSummarizer = CodeSummarizer(url=OLLAMA_URL, model=OLLAMA_MODEL)
 projectStructureExplainer = ProjectStructureExplainer(url=OLLAMA_URL, model=OLLAMA_MODEL)
-keywordExtractor = KeywordExtraction(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(20)
+keywordExtractor = KeywordExtractor(url=OLLAMA_URL, model=OLLAMA_MODEL).set_keywords_count(20)
 
 SUPABASE_URL = "http://10.13.13.4:8000"
 SUPABASE_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"

@@ -85,7 +85,7 @@ class Message():
 class CodeDocumentor:
     def __init__(
         self,
-        url: str = "http://localhost:11434/api/generate",
+        url: str = "http://localhost:11434",
         model: str = "gemma2:9b-instruct-q8_0",
         embedder = None,
         vector_store = None,
@@ -96,7 +96,7 @@ class CodeDocumentor:
         hosting_url: str = "http://localhost:11434",
         match_count: int = 100,
     ):
-        self.url = url
+        self.url = f"{url}/api/generate"
         self.model = model
         self.embedder = embedder                    
         self.vector_store = vector_store                

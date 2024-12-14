@@ -15,13 +15,13 @@ class Message():
 class ChartVisualizer:
     def __init__(
         self,
-        url: str = "http://localhost:11434/api/generate",
+        url: str = "http://localhost:11434",
         model: str = "gemma2:9b-instruct-q8_0",
         hosting_url: str = "http://localhost:11434",
         max_history_tokens_length: int = 10000,
         temp_file_path: str = "temp",
     ):
-        self.url = url
+        self.url = f"{url}/api/generate"
         self.model = model
         self.hosting_url = hosting_url
         self.max_history_tokens_length = max_history_tokens_length

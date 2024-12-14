@@ -2,8 +2,8 @@ import httpx
 import requests
 
 class CodeDocumentor:
-    def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
-        self.url = url
+    def __init__(self, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0'):
+        self.url = f"{url}/api/generate"
         self.model = model
         self.base_prompt = """
         You are an experienced software developer and task is to write a document for a junior developer to understand the code.

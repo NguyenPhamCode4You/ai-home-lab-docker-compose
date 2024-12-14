@@ -3,7 +3,7 @@ import os
 
 load_dotenv()
 
-from DataPreProcessing import DataPreProcessing
+from scripts.knowl.MarkdownProcessing import DataPreProcessing
 dataPreProcessor = DataPreProcessing()
 
 from Helper import RemoveExcessiveSpacing, SplitByMarkdownHeader

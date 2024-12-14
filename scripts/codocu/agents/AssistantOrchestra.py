@@ -17,14 +17,14 @@ class AssistantOrchestra:
     def __init__(
         self,
         model: str = "gemma2:9b-instruct-q8_0",
-        url: str = "http://localhost:11434/api/generate",
+        url: str = "http://localhost:11434",
         max_history_tokens_length: int = 6000,
         user_instructions: str = None,
         base_prompt: str = None,
     ):
+        self.url = f"{url}/api/generate"
         self.agents = {}
         self.model = model
-        self.url = url
         self.max_history_tokens_length = max_history_tokens_length
         self.user_instructions = user_instructions or "No user instructions provided."
         self.base_prompt = base_prompt or """

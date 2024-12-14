@@ -1,8 +1,8 @@
 import requests
 
 class SentenceSummarizer:
-    def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
-        self.url = url
+    def __init__(self, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0'):
+        self.url = f"{url}/api/generate"
         self.model = model
         self.base_prompt = """
         Your task is to summarize the given markdown text with 1-3 sentences.

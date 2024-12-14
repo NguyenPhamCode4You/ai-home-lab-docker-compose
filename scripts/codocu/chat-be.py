@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 load_dotenv()
 
-from jobs.DocumentExtractor import DocumentExtractor
+from jobs.RelevantDocumentExtractor import RelevantDocumentExtractor
 from agents.CodeDocumentor import CodeDocumentor
 from agents.RagKnowledgeBase import RagKnowledgeBase
 from agents.AssistantOrchestra import AssistantOrchestra
@@ -24,13 +24,13 @@ DOCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
 BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
 BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
 
-OLLAMA_URL      = "http://10.13.13.5:11434"
-CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
-
-# OLLAMA_URL      = "http://10.13.13.4:11434"
+# OLLAMA_URL      = "http://10.13.13.5:11434"
 # CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+
+OLLAMA_URL      = "http://10.13.13.4:11434"
+CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
@@ -45,17 +45,17 @@ with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r
     bvms_prompt = file.read()
 
 embedder = CreateEmbedding(
-    url=f'{OLLAMA_URL}/api/embed', 
+    url=OLLAMA_URL,
     model=EMBEDING_MODEL
 )
 
-code_document_extractor = DocumentExtractor(
-    url=f'{OLLAMA_URL}/api/generate', 
+code_document_extractor = RelevantDocumentExtractor(
+    url=OLLAMA_URL,
     model=GENERAL_MODEL
 )
 
 documentor = CodeDocumentor(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     hosting_url=HOSTING_URL,
     max_history_tokens_length = 10,
@@ -68,7 +68,7 @@ documentor = CodeDocumentor(
 )
 
 bvms_answer = RagKnowledgeBase(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=GENERAL_MODEL,
     embedder=embedder,
     vector_store=bvms_vector_store,
@@ -79,7 +79,7 @@ bvms_answer = RagKnowledgeBase(
 )
 
 vessel_master = SwaggerApiCaller(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     api_url="https://bvms-master-api-test.azurewebsites.net",
     bearer_token=os.getenv("API_TOKEN"),
@@ -97,7 +97,7 @@ vessel_master = SwaggerApiCaller(
 )
 
 outermost_master = SwaggerApiCaller(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     api_url="https://bvms-master-api-test.azurewebsites.net",
     bearer_token=os.getenv("API_TOKEN"),
@@ -116,7 +116,7 @@ outermost_master = SwaggerApiCaller(
 )
 
 port_master = SwaggerApiCaller(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     api_url="https://bvms-master-api-test.azurewebsites.net",
     bearer_token=os.getenv("API_TOKEN"),
@@ -126,7 +126,7 @@ port_master = SwaggerApiCaller(
 )
 
 voyage_data = SwaggerApiCaller(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     api_url="https://bvms-voyage-api-test.azurewebsites.net",
     bearer_token=os.getenv("API_TOKEN"),
@@ -137,7 +137,7 @@ voyage_data = SwaggerApiCaller(
 )
 
 charter = ChartVisualizer(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=CODE_MODEL,
     hosting_url=f"{HOSTING_URL}/public",
     max_history_tokens_length = 5000,
@@ -145,7 +145,7 @@ charter = ChartVisualizer(
 )
 
 ets_port_factor = AssistantOrchestra(
-    url=f'{OLLAMA_URL}/api/generate', 
+    url=OLLAMA_URL,
     model=GENERAL_MODEL,
     max_history_tokens_length = 5000,
     user_instructions="""
@@ -172,8 +172,8 @@ ets_port_factor.add_agent(
 )
 
 master_mind = AssistantOrchestra(
-    url= f'{OLLAMA_URL}/api/generate',
-    model = GENERAL_MODEL,
+    url=OLLAMA_URL,
+    model=GENERAL_MODEL,
     max_history_tokens_length = 5000
 )
 
