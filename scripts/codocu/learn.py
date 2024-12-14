@@ -5,6 +5,7 @@ from agents.CodeDocumentor import CodeDocumentor
 
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
+from jobs.RelevantDocumentExtractor import RelevantDocumentExtractor
 
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
@@ -44,7 +45,11 @@ code_documentor = CodeDocumentor(
     model=CODE_MODEL,
     embedder=embedder,
     vector_store=vector_store,
-    base_prompt=documentor_prompt
+    base_prompt=documentor_prompt,
+    document_extractor=RelevantDocumentExtractor(
+        url=OLLAMA_URL,
+        model=GENERAL_MODEL
+    )
 )
 
 code_folder_path = os.path.join(os.getcwd())
@@ -61,24 +66,24 @@ from jobs.CodeDocumentWriter import CodeDocumentWriter
 from jobs.CodeSummarizer import CodeSummarizer
 
 async def example1():
-    await code_documentor.analyze(
-        original_folder_path=code_folder_path,
-        result_folder_path=code_document_folder_path,
-        allowed_file_extensions=[".py"],
-        ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
-        document_writter=CodeDocumentWriter(
-            url=OLLAMA_URL,
-            model=CODE_MODEL,
-        ),
-        summarizer=CodeSummarizer(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-        keyword_extractor=KeywordExtractor(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-    )
+    # await code_documentor.analyze(
+    #     original_folder_path=code_folder_path,
+    #     result_folder_path=code_document_folder_path,
+    #     allowed_file_extensions=[".py"],
+    #     ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
+    #     document_writter=CodeDocumentWriter(
+    #         url=OLLAMA_URL,
+    #         model=CODE_MODEL,
+    #     ),
+    #     summarizer=CodeSummarizer(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     ),
+    #     keyword_extractor=KeywordExtractor(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     ),
+    # )
     async for agent_chunk in code_documentor.stream("Can you explain how the agent named AssistantOrchestra works? Can you also provide code snippets of this agent?", []):
         if (len(agent_chunk) > 1000):
             continue
