@@ -102,7 +102,7 @@ class AssistantAnswer:
     async def stream(self, question: str, messages: List[Message] = None):
         prompt = self.get_final_prompt(question, messages)
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
         # Send streaming request to Ollama
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():

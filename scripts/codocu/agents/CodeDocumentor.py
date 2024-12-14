@@ -86,50 +86,26 @@ class CodeDocumentor:
     def __init__(
         self,
         url: str = "http://localhost:11434/api/generate",
-        model: str = "gemma2:9b-instruct-q8_0"
+        model: str = "gemma2:9b-instruct-q8_0",
+        embedder = None,
+        vector_store = None,
+        base_prompt: str = None,
+        document_extractor = None,
+        max_context_tokens_length: int = 5500,
+        max_history_tokens_length: int = 500,
+        hosting_url: str = "http://localhost:11434",
+        match_count: int = 100,
     ):
         self.url = url
         self.model = model
-        self.embedder = None                    # Placeholder for an embedding function or model
-        self.vector_store = None                # Placeholder for a vector database
-        self.base_prompt = None
-        self.be_host_url = None
-        self.match_count = 100
-        self.max_context_tokens_length = 5500   # 5500 is the best length for the context tokens, for typescript & PL questions
-        self.max_history_tokens_length = 500    # 6000 is the maximum length, thus 6000 - 5500 = 500 for the history tokens
-    
-    def set_max_context_tokens_length(self, max_context_tokens_length: int):
-        self.max_context_tokens_length = max_context_tokens_length
-        return self
-    
-    def set_max_history_tokens_length(self, max_history_tokens_length: int):
-        self.max_history_tokens_length = max_history_tokens_length
-        return self
-
-    def set_base_prompt(self, base_prompt: str):
+        self.embedder = embedder                    
+        self.vector_store = vector_store                
         self.base_prompt = base_prompt
-        return self
-
-    # Setters to customize the instance
-    def set_match_count(self, match_count: int):
+        self.be_host_url = hosting_url
         self.match_count = match_count
-        return self
-
-    def set_embedder(self, embedder):
-        self.embedder = embedder
-        return self
-
-    def set_vector_store(self, vector_store):
-        self.vector_store = vector_store
-        return self
-    
-    def set_code_block_extractor(self, code_block_extractor):
-        self.code_block_extractor = code_block_extractor
-        return self
-    
-    def set_be_host_url(self, be_host_url: str):
-        self.be_host_url = be_host_url
-        return self
+        self.max_context_tokens_length = max_context_tokens_length   
+        self.max_history_tokens_length = max_history_tokens_length
+        self.document_extractor = document_extractor
     
     # Organize retrieved documents into structured sections
     def organize_documents(self, documents: List[dict]) -> List[dict]:
@@ -209,7 +185,7 @@ class CodeDocumentor:
             await asyncio.sleep(1)
 
             try:
-                async for blob_extractor in self.code_block_extractor.stream(question, paragraphs_validation_string):
+                async for blob_extractor in self.document_extractor.stream(question, paragraphs_validation_string):
                     if (len(blob_extractor) > 1000):
                         continue
                     validation_result += json.loads(blob_extractor)["response"]
@@ -228,25 +204,31 @@ class CodeDocumentor:
                 ]
 
                 for validated_header in validated_headers:
-                    header1 = RemoveSpecialCharacters(validated_header).replace(" ", "").lower()
-                    for original_header, paragraph_content in original_paragraphs:
-                        header2 = RemoveSpecialCharacters(original_header).replace(" ", "").lower()
-                        if header1 != header2:
-                            continue
-                        knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
-                        header_name_display = RemoveSpecialCharacters(original_header)
-                        header_document = {"content": document["content"], "metadata": {"f": header_name_display}}
-                        header_link = format_document_url(header_document, highlight=header_name_display, host_url=self.be_host_url)
-                        yield json.dumps({"response": f"\n- Learned ✅ **{header_link}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
-                        await asyncio.sleep(2)
-                        break
+                    try:
+                        header1 = RemoveSpecialCharacters(validated_header).replace(" ", "").lower()
+                        for original_header, paragraph_content in original_paragraphs:
+                            header2 = RemoveSpecialCharacters(original_header).replace(" ", "").lower()
+                            if header1 != header2:
+                                continue
+                            knowledge_context += f"\n{file_link}:\n{original_header.strip()}: {paragraph_content}\n\n"
+                            header_name_display = RemoveSpecialCharacters(original_header)
+                            header_document = {"content": document["content"], "metadata": {"f": header_name_display}}
+                            header_link = format_document_url(header_document, highlight=header_name_display, host_url=self.be_host_url)
+                            yield json.dumps({"response": f"\n- Learned ✅ **{header_link}** into **Memory**: {len(knowledge_context)}/{self.max_context_tokens_length} tokens ... \n\n"})
+                            await asyncio.sleep(2)
+                            break
+                    
+                    except Exception as e:
+                        print(f"Error in combining headers: {str(e)}")
+                        yield json.dumps({"response": f"❌ Error in combining headers: {e}"})
+                        continue
 
                 if len(knowledge_context) >= self.max_context_tokens_length:
                     break
 
             except Exception as e:
                 print(f"Error in combining headers: {str(e)}")
-                yield json.dumps({"response": f"❌ Error in combining headers: {str(e)}"})
+                yield json.dumps({"response": f"❌ Error in validating documents headers: {e}"})
                 continue
 
         await asyncio.sleep(1)
@@ -272,7 +254,7 @@ class CodeDocumentor:
         yield json.dumps({"response": f"\n### 🎯 Lets have one final revise for the question: ...\n\n"})
         await asyncio.sleep(1)
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

@@ -1,7 +1,7 @@
 import httpx
 import requests
 
-class CodeBlockExtractor:
+class DocumentExtractor:
     def __init__(self, url: str = 'http://localhost:11434/api/generate', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = url
         self.model = model
@@ -28,7 +28,7 @@ class CodeBlockExtractor:
 
     async def stream(self, question: str, document: str):
         prompt = self.base_prompt.format(document=document, question=question)
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

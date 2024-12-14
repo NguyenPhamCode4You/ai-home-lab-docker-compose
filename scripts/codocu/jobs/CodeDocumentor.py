@@ -47,7 +47,7 @@ class CodeDocumentor:
     
     async def stream(self, document: str):
         prompt = self.base_prompt.format(document=document)
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk

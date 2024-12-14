@@ -13,19 +13,21 @@ class Message():
 def remove_special_chars(text):
     return re.sub(r"[^a-zA-Z]+", ' ', text)
 
-# Main assistant class
 class AssistantOrchestra:
     def __init__(
         self,
+        model: str = "gemma2:9b-instruct-q8_0",
         url: str = "http://localhost:11434/api/generate",
-        model: str = "gemma2:9b-instruct-q8_0"
+        max_history_tokens_length: int = 6000,
+        user_instructions: str = None,
+        base_prompt: str = None,
     ):
-        self.url = url
-        self.model = model
-        self.max_history_tokens_length = 6000
         self.agents = {}
-        self.log_file = None
-        self.base_prompt = """
+        self.model = model
+        self.url = url
+        self.max_history_tokens_length = max_history_tokens_length
+        self.user_instructions = user_instructions or "No user instructions provided."
+        self.base_prompt = base_prompt or """
         You are an intelligent assistant that can help user complete complex tasks.
         Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
         -----
@@ -35,6 +37,11 @@ class AssistantOrchestra:
         You have complete access to the following agents:
         -----
         {agents}
+        -----
+
+        Additional User Instructions:
+        -----
+        {user_instructions}
         -----
         
         When you receive a question, you should anaylzye the question to determine wether you should forward the question to the agents or answer it yourself.
@@ -58,15 +65,12 @@ class AssistantOrchestra:
         -----
 
         """
-    def set_log_file(self, log_file: str):
-        self.log_file = log_file
-        return self
-    
-    async def write_analysis(self, question: str) -> None:
-        if not self.log_file:
+
+    async def write_analysis(self, question: str, log_file_path: str) -> None:
+        if not log_file_path:
             return print("No log file specified. Please set a log file using the 'set_log_file' method.")
         try:
-            with open(self.log_file, "w", encoding="utf-8") as file:
+            with open(log_file_path, "w", encoding="utf-8") as file:
                 file.write(f"\n\n## User question: {question}\n\n\n")
                 async for agent_chunk in self.stream(question, []):
                     if len(agent_chunk) > 1000:
@@ -81,12 +85,8 @@ class AssistantOrchestra:
         except Exception as e:
             print(f"Error logging task: {e}")
 
-    def set_max_history_tokens_length(self, max_history_tokens_length: int):
-        self.max_history_tokens_length = max_history_tokens_length
-        return self
-
-    def add_agent(self, agent_name: str, agent_description: str, agent):
-        self.agents[agent_name] = {"description": agent_description, "agent": agent}
+    def add_agent(self, name: str, description: str, agent):
+        self.agents[name] = {"description": description, "agent": agent}
         return self
 
     def get_agents_description(self):
@@ -96,11 +96,11 @@ class AssistantOrchestra:
     
     async def stream(self, question: str, messages: List[Message] = None):
         histories = self.get_chat_history_string(messages)
-        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories)
+        prompt = self.base_prompt.format(agents=self.get_agents_description(), question=question, histories=histories, user_instructions=self.user_instructions)
         
         agent_self_questions  = ""
         
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk_str in response.aiter_bytes():
                     if (len(chunk_str) > 1000):
@@ -194,6 +194,12 @@ class AssistantOrchestra:
                 -------------------------
 
 
+                User's Instructions:
+                -------------------------
+                {user_instructions}
+                -------------------------
+
+
                 User's original Question: 
                 -------------------------
                 {user_question}
@@ -201,14 +207,14 @@ class AssistantOrchestra:
 
                 - Combine knowledge provided by the agent responses, you need to provide a final answer the user's question.
                 - Pay careful attention to the user's question and the agent responses, and provide a complete and accurate answer to the user's question.
-                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions, histories=histories)
+                """.format(user_question=question, agents_answers=conversation_content, agent_self_questions=agent_self_questions, histories=histories, user_instructions=self.user_instructions)
 
                 await asyncio.sleep(2)
                 agent_names = ", ".join([agent_name for agent_name, _, _ in agent_questions])
                 yield json.dumps({"response": f"\n\n### 🤖 Thanks {agent_names}, lets recap on the answers ... \n\n"})
                 await asyncio.sleep(1)
 
-                async with httpx.AsyncClient() as client:
+                async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
                     async with client.stream("POST", self.url, json={"model": self.model, "prompt": final_thought_prompt}) as response:
                         async for final_thought_chunk in response.aiter_bytes():
                             yield final_thought_chunk
@@ -224,7 +230,7 @@ class AssistantOrchestra:
         accumulated_tokens = 0
         selected_messages = []
         for message in reversed(histories):  # Start from the last message
-            content_length = len(message.content[:6000])  # Restrict each message to 1800 characters
+            content_length = len(message.content[:self.max_history_tokens_length])  # Restrict each message to 1800 characters
             if accumulated_tokens + content_length > self.max_history_tokens_length:
                 break  # Stop adding messages when the limit is reached
 
