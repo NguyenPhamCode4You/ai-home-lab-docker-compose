@@ -1,85 +1,9 @@
 import asyncio
 import json
 import re
-from shlex import quote
 import httpx
 from typing import List
-from urllib.parse import urlencode, urljoin
-
-def add_query_param(base_url, param_name, param_value):
-    """
-    Add a query parameter to a URL.
-
-    :param base_url: The base URL (string).
-    :param param_name: The name of the query parameter (string).
-    :param param_value: The value of the query parameter (string).
-    :return: The full URL with the query parameter (string).
-    """
-    # Encode the query parameter
-    query = {param_name: param_value}
-    encoded_query = urlencode(query)
-    
-    # Join the base URL and the encoded query parameter
-    if "?" in base_url:
-        # If there are already query parameters, append using '&'
-        return f"{base_url}&{encoded_query}"
-    else:
-        # Otherwise, add the '?' and the parameter
-        return f"{base_url}?{encoded_query}"
-
-markdown_header_pattern = r"^(#+[ ]*.+)$"
-
-def read_file_content(file_path):
-    """Reads content from a file."""
-    with open(file_path, "r", encoding="utf-8") as file:
-        return file.read()
-    
-def convert_paragraphs_for_validation(paragraphs):
-    """Extracts and validates headers from file chunks."""
-    result = []
-    for header, content in paragraphs:
-        if len(content) >= 100 and not any(
-            kw in header.lower() for kw in ["example", "test", "summary", "keyword", "general"]
-        ):
-            if "Explanation" in content:
-                explanation = content.split("Explanation", 1)[1]
-            else:
-                explanation = content
-            result.append((f"**{header.strip()}**", explanation[:250].strip()))
-    return result
-
-def format_document_url(document, highlight: str = None, host_url: str = None) -> str:
-    relative_path = document["content"].strip().replace("\\", "/")
-    file_name = RemoveSpecialCharacters(document["metadata"]["f"])
-    document_url = f"markdown-viewer?path={relative_path}"
-    if host_url:
-        document_url = f"{host_url}/{document_url}"
-    if highlight:
-        highlight = highlight.replace("(", "").replace(")", "")
-        document_url = add_query_param(document_url, "highlight", highlight)
-    return f"[{file_name}]({document_url})"
-
-def ExtractMarkdownHeadersAndContent(text):
-    # Split the text into parts based on headers
-    parts = re.split(markdown_header_pattern, text, flags=re.MULTILINE)
-    # Group headers with their associated content
-    header_content_pairs = []
-    for i in range(1, len(parts), 2):  # Headers are in odd indices
-        header = parts[i].strip()  # Strip whitespace from the header
-        header = header.replace("#", " ")  # Replace newline characters with spaces
-        header = header.replace("  ", "")  # Replace newline characters with spaces
-        content = parts[i + 1].strip() if i + 1 < len(parts) else ""  # Get content after the header
-        header_content_pairs.append((header, content))
-    
-    return header_content_pairs
-
-def RemoveSpecialCharacters(text: str) -> str:
-    text = re.sub(r"[^a-zA-Z]+", "", text)
-    return text
-
-class Message():
-    role: str  # e.g., "user", "assistant"
-    content: str  # Message text
+from urllib.parse import urlencode
 
 # Main assistant class
 class CodeDocumentor:
@@ -258,3 +182,79 @@ class CodeDocumentor:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
                     yield chunk
+
+
+def add_query_param(base_url, param_name, param_value):
+    """
+    Add a query parameter to a URL.
+
+    :param base_url: The base URL (string).
+    :param param_name: The name of the query parameter (string).
+    :param param_value: The value of the query parameter (string).
+    :return: The full URL with the query parameter (string).
+    """
+    # Encode the query parameter
+    query = {param_name: param_value}
+    encoded_query = urlencode(query)
+    
+    # Join the base URL and the encoded query parameter
+    if "?" in base_url:
+        # If there are already query parameters, append using '&'
+        return f"{base_url}&{encoded_query}"
+    else:
+        # Otherwise, add the '?' and the parameter
+        return f"{base_url}?{encoded_query}"
+
+markdown_header_pattern = r"^(#+[ ]*.+)$"
+
+def read_file_content(file_path):
+    """Reads content from a file."""
+    with open(file_path, "r", encoding="utf-8") as file:
+        return file.read()
+    
+def convert_paragraphs_for_validation(paragraphs):
+    """Extracts and validates headers from file chunks."""
+    result = []
+    for header, content in paragraphs:
+        if len(content) >= 100 and not any(
+            kw in header.lower() for kw in ["example", "test", "summary", "keyword", "general"]
+        ):
+            if "Explanation" in content:
+                explanation = content.split("Explanation", 1)[1]
+            else:
+                explanation = content
+            result.append((f"**{header.strip()}**", explanation[:250].strip()))
+    return result
+
+def format_document_url(document, highlight: str = None, host_url: str = None) -> str:
+    relative_path = document["content"].strip().replace("\\", "/")
+    file_name = RemoveSpecialCharacters(document["metadata"]["f"])
+    document_url = f"markdown-viewer?path={relative_path}"
+    if host_url:
+        document_url = f"{host_url}/{document_url}"
+    if highlight:
+        highlight = highlight.replace("(", "").replace(")", "")
+        document_url = add_query_param(document_url, "highlight", highlight)
+    return f"[{file_name}]({document_url})"
+
+def ExtractMarkdownHeadersAndContent(text):
+    # Split the text into parts based on headers
+    parts = re.split(markdown_header_pattern, text, flags=re.MULTILINE)
+    # Group headers with their associated content
+    header_content_pairs = []
+    for i in range(1, len(parts), 2):  # Headers are in odd indices
+        header = parts[i].strip()  # Strip whitespace from the header
+        header = header.replace("#", " ")  # Replace newline characters with spaces
+        header = header.replace("  ", "")  # Replace newline characters with spaces
+        content = parts[i + 1].strip() if i + 1 < len(parts) else ""  # Get content after the header
+        header_content_pairs.append((header, content))
+    
+    return header_content_pairs
+
+def RemoveSpecialCharacters(text: str) -> str:
+    text = re.sub(r"[^a-zA-Z]+", "", text)
+    return text
+
+class Message():
+    role: str  # e.g., "user", "assistant"
+    content: str  # Message text

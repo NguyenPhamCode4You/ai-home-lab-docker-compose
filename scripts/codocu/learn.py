@@ -1,3 +1,4 @@
+import json
 import os
 from agents.RagKnowledgeBase import RagKnowledgeBase
 
@@ -15,6 +16,9 @@ CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
 GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 
+with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r", encoding="utf-8") as file:
+    bvms_prompt = file.read()
+
 knowledge_base = RagKnowledgeBase(
     url=OLLAMA_URL,
     model=GENERAL_MODEL,
@@ -27,7 +31,8 @@ knowledge_base = RagKnowledgeBase(
         token=SUPABASE_TOKEN,
         table_name=DOCU_TABLE_NAME,
         function_name=DOCU_FUNCTION
-    )
+    ),
+    base_prompt=bvms_prompt
 )
 
 original_folder_path = os.path.join(os.getcwd(), "bvms-knowledge-base")
@@ -38,29 +43,37 @@ from jobs.KeywordExtractor import KeywordExtractor
 from jobs.SentenceSummarizer import SentenceSummarizer
 from jobs.MarkdownProcessor import MarkdownProcessor
 
-import asyncio
-# asyncio.run(knowledge_base.formatting(
-#     original_folder_path=original_folder_path,
-#     formatted_folder_path=formatted_folder_path,
-#     markdown_processor=MarkdownProcessor(
-#         url=OLLAMA_URL,
-#         model=GENERAL_MODEL
-#     ),
-#     chunk_size=600
-# ))
-asyncio.run(knowledge_base.learn(
-    folder_path=formatted_folder_path,
-    line_extractor=DocumentLinesExtractor(
-        url=OLLAMA_URL,
-        model=GENERAL_MODEL
-    ),
-    keyword_extractor=KeywordExtractor(
-        url=OLLAMA_URL,
-        model=GENERAL_MODEL
-    ),
-    sentence_summarizer=SentenceSummarizer(
-        url=OLLAMA_URL,
-        model=GENERAL_MODEL
+async def example1():
+    await knowledge_base.formatting(
+        original_folder_path=original_folder_path,
+        formatted_folder_path=formatted_folder_path,
+        markdown_processor=MarkdownProcessor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+        chunk_size=600
     )
-))
-# knowledge_base.stream("What is the purpose of this knowledge base?")
+    await knowledge_base.learn(
+        folder_path=formatted_folder_path,
+        line_extractor=DocumentLinesExtractor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+        keyword_extractor=KeywordExtractor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+        sentence_summarizer=SentenceSummarizer(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        )
+    )
+    async for agent_chunk in knowledge_base.stream("Can you tell me how BVMS calculate EU ETS?", []):
+        if (len(agent_chunk) > 1000):
+            continue
+        agent_response = json.loads(agent_chunk)["response"]
+        print(agent_response, end="", flush=True)  # Real-time console output
+
+
+import asyncio
+asyncio.run(example1())
