@@ -57,7 +57,7 @@ from jobs.DocumentLinesExtractor import DocumentLinesExtractor
 from jobs.KeywordExtractor import KeywordExtractor
 from jobs.SentenceSummarizer import SentenceSummarizer
 from jobs.MarkdownProcessor import MarkdownProcessor
-from jobs.CodeDocumentorWriter import CodeDocumentorWriter
+from jobs.CodeDocumentWriter import CodeDocumentWriter
 from jobs.CodeSummarizer import CodeSummarizer
 
 async def example1():
@@ -66,11 +66,11 @@ async def example1():
         result_folder_path=code_document_folder_path,
         allowed_file_extensions=[".py"],
         ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
-        code_documentor=CodeDocumentorWriter(
+        document_writter=CodeDocumentWriter(
             url=OLLAMA_URL,
             model=CODE_MODEL,
         ),
-        code_summarizer=CodeSummarizer(
+        summarizer=CodeSummarizer(
             url=OLLAMA_URL,
             model=GENERAL_MODEL
         ),

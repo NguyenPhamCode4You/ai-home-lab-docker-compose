@@ -1,7 +1,7 @@
 import httpx
 import requests
 
-class CodeDocumentorWriter:
+class CodeDocumentWriter:
     def __init__(self, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = f"{url}/api/generate"
         self.model = model
