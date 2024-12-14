@@ -19,7 +19,7 @@ SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
 DOCU_TABLE_NAME = "n8n_documents_net_micro"
-DPCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
+DOCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
 
 BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
 BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
@@ -35,7 +35,7 @@ GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
 
-documentor_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, DOCU_TABLE_NAME, DPCU_FUNCTION)
+documentor_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, DOCU_TABLE_NAME, DOCU_FUNCTION)
 bvms_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, BVMS_TABLE_NAME, BVMS_FUNCTION)
 
 with open(os.path.join(os.path.dirname(__file__), "prompts/Document-Prompt.txt"), "r", encoding="utf-8") as file:
@@ -150,17 +150,17 @@ ets_port_factor = AssistantOrchestra(
     max_history_tokens_length = 5000,
     user_instructions="""
     Your task is to determine if the ETS port factor for a pair of ports.
-    First, ask 2 questions seleratedly to get the "Country Code", "UNLOCODE" and "OUTERMOST" of the given port names.
-    Then, folow the below steps:
+    First, ask 2 questions separately to get the "Country Code", "UNLOCODE" and "OUTERMOST" of the given port names.
+    Then, follow the below steps:
     Step 1: Check country codes of each port to see if they are from EU: [BE, BG, HR, CY, DK, EE, FI, FR, DE, GR, GP, IS, IE, IT, LV, LT, MT, MQ, NL, NO, PL, PT, RE, RO, ES, SE, MF, GF, YT, SI]
     - If both are not from EU, then the ETS port factor for each is 0%.
     - If one is from EU, then the ETS port factor for the EU port is 100% and the non-EU port is 0%.
     - If both are from EU, continue to step 2.    
-    Step 2: Check weather are they comming from same country or not.
+    Step 2: Check weather are they coming from same country or not.
     - If they are NOT from same country, then the ETS port factor for each is 100%.
     - If they are from same country, continue to step 3.
     Step 3: Check if one of them is an outermost port.
-    - If ATLEAST one of them is an outermost port, then the ETS port factor for BOTH is 0%.
+    - If AT LEAST one of them is an outermost port, then the ETS port factor for BOTH is 0%.
     - If none of them is an outermost port, then the ETS port factor for each is 100%.
     """
 )
@@ -203,7 +203,7 @@ master_mind.add_agent(
 
 master_mind.add_agent(
     name="Port Master",
-    description="This agent can provide detailed information about Marinetime Ports, by making API calls.",
+    description="This agent can provide detailed information about Marine time Ports, by making API calls.",
     agent=port_master
 )
 
@@ -227,7 +227,7 @@ import markdown
 
 # Initialize FastAPI
 app = FastAPI()
-# Serve the 'Coducu result' directory at '/public'
+# Serve the 'Codocu result' directory at '/public'
 app.mount("/public", StaticFiles(directory="codocu_results"), name="public")
 
 # Define a model for the input specific to /api/chat
@@ -290,10 +290,10 @@ async def render_markdown(
 # 3. Ask BVMS KnowledgeBase to explain the business logics of how BVMS calculate EU ETS.
 # 4. Ask BVMS Code Document to provide code implementation and explanation for calculate EU ETS.
 # Basing on the information you gather, write an analysis on how BVMS calculate EU ETS.
-# Be prefessional and detailed in your analysis, provide code snippets and documentations as needed.
+# Be professional and detailed in your analysis, provide code snippets and documentations as needed.
 # """
 # log_file_path = os.path.join(os.path.dirname(__file__), "task-log.md")
-# asyncio.run(orchesrea.write_analysis(question, log_file_path))
+# asyncio.run(master_mind.write_analysis(question, log_file_path))
 
 
 # Run the FastAPI app
