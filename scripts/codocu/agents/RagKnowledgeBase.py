@@ -68,6 +68,64 @@ class RagKnowledgeBase:
                 async for chunk in response.aiter_bytes():
                     yield chunk
 
+    async def formatting(self, original_folder_path: str, formatted_folder_path: str, chunk_size = 600, markdown_processor = None):
+        if not markdown_processor:
+            raise ValueError("Markdown processor must be set before formatting.")
+        
+        if not os.path.exists(formatted_folder_path):
+            os.makedirs(formatted_folder_path)
+
+        file_index = 1
+        section_index = 1
+        
+        for root, _, files in os.walk(original_folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                filename = os.path.splitext(file)[0]
+                try:
+                    with open(file_path, 'r', encoding="utf-8") as file:
+                        document = file.read()
+                except Exception as e:
+                    print(f"Error: {e}")
+                    continue
+
+                formatted_chunks = []
+                sections = SplitByMarkdownHeader(document)
+                
+                for section in sections:
+                    section = RemoveExcessiveSpacing(section)
+                    section_parts = [section]
+                    header = False
+
+                    if len(section) > chunk_size:
+                        header, section = ExtractMarkdownHeadersAndContent(section)[0]
+                        section_parts = RecursiveSplitSentences(section, chunk_size)
+
+                    for section in section_parts:
+                        if len(section) == 0:
+                            continue
+                        if header:
+                            section = "##  " + header + "\n\n" + section
+                        try:
+                            section = RemoveExcessiveSpacing(section)
+                            section = markdown_processor.run(section)
+                            print(section)
+                            formatted_chunks.append(section)
+                            print(f"oooooooooooooooooooo File {file_index}/{len(files)} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
+                        except Exception as e:
+                            print(f"Error: {e}")
+
+                    section_index += 1
+
+                formatted_file_path = os.path.join(formatted_folder_path, f"{filename}.md")
+                try:
+                    with open(formatted_file_path, 'w') as f:
+                        f.write('\n'.join(formatted_chunks))
+                except Exception as e:
+                    print(f"Error: {e}")
+                    
+                file_index += 1
+
     async def learn(self, folder_path: str, line_extractor = None, keyword_extractor = None, sentence_summarizer = None) -> str:
         if not line_extractor or not sentence_summarizer or not keyword_extractor:
             raise ValueError("Line extractor and sentence summarizer must be set before learning.")
@@ -81,32 +139,40 @@ class RagKnowledgeBase:
             for file in files:
                 file_path = os.path.join(root, file)
                 filename = os.path.splitext(file)[0]
-                with open(file_path, 'r') as file:
-                    document = file.read()
+                try:
+                    with open(file_path, 'r', encoding="utf-8") as file:
+                        document = file.read()
+                except Exception as e:
+                    print(f"Error: {e}")
+                    continue
 
                 sections = SplitByMarkdownHeader(document)
                 section_index = 1
 
                 for section in sections:
+                    lines = ""
                     try:
                         header, content = ExtractMarkdownHeadersAndContent(section)[0]
+                        lines = line_extractor.run(content)
                     except Exception as e:
                         print(f"Error: {e}")
                         header, content = "", section
 
-                    lines = line_extractor.run(content)
                     for line in [line for line in lines.split("VNLPAGL\n") if len(line) > 0]:
-                        keyword = keyword_extractor.run(line)
-                        metadata = {"f": filename, "k": keyword, "h": header}
-                        print(f"\nEmbedding1: {metadata}")
-                        summarize = sentence_summarizer.run(line)
-                        print(f"\nEmbedding2: {summarize}")
-                        embedding = self.embedder.run(metadata)
-                        embedding2 = self.embedder.run(summarize)
-                        content = f"{header}: {line}"
-                        print(f"\nContent: {content}")
-                        self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
-                        print(f"\noooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo")
+                        try:
+                            keyword = keyword_extractor.run(line)
+                            metadata = {"f": filename, "k": keyword, "h": header}
+                            print(f"\nEmbedding1: {metadata}")
+                            summarize = sentence_summarizer.run(line)
+                            print(f"\nEmbedding2: {summarize}")
+                            embedding = self.embedder.run(metadata)
+                            embedding2 = self.embedder.run(summarize)
+                            content = f"{header}: {line}"
+                            print(f"\nContent: {content}")
+                            self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
+                            print(f"\noooooooooooooooooooo File {file_index}/{len(files)} - Line {line_index} - Section {section_index}/{len(sections)} - {file_path} oooooooooooooooooooo")
+                        except Exception as e:
+                            print(f"Error: {e}")
                         line_index += 1
                     section_index += 1
                 file_index += 1
@@ -197,3 +263,35 @@ def CleanText(text):
   cleaned_text = cleaned_text.replace("-", " ")
 
   return cleaned_text
+
+def RemoveExcessiveSpacing(text):
+    while "  " in text:
+        text = text.replace("  ", " ")
+    while "\n\n" in text:
+        text = text.replace("\n\n", "\n")
+    while "...." in text:
+        text = text.replace("....", "")
+    while "----" in text:
+        text = text.replace("----", "")
+    return text
+
+def RecursiveSplitSentences(document: str, limit: int = 1000):
+    # Split the document into sentences
+    sentences = document.split(".")
+    
+    # Recursively split long sentences
+    paragraphs = []
+    paragraph = ""
+    while len(sentences) > 0:
+        sentence = sentences.pop(0)
+        if len(paragraph) + len(sentence) < limit:
+            paragraph += f"{sentence}. "
+        else:
+            paragraphs.append(paragraph)
+            paragraph = f"{sentence}. "
+
+    # Add the last paragraph
+    if len(paragraph) > 0:
+        paragraphs.append(paragraph)
+
+    return paragraphs

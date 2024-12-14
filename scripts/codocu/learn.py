@@ -30,14 +30,26 @@ knowledge_base = RagKnowledgeBase(
     )
 )
 
-folder_path = os.path.join(os.getcwd(), "codocu_results", "knowledge-base")
+original_folder_path = os.path.join(os.getcwd(), "bvms-knowledge-base")
+formatted_folder_path = os.path.join(os.getcwd(), "codocu_results", "bvms-knowledge-base")
+
 from jobs.DocumentLinesExtractor import DocumentLinesExtractor
 from jobs.KeywordExtractor import KeywordExtractor
 from jobs.SentenceSummarizer import SentenceSummarizer
+from jobs.MarkdownProcessor import MarkdownProcessor
 
 import asyncio
+# asyncio.run(knowledge_base.formatting(
+#     original_folder_path=original_folder_path,
+#     formatted_folder_path=formatted_folder_path,
+#     markdown_processor=MarkdownProcessor(
+#         url=OLLAMA_URL,
+#         model=GENERAL_MODEL
+#     ),
+#     chunk_size=600
+# ))
 asyncio.run(knowledge_base.learn(
-    folder_path=folder_path,
+    folder_path=formatted_folder_path,
     line_extractor=DocumentLinesExtractor(
         url=OLLAMA_URL,
         model=GENERAL_MODEL
@@ -51,6 +63,4 @@ asyncio.run(knowledge_base.learn(
         model=GENERAL_MODEL
     )
 ))
-
-
 # knowledge_base.stream("What is the purpose of this knowledge base?")

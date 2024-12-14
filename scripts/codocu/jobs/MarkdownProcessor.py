@@ -1,6 +1,6 @@
 import requests
 
-class MarkdownProcessing:
+class MarkdownProcessor:
     def __init__(self: str, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0'):
         self.url = f"{url}/api/generate"
         self.model = model
