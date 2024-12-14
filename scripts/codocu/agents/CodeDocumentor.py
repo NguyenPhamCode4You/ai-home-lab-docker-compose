@@ -1,9 +1,14 @@
 import asyncio
 import json
+import os
 import re
 import httpx
 from typing import List
 from urllib.parse import urlencode
+
+class Message():
+    role: str  # e.g., "user", "assistant"
+    content: str  # Message text
 
 # Main assistant class
 class CodeDocumentor:
@@ -64,6 +69,103 @@ class CodeDocumentor:
         for section in sections:
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
+    
+    async def write_documents(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], code_documentor = None, code_summarizer = None, keyword_extractor = None):
+        if not code_documentor or not code_summarizer or not keyword_extractor:
+            raise ValueError("Code documentor, code summarizer, and keyword extractor must be set before writing documents.")
+        
+        root_folder_name = original_folder_path.split("\\")[-1]
+        output_path = f"{result_folder_path}\\{root_folder_name}"
+
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+
+        files_list = []
+        for root, _, files in os.walk(original_folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if not is_allowed_file(file_path, allowed_file_extensions, ignored_file_pattern):
+                    continue
+                if file_path not in files_list:
+                    files_list.append(file_path)
+
+        file_index = 1
+        for file_path in files_list:
+            print(f"\n\n\n\n\noooooooooooooooooooo Processing File {file_index}/{len(files_list)} - {file_path} oooooooooooooooooooo \n\n\n\n\n")
+            filename = os.path.basename(file_path)
+            folder_path = file_path.replace(original_folder_path, "").replace(filename, "").strip("\\")
+            try:
+                with open(file_path, 'r', encoding="utf-8") as file:
+                    file_content = file.read()
+                    if len(file_content) > 30000:
+                        print(f"File {file_path} is too large: {len(file_content)} tokens")
+                        continue
+
+            except Exception as e:
+                print(f"Error reading file {file_path}: {e}")
+                continue
+
+            chunks = RecursiveSplitLines(file_content, 6000)
+            final_content = ""
+            summarize = ""
+
+            for chunk in chunks:
+                try:
+                    print(f"\n\nooooooooo Writing documentation for file {file_path} - Chunk: {len(chunk)} tokens \n\n")
+                    await asyncio.sleep(1)
+                    document = ""
+                    async for blob_extractor in code_documentor.stream(chunk):
+                        if (len(blob_extractor) > 1000):
+                            continue
+                        agent_response = json.loads(blob_extractor)["response"]
+                        document += agent_response
+                        print(agent_response, end="", flush=True)  # Real-time console output
+
+                    print(f"\n\nooooooooo Summarizing file {file_path} - Chunk: {len(chunk)} tokens \n\n")
+                    await asyncio.sleep(1)
+                    summarize = ""
+                    async for blob_extractor in code_summarizer.stream(document):
+                        if (len(blob_extractor) > 1000):
+                            continue
+                        agent_response = json.loads(blob_extractor)["response"]
+                        summarize += agent_response
+                        print(agent_response, end="", flush=True)  # Real-time console output
+
+                    keyword = keyword_extractor.run(file_content)
+
+                    document += f"\n\n#### Summarize:\n {summarize}"
+                    document += f"\n\n#### Keyword:\n {keyword}"
+
+                    final_content += document
+                except Exception as e:
+                    print(f"Error processing file {file_path}: {e}")
+                    continue
+
+            try:
+                processed_folder_path = os.path.join(output_path, folder_path)
+                processed_file_name = CleanText(filename.replace(original_folder_path, ""))
+                processed_file_path = os.path.join(processed_folder_path, f"{processed_file_name}.md")
+
+                if not os.path.exists(processed_folder_path):
+                    os.makedirs(processed_folder_path)
+
+                with open(processed_file_path, 'w') as f:
+                    f.write(final_content)
+                    print(f"File Analyzed: {processed_file_path}")
+            
+            except Exception as e:
+                print(f"Error writing file {processed_file_path}: {e}")
+                continue
+
+            # content = processed_file_path
+            # metadata = {"f": filename, "k": keyword}
+
+            # embedding = self.embedder.run(metadata)
+            # embedding2 = self.embedder.run(summarize)
+
+            # self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
+            file_index += 1
+        
     
     async def stream(self, question: str, messages: List[Message] = None):
         yield json.dumps({"response": f"📚 Finding top {self.match_count} documents basing on relevance level ...\n\n"})
@@ -255,6 +357,43 @@ def RemoveSpecialCharacters(text: str) -> str:
     text = re.sub(r"[^a-zA-Z]+", "", text)
     return text
 
-class Message():
-    role: str  # e.g., "user", "assistant"
-    content: str  # Message text
+def is_allowed_file(file_path, allowed_file_extensions: List[str], ignored_file_pattern: List[str]):
+    if not any(file_path.endswith(ext) for ext in allowed_file_extensions):
+        return False
+    
+    if not is_allowed_path(file_path, ignored_file_pattern):
+        return False
+    
+    return True
+
+def is_allowed_path(file_path, ignored_file_pattern: List[str]):
+    if any(pattern in file_path for pattern in ignored_file_pattern):
+        return False
+    
+    return True
+
+def RecursiveSplitLines(document: str, limit: int = 1000):
+    lines = document.split("\n")
+    paragraphs = []
+    paragraph = ""
+    for line in lines:
+        if len(paragraph) + len(line) < limit:
+            paragraph += f"{line}\n"
+        else:
+            paragraphs.append(paragraph)
+            paragraph = f"{line}\n"
+
+    if len(paragraph) > 0:
+        paragraphs.append(paragraph)
+
+    return paragraphs
+
+def CleanText(text):
+  # Remove newlines, tabs, and extra spaces
+  cleaned_text = text.strip().replace("\n", " ").replace("\r", " ").replace("\t", " ").replace("  ", " ")
+  cleaned_text = cleaned_text.replace("|||", "").replace("| |", "")
+  cleaned_text = cleaned_text.replace(" | ", "-")
+  cleaned_text = cleaned_text.replace("**", "").replace("--", "")
+  cleaned_text = cleaned_text.replace("-", " ")
+
+  return cleaned_text
