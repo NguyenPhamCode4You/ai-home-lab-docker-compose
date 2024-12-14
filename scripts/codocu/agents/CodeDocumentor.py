@@ -103,40 +103,45 @@ class CodeDocumentor:
                 continue
 
             chunks = RecursiveSplitLines(file_content, 5000)
-            final_content = ""
-            summarize = ""
+            document_content = ""
+            document_summarize = ""
+            document_keywords = ""
 
             for chunk in chunks:
                 try:
                     print(f"\n\nooooooooo Writing documentation for file {file_path} - Chunk: {len(chunk)} tokens \n\n")
                     await asyncio.sleep(1)
-                    document = ""
                     async for blob_extractor in document_writter.stream(chunk):
                         if (len(blob_extractor) > 1000):
                             continue
                         agent_response = json.loads(blob_extractor)["response"]
-                        document += agent_response
+                        document_content += agent_response
                         print(agent_response, end="", flush=True)  # Real-time console output
 
                     print(f"\n\nooooooooo Summarizing file {file_path} - Chunk: {len(chunk)} tokens \n\n")
                     await asyncio.sleep(1)
-                    summarize = ""
-                    async for blob_extractor in summarizer.stream(document):
+                    async for blob_extractor in summarizer.stream(chunk):
                         if (len(blob_extractor) > 1000):
                             continue
                         agent_response = json.loads(blob_extractor)["response"]
-                        summarize += agent_response
+                        document_summarize += agent_response
                         print(agent_response, end="", flush=True)  # Real-time console output
 
-                    keyword = keyword_extractor.run(file_content)
+                    print(f"\n\nooooooooo Extracting keywords for file {file_path} - Chunk: {len(chunk)} tokens \n\n")
+                    await asyncio.sleep(1)
 
-                    document += f"\n\n#### Summarize:\n {summarize}"
-                    document += f"\n\n#### Keyword:\n {keyword}"
-
-                    final_content += document
+                    chunk_keywords = keyword_extractor.run(chunk)
+                    print(chunk_keywords, end="", flush=True)  # Real-time console output
+                    document_keywords += ', ' + chunk_keywords
+                
                 except Exception as e:
                     print(f"Error processing file {file_path}: {e}")
                     continue
+
+            # get unique keywords
+            document_keywords = ", ".join(list(set(document_keywords.split(","))))
+            document_content += f"\n\n#### Summary:\n {document_summarize}"
+            document_content += f"\n\n#### Keywords:\n {document_keywords}"
 
             try:
                 processed_folder_path = os.path.join(output_path, folder_path)
@@ -147,20 +152,31 @@ class CodeDocumentor:
                     os.makedirs(processed_folder_path)
 
                 with open(processed_file_path, 'w') as f:
-                    f.write(final_content)
+                    f.write(document_content)
                     print(f"File Analyzed: {processed_file_path}")
             
             except Exception as e:
                 print(f"Error writing file {processed_file_path}: {e}")
                 continue
 
+            final_summary = document_summarize
+            if len(chunks) > 1:
+                print(f"\n\nooooooooo Finally Summarizing file {file_path} - Full Document: {len(document_summarize)} tokens \n\n")
+                async for blob_extractor in summarizer.stream(document_summarize):
+                    if (len(blob_extractor) > 1000):
+                        continue
+                    agent_response = json.loads(blob_extractor)["response"]
+                    final_summary += agent_response
+                    print(agent_response, end="", flush=True)
+
             content = processed_file_path
-            metadata = {"f": filename, "k": keyword}
+            metadata = {"f": filename, "p": processed_file_path, "k": document_keywords}
 
             embedding = self.embedder.run(metadata)
-            embedding2 = self.embedder.run(processed_file_path)
+            embedding2 = self.embedder.run(final_summary)
 
             self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
+            print(f"\n\n\n\nooooooooo Document inserted: {processed_file_path} ooooooooo\n\n\n\n")
             file_index += 1
         
     
