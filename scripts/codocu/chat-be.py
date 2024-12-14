@@ -18,8 +18,8 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
-DOCU_TABLE_NAME = "n8n_documents_net_micro"
-DOCU_FUNCTION   = "match_n8n_documents_net_micro_neo"
+DOCU_TABLE_NAME = "n8n_documents_ebook"
+DOCU_FUNCTION   = "match_n8n_documents_ebook_neo"
 
 BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
 BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
@@ -248,7 +248,7 @@ async def get_answer_for_question_stream(request: CompletionRequest):
         user_question = get_last_user_question(request.messages)
         history = [message for message in request.messages or []]
         # history = history[:-1]  # Remove the last user question from history
-        return StreamingResponse(master_mind.stream(user_question, history), media_type="application/json")
+        return StreamingResponse(documentor.stream(user_question, history), media_type="application/json")
 
     except Exception as e:
         print(f"Error handling request: {e}")

@@ -161,7 +161,7 @@ class CodeDocumentor:
             metadata = {"f": filename, "k": keyword}
 
             embedding = self.embedder.run(metadata)
-            embedding2 = self.embedder.run(summarize)
+            embedding2 = self.embedder.run(processed_file_path)
 
             self.vector_store.insert_document({"content": content, "embedding": embedding, "embedding2": embedding2, "metadata": metadata, "summarize": summarize})
             file_index += 1
