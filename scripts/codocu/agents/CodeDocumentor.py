@@ -70,8 +70,8 @@ class CodeDocumentor:
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
     
-    async def write_documents(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], code_documentor = None, code_summarizer = None, keyword_extractor = None):
-        if not code_documentor or not code_summarizer or not keyword_extractor:
+    async def analyze(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], document_writter = None, summarizer = None, keyword_extractor = None):
+        if not document_writter or not summarizer or not keyword_extractor:
             raise ValueError("Code documentor, code summarizer, and keyword extractor must be set before writing documents.")
         
         root_folder_name = original_folder_path.split("\\")[-1]
@@ -97,9 +97,6 @@ class CodeDocumentor:
             try:
                 with open(file_path, 'r', encoding="utf-8") as file:
                     file_content = file.read()
-                    if len(file_content) > 30000:
-                        print(f"File {file_path} is too large: {len(file_content)} tokens")
-                        continue
 
             except Exception as e:
                 print(f"Error reading file {file_path}: {e}")
@@ -114,7 +111,7 @@ class CodeDocumentor:
                     print(f"\n\nooooooooo Writing documentation for file {file_path} - Chunk: {len(chunk)} tokens \n\n")
                     await asyncio.sleep(1)
                     document = ""
-                    async for blob_extractor in code_documentor.stream(chunk):
+                    async for blob_extractor in document_writter.stream(chunk):
                         if (len(blob_extractor) > 1000):
                             continue
                         agent_response = json.loads(blob_extractor)["response"]
@@ -124,7 +121,7 @@ class CodeDocumentor:
                     print(f"\n\nooooooooo Summarizing file {file_path} - Chunk: {len(chunk)} tokens \n\n")
                     await asyncio.sleep(1)
                     summarize = ""
-                    async for blob_extractor in code_summarizer.stream(document):
+                    async for blob_extractor in summarizer.stream(document):
                         if (len(blob_extractor) > 1000):
                             continue
                         agent_response = json.loads(blob_extractor)["response"]

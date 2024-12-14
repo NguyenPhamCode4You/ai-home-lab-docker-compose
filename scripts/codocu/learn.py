@@ -8,7 +8,6 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-
 TABLE_NAME = "n8n_documents_ebook"
 FUNCTION   = "match_n8n_documents_ebook_neo"
 
@@ -62,7 +61,7 @@ from jobs.CodeDocumentorWriter import CodeDocumentorWriter
 from jobs.CodeSummarizer import CodeSummarizer
 
 async def example1():
-    await code_documentor.write_documents(
+    await code_documentor.analyze(
         original_folder_path=code_folder_path,
         result_folder_path=code_document_folder_path,
         allowed_file_extensions=[".py"],
