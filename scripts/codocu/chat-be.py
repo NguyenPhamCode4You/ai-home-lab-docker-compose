@@ -6,11 +6,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from jobs.RelevantDocumentExtractor import RelevantDocumentExtractor
+from jobs.UrlSummarizer import UrlSummarizer
+
 from agents.CodeDocumentor import CodeDocumentor
 from agents.RagKnowledgeBase import RagKnowledgeBase
 from agents.AssistantOrchestra import AssistantOrchestra
 from agents.SwaggerApiCaller import SwaggerApiCaller
 from agents.ChartVisualizer import ChartVisualizer
+from agents.WebSearchAgent import WebSearchAgent
 
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
@@ -18,16 +21,13 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
-DOCU_TABLE_NAME = ""
-DOCU_FUNCTION   = "match_n8n_documents_ebook_neo"
+# OLLAMA_URL      = "http://10.13.13.5:11434"
+# CODE_MODEL      = "qwen2.5-coder:32b"
+# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
-OLLAMA_URL      = "http://10.13.13.5:11434"
-CODE_MODEL      = "qwen2.5-coder:32b"
-GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
-
-# OLLAMA_URL      = "http://10.13.13.4:11434"
-# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+OLLAMA_URL      = "http://10.13.13.4:11434"
+CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
@@ -35,6 +35,16 @@ HOSTING_URL     = "http://10.13.13.2:8000"
 embedder = CreateEmbedding(
     url=OLLAMA_URL,
     model=EMBEDING_MODEL
+)
+web_searcher = WebSearchAgent(
+    url=OLLAMA_URL,
+    model=GENERAL_MODEL,
+    serp_api_key=os.getenv("SERP_API_KEY"),
+    url_summarizer=UrlSummarizer(
+        url=OLLAMA_URL,
+        model=GENERAL_MODEL
+    ),
+    match_count=5
 )
 bvms_answer = RagKnowledgeBase(
     url=OLLAMA_URL,
@@ -259,6 +269,11 @@ master_mind.add_agent(
     name="Chart Visualizer",
     description="This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.",
     agent=charter
+)
+master_mind.add_agent(
+    name="Web Searcher",
+    description="This agent can search the web for relevant information based on user's question.",
+    agent=web_searcher
 )
 
 from fastapi import FastAPI, Query
