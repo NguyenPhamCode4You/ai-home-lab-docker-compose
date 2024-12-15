@@ -101,22 +101,30 @@ class ChartVisualizer:
     def get_chat_history_string(self, histories: List[Message] = None) -> str:
         """
         Returns a string representation of the chat history, limited to the last N tokens.
-        Each entry includes the role and the first 1800 characters of content.
+        Each entry includes the role and the last 3000 tokens of content.
         """
-        histories = histories or []  # Use an empty list if histories is None
+        if histories is None:
+            histories = []  # Default to an empty list if no histories are provided
 
-        # Calculate how many tokens we can extract starting from the end
         accumulated_tokens = 0
+        max_length = self.max_history_tokens_length
         selected_messages = []
-        for message in reversed(histories):  # Start from the last message
-            content_length = len(message.content[:6000])  # Restrict each message to 1800 characters
-            if accumulated_tokens + content_length > self.max_history_tokens_length:
-                break  # Stop adding messages when the limit is reached
 
-            selected_messages.append(f"\n >> {message.role}: {message.content[:1800]}\n\n")
+        # Traverse the history in reverse to start from the latest messages
+        for message in reversed(histories):
+            # Get the last 3000 tokens of the message content
+            truncated_content = message.content[-3000:]
+            content_length = len(truncated_content)
+
+            # Stop adding messages if the token limit would be exceeded
+            if accumulated_tokens + content_length > max_length:
+                break
+
+            # Append the formatted message
+            selected_messages.append(f"\n >> {message.role}: {truncated_content}\n\n")
             accumulated_tokens += content_length
 
-        # Reverse again to preserve the original chronological order
+        # Return the messages in chronological order
         return "".join(reversed(selected_messages))
                 
         
