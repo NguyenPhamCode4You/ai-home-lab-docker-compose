@@ -47,7 +47,7 @@ bvms_answer = RagKnowledgeBase(
         function_name="match_n8n_documents_bbc_bvms"
     ),
     match_count=200,
-    max_context_tokens_length=5800,
+    max_context_tokens_length=5600,
     max_history_tokens_length=10,
     base_prompt="""
     You are an intelligent RAG AI agent for the BVMS (BBC Voyage Management System) to assist users with their questions.
