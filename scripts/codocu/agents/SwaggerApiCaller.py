@@ -146,13 +146,11 @@ class SwaggerApiCaller:
         {question}
         -------------------
 
-        Paycareful attention to the instruction to select the correct APIs to call.
-        Multiple APIs can be called in sequence to get the desired information.
-        Seperate multiple APIs with a new line, and return the API path only, as plain text, no quotes or code blocks.
+        Paycareful attention to the instruction to select the most correct API to call.
+        Return the API path only, as plain text, no quotes or code blocks.
         
         Example: 
         /Search1
-        /Search2
 
         """
         response = requests.post(

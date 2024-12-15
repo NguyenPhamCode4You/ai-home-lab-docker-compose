@@ -139,14 +139,9 @@ vessel_master = SwaggerApiCaller(
     bearer_token=os.getenv("API_TOKEN"),
     allowed_api_paths=[
         ("/Vessels/Search", "Method: POST, Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
-        ("/Vessels/{vesselId}", "Method: GET, Description: Get vessel details by vessel GUID. This include information about where the vessel is currently located, its current speed, and its current heading"),
         ("/Vessels/{vesselId}/ConsumptionRates/Search", "Method: POST, Description: Search for vessel bunker or fuel consumption rate using vessel GUID. Body = {pageSize} with pageSize default = 3, max = 5. No query in the URL."),
     ],
     user_instructions="""
-    1a. If user asks for vessel bunker or fuel consumption:
-    - First call /Vessels/Search to get the vessel GUID 
-    - Then replace the vessel ID inside this API call /Vessels/{vesselId}/ConsumptionRates/Search to get the vessel bunker details.
-    1b. Otherwise, always call /Vessels/Search.
     """
 )
 

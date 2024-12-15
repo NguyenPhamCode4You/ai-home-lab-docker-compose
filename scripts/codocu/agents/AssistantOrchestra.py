@@ -50,6 +50,8 @@ class AssistantOrchestra:
         Follow the structure below to forward the question to an agent:
         👋 **[agent_name_1]**: [question 1]? 👀
         👋 **[agent_name_2]**: [question 2]? 👀
+
+        The "?" and "👀" are important to help the agents recognize their questions to answer.
         
         You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
         If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
@@ -125,7 +127,8 @@ class AssistantOrchestra:
                         agent_question = agent_question_part.split("👀")[0]
                         
                         # Check if the extracted text qualifies as a valid question
-                        if ":" in agent_question and "?" in agent_question:
+                        # if ":" in agent_question and "?" in agent_question:
+                        if ":" in agent_question and "👀" in agent_question_part:
                             agent_questions.append((agent_name, agent_question.strip(), agent_mention_index))
                 # ---------------------------------------
                 # 2. Order the agents based on their mention index
