@@ -18,64 +18,108 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
-DOCU_TABLE_NAME = "n8n_documents_ebook"
+DOCU_TABLE_NAME = ""
 DOCU_FUNCTION   = "match_n8n_documents_ebook_neo"
 
-BVMS_TABLE_NAME = "n8n_documents_bbc_bvms"
-BVMS_FUNCTION   = "match_n8n_documents_bbc_bvms"
+OLLAMA_URL      = "http://10.13.13.5:11434"
+CODE_MODEL      = "qwen2.5-coder:32b"
+GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
-# OLLAMA_URL      = "http://10.13.13.5:11434"
+# OLLAMA_URL      = "http://10.13.13.4:11434"
 # CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
-
-OLLAMA_URL      = "http://10.13.13.4:11434"
-CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
-
-documentor_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, DOCU_TABLE_NAME, DOCU_FUNCTION)
-bvms_vector_store = SupabaseVectorStore(SUPABASE_URL, SUPABASE_TOKEN, BVMS_TABLE_NAME, BVMS_FUNCTION)
-
-with open(os.path.join(os.path.dirname(__file__), "prompts/Document-Prompt.txt"), "r", encoding="utf-8") as file:
-    documentor_prompt = file.read()
-
-with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r", encoding="utf-8") as file:
-    bvms_prompt = file.read()
 
 embedder = CreateEmbedding(
     url=OLLAMA_URL,
     model=EMBEDING_MODEL
 )
-
-code_document_extractor = RelevantDocumentExtractor(
-    url=OLLAMA_URL,
-    model=GENERAL_MODEL
-)
-
-documentor = CodeDocumentor(
-    url=OLLAMA_URL,
-    model=CODE_MODEL,
-    hosting_url=HOSTING_URL,
-    max_history_tokens_length = 10,
-    max_context_tokens_length = 6000,
-    embedder=embedder,
-    vector_store=documentor_vector_store,
-    base_prompt=documentor_prompt,
-    document_extractor=code_document_extractor,
-    match_count=15,
-)
-
 bvms_answer = RagKnowledgeBase(
     url=OLLAMA_URL,
     model=GENERAL_MODEL,
     embedder=embedder,
-    vector_store=bvms_vector_store,
-    base_prompt=bvms_prompt,
+    vector_store=SupabaseVectorStore(
+        url=SUPABASE_URL,
+        token=SUPABASE_TOKEN,
+        table_name="n8n_documents_bbc_bvms",
+        function_name="match_n8n_documents_bbc_bvms"
+    ),
     match_count=200,
-    max_context_tokens_length=5600,
-    max_history_tokens_length=10
+    max_context_tokens_length=5800,
+    max_history_tokens_length=10,
+    base_prompt="""
+    You are an intelligent RAG AI agent for the BVMS (BBC Voyage Management System) to assist users with their questions.
+    Here is the user question: {question}
+
+    Before answering, first, analyze carefully the knowledge below to base your answer on. Consider only the relevant information to the question besing asked.
+    {context}
+
+    Then, generate a WELL-STRUCTURED, BULLET-POINT, CONCISE, ACCURATE but DETAILED answer to the question!
+    Important:
+    - Always base your answer on the retrieved knowledge.
+    - You may enhance your response with factual support when possible.
+    - If the query goes beyond retrieved knowledge, just answer that you dont have information about this topics. Dont make up information.
+
+    Here are the previous questions and answers that you can use to base your answer on:
+    {histories}
+
+    Now, answer with confidence.
+    """
+)
+
+be_documentor = CodeDocumentor(
+    url=OLLAMA_URL,
+    model=CODE_MODEL,
+    hosting_url=HOSTING_URL,
+    embedder=embedder,
+    vector_store=SupabaseVectorStore(
+        url=SUPABASE_URL,
+        token=SUPABASE_TOKEN,
+        table_name="n8n_documents_net_micro",
+        function_name="match_n8n_documents_net_micro_neo"
+    ),
+    document_extractor=RelevantDocumentExtractor(
+        url=OLLAMA_URL,
+        model=GENERAL_MODEL
+    ),
+    match_count=15,
+    max_history_tokens_length = 10,
+    max_context_tokens_length = 5800,
+    base_prompt="""
+    You are an experienced software developer and your task is reading a code document to answer user questions.
+    Here is the code document you need to read:
+    {context}
+    User Question: {question}
+    Try your very best to assist the user with their question.
+    """
+)
+ai_documentor = CodeDocumentor(
+    url=OLLAMA_URL,
+    model=CODE_MODEL,
+    hosting_url=HOSTING_URL,
+    embedder=embedder,
+    vector_store=SupabaseVectorStore(
+        url=SUPABASE_URL,
+        token=SUPABASE_TOKEN,
+        table_name="n8n_documents_ebook",
+        function_name="match_n8n_documents_ebook_neo"
+    ),
+    document_extractor=RelevantDocumentExtractor(
+        url=OLLAMA_URL,
+        model=GENERAL_MODEL
+    ),
+    match_count=15,
+    max_history_tokens_length = 10,
+    max_context_tokens_length = 5800,
+    base_prompt="""
+    You are an experienced software developer and your task is reading a code document to answer user questions.
+    Here is the code document you need to read:
+    {context}
+    User Question: {question}
+    Try your very best to assist the user with their question.
+    """
 )
 
 vessel_master = SwaggerApiCaller(
@@ -176,50 +220,48 @@ master_mind = AssistantOrchestra(
     model=GENERAL_MODEL,
     max_history_tokens_length = 5000
 )
-
 master_mind.add_agent(
-    name="Documentor",
+    name="Backend Documentor",
     description="This agent can provide code snippets and documentations about BVMS Backend source code, which is built using .NET",
-    agent=documentor
+    agent=be_documentor
 )
-
+master_mind.add_agent(
+    name="AI Documentor",
+    description="This agent can provide code snippets and documentations about BVMS AI Agents implementation, which is built using python",
+    agent=ai_documentor
+)
 master_mind.add_agent(
     name="BVMS KnowledgeBase",
     description="This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. It also contains some api informations about Sedna & DA Desk. It knows about the business logics of cargo planner software.",
     agent=bvms_answer
 )
-
 master_mind.add_agent(
     name="Vessel Master",
     description="This agent can provide detailed information about Vessels of BBC by making API calls.",
     agent=vessel_master
 )
-
 master_mind.add_agent(
     name="Shipment Master",
     description="This agent can provide detailed information about BVMS Shipments and estimated voyages by making API calls.",
     agent=voyage_data
 )
-
 master_mind.add_agent(
     name="Port Master",
     description="This agent can provide detailed information about Marine time Ports, by making API calls.",
     agent=port_master
 )
-
 master_mind.add_agent(
     name="Port Factor for ETS calculation",
     description="This agent can determine the port factor for ETS calculation for a pair of ports. Should NOT be used for business related questions.",
     agent=ets_port_factor
 )
-
 master_mind.add_agent(
     name="Chart Visualizer",
     description="This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.",
     agent=charter
 )
 
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Query
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -247,8 +289,7 @@ async def get_answer_for_question_stream(request: CompletionRequest):
     try:
         user_question = get_last_user_question(request.messages)
         history = [message for message in request.messages or []]
-        # history = history[:-1]  # Remove the last user question from history
-        return StreamingResponse(documentor.stream(user_question, history), media_type="application/json")
+        return StreamingResponse(master_mind.stream(user_question, history), media_type="application/json")
 
     except Exception as e:
         print(f"Error handling request: {e}")

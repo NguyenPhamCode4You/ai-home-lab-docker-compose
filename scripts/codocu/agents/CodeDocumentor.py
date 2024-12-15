@@ -214,7 +214,7 @@ class CodeDocumentor:
                 yield json.dumps({"response": f"\n\n 📖 Reading file: {file_link} 👀 - File: **{file_index + 1}**/**{len(documents)}** - Found **{len(original_paragraphs)}** paragraphs...\n\n"})
 
                 paragraphs_to_validate = convert_paragraphs_for_validation(original_paragraphs)
-                paragraphs_validation_string = "\n\n".join([f"{header}: {content}" for header, content in paragraphs_to_validate])
+                paragraphs_validation_string = "\n\n".join([f"{header}: (file name {document["metadata"]["f"]}) {content}" for header, content in paragraphs_to_validate])
 
                 validation_result = ""
             except Exception as e:

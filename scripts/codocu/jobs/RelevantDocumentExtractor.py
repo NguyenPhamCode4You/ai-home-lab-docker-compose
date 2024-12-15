@@ -7,22 +7,23 @@ class RelevantDocumentExtractor:
         self.model = model
         self.base_prompt = """
         Given this CONVERSATION:
-        ----------------------
         {question}
-        ----------------------
 
-        Your task is to extract headers of pagraphs that are relevance to the above conversation.
-        Here is the DOCUMENT to extract headers from:
-        ----------------------
+        First, anaylyze the topics and keywords of the conversation to understand the context.
+        Then, extract the headers from the following paragraphs that are relevant to the topics and keywords of the conversation:
         {document}
-        ----------------------
 
-        Return the selected relevant headers in the following format, seperated by new lines.
-        - [Relevant header]: [Explanation why it is relevant, in 50 words max]
+        **If user enquired for reading the entire file, then all the headers are relevant.**
 
-        DO return ONLY headers in the given document.
-        DO NOT return ANY headers in the CONVERSATION. DO NOT make up new headers. 
-        IF NO relevant headers found in the document, just return "- No relevant headers found."
+        Return the headers of the relevant paragraphs in the following format:
+        - [Relevant header]: [Explanation why it is relevant to the topics and keywords of the conversation, in 65 words max]
+        
+        **Since tokens is limited, DO NOT explain in details! 65 words max for each headers selected.**
+        
+        Important:
+        - DO NOT return headers in the CONVERSATION unless it is mentioned in the paragraphs. DO NOT make up new headers.
+        - DO NOT modified the headers. Return them as they are since they are being used to search for the relevant paragraphs later.
+        - IF NO relevant information can be found, just return "- No relevant headers found."
 
         """
 

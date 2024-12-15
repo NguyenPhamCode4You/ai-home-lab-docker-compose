@@ -12,16 +12,15 @@ SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJh
 TABLE_NAME = "n8n_documents_ebook"
 FUNCTION   = "match_n8n_documents_ebook_neo"
 
-OLLAMA_URL      = "http://10.13.13.4:11434"
-CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+# OLLAMA_URL      = "http://10.13.13.4:11434"
+# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+
+OLLAMA_URL      = "http://10.13.13.5:11434"
+CODE_MODEL      = "qwen2.5-coder:32b"
+GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
-
-with open(os.path.join(os.path.dirname(__file__), "prompts/BVMS-Prompt.txt"), "r", encoding="utf-8") as file:
-    bvms_prompt = file.read()
-
-with open(os.path.join(os.path.dirname(__file__), "prompts/Document-Prompt.txt"), "r", encoding="utf-8") as file:
-    documentor_prompt = file.read()
 
 embedder = CreateEmbedding(
     url=OLLAMA_URL,
@@ -38,18 +37,43 @@ knowledge_base = RagKnowledgeBase(
     model=GENERAL_MODEL,
     embedder=embedder,
     vector_store=vector_store,
-    base_prompt=bvms_prompt
+    base_prompt="""
+    You are an intelligent RAG AI agent for assisting users with their questions.
+    Here is the user question: {question}
+
+    Before answering, first, analyze carefully the knowledge below to base your answer on. Consider only the relevant information to the question besing asked.
+    {context}
+
+    Then, generate a WELL-STRUCTURED, BULLET-POINT, CONCISE, ACCURATE but DETAILED answer to the question!
+    Important:
+    - Always base your answer on the retrieved knowledge.
+    - You may enhance your response with factual support when possible.
+    - If the query goes beyond retrieved knowledge, just answer that you dont have information about this topics. Dont make up information.
+
+    Here are the previous questions and answers that you can use to base your answer on:
+    {histories}
+
+    Now, answer with confidence.
+    """
 )
 code_documentor = CodeDocumentor(
     url=OLLAMA_URL,
     model=CODE_MODEL,
     embedder=embedder,
     vector_store=vector_store,
-    base_prompt=documentor_prompt,
+    max_context_tokens_length=8000,
     document_extractor=RelevantDocumentExtractor(
         url=OLLAMA_URL,
         model=GENERAL_MODEL
-    )
+    ),
+    base_prompt="""
+    You are an experienced software developer and your task is reading a code document to answer user questions.
+    Here is the code document you need to read:
+    {context}
+    User Question: {question}
+    Try your very best to assist the user with their question.
+    """
+    
 )
 
 code_folder_path = os.path.join(os.getcwd())
@@ -84,7 +108,7 @@ async def example1():
     #         model=GENERAL_MODEL
     #     ),
     # )
-    async for agent_chunk in code_documentor.stream("Can you explain how the agent named AssistantOrchestra works? Can you also provide code snippets of this agent?", []):
+    async for agent_chunk in code_documentor.stream("Read through all aspect of AssistantOrchestra carefully, then basing on this current code, suggest for codes to add a reflection layer to let the agent revise on their final answer. If the final answer is not good, it need to correct itself and answer the question again", []):
         if (len(agent_chunk) > 1000):
             continue
         agent_response = json.loads(agent_chunk)["response"]
