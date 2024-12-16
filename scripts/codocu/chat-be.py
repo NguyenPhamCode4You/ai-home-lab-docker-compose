@@ -14,6 +14,7 @@ from agents.AssistantOrchestra import AssistantOrchestra
 from agents.SwaggerApiCaller import SwaggerApiCaller
 from agents.ChartVisualizer import ChartVisualizer
 from agents.WebSearchAgent import WebSearchAgent
+from agents.PerflexityAgent import PerflexityAgent
 
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
@@ -35,6 +36,9 @@ HOSTING_URL     = "http://10.13.13.2:8000"
 embedder = CreateEmbedding(
     url=OLLAMA_URL,
     model=EMBEDING_MODEL
+)
+perflexity_knowledge = PerflexityAgent(
+    api_key=os.getenv("PERFLEXITY_API_KEY")
 )
 web_searcher = WebSearchAgent(
     url=OLLAMA_URL,
@@ -269,6 +273,11 @@ master_mind.add_agent(
     name="Web Searcher",
     description="This agent can search the web for relevant information based on user's question.",
     agent=web_searcher
+)
+master_mind.add_agent(
+    name="Perflexity Knowledge",
+    description="This agent can provide detailed information about a wide range of topics outside of BVMS.",
+    agent=perflexity_knowledge
 )
 
 from fastapi import FastAPI, Query
