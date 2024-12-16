@@ -232,42 +232,47 @@ master_mind = AssistantOrchestra(
 master_mind.add_agent(
     name="Backend Documentor",
     description="This agent can provide code snippets and documentations about BVMS Backend source code, which is built using .NET",
-    agent=be_documentor
+    agent=be_documentor,
 )
 master_mind.add_agent(
     name="AI Documentor",
     description="This agent can provide code snippets and documentations about BVMS AI Agents implementation, which is built using python",
-    agent=ai_documentor
+    agent=ai_documentor,
 )
 master_mind.add_agent(
     name="BVMS KnowledgeBase",
     description="This agent can answer general questions about business knowledge of BVMS, which is a maritime software that handle cargo, shipments and estimate profit and loss for voyages. It also contains some api informations about Sedna & DA Desk. It knows about the business logics of cargo planner software.",
-    agent=bvms_answer
+    agent=bvms_answer,
 )
 master_mind.add_agent(
     name="Vessel Master",
     description="This agent can provide detailed information about Vessels of BBC by making API calls.",
-    agent=vessel_master
+    agent=vessel_master,
+    context_awareness=True
 )
 master_mind.add_agent(
     name="Shipment Master",
     description="This agent can provide detailed information about BVMS Shipments and estimated voyages by making API calls.",
-    agent=voyage_data
+    agent=voyage_data,
+    context_awareness=True
 )
 master_mind.add_agent(
     name="Port Master",
     description="This agent can provide detailed information about Marine time Ports, by making API calls.",
-    agent=port_master
+    agent=port_master,
+    context_awareness=True
 )
 master_mind.add_agent(
     name="Port Factor for ETS calculation",
     description="This agent can determine the port factor for ETS calculation for a pair of ports. Should NOT be used for business related questions.",
-    agent=ets_port_factor
+    agent=ets_port_factor,
+    context_awareness=True
 )
 master_mind.add_agent(
     name="Chart Visualizer",
     description="This agent can help user create simple charts basing on a given data. Supported chart types are: line, bar, pie.",
-    agent=charter
+    agent=charter,
+    context_awareness=True
 )
 master_mind.add_agent(
     name="Web Searcher",

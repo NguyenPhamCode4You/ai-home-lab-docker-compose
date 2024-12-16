@@ -87,8 +87,8 @@ class AssistantOrchestra:
         except Exception as e:
             print(f"Error logging task: {e}")
 
-    def add_agent(self, name: str, description: str, agent):
-        self.agents[name] = {"description": description, "agent": agent}
+    def add_agent(self, name: str, description: str, agent, context_awareness: bool = False):
+        self.agents[name] = {"description": description, "agent": agent, "context_awareness": context_awareness}
         return self
 
     def get_agents_description(self):
@@ -151,6 +151,9 @@ class AssistantOrchestra:
                         additional_context = "".join(conversation_content)
                     else:
                         additional_context = "".join(agent_self_questions)
+
+                    if agent_details.get("context_awareness") == False:
+                        additional_context = ""
 
                     real_agent_question = f"**Addtional context that might be useful:**\n{additional_context}\n**Finally, here is your question:** {agent_question}"
                     
