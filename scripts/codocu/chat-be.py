@@ -46,7 +46,8 @@ web_searcher = WebSearchAgent(
     serp_api_key=os.getenv("SERP_API_KEY"),
     url_summarizer=UrlSummarizer(
         url=OLLAMA_URL,
-        model=GENERAL_MODEL
+        model=GENERAL_MODEL,
+        fire_craw_api_key=os.getenv("FIRE_CRAW_API_KEY")
     ),
     match_count=5
 )

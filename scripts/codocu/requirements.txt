@@ -8,3 +8,4 @@ httpx
 serpapi
 google-search-results
 bs4
+firecrawl-py
