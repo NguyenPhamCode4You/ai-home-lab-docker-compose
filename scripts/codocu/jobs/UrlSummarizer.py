@@ -54,12 +54,12 @@ class UrlSummarizer:
         # ---------------------------------------
         # 3. Generate the final analysis
         # ----------------------------------------
-        self.write_to_log(question, final_content)
+        self.write_to_log(url, final_content)
 
-    def write_to_log(self, question, content):
+    def write_to_log(self, url, content):
         if not self.log_folder:
             return
-        final_file_name = f"firecraw-{''.join(e for e in question if e.isalnum())}.md"
+        final_file_name = f"firecraw-{''.join(e for e in url if e.isalnum())}.md"
         datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(self.log_folder, datetime_str)
         log_file_path = os.path.join(folder_path, final_file_name)
