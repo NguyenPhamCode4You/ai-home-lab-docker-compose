@@ -169,8 +169,8 @@ class SwaggerApiCaller:
             if path == api_path:
                 documenation = details
                 break
-        if not documenation:
-            raise Exception(f"API Path {api_path} not found in the allowed API paths")
+        # if not documenation:
+            # raise Exception(f"API Path {api_path} not found in the allowed API paths")
         
         prompt = f"""
         Given the following API documentation:
@@ -220,6 +220,8 @@ class SwaggerApiCaller:
         method = lines[0].split(":", 1)[1].strip().lower()
         api_path = lines[1].split(":", 1)[1].strip()
         body = ":".join(lines[2].split(":", 1)[1:]).strip()
+
+        print(f"Method: {method}, API Path: {api_path}, Body: {body}")
 
         return method, api_path, body
     

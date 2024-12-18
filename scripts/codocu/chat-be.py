@@ -23,7 +23,8 @@ SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
 # OLLAMA_URL      = "http://10.13.13.5:11434"
-# CODE_MODEL      = "qwen2.5-coder:32b"
+# # CODE_MODEL      = "qwen2.5-coder:32b"
+# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
 # GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
 OLLAMA_URL      = "http://10.13.13.4:11434"
@@ -195,6 +196,7 @@ voyage_data = SwaggerApiCaller(
     bearer_token=os.getenv("API_TOKEN"),
     allowed_api_paths=[
         ("/Estimates/Search", "Method: POST, Description: Search for estimates using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL."),
+        ("/Estimates/{estimateId}", "Method: GET, Description: Get the estimate details using its UUID. Body can be empty object`{}`. No query in the URL."),
         ("/Shipments/Search", "Method: POST, Description: Search for shipments using keywords, but cannot search for ID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.")
     ]
 )
