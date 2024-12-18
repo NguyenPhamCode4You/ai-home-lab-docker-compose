@@ -12,13 +12,13 @@ SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJh
 TABLE_NAME = "n8n_documents_ebook"
 FUNCTION   = "match_n8n_documents_ebook_neo"
 
-# OLLAMA_URL      = "http://10.13.13.4:11434"
-# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+OLLAMA_URL      = "http://10.13.13.4:11434"
+CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
-OLLAMA_URL      = "http://10.13.13.5:11434"
-CODE_MODEL      = "qwen2.5-coder:32b"
-GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+# OLLAMA_URL      = "http://10.13.13.5:11434"
+# CODE_MODEL      = "qwen2.5-coder:32b"
+# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 
@@ -77,6 +77,7 @@ code_documentor = CodeDocumentor(
 )
 
 code_folder_path = os.path.join(os.getcwd())
+code_folder_path = "C:\\Users\\niche\\gitlab\\bbc-bvms-net-back-end-modular"
 code_document_folder_path = os.path.join(os.getcwd(), "codocu_results", "code-documentation")
 
 original_folder_path = os.path.join(os.getcwd(), "bvms-knowledge-base")
@@ -90,29 +91,31 @@ from jobs.CodeDocumentWriter import CodeDocumentWriter
 from jobs.CodeSummarizer import CodeSummarizer
 
 async def example1():
-    # await code_documentor.analyze(
-    #     original_folder_path=code_folder_path,
-    #     result_folder_path=code_document_folder_path,
-    #     allowed_file_extensions=[".py"],
-    #     ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
-    #     document_writter=CodeDocumentWriter(
-    #         url=OLLAMA_URL,
-    #         model=CODE_MODEL,
-    #     ),
-    #     summarizer=CodeSummarizer(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     ),
-    #     keyword_extractor=KeywordExtractor(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     ),
-    # )
-    async for agent_chunk in code_documentor.stream("Read through all aspect of AssistantOrchestra carefully, then basing on this current code, suggest for codes to add a reflection layer to let the agent revise on their final answer. If the final answer is not good, it need to correct itself and answer the question again", []):
-        if (len(agent_chunk) > 1000):
-            continue
-        agent_response = json.loads(agent_chunk)["response"]
-        print(agent_response, end="", flush=True)  # Real-time console output
+    await code_documentor.analyze(
+        original_folder_path=code_folder_path,
+        result_folder_path=code_document_folder_path,
+        # allowed_file_extensions=[".py"],
+        # ignored_file_pattern=['codocu_results', 'venv', '__pycache__', 'prompts', 'cpython'],
+        allowed_file_extensions=[".cs"],
+        ignored_file_pattern=['Test', 'test', 'bin', 'obj', 'Properties', 'packages', 'csproj', 'controller', 'program', 'startup', 'dto', 'Migrations', 'snapshot', 'mapping', 'documents', 'SednaIntegrationService', 'setup'],
+        document_writter=CodeDocumentWriter(
+            url=OLLAMA_URL,
+            model=CODE_MODEL,
+        ),
+        summarizer=CodeSummarizer(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+        keyword_extractor=KeywordExtractor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+    )
+    # async for agent_chunk in code_documentor.stream("Read through all aspect of AssistantOrchestra carefully, then basing on this current code, suggest for codes to add a reflection layer to let the agent revise on their final answer. If the final answer is not good, it need to correct itself and answer the question again", []):
+    #     if (len(agent_chunk) > 1000):
+    #         continue
+    #     agent_response = json.loads(agent_chunk)["response"]
+    #     print(agent_response, end="", flush=True)  # Real-time console output
 
 async def example2():
     await knowledge_base.formatting(

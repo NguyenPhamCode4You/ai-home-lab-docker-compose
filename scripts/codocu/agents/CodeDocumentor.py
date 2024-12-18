@@ -381,7 +381,7 @@ def is_allowed_file(file_path, allowed_file_extensions: List[str], ignored_file_
     return True
 
 def is_allowed_path(file_path, ignored_file_pattern: List[str]):
-    if any(pattern in file_path for pattern in ignored_file_pattern):
+    if any(pattern.lower() in file_path.lower() for pattern in ignored_file_pattern):
         return False
     
     return True
