@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import re
 import httpx
 import requests
 from bs4 import BeautifulSoup
@@ -59,7 +60,7 @@ class UrlSummarizer:
     def write_to_log(self, url, content):
         if not self.log_folder:
             return
-        final_file_name = f"firecraw-{''.join(e for e in url if e.isalnum())}.md"
+        final_file_name = f"firecraw-{cleanFileName(url)}.md"
         datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(self.log_folder, datetime_str)
         log_file_path = os.path.join(folder_path, final_file_name)
@@ -72,6 +73,25 @@ class UrlSummarizer:
         # Assuming the API response has a 'response' field with the raw JSON text
         response = response_data.get("response", "")
         return response
+    
+def cleanFileName(file_name: str) -> str:
+    """
+    Cleans a file name by keeping only alphanumeric characters,
+    replacing spaces with dashes, and removing special characters.
+
+    Args:
+        file_name (str): The original file name.
+
+    Returns:
+        str: The cleaned file name.
+    """
+    # Replace spaces with dashes
+    file_name = file_name.replace(" ", "-")
+    # Remove non-alphanumeric characters except dashes
+    file_name = re.sub(r'[^A-Za-z0-9\-]', '', file_name)
+    # Ensure no double dashes
+    file_name = re.sub(r'-+', '-', file_name)
+    return file_name.strip("-")
     
 async def scrape_content(url: str) -> str:
     """

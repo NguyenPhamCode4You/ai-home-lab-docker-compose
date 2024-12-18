@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import os
+import re
 import httpx
 from typing import List
 from serpapi import GoogleSearch
@@ -84,7 +85,7 @@ class WebSearchAgent:
     def write_to_log(self, question, content):
         if not self.log_folder:
             return
-        final_file_name = f"websearch-{''.join(e for e in question if e.isalnum())}.md"
+        final_file_name = f"websearch-{cleanFileName(question)}.md"
         datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(self.log_folder, datetime_str)
         log_file_path = os.path.join(folder_path, final_file_name)
@@ -95,6 +96,25 @@ class WebSearchAgent:
 
 def format_url_link(url_result):
     return f"[{url_result['title']}]({url_result['url']})"
+
+def cleanFileName(file_name: str) -> str:
+    """
+    Cleans a file name by keeping only alphanumeric characters,
+    replacing spaces with dashes, and removing special characters.
+
+    Args:
+        file_name (str): The original file name.
+
+    Returns:
+        str: The cleaned file name.
+    """
+    # Replace spaces with dashes
+    file_name = file_name.replace(" ", "-")
+    # Remove non-alphanumeric characters except dashes
+    file_name = re.sub(r'[^A-Za-z0-9\-]', '', file_name)
+    # Ensure no double dashes
+    file_name = re.sub(r'-+', '-', file_name)
+    return file_name.strip("-")
 
 def search_using_serp_api(query, api_key, num_results=10):
     """
