@@ -17,18 +17,20 @@ class PerflexityAgent:
     def __init__(
         self,
         api_key: str = None,
-        log_folder: str = None
+        log_folder: str = None,
+        url_summarizer = None
     ):
         self.api_key = api_key
         if log_folder:
             os.makedirs(log_folder, exist_ok=True)
         self.log_folder = log_folder
+        self.url_summarizer = url_summarizer
 
     async def stream(self, question: str, messages: List[dict] = None):
         url = "https://api.perplexity.ai/chat/completions"
         payload = {
             "stream": False,
-            "model": "llama-3.1-sonar-large-128k-online",
+            "model": "llama-3.1-sonar-small-128k-online",
             "messages": [{"role": "user", "content": question}],
         }
 
@@ -44,7 +46,7 @@ class PerflexityAgent:
 
                 # Parse the response and clean the final text
                 response_data = response.json()
-                final_text = await self._clean_json_response(response_data)
+                citations, final_text = await self._clean_json_response(response_data)
 
                 # ---------------------------------------
                 # 3. Generate the final analysis
@@ -53,6 +55,17 @@ class PerflexityAgent:
 
                 async for token in stream_batch_words(final_text, batch_size=3, stream_delay=0.05):
                     yield token
+
+                if citations and self.url_summarizer:
+                    citations = citations[:3]  # Limit to 3 citations
+                    for url_index, citation in enumerate(citations):
+                        try:
+                            yield json.dumps({"response": f"\n\n📖 {url_index + 1}. Summarizing content from {citation}...\n\n"})
+                            await asyncio.sleep(0.5)
+                            async for agent_chunk in self.url_summarizer.stream(question, citation):
+                                yield agent_chunk
+                        except Exception as e:
+                            yield json.dumps({"response": f"\n\n❌ Summary error: {e}\n\n"})
 
             except httpx.HTTPStatusError as exc:
                 raise RuntimeError(f"HTTP error: {exc.response.status_code} - {exc.response.text}")
@@ -87,7 +100,7 @@ class PerflexityAgent:
         citations = response_data.get("citations", [])
         formatted_citations = "\n**Citations:**\n" + "\n".join(citations) if citations else ""
 
-        return f"{content}\n{formatted_citations}"
+        return citations, f"{content}\n{formatted_citations}"
     
 
 async def stream_batch_words(final_text: str, batch_size: int = 2, stream_delay: float = 0.1):

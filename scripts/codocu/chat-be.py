@@ -39,7 +39,13 @@ embedder = CreateEmbedding(
 )
 perflexity_knowledge = PerflexityAgent(
     api_key=os.getenv("PERFLEXITY_API_KEY"),
-    log_folder=os.path.join(os.path.dirname(__file__), "web_search_results")
+    log_folder=os.path.join(os.path.dirname(__file__), "web_search_results"),
+    url_summarizer=UrlSummarizer(
+        url=OLLAMA_URL,
+        model=GENERAL_MODEL,
+        fire_craw_api_key=os.getenv("FIRE_CRAW_API_KEY"),
+        log_folder=os.path.join(os.path.dirname(__file__), "web_search_results")
+    ),
 )
 web_searcher = WebSearchAgent(
     url=OLLAMA_URL,
