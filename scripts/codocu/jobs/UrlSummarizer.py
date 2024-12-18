@@ -1,11 +1,18 @@
+import datetime
 import json
+import os
 import httpx
 import requests
 from bs4 import BeautifulSoup
 from firecrawl import FirecrawlApp
 
 class UrlSummarizer:
-    def __init__(self, url: str = 'http://localhost:11434', model: str = 'gemma2:9b-instruct-q8_0', fire_craw_api_key: str = None):
+    def __init__(self, 
+            url: str = 'http://localhost:11434', 
+            model: str = 'gemma2:9b-instruct-q8_0', 
+            fire_craw_api_key: str = None,
+            log_folder: str = None
+        ):
         self.url = f"{url}/api/generate"
         self.model = model
         self.base_prompt = """
@@ -20,36 +27,46 @@ class UrlSummarizer:
         """
         if fire_craw_api_key:
             self.firecrawl = FirecrawlApp(fire_craw_api_key)
+        if log_folder:
+            os.makedirs(log_folder, exist_ok=True)
+        self.log_folder = log_folder
 
     async def stream(self, question: str, url: str):
+        final_content = f"\n\n📖 **Crawling content from {url}**...\n\n"
         if self.firecrawl:
             response = self.firecrawl.scrape_url(url=url, params={'formats': ['markdown']})
             document = response.get('markdown', '')
         else:
             document = await scrape_content(url)
+        
+        final_content += document
+        final_content += f"\n\n📖 **Summarizing content**...\n\n"
 
         prompt = self.base_prompt.format(document=document, question=question)
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
                 async for chunk in response.aiter_bytes():
+                    if len(chunk) > 1000:
+                        continue
+                    final_content += json.loads(chunk).get("response", "")
                     yield chunk
 
-    async def run(self, question: str, url: str) -> str:
-        if self.firecrawl:
-            response = self.firecrawl.scrape_url(url=url, params={'formats': ['markdown']})
-            document = response.get('markdown', '')
-        else:
-            document = await scrape_content(url)
+        # ---------------------------------------
+        # 3. Generate the final analysis
+        # ----------------------------------------
+        self.write_to_log(question, final_content)
 
-        prompt = self.base_prompt.format(document=document, question=question)
-        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
-            response = await client.post(
-                url=self.url,
-                json={"model": self.model, "prompt": str(prompt), "stream": False}
-            )
-        if response.status_code != 200:
-            raise Exception(f"Failed to connect: {response.status_code}")
-        return self._clean_json_response(response.json())
+    def write_to_log(self, question, content):
+        if not self.log_folder:
+            return
+        final_file_name = f"firecraw-{''.join(e for e in question if e.isalnum())}.md"
+        datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        folder_path = os.path.join(self.log_folder, datetime_str)
+        log_file_path = os.path.join(folder_path, final_file_name)
+        os.makedirs(folder_path, exist_ok=True)
+        with open(log_file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+            file.flush()
 
     def _clean_json_response(self, response_data):
         # Assuming the API response has a 'response' field with the raw JSON text

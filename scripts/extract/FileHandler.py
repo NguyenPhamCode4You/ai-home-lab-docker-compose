@@ -40,7 +40,7 @@ class FileHandler:
         Saves the uploaded file to a temporary file with a timestamped name.
         :return: The file path of the saved temporary file.
         """
-        timestamp = datetime.now().strftime('%Y.%m.%d-%H.%M.%S')
+        timestamp = datetime.datetime.now().strftime('%Y.%m.%d-%H.%M.%S')
         filename_with_timestamp = f"{timestamp}-{self.filename}"
         self.temp_file_path = os.path.join(os.getcwd(), 'temp', filename_with_timestamp)
 

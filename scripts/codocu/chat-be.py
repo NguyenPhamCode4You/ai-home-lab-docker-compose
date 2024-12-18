@@ -22,13 +22,13 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
-# OLLAMA_URL      = "http://10.13.13.5:11434"
-# CODE_MODEL      = "qwen2.5-coder:32b"
-# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+OLLAMA_URL      = "http://10.13.13.5:11434"
+CODE_MODEL      = "qwen2.5-coder:32b"
+GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
-OLLAMA_URL      = "http://10.13.13.4:11434"
-CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+# OLLAMA_URL      = "http://10.13.13.4:11434"
+# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
@@ -38,7 +38,8 @@ embedder = CreateEmbedding(
     model=EMBEDING_MODEL
 )
 perflexity_knowledge = PerflexityAgent(
-    api_key=os.getenv("PERFLEXITY_API_KEY")
+    api_key=os.getenv("PERFLEXITY_API_KEY"),
+    log_folder=os.path.join(os.path.dirname(__file__), "web_search_results")
 )
 web_searcher = WebSearchAgent(
     url=OLLAMA_URL,
@@ -47,9 +48,11 @@ web_searcher = WebSearchAgent(
     url_summarizer=UrlSummarizer(
         url=OLLAMA_URL,
         model=GENERAL_MODEL,
-        fire_craw_api_key=os.getenv("FIRE_CRAW_API_KEY")
+        fire_craw_api_key=os.getenv("FIRE_CRAW_API_KEY"),
+        log_folder=os.path.join(os.path.dirname(__file__), "web_search_results")
     ),
-    match_count=5
+    match_count=3,
+    log_folder=os.path.join(os.path.dirname(__file__), "web_search_results")
 )
 bvms_answer = RagKnowledgeBase(
     url=OLLAMA_URL,

@@ -1,6 +1,6 @@
 import asyncio
 from asyncio import subprocess
-from datetime import datetime
+import datetime
 import json
 import os
 import sys
@@ -32,7 +32,7 @@ class ChartVisualizer:
         full_conversation_context = f"Conversation history: {history_string}\n\n" if history_string else ""
         full_conversation_context += f"User question: {question}"
         # Format datetime as a string suitable for filenames
-        filename = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         
         file_path = os.path.join(self.temp_file_path, f"{filename}.png")
         python_file_path = os.path.join(self.temp_file_path, f"{filename}.py")

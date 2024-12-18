@@ -1,5 +1,7 @@
 import asyncio
+import datetime
 import json
+import os
 import re
 import httpx
 from typing import List
@@ -15,14 +17,18 @@ class PerflexityAgent:
     def __init__(
         self,
         api_key: str = None,
+        log_folder: str = None
     ):
         self.api_key = api_key
+        if log_folder:
+            os.makedirs(log_folder, exist_ok=True)
+        self.log_folder = log_folder
 
     async def stream(self, question: str, messages: List[dict] = None):
         url = "https://api.perplexity.ai/chat/completions"
         payload = {
             "stream": False,
-            "model": "llama-3.1-sonar-small-128k-online",
+            "model": "llama-3.1-sonar-large-128k-online",
             "messages": [{"role": "user", "content": question}],
         }
 
@@ -40,6 +46,11 @@ class PerflexityAgent:
                 response_data = response.json()
                 final_text = await self._clean_json_response(response_data)
 
+                # ---------------------------------------
+                # 3. Generate the final analysis
+                # ----------------------------------------
+                self.write_to_log(question, final_text)
+
                 async for token in stream_batch_words(final_text, batch_size=3, stream_delay=0.05):
                     yield token
 
@@ -47,6 +58,18 @@ class PerflexityAgent:
                 raise RuntimeError(f"HTTP error: {exc.response.status_code} - {exc.response.text}")
             except Exception as exc:
                 raise RuntimeError(f"Unexpected error: {exc}")
+            
+    def write_to_log(self, question, content):
+        if not self.log_folder:
+            return
+        final_file_name = f"perflexity-{''.join(e for e in question if e.isalnum())}.md"
+        datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        folder_path = os.path.join(self.log_folder, datetime_str)
+        log_file_path = os.path.join(folder_path, final_file_name)
+        os.makedirs(folder_path, exist_ok=True)
+        with open(log_file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+            file.flush()
     
     async def _clean_json_response(self, response_data: dict) -> str:
         """

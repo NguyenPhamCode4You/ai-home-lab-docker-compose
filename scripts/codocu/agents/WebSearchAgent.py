@@ -1,5 +1,7 @@
 import asyncio
+import datetime
 import json
+import os
 import httpx
 from typing import List
 from serpapi import GoogleSearch
@@ -17,12 +19,16 @@ class WebSearchAgent:
         serp_api_key: str = None,
         match_count: int = 5,
         url_summarizer = None,
+        log_folder: str = None
     ):
         self.url = f"{url}/api/generate"
         self.model = model
         self.serp_api_key = serp_api_key
         self.match_count = match_count
         self.url_summarizer = url_summarizer
+        if log_folder:
+            os.makedirs(log_folder, exist_ok=True)
+        self.log_folder = log_folder
 
     async def stream(self, question: str, messages: List[Message] = None):
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
@@ -51,14 +57,18 @@ class WebSearchAgent:
             # ---------------------------------------
             # 2. Summarize the content of each URL
             # ----------------------------------------
+            final_analysis_content = ""
             for url_index, url_result in enumerate(urls_result):
                 url_link = format_url_link(url_result)
-                yield json.dumps({"response": f"\n\n📖 {url_index + 1}. Summarizing content from {url_link}...\n\n"})
+                content_header = f"\n\n📖 {url_index + 1}. Summarizing content from {url_link}...\n\n"
+                yield json.dumps({"response": content_header})
+                final_analysis_content += content_header
                 await asyncio.sleep(0.5)
                 try:
                     async for agent_chunk in self.url_summarizer.stream(question, url_result.get("url")):
                         if len(agent_chunk) > 1000:
                             continue
+                        final_analysis_content += json.loads(agent_chunk).get("response", "")
                         yield agent_chunk
                 except Exception as e:
                     yield json.dumps({"response": f"\n\n❌ Failed to summarize for {url_link}: {e}\n\n"})
@@ -66,25 +76,22 @@ class WebSearchAgent:
 
                 await asyncio.sleep(0.5)
 
-    async def write_analysis(self, question: str, log_file_path: str):
-        if not log_file_path:
-            return print("No log file specified. Please set a log file to save the analysis.")
-        try:
-            with open(log_file_path, "w", encoding="utf-8") as file:
-                file.write(f"\n\n## User question: {question}\n\n\n")
-                async for agent_chunk in self.stream(question, []):
-                    if len(agent_chunk) > 1000:
-                        continue
-                    try:
-                        chunk = json.loads(agent_chunk).get("response", "")
-                        file.write(chunk)
-                        file.flush()  # Ensures real-time writing to the file
-                        print(chunk, end="", flush=True)  # Real-time console output
-                    except json.JSONDecodeError:
-                        print(f"Invalid JSON received: {agent_chunk}")
-                        continue
-        except Exception as e:
-            print(f"Error opening log file: {e}")     
+            # ---------------------------------------
+            # 3. Generate the final analysis
+            # ----------------------------------------
+            self.write_to_log(question, final_analysis_content)
+
+    def write_to_log(self, question, content):
+        if not self.log_folder:
+            return
+        final_file_name = f"websearch-{''.join(e for e in question if e.isalnum())}.md"
+        datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        folder_path = os.path.join(self.log_folder, datetime_str)
+        log_file_path = os.path.join(folder_path, final_file_name)
+        os.makedirs(folder_path, exist_ok=True)
+        with open(log_file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+            file.flush()
 
 def format_url_link(url_result):
     return f"[{url_result['title']}]({url_result['url']})"
