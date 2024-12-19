@@ -111,33 +111,7 @@ be_documentor = CodeDocumentor(
     ),
     match_count=15,
     max_history_tokens_length = 10,
-    max_context_tokens_length = 5800,
-    base_prompt="""
-    You are an experienced software developer and your task is reading a code document to answer user questions.
-    Here is the code document you need to read:
-    {context}
-    User Question: {question}
-    Try your very best to assist the user with their question.
-    """
-)
-ai_documentor = CodeDocumentor(
-    url=OLLAMA_URL,
-    model=CODE_MODEL,
-    hosting_url=HOSTING_URL,
-    embedder=embedder,
-    vector_store=SupabaseVectorStore(
-        url=SUPABASE_URL,
-        token=SUPABASE_TOKEN,
-        table_name="n8n_documents_ebook",
-        function_name="match_n8n_documents_ebook_neo"
-    ),
-    document_extractor=RelevantDocumentExtractor(
-        url=OLLAMA_URL,
-        model=GENERAL_MODEL
-    ),
-    match_count=15,
-    max_history_tokens_length = 10,
-    max_context_tokens_length = 5800,
+    max_context_tokens_length = 8000,
     base_prompt="""
     You are an experienced software developer and your task is reading a code document to answer user questions.
     Here is the code document you need to read:
@@ -245,11 +219,6 @@ master_mind.add_agent(
     name="Backend Documentor",
     description="This agent can provide code snippets and documentations about BVMS Backend source code, which is built using .NET",
     agent=be_documentor,
-)
-master_mind.add_agent(
-    name="AI Documentor",
-    description="This agent can provide code snippets and documentations about BVMS AI Agents implementation, which is built using python",
-    agent=ai_documentor,
 )
 master_mind.add_agent(
     name="BVMS KnowledgeBase",

@@ -9,8 +9,8 @@ from jobs.RelevantDocumentExtractor import RelevantDocumentExtractor
 
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
-TABLE_NAME = "n8n_documents_ebook"
-FUNCTION   = "match_n8n_documents_ebook_neo"
+TABLE_NAME = "n8n_documents_ops"
+FUNCTION   = "match_n8n_documents_ops_neo"
 
 OLLAMA_URL      = "http://10.13.13.4:11434"
 CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
@@ -119,35 +119,35 @@ async def example1():
 
 async def example2():
     await knowledge_base.formatting(
-        original_folder_path=original_folder_path,
-        formatted_folder_path=formatted_folder_path,
+        original_folder_path=".\operation-scape-logs",
+        formatted_folder_path=".\operation-scape-logs-formated",
         markdown_processor=MarkdownProcessor(
             url=OLLAMA_URL,
             model=GENERAL_MODEL
         ),
         chunk_size=600
     )
-    await knowledge_base.learn(
-        folder_path=formatted_folder_path,
-        line_extractor=DocumentLinesExtractor(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-        keyword_extractor=KeywordExtractor(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        ),
-        sentence_summarizer=SentenceSummarizer(
-            url=OLLAMA_URL,
-            model=GENERAL_MODEL
-        )
-    )
-    async for agent_chunk in knowledge_base.stream("Can you tell me how BVMS calculate EU ETS?", []):
-        if (len(agent_chunk) > 1000):
-            continue
-        agent_response = json.loads(agent_chunk)["response"]
-        print(agent_response, end="", flush=True)  # Real-time console output
+    # await knowledge_base.learn(
+    #     folder_path=formatted_folder_path,
+    #     line_extractor=DocumentLinesExtractor(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     ),
+    #     keyword_extractor=KeywordExtractor(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     ),
+    #     sentence_summarizer=SentenceSummarizer(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     )
+    # )
+    # async for agent_chunk in knowledge_base.stream("Can you tell me how BVMS calculate EU ETS?", []):
+    #     if (len(agent_chunk) > 1000):
+    #         continue
+    #     agent_response = json.loads(agent_chunk)["response"]
+    #     print(agent_response, end="", flush=True)  # Real-time console output
 
 
 import asyncio
-asyncio.run(example1())
+asyncio.run(example2())
