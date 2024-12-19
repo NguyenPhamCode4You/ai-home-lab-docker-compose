@@ -22,14 +22,14 @@ from tools.SupabaseVectorStore import SupabaseVectorStore
 SUPABASE_URL    = "http://10.13.13.4:8000"
 SUPABASE_TOKEN  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE"
 
-# OLLAMA_URL      = "http://10.13.13.5:11434"
-# # CODE_MODEL      = "qwen2.5-coder:32b"
+OLLAMA_URL      = "http://10.13.13.5:11434"
+CODE_MODEL      = "qwen2.5-coder:32b"
 # CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-# GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
+GENERAL_MODEL   = "gemma2:27b-instruct-q5_1"
 
-OLLAMA_URL      = "http://10.13.13.4:11434"
-CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
-GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
+# OLLAMA_URL      = "http://10.13.13.4:11434"
+# CODE_MODEL      = "qwen2.5-coder:14b-instruct-q6_K"
+# GENERAL_MODEL   = "gemma2:9b-instruct-q8_0"
 
 EMBEDING_MODEL  = "nomic-embed-text:137m-v1.5-fp16"
 HOSTING_URL     = "http://10.13.13.2:8000"
@@ -102,8 +102,8 @@ be_documentor = CodeDocumentor(
     vector_store=SupabaseVectorStore(
         url=SUPABASE_URL,
         token=SUPABASE_TOKEN,
-        table_name="n8n_documents_net_micro",
-        function_name="match_n8n_documents_net_micro_neo"
+        table_name="n8n_documents_ebook",
+        function_name="match_n8n_documents_ebook_neo"
     ),
     document_extractor=RelevantDocumentExtractor(
         url=OLLAMA_URL,

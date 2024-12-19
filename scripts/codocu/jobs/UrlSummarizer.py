@@ -40,22 +40,25 @@ class UrlSummarizer:
         else:
             document = await scrape_content(url)
         
-        final_content += document
-        final_content += f"\n\n📖 **Summarizing content**...\n\n"
+        document_chunks = RecursiveSplitLines(document, 6000)
+        final_analysis = ""
 
-        prompt = self.base_prompt.format(document=document, question=question)
-        async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
-            async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
-                async for chunk in response.aiter_bytes():
-                    if len(chunk) > 1000:
-                        continue
-                    final_content += json.loads(chunk).get("response", "")
-                    yield chunk
+        for chunk_index, document_chunk in enumerate(document_chunks):
+            yield f"\n\n📖 **Chunk {chunk_index + 1}/{len(document_chunks)} - {len(document_chunk)} tokens - Summary ...**\n\n"
+            prompt = self.base_prompt.format(document=document_chunk, question=question)
+            async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
+                async with client.stream("POST", self.url, json={"model": self.model, "prompt": prompt}) as response:
+                    async for chunk in response.aiter_bytes():
+                        if len(chunk) > 1000:
+                            continue
+                        final_analysis += json.loads(chunk.decode('utf-8')).get("response", "")
+                        yield chunk
 
         # ---------------------------------------
         # 3. Generate the final analysis
         # ----------------------------------------
-        self.write_to_log(url, final_content)
+        self.write_to_log(f"{url}", document)
+        self.write_to_log(f"{url}-Final-Summary.md", final_analysis)
 
     def write_to_log(self, url, content):
         if not self.log_folder:
@@ -135,6 +138,26 @@ async def scrape_content(url: str) -> str:
         
     except Exception as e:
         raise Exception(f"Failed to scrape URL {url}: {e}")
+    
+def RecursiveSplitLines(document: str, limit: int = 1000):
+    lines = document.split("\n")
+    paragraphs = []
+    paragraph = ""
+
+    for line in lines:
+        # Check if adding the line exceeds the limit
+        if len(paragraph) + len(line) + 1 > limit:  # Adding +1 to account for the newline
+            if len(paragraph) > 0:
+                paragraphs.append(paragraph)  # Append the current paragraph
+            paragraph = f"{line}\n"  # Start a new paragraph
+        else:
+            paragraph += f"{line}\n"  # Add the line to the current paragraph
+
+    if len(paragraph) > 0:
+        paragraphs.append(paragraph)  # Append the last paragraph
+
+    return paragraphs
+
     
 # if __name__ == "__main__":
 #     import asyncio
