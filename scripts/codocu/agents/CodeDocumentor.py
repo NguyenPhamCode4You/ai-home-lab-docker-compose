@@ -70,7 +70,7 @@ class CodeDocumentor:
             context += f"""\n# {section["title"]}:\n{section['context']}"""
         return context
     
-    async def analyze(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], document_writter = None, summarizer = None, keyword_extractor = None):
+    async def write_documents(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], document_writter = None, summarizer = None, keyword_extractor = None):
         if not document_writter or not summarizer or not keyword_extractor:
             raise ValueError("Code documentor, code summarizer, and keyword extractor must be set before writing documents.")
         

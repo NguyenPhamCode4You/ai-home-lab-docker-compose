@@ -118,30 +118,30 @@ async def example1():
     #     print(agent_response, end="", flush=True)  # Real-time console output
 
 async def example2():
-    await knowledge_base.formatting(
-        original_folder_path=".\operation-scape-logs",
-        formatted_folder_path=".\operation-scape-logs-formated",
-        markdown_processor=MarkdownProcessor(
+    # await knowledge_base.formatting(
+    #     original_folder_path=".\operation-scape-logs",
+    #     formatted_folder_path=".\operation-scape-logs-formated",
+    #     markdown_processor=MarkdownProcessor(
+    #         url=OLLAMA_URL,
+    #         model=GENERAL_MODEL
+    #     ),
+    #     chunk_size=600
+    # )
+    await knowledge_base.learn(
+        folder_path=".\operation-scape-logs-formated",
+        line_extractor=DocumentLinesExtractor(
             url=OLLAMA_URL,
             model=GENERAL_MODEL
         ),
-        chunk_size=600
+        keyword_extractor=KeywordExtractor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+        sentence_summarizer=SentenceSummarizer(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        )
     )
-    # await knowledge_base.learn(
-    #     folder_path=formatted_folder_path,
-    #     line_extractor=DocumentLinesExtractor(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     ),
-    #     keyword_extractor=KeywordExtractor(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     ),
-    #     sentence_summarizer=SentenceSummarizer(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     )
-    # )
     # async for agent_chunk in knowledge_base.stream("Can you tell me how BVMS calculate EU ETS?", []):
     #     if (len(agent_chunk) > 1000):
     #         continue
