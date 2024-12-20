@@ -8,7 +8,7 @@ from firecrawl import FirecrawlApp
 from dotenv import load_dotenv
 load_dotenv()
 
-class FireCraw:
+class Crawler:
     def __init__(self, api_key: str = None, log_folder: str = None):
         api_key = api_key or os.getenv("FIRECRAW_API_KEY") or None
         print(f"API Key: {api_key}")
@@ -91,6 +91,6 @@ def RecursiveSplitLines(document: str, limit: int = 1000):
     
 if __name__ == "__main__":
     import asyncio
-    summarizer = FireCraw(log_folder="logs")
+    crawler = Crawler(log_folder="logs")
     url = "https://climate.ec.europa.eu/eu-action/transport/reducing-emissions-shipping-sector/faq-maritime-transport-eu-emissions-trading-system-ets_en"
-    asyncio.run(summarizer.craw(url))
+    asyncio.run(crawler.craw(url))
