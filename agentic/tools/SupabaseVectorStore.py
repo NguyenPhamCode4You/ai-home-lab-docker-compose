@@ -2,10 +2,11 @@ import os
 import requests
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 class SupabaseVectorStore:
-    def __init__(self, embbeder, url: str = None, token: str = None, ):
+    def __init__(self, embbeder, url: str = None, token: str = None):
         self.embbeder = embbeder
         self.url = url or os.getenv("SUPABASE_URL") or None
         self.token = token or os.getenv("SUPABASE_TOKEN") or None
@@ -47,4 +48,12 @@ class SupabaseVectorStore:
         if response.status_code != 201:
             raise Exception(f"Failed to insert document: {response.status_code}, {response.text}")
         return True
+    
+# if __name__ == "__main__":
+#     from agentic.models import Embedder
+#     embbeder = Embedder()
+#     data = SupabaseVectorStore(embbeder=embbeder)
+#     data.insert_document("documents", "This is a test document", metadata={"title": "Test Document"})
+#     results = data.query_documents("query_documents", "Who is the president of the United States?")
+#     print(results)
     
