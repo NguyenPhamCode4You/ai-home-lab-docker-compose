@@ -2,6 +2,7 @@ import json
 import os
 from agents.RagKnowledgeBase import RagKnowledgeBase
 from agents.CodeDocumentor import CodeDocumentor
+from agents.CodeSnippetProvider import CodeSnippetProvider
 
 from tools.CreateEmbedding import CreateEmbedding
 from tools.SupabaseVectorStore import SupabaseVectorStore
@@ -149,5 +150,30 @@ async def example2():
     #     print(agent_response, end="", flush=True)  # Real-time console output
 
 
+async def example3():
+    code_snippet_provider = CodeSnippetProvider(
+        embedder=embedder,
+        url=OLLAMA_URL,
+        model=CODE_MODEL,
+        max_context_tokens_length=8000,
+        vector_store=SupabaseVectorStore(
+            url=SUPABASE_URL,
+            token=SUPABASE_TOKEN,
+            table_name="n8n_documents_net_micro",
+            function_name="match_n8n_documents_net_micro_neo"
+        )
+    )
+
+    bvms_document_path = os.path.join(code_document_folder_path, "bbc-bvms-net-back-end-modular")
+
+    await code_snippet_provider.learn(
+        folder_path=bvms_document_path,
+        keyword_extractor=KeywordExtractor(
+            url=OLLAMA_URL,
+            model=GENERAL_MODEL
+        ),
+    )
+
+
 import asyncio
-asyncio.run(example2())
+asyncio.run(example3())

@@ -36,40 +36,6 @@ class CodeDocumentor:
         self.max_history_tokens_length = max_history_tokens_length
         self.document_extractor = document_extractor
     
-    # Organize retrieved documents into structured sections
-    def organize_documents(self, documents: List[dict]) -> List[dict]:
-        # Extract titles and organize by unique titles
-        titles = [document["content"].split(":")[0] for document in documents]
-        unique_titles = list(dict.fromkeys(titles))
-
-        sections = []
-        for title in unique_titles:
-            counts = len([doc for doc in documents if doc["content"].split(":")[0] == title])
-            docs = [
-                document["content"].replace(title, "", 1).replace(":", "", 1).strip()
-                for document in documents
-                if document["content"].split(":")[0] == title
-            ]
-            context = "\n".join(docs)
-
-            sections.append({"title": title, "counts": counts, "context": context})
-
-        return sections
-
-    # Retrieve documents relevant to the question
-    def retrieve_documents(self, question: str) -> str:
-        if not self.embedder or not self.vector_store:
-            raise ValueError("Embedder and vector store must be set before retrieving documents.")
-        
-        question_embedding = self.embedder.run(question)
-        documents = self.vector_store.query_documents(query_embedding=question_embedding, match_count=self.match_count)
-
-        sections = self.organize_documents(documents)
-        context = ""
-        for section in sections:
-            context += f"""\n# {section["title"]}:\n{section['context']}"""
-        return context
-    
     async def write_documents(self, original_folder_path: str, result_folder_path: str, allowed_file_extensions: List[str] = [], ignored_file_pattern: List[str] = [], document_writter = None, summarizer = None, keyword_extractor = None):
         if not document_writter or not summarizer or not keyword_extractor:
             raise ValueError("Code documentor, code summarizer, and keyword extractor must be set before writing documents.")
