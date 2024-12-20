@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Crawler:
-    def __init__(self, api_key: str = None, log_folder: str = None):
+    def __init__(self, api_key: str = None):
         api_key = api_key or os.getenv("FIRECRAW_API_KEY") or None
         print(f"API Key: {api_key}")
         if api_key:
             self.firecrawl = FirecrawlApp(api_key)
-        if log_folder:
-            self.log_folder = log_folder
-            os.makedirs(log_folder, exist_ok=True)
+        log_folder = os.path.join(os.getcwd(), "logs", "crawler")
+        os.makedirs(log_folder, exist_ok=True)
+        self.log_folder = log_folder
 
     async def craw(self, url: str):
         final_content = f"\n\n📖 **Crawling content from {url}**...\n\n"
@@ -26,13 +26,10 @@ class Crawler:
         else:
             document = await scrape_content(url)
         final_content += document
-        if self.log_folder:
-            self.write_to_log(f"{url}", document)
+        self.write_to_log(f"{url}", document)
         return final_content
 
     def write_to_log(self, url, content):
-        if not self.log_folder:
-            return
         datetime_str = datetime.datetime.now().strftime("%Y-%m-%d")
         final_file_name = f"firecraw-{datetime_str}-{cleanFileName(url)}.md"
         folder_path = os.path.join(self.log_folder, datetime_str)
@@ -91,6 +88,6 @@ def RecursiveSplitLines(document: str, limit: int = 1000):
     
 if __name__ == "__main__":
     import asyncio
-    crawler = Crawler(log_folder="logs")
+    crawler = Crawler()
     url = "https://climate.ec.europa.eu/eu-action/transport/reducing-emissions-shipping-sector/faq-maritime-transport-eu-emissions-trading-system-ets_en"
     asyncio.run(crawler.craw(url))

@@ -7,6 +7,7 @@ load_dotenv()
 
 class ChatGpt:
     def __init__(self, api_key: str = None):
+        self.name = "ChatGpt"
         self.api_key = api_key or os.getenv("OPENAI_API_KEY") or None
         self.client = OpenAI(api_key=api_key)
 
