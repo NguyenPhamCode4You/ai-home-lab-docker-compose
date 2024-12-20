@@ -8,7 +8,7 @@ class Job:
         self.instruction = instruction
         self.document_chunk_size = document_chunk_size
 
-    async def stream(self, context: str):
+    async def stream(self, question: str = None, context: str = None):
         chunks = HardSplitChar(context, self.document_chunk_size)
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.model.name, self.name, date_str)
@@ -17,7 +17,7 @@ class Job:
         
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
             for chunk in chunks:
-                final_prompt = self.instruction.format(context=chunk)
+                final_prompt = self.instruction.format(context=chunk, question=question)
                 async for response_chunk in self.model.stream(final_prompt):
                     yield response_chunk
                     file.write(response_chunk)

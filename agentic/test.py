@@ -27,7 +27,7 @@ async def main():
     with open(file_path, "r", encoding="utf-8") as file:
         url_content = file.read()
 
-    async for chunk in content_writer.stream(url_content):
+    async for chunk in content_writer.stream(context=url_content):
         print(chunk, end="", flush=True)
 
 if __name__ == "__main__":

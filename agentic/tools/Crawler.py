@@ -11,7 +11,6 @@ load_dotenv()
 class Crawler:
     def __init__(self, api_key: str = None):
         api_key = api_key or os.getenv("FIRECRAW_API_KEY") or None
-        print(f"API Key: {api_key}")
         if api_key:
             self.firecrawl = FirecrawlApp(api_key)
         log_folder = os.path.join(os.getcwd(), "logs", "crawler")
@@ -40,11 +39,8 @@ class Crawler:
             file.flush()
 
 def cleanFileName(file_name: str) -> str:
-    # Replace spaces with dashes
     file_name = file_name.replace(" ", "-")
-    # Remove non-alphanumeric characters except dashes
     file_name = re.sub(r'[^A-Za-z0-9\-]', '', file_name)
-    # Ensure no double dashes
     file_name = re.sub(r'-+', '-', file_name)
     return file_name.strip("-")
     
