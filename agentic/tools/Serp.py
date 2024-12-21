@@ -8,7 +8,7 @@ class Serp:
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("SERP_API_KEY") or None
 
-    def search_urls(self, query, num_results=10):
+    def run(self, query, num_results=10):
         try:
             params = {
                 "engine": "google",
@@ -35,6 +35,6 @@ class Serp:
         
 if __name__ == "__main__":
     serp = Serp()
-    results = serp.search_urls("Python programming", num_results=5)
+    results = serp.run("Python programming", num_results=5)
     for result in results:
         print(f"{result['title']}: {result['url']}")
