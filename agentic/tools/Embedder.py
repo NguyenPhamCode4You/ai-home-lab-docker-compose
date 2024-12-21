@@ -1,11 +1,11 @@
 import os
-from dotenv import load_dotenv
 import requests
+
+from dotenv import load_dotenv
 load_dotenv()
 
 class Embedder:
     def __init__(self, url: str = None, model: str = None):
-        self.name = "Embedder"
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_EMBEDDING_MODEL") or None
 

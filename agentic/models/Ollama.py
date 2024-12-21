@@ -26,12 +26,6 @@ class Ollama:
                         print(f"Error decoding chunk: {e}")
                         continue
 
-    async def run(self, prompt: str):
-        final_text = ""
-        async for response_text in self.stream(prompt):
-            final_text += response_text
-        return final_text
-
 # Example usage
 if __name__ == "__main__":
     import asyncio

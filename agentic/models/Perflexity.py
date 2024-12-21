@@ -35,12 +35,6 @@ class Perplexity:
             except Exception as exc:
                 raise RuntimeError(f"Unexpected error: {exc}")
     
-    async def run(self, prompt: str):
-        final_text = ""
-        async for response_text in self.stream(prompt):
-            final_text += response_text
-        return final_text
-            
 async def stream_batch_words(final_text: str, batch_size: int = 2, stream_delay: float = 0.1):
     # Use regex to capture words and whitespace, preserving newlines
     tokens = re.findall(r'\S+|\s+', final_text)
