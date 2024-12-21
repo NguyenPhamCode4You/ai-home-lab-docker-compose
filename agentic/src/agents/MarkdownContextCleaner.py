@@ -1,5 +1,5 @@
-from Task import Task
-from models.Ollama import Ollama
+from .Task import Task
+from .models.Ollama import Ollama
 
 class MarkdownContextCleaner(Task):
     def __init__(self):

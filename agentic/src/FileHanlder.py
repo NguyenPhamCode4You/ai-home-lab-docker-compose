@@ -3,17 +3,17 @@ import re
 from typing import Callable
 
 async def for_each_file_in_folder(folder_path: str, executor: Callable[[str, str, str], None]) -> None:
-    for root, file_path, files in os.walk(folder_path):
+    for root, _, files in os.walk(folder_path):
         for file in files:
-            root_file_path = os.path.join(root, file)
+            file_path = os.path.join(root, file)
             file_name = os.path.splitext(file)[0]
             try:
-                file_content = _read_file(root_file_path)
+                file_content = _read_file(file_path)
             except Exception as e:
                 print(f"Failed to read file '{file_path}': {e}")
                 continue
             try:
-                await executor(file_content, file_path, file_name)
+                await executor(file_content, root, file_name)
             except Exception as e:
                 print(f"Failed to execute handler for file '{file_path}': {e}")
 
