@@ -8,7 +8,6 @@ load_dotenv()
 
 class Perplexity:
     def __init__(self, api_key: str = None):
-        self.name = "Perplexity"
         self.api_key = api_key or os.getenv("PERFLEXITY_API_KEY") or None
 
     async def stream(self, prompt: str):

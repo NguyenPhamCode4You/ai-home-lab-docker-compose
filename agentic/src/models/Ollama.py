@@ -7,7 +7,6 @@ load_dotenv()
 
 class Ollama:
     def __init__(self, url: str = None, model: str = None):
-        self.name = "Ollama"
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_GENERAL_MODEL") or None
 
