@@ -6,8 +6,7 @@ from fastapi.responses import StreamingResponse
 from src.RagAssistant import RagAssistant
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
-    max_context_tokens=9000,
-    context_chunk_size=5600,
+    max_context_tokens=10000,
     max_histories_tokens=200)
 
 # Define a model for the input specific to /api/chat

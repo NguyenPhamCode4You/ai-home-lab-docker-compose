@@ -1,14 +1,24 @@
+import asyncio
 import datetime
 import os
 from typing import List
 
+final_thought_prompt_template = """
+You are the final thought that reflect your previous answers to the user questions.
+Here is the user question: {question}
+Your previous answers to the user questions:
+{context}
+Generate one final answer that combines all the previous answers to the user questions as your best answer to the user question.
+"""
+
 class Task:
-    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = 8000, max_histories_tokens: int = 1000):
+    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = 8000, max_histories_tokens: int = 1000, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
         self.max_histories_tokens = max_histories_tokens
+        self.allow_reflection = allow_reflection
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         chunks = HardSplitChar(context, self.context_chunk_size)
@@ -19,14 +29,31 @@ class Task:
         histories = get_chat_history_string(conversation_history, self.max_histories_tokens)
         
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
+            response_iterations = ""
             for index, chunk in enumerate(chunks):
+                if index > 0:
+                    next_iteration_header = "\n\nAdditionally...\n\n"
+                    await asyncio.sleep(1)
+                    yield next_iteration_header
+                    file.write(next_iteration_header)
+                    file.flush()
                 final_prompt = self.instruction_template.format(context=chunk, question=question, histories=histories)
                 if len(chunks) > 1:
-                    final_prompt += f"\nThis is a continuation answers number: {index + 1}/{len(chunks)}, so be direct with your answer."
-                if index > 0:
-                    yield "\n**Continues...**\n"
-                    file.write("\n")
+                    final_prompt += "\n\nBe very direct with your answer!\n\n"
                 async for response_chunk in self.llm_model.stream(final_prompt):
+                    yield response_chunk
+                    response_iterations += response_chunk
+                    file.write(response_chunk)
+                    file.flush()
+
+            if len(chunks) > 1 and self.allow_reflection:
+                final_thought_header = f"\n\n ### 🎯 Lets have one final revise on the question ...\n\n"
+                await asyncio.sleep(1)
+                yield final_thought_header
+                file.write(final_thought_header)
+                file.flush()
+                final_thought_prompt = final_thought_prompt_template.format(context=response_iterations, question=question)
+                async for response_chunk in self.llm_model.stream(final_thought_prompt):
                     yield response_chunk
                     file.write(response_chunk)
                     file.flush()
