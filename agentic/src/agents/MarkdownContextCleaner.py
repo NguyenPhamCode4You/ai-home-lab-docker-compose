@@ -7,12 +7,13 @@ class MarkdownContextCleaner(Task):
             task_name="markdown-context-cleaner",
             llm_model=Ollama(),
             instruction_template="""
-            You are an expert at re-formatting markdown text for further processing.
+            You are an expert at re-formatting markdown content for further LLM processing.
 
             1. For tables:
-            - Remove table formating
-            - Describe each row in a single line.
-            Example:
+            - Remove all table formating
+            - Describe each row in a single line, with column names and values separated by a colon.
+            
+            Table Example:
             ## Product Comparison
             | Product    | Price | Rating | Description                         |
             |------------|-------|--------|-------------------------------------|
@@ -22,59 +23,30 @@ class MarkdownContextCleaner(Task):
 
             Output:
             ## Product Comparison
-            Product A: Price $10, Rating 4.5, Affordable and high-quality.
-            Product B: Price $20, Rating 4.8, Premium quality with extra features.
-            Product C: Price $15, Rating 4.2, Good value for the price.
+            Product: Product A: Price $10, Rating 4.5, Description: Affordable and high-quality.
+            Product: Product B: Price $20, Rating 4.8, Description: Premium quality with extra features.
+            Product: Product C: Price $15, Rating 4.2, Description: Good value for the price.
 
-            3. For code blocks, api urls or json object: Keep them untouched, put all in 01 line.
-            4. For sentences or lines with words counts less then 5:
-            - Combine them into a single line, reduce number of line breaks.
-            - Except for markdown headers, keep them as is.
+            2. For code blocks, api urls or json object: Keep them untouched, put all in 01 line.
+            3. For sentences or lines with words counts less then 5: Combine them into a single line, reduce number of line breaks.
             Example:
             ---
-            # VOYAGE MANAGEMENT SYSTEM
-
             High Level Database Design Document
-
             15-Nov-2023
-
             Version: 1.0
-
             Document Control
-
             Document Information
             ---
-
             Output:
-            # VOYAGE MANAGEMENT SYSTEM 
             High Level Database Design Document, 15-Nov-2023, Version: 1.0, Document Control, Document Information
 
-            5. For tables with repeated values
-            - Remove the repeated values, make the unique values comma separated.
-            - Remove numbers, special characters and formatting issues.
+            4. For repeated values: Keep only one instance of the value.
+            5. For lists: Convert items to numbering format.
 
-            Example:
-            ## Voyage Revenues
-            | Voyage Revenues      | Voyage Revenues      | Voyage Revenues      | 1.345.150      |
-            |----------------------|----------------------|----------------------|----------------|
-            | Freight              | Freight 12              | Freight              | 1.200.000      |
-            | Misc. Revenue        | Misc. Revenue        | Misc. Revenueqq        | 150            |
-            | Demurrage            | Demurrage sfe            | Demurrageddw            | 26.000         |
-            | Despatch             | Despatch             | Despatch             | 21.500         |
-
-            Output:
-            ## Voyage Revenues
-            Voyage Revenues: Freight, Misc. Revenue, Demurrage, Despatch
-
-            6. For lists:
-            - Convert items to numbering format.
-
-            The rest of the text should be kept as is.
             Important:
-            - Return only the formatted text.
-            - Do not include the base prompt in the response.
-            - Do not include the input text in the response.
-            - Do not include any additional information.
+            1. DO NOT include noise or irrelevant information, for example: ads, comments, page navigation, hyberlink, citations, references.
+            2. Just return the written content, no extra explanation needed.
+            3. Keep the markdown header as is, only re-format the content.
 
             Now, please re-format the following text: 
             {context}
