@@ -1,4 +1,5 @@
 import os
+from typing import List
 import requests
 
 from dotenv import load_dotenv
@@ -14,6 +15,14 @@ class SupabaseVectorStore:
             "Authorization": f"Bearer {self.token}",
             "apikey": self.token
         }
+
+    def get_documents_string(self, function_name: str, question: str, match_count: int = 200):
+        documents = self.query_documents(function_name, question, match_count)
+        sections = self.organize_documents(documents)
+        context_result = ""
+        for section in sections:
+            context += f"""\n# {section["title"]}:\n{section['context']}"""
+        return context_result
     
     def query_documents(self, function_name: str, question: str, match_count: int = 200):
         rpc_endpoint = f"{self.url}/rest/v1/rpc/{function_name}"
@@ -47,3 +56,18 @@ class SupabaseVectorStore:
         if response.status_code != 201:
             raise Exception(f"Failed to insert document: {response.status_code}, {response.text}")
         return True
+    
+    def organize_documents(self, documents: List[dict]) -> List[dict]:
+        titles = [document["content"].split(":")[0] for document in documents]
+        unique_titles = list(dict.fromkeys(titles))
+        sections = []
+        for title in unique_titles:
+            counts = len([doc for doc in documents if doc["content"].split(":")[0] == title])
+            docs = [
+                document["content"].replace(title, "", 1).replace(":", "", 1).strip()
+                for document in documents
+                if document["content"].split(":")[0] == title
+            ]
+            context = "\n".join(docs)
+            sections.append({"title": title, "counts": counts, "context": context})
+        return sections
