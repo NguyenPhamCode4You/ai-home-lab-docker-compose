@@ -6,7 +6,7 @@ from fastapi.responses import StreamingResponse
 from src.RagAssistant import RagAssistant
 imos_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_ops_neo",
-    max_context_tokens=9000,
+    max_context_tokens=15000,
     context_chunk_size=5600,
     max_histories_tokens=200)
 
