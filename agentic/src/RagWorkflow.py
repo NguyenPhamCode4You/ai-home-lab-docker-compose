@@ -1,5 +1,5 @@
 import os
-from FileHanlder import for_each_file_in_folder, remove_excessive_spacing, split_markdown_header_and_content, recursive_split_chunks, extract_rag_sentences
+from FileHanlder import for_each_file_in_folder, remove_excessive_spacing, split_markdown_header_and_content, recursive_split_chunks
 from agents.MarkdownContextCleaner import MarkdownContextCleaner
 from agents.DocumentLinesExtractor import DocumentLinesExtractor
 from agents.KeywordExtractor import KeywordExtractor
@@ -28,12 +28,8 @@ async def insert_sentences(
         for header, content in sections:
             header = header.strip().replace(":","")
             content = remove_excessive_spacing(content)
-            # Method 1
             chunks_string = await sentence_extractor.run(context=content)
             sentences = chunks_string.split(sentence_delimeter) if chunks_string else []
-            # Method 2
-            # sentences = extract_rag_sentences(content) if content else []
-            # print(f"\n\n\n Extracted sentences ooooooooooooooooo\n {"\n".join(sentences)} \n ooooooooooooooooo \n\n\n")
             for sentence in sentences:
                 if not sentence or len(sentence) < 5:
                     continue
@@ -84,11 +80,14 @@ async def clean_src_folder(
 
 if __name__ == "__main__":
     import asyncio
-    # asyncio.run(clean_src_folder(
-    #     src_folder_path="docs/bvms",
-    #     context_chunk_size=1600,
-    # ))
-    asyncio.run(insert_sentences(
-        src_folder_path="docs/bvms_cleaned",
-        table_name="n8n_documents_bvms_neo",
-    ))
+    async def clean():
+        await clean_src_folder(
+            src_folder_path="docs/bvms",
+            context_chunk_size=1600,
+        )
+    async def insert():
+        await insert_sentences(
+            src_folder_path="docs/bvms_cleaned",
+            table_name="n8n_documents_bvms_neo",
+        )
+    asyncio.run(clean())
