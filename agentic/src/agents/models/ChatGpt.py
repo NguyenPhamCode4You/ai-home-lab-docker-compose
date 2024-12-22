@@ -12,7 +12,7 @@ class ChatGpt:
     async def stream(self, prompt: str):
         if not self.api_key:
             raise ValueError("OpenAI API key must be set before using the assistant.")
-        client = OpenAI(self.api_key)
+        client = OpenAI(api_key=self.api_key)
         response = client.chat.completions.create(
             model='gpt-4o',
             messages=[{"role": "user", "content": prompt}],
