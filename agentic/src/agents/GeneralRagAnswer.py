@@ -24,6 +24,6 @@ class GeneralRagAnswer(Task):
             Here are the previous questions and answers that you can use to base your answer on:
             {histories}
 
-            Now, answer with confidence.
+            Now, answer with confidence. Be direct!
             """
         )

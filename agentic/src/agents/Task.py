@@ -19,8 +19,13 @@ class Task:
         histories = get_chat_history_string(conversation_history, self.max_histories_tokens)
         
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
-            for chunk in chunks:
+            for index, chunk in enumerate(chunks):
                 final_prompt = self.instruction_template.format(context=chunk, question=question, histories=histories)
+                if len(chunks) > 1:
+                    final_prompt += f"\nThis is a continuation answers number: {index + 1}/{len(chunks)}, so be direct with your answer."
+                if index > 0:
+                    yield "\n**Continues...**\n"
+                    file.write("\n")
                 async for response_chunk in self.llm_model.stream(final_prompt):
                     yield response_chunk
                     file.write(response_chunk)

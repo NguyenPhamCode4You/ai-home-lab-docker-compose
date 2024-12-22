@@ -9,7 +9,7 @@ class RagAssistant():
             query_function_name: str, 
             llm_vector_store: SupabaseVectorStore = None, 
             llm_rag_answer: Task = None,
-            document_match_count: int = 50,
+            document_match_count: int = 200,
             max_context_tokens: int = 9000,
             context_chunk_size: int = 5600,
             max_histories_tokens: int = 50):
@@ -23,7 +23,7 @@ class RagAssistant():
         self.max_histories_tokens = max_histories_tokens
 
     async def stream(self, question: str = None, conversation_history: list = None):
-        context = await self.vector_store.get_documents_string(
+        context = self.vector_store.get_documents_string(
             question=question,
             function_name=self.query_function_name,
             match_count=self.document_match_count)
