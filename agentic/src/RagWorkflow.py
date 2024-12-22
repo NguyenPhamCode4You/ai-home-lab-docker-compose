@@ -26,7 +26,7 @@ async def insert_sentences(
         vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
         sections = split_markdown_header_and_content(file_content)
         for header, content in sections:
-            header = header.strip()
+            header = header.strip().replace(":","")
             content = remove_excessive_spacing(content)
             # Method 1
             chunks_string = await sentence_extractor.run(context=content)
