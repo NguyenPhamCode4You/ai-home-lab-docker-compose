@@ -17,7 +17,7 @@ class Crawler:
         os.makedirs(log_folder, exist_ok=True)
         self.log_folder = log_folder
 
-    async def craw(self, url: str):
+    async def run(self, url: str):
         final_content = f"\n\n📖 **Crawling content from {url}**...\n\n"
         if self.firecrawl:
             response = self.firecrawl.scrape_url(url=url, params={'formats': ['markdown']})
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     import asyncio
     crawler = Crawler()
     url = "https://climate.ec.europa.eu/eu-action/transport/reducing-emissions-shipping-sector/faq-maritime-transport-eu-emissions-trading-system-ets_en"
-    asyncio.run(crawler.craw(url))
+    asyncio.run(crawler.run(url))

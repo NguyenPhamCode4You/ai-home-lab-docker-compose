@@ -63,7 +63,7 @@ ollama push nichealpham/lora-8b
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create a table to store your documents
-create table n8n_documents_ops (
+create table n8n_documents_bvms_neo (
   id bigserial primary key,
   content text,
   summarize text,
@@ -73,7 +73,7 @@ create table n8n_documents_ops (
 );
 
 -- Create a function to search for documents
-CREATE FUNCTION match_n8n_documents_ops_neo (
+CREATE FUNCTION match_n8n_documents_bvms_neo (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
   filter JSONB DEFAULT '{}'
@@ -94,8 +94,8 @@ BEGIN
     content,
     summarize,
     metadata,
-    2 - ((n8n_documents_ops.embedding <=> query_embedding) + (n8n_documents_ops.embedding2 <=> query_embedding)) AS similarity
-  FROM n8n_documents_ops
+    2 - ((n8n_documents_bvms_neo.embedding <=> query_embedding) + (n8n_documents_bvms_neo.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_bvms_neo
   WHERE metadata @> filter
   ORDER BY similarity DESC
   LIMIT match_count;

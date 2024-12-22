@@ -1,15 +1,15 @@
 import os
-from dotenv import load_dotenv
 import requests
+
+from dotenv import load_dotenv
 load_dotenv()
 
-class Embedder:
+class Embedding:
     def __init__(self, url: str = None, model: str = None):
-        self.name = "Embedder"
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_EMBEDDING_MODEL") or None
 
-    def run(self, message: str) -> list:
+    def run(self, message: str):
         response = requests.post(
             f"{self.url}/api/embed",
             json={"model": self.model, "input": str(message)}
@@ -24,6 +24,6 @@ class Embedder:
 if __name__ == "__main__":
     import asyncio
     async def main():
-        model = Embedder()
+        model = Embedding()
         print(model.run("Who is the president of the United States?"))
     asyncio.run(main())

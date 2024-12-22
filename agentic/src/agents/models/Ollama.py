@@ -7,7 +7,6 @@ load_dotenv()
 
 class Ollama:
     def __init__(self, url: str = None, model: str = None):
-        self.name = "Ollama"
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_GENERAL_MODEL") or None
 
@@ -25,12 +24,6 @@ class Ollama:
                     except Exception as e:
                         print(f"Error decoding chunk: {e}")
                         continue
-
-    async def run(self, prompt: str):
-        final_text = ""
-        async for response_text in self.stream(prompt):
-            final_text += response_text
-        return final_text
 
 # Example usage
 if __name__ == "__main__":
