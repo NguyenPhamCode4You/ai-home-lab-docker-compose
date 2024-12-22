@@ -4,7 +4,8 @@ from typing import Callable
 
 async def for_each_file_in_folder(folder_path: str, executor: Callable[[str, str, str], None]) -> None:
     for root, _, files in os.walk(folder_path):
-        for file in files:
+        for index, file in enumerate(files):
+            print(f"Processing file {index + 1}/{len(files)}: {file} in {root} ooooooooooooooooo")
             file_path = os.path.join(root, file)
             file_name = os.path.splitext(file)[0]
             try:
@@ -72,3 +73,25 @@ def recursive_split_chunks(document: str, char: str = ".", limit: int = 600):
     if len(paragraph) > 0:
         paragraphs.append(paragraph)
     return paragraphs
+
+def extract_rag_sentences(text: str, min_chars = 100):
+    extracted_sentences = []
+    sentences = text.split(". ")
+    for sentence in sentences:
+        if "```" in sentence or "===" in sentence or "'''" in sentence:
+            extracted_sentences.append(sentence)
+            continue
+        if "{" in sentence and "}" in sentence and '"' in sentence and ":" in sentence:
+            extracted_sentences.append(sentence)
+            continue
+        sub_sentences = sentence.split("\n")
+        current_sentence = ""
+        for sub_sentence in sub_sentences:
+            if len(current_sentence) + len(sub_sentence) < min_chars:
+                current_sentence += f"{sub_sentence}. "
+                continue
+            extracted_sentences.append(current_sentence)
+            current_sentence = f"{sub_sentence}. "
+        if len(current_sentence) > 0:
+            extracted_sentences.append(current_sentence)
+    return extracted_sentences

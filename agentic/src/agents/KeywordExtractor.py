@@ -8,7 +8,7 @@ class KeywordExtractor(Task):
             llm_model=Ollama(),
             instruction_template=f"""
             Your task is to extract important keywords from the below context.
-            {'{context}'}
+            {"{context}"}
             ------
             Considerations:
             1. Keywords should be the main entities that text is about, or refering to
