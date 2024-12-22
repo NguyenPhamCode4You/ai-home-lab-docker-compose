@@ -17,11 +17,12 @@ class SupabaseVectorStore:
         }
 
     def get_documents_string(self, function_name: str, question: str, match_count: int = 200):
-        documents = self.query_documents(function_name, question, match_count)
+        documents = self.query(function_name, question, match_count)
         sections = self.organize_documents(documents)
         context_result = ""
         for section in sections:
-            context += f"""\n# {section["title"]}:\n{section['context']}"""
+            context_result += f"""\n# {section["title"]}:\n{section['context']}"""
+        print(f"Context result: {context_result}")
         return context_result
     
     def query(self, function_name: str, question: str, match_count: int = 200):
