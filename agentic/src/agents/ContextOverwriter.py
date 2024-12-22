@@ -13,6 +13,7 @@ class ContextOverwriter(Task):
             Important:
             1. DO NOT include noise or irrelevant information, for example: ads, comments, page navigation, hyberlink, citations, references.
             2. Keep the content clear, detailed, well-structured with bullet points, and easy to understand.
-            3. Just return the written content, no extra explanation needed.
+            3. Create markdown headers for each section, each header should be concise, informative, and relevant to the content. Maximum 10 words.
+            4. Just return the written content, no extra explanation needed.
             """
         )

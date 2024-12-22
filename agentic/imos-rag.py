@@ -11,14 +11,16 @@ async def overwrite():
     await clean_src_folder(
         src_folder_path=src_folder_path, 
         target_folder_path=overwrite_folder_path, 
-        llm_context_cleaner=ContextOverwriter())
+        llm_context_cleaner=ContextOverwriter(),
+        context_chunk_size=1600)
     print("Overwrite done")
 
 async def clean():
     await clean_src_folder(
         src_folder_path=overwrite_folder_path, 
         target_folder_path=cleaned_folder_path, 
-        llm_context_cleaner=MarkdownContextCleaner())
+        llm_context_cleaner=MarkdownContextCleaner(),
+        context_chunk_size=1600)
     print("Clean done")
 
 async def insert():
@@ -29,4 +31,4 @@ async def insert():
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(overwrite())
+    asyncio.run(insert())
