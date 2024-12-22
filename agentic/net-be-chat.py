@@ -12,8 +12,11 @@ net_be_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(
-            model=OLLAMA_CODE_MODEL
+            model=OLLAMA_CODE_MODEL,
         ),
+        context_chunk_size=6000,
+        max_histories_tokens=200,
+        allow_reflection=True
     ),
     max_context_tokens=11000,
     max_histories_tokens=200)
