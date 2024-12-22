@@ -6,7 +6,6 @@ from fastapi.responses import StreamingResponse
 from src.RagAssistant import RagAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.models.Ollama import Ollama
-from src.agents.models.ChatGpt import ChatGpt
 from src.agents.constants import OLLAMA_CODE_MODEL
 
 net_be_assistant = RagAssistant(
@@ -15,7 +14,6 @@ net_be_assistant = RagAssistant(
         llm_model=Ollama(
             model=OLLAMA_CODE_MODEL,
         ),
-        # llm_model=ChatGpt(),
         context_chunk_size=6000,
         max_histories_tokens=200,
         allow_reflection=True

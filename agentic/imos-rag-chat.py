@@ -3,12 +3,21 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 
+from src.agents.GeneralRagAnswer import GeneralRagAnswer
+from src.agents.models.Ollama import Ollama
+from src.agents.models.ChatGpt import ChatGpt
 from src.RagAssistant import RagAssistant
+
 imos_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_ops_neo",
-    max_context_tokens=15000,
-    context_chunk_size=5600,
-    max_histories_tokens=200)
+    llm_rag_answer=GeneralRagAnswer(
+        llm_model=ChatGpt(),
+        context_chunk_size=12000,
+        max_histories_tokens=500,
+        allow_reflection=False
+    ),
+    max_context_tokens=12000,
+    max_histories_tokens=500)
 
 # Define a model for the input specific to /api/chat
 class Message(BaseModel):
