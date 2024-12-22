@@ -1,7 +1,7 @@
 from .Task import Task
 from .models.Ollama import Ollama
 
-from constants import OLLAMA_CODE_MODEL
+from .constants import OLLAMA_CODE_MODEL
 
 class CodeSummarizer(Task):
     def __init__(self):

@@ -1,12 +1,12 @@
 import os
-from FileHanlder import for_each_file_in_folder, remove_excessive_spacing, split_markdown_header_and_content, recursive_split_chunks
-from agents.MarkdownContextCleaner import MarkdownContextCleaner
-from agents.DocumentLinesExtractor import DocumentLinesExtractor
-from agents.KeywordExtractor import KeywordExtractor
-from agents.ContextSummarizer import ContextSummarizer
-from agents.tools.SupabaseVectorStore import SupabaseVectorStore
-from agents.tools.Embedding import Embedding
-from agents.Task import Task
+from .FileHanlder import for_each_file_in_folder, remove_excessive_spacing, split_markdown_header_and_content, recursive_split_chunks
+from .agents.MarkdownContextCleaner import MarkdownContextCleaner
+from .agents.DocumentLinesExtractor import DocumentLinesExtractor
+from .agents.KeywordExtractor import KeywordExtractor
+from .agents.ContextSummarizer import ContextSummarizer
+from .agents.tools.SupabaseVectorStore import SupabaseVectorStore
+from .agents.tools.Embedding import Embedding
+from .agents.Task import Task
 
 async def insert_sentences(
         src_folder_path: str,
