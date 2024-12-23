@@ -10,16 +10,14 @@ from src.agents.constants import OLLAMA_CODE_MODEL
 
 net_be_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
+    max_context_tokens=11000,
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(
             model=OLLAMA_CODE_MODEL,
         ),
         context_chunk_size=6000,
-        max_histories_tokens=200,
         allow_reflection=True
-    ),
-    max_context_tokens=11000,
-    max_histories_tokens=200)
+    ))
 
 # Define a model for the input specific to /api/chat
 class Message(BaseModel):

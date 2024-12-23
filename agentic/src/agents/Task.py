@@ -12,7 +12,7 @@ Generate one final answer that combines all the previous answers to the user que
 """
 
 class Task:
-    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = 8000, max_histories_tokens: int = 1000, allow_reflection: bool = False):
+    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = 6000, max_histories_tokens: int = 10, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model
         self.instruction_template = instruction_template
@@ -21,7 +21,7 @@ class Task:
         self.allow_reflection = allow_reflection
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
-        chunks = HardSplitChar(context, self.context_chunk_size)
+        chunks = HardSplitContextChunks(context, self.context_chunk_size)
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
         os.makedirs(folder_path, exist_ok=True)
@@ -31,15 +31,14 @@ class Task:
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
             response_iterations = ""
             for index, chunk in enumerate(chunks):
-                if index > 0:
-                    next_iteration_header = "\n\nAdditionally...\n\n"
-                    await asyncio.sleep(1)
+                if len(chunks) > 1:
+                    next_iteration_header = get_iternation_name(index)
                     yield next_iteration_header
                     file.write(next_iteration_header)
                     file.flush()
                 final_prompt = self.instruction_template.format(context=chunk, question=question, histories=histories)
                 if len(chunks) > 1:
-                    final_prompt += "\n\nBe very direct with your answer!\n\n"
+                    final_prompt += "\n\nBe direct with your answer!\n\n"
                 async for response_chunk in self.llm_model.stream(final_prompt):
                     yield response_chunk
                     response_iterations += response_chunk
@@ -64,8 +63,14 @@ class Task:
             print(response_chunk, end="", flush=True)
             final_text += response_chunk
         return final_text
+    
+def get_iternation_name(iteration_index: int = 0):
+    recal_name = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
+    return f"\n\n #### 🧠 {recal_name[iteration_index]} Recall from Memory ... \n\n"
 
-def HardSplitChar(text: str, max_length: int = 8000):
+def HardSplitContextChunks(text: str, max_length: int = 8000):
+    if text is None:
+        return ["No context provided."]
     chunks = []
     while len(text) > max_length:
         chunks.append(text[:max_length])
