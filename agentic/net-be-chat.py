@@ -10,12 +10,12 @@ from src.agents.constants import OLLAMA_CODE_MODEL
 
 net_be_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
-    max_context_tokens=11000,
+    max_context_tokens=12000,
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(
             model=OLLAMA_CODE_MODEL,
         ),
-        context_chunk_size=6000,
+        context_chunk_size=5500,
         allow_reflection=True
     ))
 

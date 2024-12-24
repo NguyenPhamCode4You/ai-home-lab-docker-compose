@@ -10,3 +10,4 @@ google-search-results
 bs4
 firecrawl-py
 openai
+google-generativeai
