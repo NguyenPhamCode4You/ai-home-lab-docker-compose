@@ -45,7 +45,7 @@ class ResearchAssistant():
                 yield "\n\n"
                 research_result += topic_name
                 research_prompt = f"""
-                Provide a comprehensive answer for this topic: {topic}, with regard to the user question: {question}
+                Provide a comprehensive answer for this topic: {topic}.
                 Your answer should be written is a well-structured, informative bullet points format.
                 Now, jump into the content directly.
                 """
