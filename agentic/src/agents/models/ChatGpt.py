@@ -6,15 +6,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class ChatGpt:
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, model: str = "gpt-4o"):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY") or None
+        self.model = model or "gpt-4o"
 
     async def stream(self, prompt: str):
         if not self.api_key:
             raise ValueError("OpenAI API key must be set before using the assistant.")
         client = OpenAI(api_key=self.api_key)
         response = client.chat.completions.create(
-            model='gpt-4o',
+            model=self.model,
             messages=[{"role": "user", "content": prompt}],
             stream=True
         )

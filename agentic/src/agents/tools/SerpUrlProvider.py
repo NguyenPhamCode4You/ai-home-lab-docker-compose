@@ -4,7 +4,7 @@ from serpapi import GoogleSearch
 from dotenv import load_dotenv
 load_dotenv()
 
-class Serp:
+class SerpUrlProvider:
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("SERP_API_KEY") or None
 
@@ -34,7 +34,7 @@ class Serp:
             return []
         
 if __name__ == "__main__":
-    serp = Serp()
+    serp = SerpUrlProvider()
     results = serp.run("Python programming", num_results=5)
     for result in results:
         print(f"{result['title']}: {result['url']}")

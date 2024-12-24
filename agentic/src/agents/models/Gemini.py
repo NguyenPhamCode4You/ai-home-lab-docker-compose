@@ -6,14 +6,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Gemini:
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, model: str = "gemini-1.5-flash"):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY") or None
+        self.model = model or "gemini-1.5-flash"
         genai.configure(api_key=api_key)
 
     async def stream(self, prompt: str):
         if not self.api_key:
             raise ValueError("Gemini API key must be set before using the assistant.")
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel(self.model)
         response = model.generate_content(prompt, stream=True)
         for chunk in response:
             yield chunk.text
