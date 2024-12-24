@@ -40,11 +40,19 @@ class Serp:
                 yield token
 
             if self.crawler is not None:
-                search_results = search_results[:3]
-                for url in search_results:
+                topics_parts = citation_string.split("\n**Citations:**\n")
+                if len(topics_parts) > 1:
+                    topics_string = topics_parts[1]
+                    topics = topics_string.split("\n")
+                else:
+                    topics = []
+                citations = [topic for topic in topics if topic is not None and len(topic) > 0 and ":" in topic]
+                citations = citations[:3]
+                for url in citations:
                     yield f"\n\n📖 **Summarizing content from {url}**...\n\n"
                     url_content = await self.crawler.run(url)
-                    async for summary_chunk in self.general_answer.stream(f"For less than 400 words, summarize this content: {url_content}"):
+                    url_summarize_prompt = f"For less than 250 words, summarize this content: {url_content}"
+                    async for summary_chunk in self.general_answer.stream():
                         yield summary_chunk
 
         except Exception as e:

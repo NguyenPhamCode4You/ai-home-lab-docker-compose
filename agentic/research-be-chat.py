@@ -10,6 +10,7 @@ from src.agents.ContextSummarizer import ContextSummarizer
 
 research_assistant = ResearchAssistant(
     topics_count=3,
+    allow_summarize_url=True,
     # llm_context_summarizer=ContextSummarizer(
     #     llm_model=Gemini(),
     #     max_char=4000,

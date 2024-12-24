@@ -40,13 +40,18 @@ class Perplexity:
             
             if self.crawler is not None:
                 general_answer = Ollama()
-                citations_string = final_text.split("\n**Citations:**\n")[1:]
-                citations = citations_string.split("\n")
+                topics_parts = final_text.split("\n**Citations:**\n")
+                if len(topics_parts) > 1:
+                    topics_string = topics_parts[1]
+                    topics = topics_string.split("\n")
+                else:
+                    topics = []
+                citations = [topic for topic in topics if topic is not None and len(topic) > 0 and ":" in topic]
                 citations = citations[:3]
-                for url in citations:
-                    yield f"\n\n📖 **Summarizing content from {url}**...\n\n"
+                for url_index, url in enumerate(citations):
+                    yield f"\n\n📖 **{url_index + 1}. Summarizing content from:** {url}...\n\n"
                     url_content = await self.crawler.run(url)
-                    async for summary_chunk in general_answer.stream(f"For less than 400 words, summarize this content: {url_content}"):
+                    async for summary_chunk in general_answer.stream(f"For less than 250 words, summarize this content: {url_content}"):
                         yield summary_chunk
     
 async def stream_batch_words(final_text: str, batch_size: int = 2, stream_delay: float = 0.1):
