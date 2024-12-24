@@ -5,8 +5,17 @@ from fastapi.responses import StreamingResponse
 
 from src.ResearchAssistant import ResearchAssistant
 from src.agents.models.Ollama import Ollama
+from src.agents.models.Gemini import Gemini
+from src.agents.ContextSummarizer import ContextSummarizer
 
-research_assistant = ResearchAssistant()
+research_assistant = ResearchAssistant(
+    topics_count=3,
+    # llm_context_summarizer=ContextSummarizer(
+    #     llm_model=Gemini(),
+    #     max_char=4000,
+    #     context_chunk_size=200000
+    # ),
+)
 
 # Define a model for the input specific to /api/chat
 class Message(BaseModel):

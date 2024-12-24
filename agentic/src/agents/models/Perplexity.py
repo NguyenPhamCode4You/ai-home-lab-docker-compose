@@ -6,9 +6,12 @@ import httpx
 from dotenv import load_dotenv
 load_dotenv()
 
+from .Ollama import Ollama
+
 class Perplexity:
-    def __init__(self, api_key: str = None):
+    def __init__(self, api_key: str = None, crawler = None):
         self.api_key = api_key or os.getenv("PERPLEXITY_API_KEY") or None
+        self.crawler = crawler
 
     async def stream(self, prompt: str):
         if not self.api_key:
@@ -24,6 +27,7 @@ class Perplexity:
             "Content-Type": "application/json",
         }
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
+            final_text = ""
             try:
                 response = await client.post(url, json=payload, headers=headers)
                 response.raise_for_status()
@@ -33,6 +37,17 @@ class Perplexity:
                     yield token
             except Exception as exc:
                 raise RuntimeError(f"Unexpected error: {exc}")
+            
+            if self.crawler is not None:
+                general_answer = Ollama()
+                citations_string = final_text.split("\n**Citations:**\n")[1:]
+                citations = citations_string.split("\n")
+                citations = citations[:3]
+                for url in citations:
+                    yield f"\n\n📖 **Summarizing content from {url}**...\n\n"
+                    url_content = await self.crawler.run(url)
+                    async for summary_chunk in general_answer.stream(f"For less than 400 words, summarize this content: {url_content}"):
+                        yield summary_chunk
     
 async def stream_batch_words(final_text: str, batch_size: int = 2, stream_delay: float = 0.1):
     # Use regex to capture words and whitespace, preserving newlines

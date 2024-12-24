@@ -2,10 +2,11 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class ContextSummarizer(Task):
-    def __init__(self, max_char: int = 250):
+    def __init__(self, max_char: int = 250, llm_model: Task = None, context_chunk_size: int = 6000):
         super().__init__(
             task_name="context-summarizer",
-            llm_model=Ollama(),
+            llm_model=llm_model or Ollama(),
+            context_chunk_size=context_chunk_size,
             instruction_template=f"""
             Your task is to summarize the given paragraph. 
 
