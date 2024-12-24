@@ -31,28 +31,21 @@ class Serp:
                         yield (f"Error: Received status code {response.status}")
                     results = await response.json()
 
-            search_results = []
+            citations = []
             if "organic_results" in results:
                 for result in results["organic_results"]:
-                    search_results.append(result.get("link"))
-            citation_string = f"\n**Citations:**\n{"\n".join(search_results)}" 
+                    citations.append(result.get("link"))
+            citation_string = f"\n**Citations:**\n{"\n".join(citations)}" 
             async for token in stream_batch_words(citation_string, batch_size=3, stream_delay=0.05):
                 yield token
 
             if self.crawler is not None:
-                topics_parts = citation_string.split("\n**Citations:**\n")
-                if len(topics_parts) > 1:
-                    topics_string = topics_parts[1]
-                    topics = topics_string.split("\n")
-                else:
-                    topics = []
-                citations = [topic for topic in topics if topic is not None and len(topic) > 0 and ":" in topic]
                 citations = citations[:3]
                 for url in citations:
                     yield f"\n\n📖 **Summarizing content from {url}**...\n\n"
                     url_content = await self.crawler.run(url)
                     url_summarize_prompt = f"For less than 250 words, summarize this content: {url_content}"
-                    async for summary_chunk in self.general_answer.stream():
+                    async for summary_chunk in self.general_answer.stream(url_summarize_prompt):
                         yield summary_chunk
 
         except Exception as e:

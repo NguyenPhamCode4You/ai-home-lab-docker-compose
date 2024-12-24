@@ -32,22 +32,15 @@ class Perplexity:
                 response = await client.post(url, json=payload, headers=headers)
                 response.raise_for_status()
                 response_data = response.json()
-                final_text = _clean_perplexity_json_response(response_data)
+                final_text, citations = _clean_perplexity_json_response(response_data)
                 async for token in stream_batch_words(final_text, batch_size=3, stream_delay=0.05):
                     yield token
             except Exception as exc:
                 raise RuntimeError(f"Unexpected error: {exc}")
             
             if self.crawler is not None:
-                general_answer = Ollama()
-                topics_parts = final_text.split("\n**Citations:**\n")
-                if len(topics_parts) > 1:
-                    topics_string = topics_parts[1]
-                    topics = topics_string.split("\n")
-                else:
-                    topics = []
-                citations = [topic for topic in topics if topic is not None and len(topic) > 0 and ":" in topic]
                 citations = citations[:3]
+                general_answer = Ollama()
                 for url_index, url in enumerate(citations):
                     yield f"\n\n📖 **{url_index + 1}. Summarizing content from:** {url}...\n\n"
                     url_content = await self.crawler.run(url)
@@ -80,7 +73,7 @@ def _clean_perplexity_json_response(response_data: dict) -> str:
     content = message.get("content", "No content provided.")
     citations = response_data.get("citations", [])
     formatted_citations = "\n**Citations:**\n" + "\n".join(citations) if citations else ""
-    return f"{content}\n{formatted_citations}"
+    return f"{content}\n{formatted_citations}", citations
 
 # Example usage
 if __name__ == "__main__":

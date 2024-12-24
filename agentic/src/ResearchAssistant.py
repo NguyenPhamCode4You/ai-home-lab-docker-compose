@@ -24,14 +24,10 @@ class ResearchAssistant():
             yield topic_ledger_chunk
             topics_string += topic_ledger_chunk
 
-        topics_parts = topics_string.split("**Research Contents:**\n")
-        if len(topics_parts) > 1:
-            topics_string = topics_parts[1]
-            topics = topics_string.split("\n")
-        else:
-            topics = []
-
-        topics = [topic for topic in topics if topic is not None and len(topic) > 0 and ":" in topic]
+        topics = []
+        if "**Research Contents:**\n" in topics_string:
+            topics_string = topics_string.split("**Research Contents:**\n", 1)[1]
+        topics = [topic for topic in topics_string.split("\n") if ":" in topic and topic.strip()]
         research_result = ""
 
         if self.researcher is not None:
