@@ -2,7 +2,7 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class GeneralRagAnswer(Task):
-    def __init__(self, llm_model = None, context_chunk_size: int = 5500, max_histories_tokens: int = 500, allow_reflection: bool = False):
+    def __init__(self, llm_model = None, context_chunk_size: int = None, max_histories_tokens: int = 10, allow_reflection: bool = False):
         super().__init__(
             task_name="general-rag-answer",
             context_chunk_size=context_chunk_size,

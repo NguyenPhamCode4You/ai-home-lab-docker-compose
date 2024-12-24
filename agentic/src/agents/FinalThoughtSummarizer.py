@@ -2,7 +2,7 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class FinalThoughtSummarizer(Task):
-    def __init__(self, llm_model: Task = None, context_chunk_size: int = 6000):
+    def __init__(self, llm_model: Task = None, context_chunk_size: int = None):
         super().__init__(
             task_name="final-thought-summarizer",
             llm_model=llm_model or Ollama(),

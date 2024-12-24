@@ -12,7 +12,7 @@ Generate one final answer that combines all the previous answers to the user que
 """
 
 class Task:
-    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = 6000, max_histories_tokens: int = 10, allow_reflection: bool = False):
+    def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = None, max_histories_tokens: int = 10, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model
         self.instruction_template = instruction_template
@@ -68,9 +68,11 @@ def get_iternation_name(iteration_index: int = 0):
     recal_name = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
     return f"\n\n #### 🧠 {recal_name[iteration_index]} Recall from Memory ... \n\n"
 
-def HardSplitContextChunks(text: str, max_length: int = 8000):
+def HardSplitContextChunks(text: str, max_length: int = None):
     if text is None:
         return ["No context provided."]
+    if max_length is None:
+        return [text]
     chunks = []
     while len(text) > max_length:
         chunks.append(text[:max_length])

@@ -2,7 +2,7 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class ContextSummarizer(Task):
-    def __init__(self, max_char: int = 250, llm_model: Task = None, context_chunk_size: int = 6000):
+    def __init__(self, max_char: int = 250, llm_model: Task = None, context_chunk_size: int = None):
         super().__init__(
             task_name="context-summarizer",
             llm_model=llm_model or Ollama(),

@@ -1,22 +1,19 @@
 import asyncio
 from .agents.Task import Task
-from .agents.tools.Crawler import Crawler
-from .agents.models.Perplexity import Perplexity
-from .agents.models.Serp import Serp
 from .agents.ResearchTopicsLedger import ResearchTopicsLedger
+from .agents.models.Ollama import Ollama
+from .agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 
 class ResearchAssistant():
     def __init__(self,
+            llm_model: Task = None,
             llm_topics_ledger: Task = None,
-            llm_context_summarizer: Task = None,
-            research_mode: str = "perplexity",
-            allow_summarize_url: bool = False,
-            topics_count: int = 3
+            topics_count: int = 3,
+            llm_summarizer: Task = None,
         ):
-        self.crawler = allow_summarize_url and Crawler() or None
         self.topic_ledger = llm_topics_ledger or ResearchTopicsLedger(topics_count=topics_count)
-        self.researcher = Perplexity(crawler=self.crawler) if research_mode == "perplexity" else Serp(crawler=self.crawler)
-        self.context_summarizer = llm_context_summarizer
+        self.model = llm_model or Ollama()
+        self.summarizer = llm_summarizer or FinalThoughtSummarizer()
 
     async def stream(self, question: str = None, conversation_history: list = None):
         topics_string = ""
@@ -29,29 +26,28 @@ class ResearchAssistant():
             topics_string = topics_string.split("**Research Contents:**\n", 1)[1]
         topics = [topic for topic in topics_string.split("\n") if ":" in topic and topic.strip()]
         research_result = ""
+        for topic in topics:
+            yield "\n\n"
+            topic_name = f"\n## 📖 Section {topic.split(":")[0].replace("**", "").strip()}:\n"
+            research_result += topic_name
+            yield topic_name
+            await asyncio.sleep(2)
+            topic_description = f"\n**Description**: {topic.split(':')[1].replace("**", "").strip()}\n"
+            yield topic_description
+            yield "\n\n"
+            research_prompt = f"""
+            Provide a comprehensive answer for this topic: {topic}.
+            Your answer should be written is a well-structured, informative bullet points format.
+            Now, jump into the content directly.
+            """
+            async for research_chunk in self.model.stream(research_prompt):
+                yield research_chunk
+                research_result += research_chunk
 
-        if self.researcher is not None:
-            for topic in topics:
-                yield "\n\n"
-                topic_name = f"\n## 📖 Section {topic.split(":")[0].replace("**", "").strip()}:\n"
-                yield topic_name
-                await asyncio.sleep(1)
-                topic_description = f"\n**Description**: {topic.split(':')[1].replace("**", "").strip()}\n"
-                yield topic_description
-                yield "\n\n"
-                research_result += topic_name
-                research_prompt = f"""
-                Provide a comprehensive answer for this topic: {topic}.
-                Your answer should be written is a well-structured, informative bullet points format.
-                Now, jump into the content directly.
-                """
-                async for research_chunk in self.researcher.stream(research_prompt):
-                    yield research_chunk
-                    research_result += research_chunk
-
-        if self.context_summarizer is not None:
-            async for summarizer_chunk in self.context_summarizer.stream(context=research_result, question=question):
-                yield summarizer_chunk
+        summarizer_header = f"\n\n## 🎯 Final Revision on this topic:\n\n"
+        yield summarizer_header
+        async for summarizer_chunk in self.summarizer.stream(context=research_result, question=question):
+            yield summarizer_chunk
 
             
 

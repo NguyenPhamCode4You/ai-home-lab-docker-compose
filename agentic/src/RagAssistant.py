@@ -12,7 +12,7 @@ class RagAssistant():
             llm_context_enricher: Task = None,
             llm_final_summarizer: Task = None,
             document_match_count: int = 200,
-            max_context_tokens: int = 9000):
+            max_context_tokens: int = 6000):
         
         self.query_function_name = query_function_name
         self.vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
