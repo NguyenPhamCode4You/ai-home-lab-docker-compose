@@ -5,17 +5,19 @@ import aiohttp
 from dotenv import load_dotenv
 load_dotenv()
 
-from .Ollama import Ollama
+from Ollama import Ollama
 
 class Serp:
-    def __init__(self, api_key: str = None, crawler = None):
+    def __init__(self, api_key: str = None, crawler = None, provide_general_answer = False):
         self.api_key = api_key or os.getenv("SERP_API_KEY") or None
         self.general_answer = Ollama()
         self.crawler = crawler
+        self.provide_general_answer = provide_general_answer
 
     async def stream(self, prompt: str):
-        async for general_answer_chunk in self.general_answer.stream(f"Provide comprehensive answer for this topic: {prompt}"):
-            yield general_answer_chunk
+        if self.provide_general_answer:
+            async for general_answer_chunk in self.general_answer.stream(f"Provide general answer for this topic: {prompt}"):
+                yield general_answer_chunk
         try:
             params = {
                 "engine": "google",

@@ -3,6 +3,7 @@ from .agents.Task import Task
 from .agents.ResearchTopicsLedger import ResearchTopicsLedger
 from .agents.models.Ollama import Ollama
 from .agents.FinalThoughtSummarizer import FinalThoughtSummarizer
+from .agents.tools.ImageProvider import ImageProvider
 
 class ResearchAssistant():
     def __init__(self,
@@ -10,10 +11,12 @@ class ResearchAssistant():
             llm_topics_ledger: Task = None,
             topics_count: int = 3,
             llm_summarizer: Task = None,
+            image_provider: Task = None,
         ):
         self.topic_ledger = llm_topics_ledger or ResearchTopicsLedger(topics_count=topics_count)
         self.model = llm_model or Ollama()
         self.summarizer = llm_summarizer or FinalThoughtSummarizer()
+        self.image_provider = image_provider or ImageProvider()
 
     async def stream(self, question: str = None, conversation_history: list = None):
         topics_string = ""
@@ -31,10 +34,15 @@ class ResearchAssistant():
             topic_name = f"\n## 📖 Section {topic.split(":")[0].replace("**", "").strip()}:\n"
             research_result += topic_name
             yield topic_name
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
             topic_description = f"\n**Description**: {topic.split(':')[1].replace("**", "").strip()}\n"
             yield topic_description
             yield "\n\n"
+            await asyncio.sleep(1)
+            if self.image_provider:
+                async for image_chunk in self.image_provider.stream(prompt=topic):
+                    yield image_chunk
+            await asyncio.sleep(1)
             research_prompt = f"""
             Provide a comprehensive answer for this topic: {topic}.
             Your answer should be written is a well-structured, informative bullet points format.
