@@ -16,12 +16,12 @@ class Gemini:
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt, stream=True)
         for chunk in response:
-            yield chunk
+            yield chunk.text
 
 if __name__ == "__main__":
     import asyncio
     async def main():
         model = Gemini()
-        async for response in model.stream("Who is the president of the United States?"):
+        async for response in model.stream("Can you write me a 400 words poem?"):
             print(response, end="", flush=True)
     asyncio.run(main())
