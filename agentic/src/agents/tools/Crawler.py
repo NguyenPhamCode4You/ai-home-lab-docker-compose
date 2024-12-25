@@ -3,29 +3,25 @@ import os
 import re
 from bs4 import BeautifulSoup
 import httpx
-from firecrawl import FirecrawlApp
 
 from dotenv import load_dotenv
 load_dotenv()
 
 class Crawler:
-    def __init__(self, api_key: str = None):
-        api_key = api_key or os.getenv("FIRECRAW_API_KEY") or None
-        if api_key:
-            self.firecrawl = FirecrawlApp(api_key)
+    def __init__(self):
         log_folder = os.path.join(os.getcwd(), "logs", "crawler")
         os.makedirs(log_folder, exist_ok=True)
         self.log_folder = log_folder
 
     async def run(self, url: str):
         final_content = f"\n\n📖 **Crawling content from {url}**...\n\n"
-        if self.firecrawl:
-            response = self.firecrawl.scrape_url(url=url, params={'formats': ['markdown']})
-            document = response.get('markdown', '')
-        else:
+        try:
             document = await scrape_content(url)
-        final_content += document
-        self.write_to_log(f"{url}", document)
+            final_content += document
+            self.write_to_log(f"{url}", document)
+        except Exception as e:
+            print("Failed to scrape URL", e)
+            return ""
         return final_content
 
     def write_to_log(self, url, content):
@@ -66,21 +62,6 @@ async def scrape_content(url: str) -> str:
             return "\n".join(content)
     except Exception as e:
         raise Exception(f"Failed to scrape URL {url}: {e}")
-    
-def RecursiveSplitLines(document: str, limit: int = 1000):
-    lines = document.split("\n")
-    paragraphs = []
-    paragraph = ""
-    for line in lines:
-        if len(paragraph) + len(line) + 1 > limit:
-            if len(paragraph) > 0:
-                paragraphs.append(paragraph)
-            paragraph = f"{line}\n"
-        else:
-            paragraph += f"{line}\n"
-    if len(paragraph) > 0:
-        paragraphs.append(paragraph)
-    return paragraphs
     
 if __name__ == "__main__":
     import asyncio
