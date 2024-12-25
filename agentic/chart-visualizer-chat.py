@@ -1,7 +1,7 @@
 from src.ChatBackend import create_chat_backend
-from src.ChartVisualizerAssistant import ChartVisualizerAssistant
+from agentic.src.ChartAssistant import ChartAssistant
 
-assistant = ChartVisualizerAssistant()
+assistant = ChartAssistant()
 
 app = create_chat_backend(assistant)
 if __name__ == "__main__":
