@@ -1,4 +1,6 @@
+import os
 from typing import List
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
@@ -15,6 +17,8 @@ def get_last_user_question(messages):
 
 def create_chat_backend(assistant):
     app = FastAPI()
+    os.makedirs("temp", exist_ok=True)
+    app.mount("/public", StaticFiles(directory="temp"), name="public")
     @app.post("/api/answer/stream")
     async def get_answer_for_question_stream(request: CompletionRequest):
         try:
