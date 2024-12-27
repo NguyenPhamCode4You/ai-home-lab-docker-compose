@@ -1,5 +1,5 @@
 from src.ChatBackend import create_chat_backend
-from agentic.src.ChartAssistant import ChartAssistant
+from src.ChartAssistant import ChartAssistant
 
 assistant = ChartAssistant()
 
