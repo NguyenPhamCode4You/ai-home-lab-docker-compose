@@ -3,7 +3,7 @@ from src.ChatBackend import create_chat_backend
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
-    max_context_tokens=6500)
+    max_context_tokens=5500)
 
 app = create_chat_backend(bvms_rag_assistant)    
 if __name__ == "__main__":

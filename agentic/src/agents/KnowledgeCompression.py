@@ -1,5 +1,4 @@
 from .Task import Task
-from .models.Ollama import Ollama
 
 class KnowledgeCompression(Task):
     def __init__(self, max_char: int = 450):
