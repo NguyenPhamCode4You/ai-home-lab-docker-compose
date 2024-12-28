@@ -14,7 +14,7 @@ class UrlAnswerAssistant():
         self.question_extractor = llm_question_extractor or SimpleEntityExtractor("user requests")
         self.context_answer = llm_context_answer or ContextAnswer()
 
-    async def stream(self, question: str = None, conversation_history: list = None):
+    async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         urls_string = await self.url_extractor.run(context=question)
         questions_string = await self.question_extractor.run(context=question)
         if "No data found" in urls_string or "No data found" in questions_string:

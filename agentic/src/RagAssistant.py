@@ -22,14 +22,14 @@ class RagAssistant():
         self.document_match_count = document_match_count
         self.max_context_tokens = max_context_tokens
 
-    async def stream(self, question: str = None, conversation_history: list = None):
-        context = self.vector_store.get_documents_string(
+    async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
+        knowledge_context = self.vector_store.get_documents_string(
             question=question,
             function_name=self.query_function_name,
             match_count=self.document_match_count)
-        context = context[:self.max_context_tokens]
+        knowledge_context = knowledge_context[:self.max_context_tokens]
         iterations_response = ""
-        async for response_chunk in self.rag_answer.stream(context, question, conversation_history):
+        async for response_chunk in self.rag_answer.stream(knowledge_context, question, conversation_history):
             yield response_chunk
             iterations_response += response_chunk
         if self.context_enricher:

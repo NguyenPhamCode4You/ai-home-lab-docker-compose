@@ -20,7 +20,7 @@ class ApiCallerAssistant():
         self.max_history_tokens_length = max_history_tokens_length
         self.api_instructions = api_instructions
 
-    async def stream(self, question: str = None, conversation_history: list = None):
+    async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         api_instructions_string = "\n".join(self.api_instructions)
         api_config_string = await self.api_config_writter.run(question=question, context=api_instructions_string)
         api_config_lines = api_config_string.strip().split("\n")

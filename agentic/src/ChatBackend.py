@@ -24,7 +24,7 @@ def create_chat_backend(assistant):
         try:
             user_question = get_last_user_question(request.messages)
             history = [message for message in request.messages or []]
-            return StreamingResponse(assistant.stream(user_question, history), media_type="application/json")
+            return StreamingResponse(assistant.stream(question=user_question, context="", conversation_history=history), media_type="application/json")
 
         except Exception as e:
             print(f"Error handling request: {e}")

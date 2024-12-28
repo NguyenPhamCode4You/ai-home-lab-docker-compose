@@ -13,6 +13,7 @@ class MermaidCodeWriter(Task):
             instruction_template="""
             You are an intelligent mermaid markdown assistant that can help user create diagram basing on a given context.
             {context}
+            {histories}
             User question: {question}
             Provide the markdown in mermaid language to create a diagram that best answers the user question.
             TRY to be as simple in your code as possible.

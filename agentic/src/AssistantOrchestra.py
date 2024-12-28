@@ -19,7 +19,7 @@ class AssistantOrchestra:
         self.question_forwarder.max_histories_tokens = max_histories_tokens
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
     
-    async def stream(self, question: str = None, conversation_history: list = None):
+    async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         agent_self_questions  = ""
         async for question_chunk in self.question_forwarder.stream(context=self.get_agents_description(), question=question, conversation_history=conversation_history):
             agent_self_questions += question_chunk
@@ -66,11 +66,9 @@ class AssistantOrchestra:
                 additional_context = conversation_context
             else:
                 additional_context = agent_self_questions
-
             if agent_details.get("context_awareness") == False:
                 additional_context = ""
-
-            real_agent_question = f"**Additional context that might be useful:**\n{additional_context}\n**Finally, here is your question:** {agent_question}"
+                
             agent_name_question = f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"
             yield agent_name_question
             conversation_context += agent_name_question
@@ -79,7 +77,7 @@ class AssistantOrchestra:
             # 4. Execute the agent and stream the response
             # ----------------------------------------
             try:
-                async for agent_chunk in agent.stream(real_agent_question):
+                async for agent_chunk in agent.stream(question=agent_question, context=additional_context, conversation_history=conversation_history):
                     conversation_context += agent_chunk
                     yield agent_chunk
             

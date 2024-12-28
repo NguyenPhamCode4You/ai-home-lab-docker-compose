@@ -18,7 +18,7 @@ class ResearchAssistant():
         self.summarizer = llm_summarizer or FinalThoughtSummarizer()
         self.image_provider = image_provider or ImageProvider()
 
-    async def stream(self, question: str = None, conversation_history: list = None):
+    async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         topics_string = ""
         async for topic_ledger_chunk in self.topic_ledger.stream(question=question):
             yield topic_ledger_chunk

@@ -13,6 +13,7 @@ class MathplotCodeWriter(Task):
             instruction_template="""
             You are an intelligent matplotlib python assistant that can help user create simple charts basing on a given data.
             {context}
+            {histories}
             User question: {question}
             Provide the code to create a chart that best answers the user question, in python using matplotlib.
             DO NOT include plt.show() in the code.
