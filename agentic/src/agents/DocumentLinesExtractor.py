@@ -2,7 +2,7 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class DocumentLinesExtractor(Task):
-    def __init__(self, line_delimiter="\nVNAGL\n"):
+    def __init__(self, line_delimiter="VNAGL-NEWLINE"):
         super().__init__(
             task_name="document-lines-extractor",
             llm_model=Ollama(),

@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import os
 from typing import List
+from .models import Ollama
 
 final_thought_prompt_template = """
 You are the final thought that reflect your previous answers to the user questions.
@@ -14,7 +15,7 @@ Generate one final answer that combines all the previous answers to the user que
 class Task:
     def __init__(self, task_name: str, instruction_template: str, llm_model, context_chunk_size: int = None, max_histories_tokens: int = 10, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
-        self.llm_model = llm_model
+        self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
         self.max_histories_tokens = max_histories_tokens
