@@ -4,6 +4,7 @@ from src.ChatBackend import create_chat_backend
 from src.ChartAssistant import ChartAssistant
 from src.ResearchAssistant import ResearchAssistant
 from src.AssistantOrchestra import AssistantOrchestra
+from src.DiagramAssistant import DiagramAssistant
 
 from dotenv import load_dotenv
 import os
@@ -18,13 +19,15 @@ api_assistant = ApiCallerAssistant(
     ]
 )
 chart_assistant = ChartAssistant()
+diagram_assistant = DiagramAssistant()
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(query_function_name="match_n8n_documents_bvms_neo", max_context_tokens=5500)
 
 assistant = AssistantOrchestra()
 assistant.agents = {
     "API Assistant": {"agent": api_assistant, "context_awareness": True, "description": "This agent can get information about Vessels and Ports"},
-    "Chart Assistant": {"agent": chart_assistant, "context_awareness": True, "description": "This agent can generate charts based on the data provided"},
+    "Chart Assistant": {"agent": chart_assistant, "context_awareness": True, "description": "This agent can generate data charts based on a given data"},
+    "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
     "Research Assistant": {"agent": research_assistant, "context_awareness": False, "description": "This agent can generate detailed web-research on complex topics"},
     "RAG Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
 }
