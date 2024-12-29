@@ -1,15 +1,9 @@
 from .Task import Task
-from .models.Ollama import Ollama
 
 class GeneralRagAnswer(Task):
-    def __init__(self, llm_model = None, context_chunk_size: int = None, max_context_tokens: int = 5500, allow_reflection: bool = False):
-        super().__init__(
-            task_name="general-rag-answer",
-            context_chunk_size=context_chunk_size,
-            max_context_tokens=max_context_tokens,
-            allow_reflection=allow_reflection,
-            llm_model=llm_model or Ollama(),
-            instruction_template="""
+    def __init__(self, **kwargs):
+        kwargs["task_name"] = kwargs.get("task_name", "general-rag-answer")
+        kwargs["instruction_template"] = kwargs.get("instruction_template", """
             You are an intelligent RAG AI agent to assist users with their questions.
             Here is the user question: {question}
 
@@ -23,5 +17,5 @@ class GeneralRagAnswer(Task):
             - If you could not find the answer, just say with "For more information, please consult [some source here]."
 
             Now, answer with confidence.
-            """
-        )
+            """)
+        super().__init__(**kwargs)

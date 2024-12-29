@@ -5,6 +5,7 @@ from src.ChartAssistant import ChartAssistant
 from src.ResearchAssistant import ResearchAssistant
 from src.AssistantOrchestra import AssistantOrchestra
 from src.DiagramAssistant import DiagramAssistant
+from src.agents.GeneralRagAnswer import GeneralRagAnswer
 
 from dotenv import load_dotenv
 import os
@@ -21,7 +22,10 @@ api_assistant = ApiCallerAssistant(
 chart_assistant = ChartAssistant()
 diagram_assistant = DiagramAssistant()
 research_assistant = ResearchAssistant(topics_count=3)
-bvms_rag_assistant = RagAssistant(query_function_name="match_n8n_documents_bvms_neo")
+bvms_rag_assistant = RagAssistant(
+    query_function_name="match_n8n_documents_bvms_neo",
+    llm_rag_answer=GeneralRagAnswer(max_context_tokens=9000, context_chunk_size=5500)
+)
 
 assistant = AssistantOrchestra()
 assistant.agents = {

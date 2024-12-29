@@ -22,6 +22,7 @@ class Task:
         self.max_context_tokens = max_context_tokens
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
+        context = str(context)[:self.max_context_tokens] if context else None
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
