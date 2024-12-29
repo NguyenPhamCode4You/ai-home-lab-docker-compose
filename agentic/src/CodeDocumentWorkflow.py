@@ -1,8 +1,42 @@
 import os
 from typing import List
-from .FileHanlder import for_each_file_in_folder
+from .FileHanlder import for_each_file_in_folder, split_markdown_header_and_content
 from .agents.CodeDocumentWriter import CodeDocumentWriter
 from .agents.Task import Task
+from .agents.KeywordExtractor import KeywordExtractor
+from .agents.tools.SupabaseVectorStore import SupabaseVectorStore
+from .agents.tools.Embedding import Embedding
+
+async def insert_code_documents(
+        src_folder_path: str,
+        table_name: str,
+        llm_vector_store: SupabaseVectorStore = None,
+        llm_keyword_extractor: Task = None,
+        keyword_count: int = 10):
+    async def handle_insert_file(file_content: str, folder_path: str, file_name: str) -> None:
+        print(f"Inserting file {file_name} at {folder_path} ooooooooooooooooo")
+        keyword_extractor = llm_keyword_extractor or KeywordExtractor(count=keyword_count)
+        vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
+        sections = split_markdown_header_and_content(file_content)
+        for header, content in sections:
+            header = header.strip().replace(":","")
+            if "**Explanation**" not in content:
+                continue
+            code_block = content.split("**Explanation**")[0]
+            explaination = content.split("**Explanation**")[1]
+            try:
+                knowledge = f"# {header}:\n\n {code_block}"
+                keywords = await keyword_extractor.run(context=knowledge)
+                metadata={"file_name": file_name, "section": header, "keywords": keywords}
+                vector_store.insert(
+                    table_name=table_name,
+                    content=knowledge,
+                    metadata=metadata,
+                    summarize=explaination)
+                print(f"ooooooooooooooooo Sentence inserted success ooooooooooooooooo")
+            except Exception as e:
+                print(f"Failed to insert: {header}, error: {e}")
+    await for_each_file_in_folder(src_folder_path, handle_insert_file)
 
 async def write_code_document(
         src_folder_path: str, 
