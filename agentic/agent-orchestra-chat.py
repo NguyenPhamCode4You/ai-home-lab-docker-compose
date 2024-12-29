@@ -21,7 +21,7 @@ api_assistant = ApiCallerAssistant(
 chart_assistant = ChartAssistant()
 diagram_assistant = DiagramAssistant()
 research_assistant = ResearchAssistant(topics_count=3)
-bvms_rag_assistant = RagAssistant(query_function_name="match_n8n_documents_bvms_neo", max_context_tokens=5500)
+bvms_rag_assistant = RagAssistant(query_function_name="match_n8n_documents_bvms_neo")
 
 assistant = AssistantOrchestra()
 assistant.agents = {

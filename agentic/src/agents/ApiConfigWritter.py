@@ -6,7 +6,7 @@ from .constants import OLLAMA_CODE_MODEL
 class ApiConfigWritter(Task):
     def __init__(self):
         super().__init__(
-            task_name="api-config-writter",
+            task_name="api-config-writer",
             llm_model=Ollama(
                 model=OLLAMA_CODE_MODEL
             ),
@@ -21,8 +21,8 @@ class ApiConfigWritter(Task):
                 {question}
                 -------------------
 
-                Return the correct method (1st), api path (2nd) and request body (3rd), reperated by new line to make the API call.
-                Method, api apth and request body (as json object) should be returned as plain text. Do not wrap in quotes or code blocks.
+                Return the correct method (1st), api path (2nd) and request body (3rd), separated by new line to make the API call.
+                Method, api path and request body (as json object) should be returned as plain text. Do not wrap in quotes or code blocks.
 
                 Important Notes:
                 1. For search related APIs, the keyword to search should be less than 3 words.

@@ -13,13 +13,13 @@ Generate one final answer that combines all the previous answers to the user que
 """
 
 class Task:
-    def __init__(self, task_name: str, instruction_template: str, llm_model = None, context_chunk_size: int = None, max_histories_tokens: int = 10, allow_reflection: bool = False):
+    def __init__(self, task_name: str, instruction_template: str, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
-        self.max_histories_tokens = max_histories_tokens
         self.allow_reflection = allow_reflection
+        self.max_context_tokens = max_context_tokens
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
@@ -27,7 +27,8 @@ class Task:
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
         os.makedirs(folder_path, exist_ok=True)
         time_str = datetime.datetime.now().strftime("%H-%M-%S")
-        histories = get_chat_history_string(conversation_history, self.max_histories_tokens)
+        max_history_tokens = self.max_context_tokens - len(context or "")
+        histories = get_chat_history_string(conversation_history, max_history_tokens)
         
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
             response_iterations = ""
@@ -86,13 +87,13 @@ class Message():
     content: str  # Message text
 
 def get_chat_history_string(histories: List[Message] = None, max_histories_token: int = 1000) -> str:
-        if histories is None:
-            histories = []
+        if histories is None or len(histories) == 0 or max_histories_token is None or max_histories_token <= 0:
+            return ""
         accumulated_tokens = 0
         selected_messages = []
         for message in reversed(histories):
             # Get the last 3000 tokens of the message content
-            truncated_content = message.content[-3000:]
+            truncated_content = message.content[-2500:]
             content_length = len(truncated_content)
             # Stop adding messages if the token limit would be exceeded
             if accumulated_tokens + content_length > max_histories_token:

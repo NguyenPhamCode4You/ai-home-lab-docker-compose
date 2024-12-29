@@ -10,7 +10,7 @@ class KnowledgeCompression(Task):
             - The summary should be extremely concise and to the point.
             - The summary should contains a general purpose and encapsulates all important information of the paragraph.
 
-            Return only the summary. No extra explaination is needed.
+            Return only the summary. No extra explanation is needed.
             Now, let's start with the paragraph:
             {"{context}"}
             """

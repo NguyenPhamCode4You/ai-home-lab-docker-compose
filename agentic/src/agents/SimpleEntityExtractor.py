@@ -11,6 +11,6 @@ class SimpleEntityExtractor(Task):
             {"{context}"}
             Important:
             - If no {entity} can be found, just return "No data found".
-            - Return only the {entity} seperated with a new line, no extra information or explanation needed.
+            - Return only the {entity} separated with a new line, no extra information or explanation needed.
             """
         )

@@ -12,11 +12,9 @@ class AssistantOrchestra:
         self,
         llm_question_forwarder: Task = None,
         llm_final_thought_summarizer: Task = None,
-        max_histories_tokens: int = 400,
     ):
         self.agents = {}
         self.question_forwarder = llm_question_forwarder or QuestionForwarder()
-        self.question_forwarder.max_histories_tokens = max_histories_tokens
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
     
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):

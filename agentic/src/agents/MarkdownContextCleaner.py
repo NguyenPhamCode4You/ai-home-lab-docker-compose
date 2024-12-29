@@ -10,7 +10,7 @@ class MarkdownContextCleaner(Task):
             You are an expert at re-formatting markdown content for further LLM processing.
 
             1. For tables:
-            - Remove all table formating
+            - Remove all table formatting
             - Describe each row in a single line, with column names and values separated by a colon.
             
             Table Example:
@@ -44,7 +44,7 @@ class MarkdownContextCleaner(Task):
             5. For lists: Convert items to numbering format.
 
             Important:
-            1. DO NOT include noise or irrelevant information, for example: ads, comments, page navigation, hyberlink, citations, references.
+            1. DO NOT include noise or irrelevant information, for example: ads, comments, page navigation, hyperlink, citations, references.
             2. Just return the written content, no extra explanation needed.
             3. Keep the markdown header as is, only re-format the content.
 

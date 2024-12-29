@@ -18,7 +18,7 @@ class MathplotCodeWriter(Task):
             Provide the code to create a chart that best answers the user question, in python using matplotlib.
             DO NOT include plt.show() in the code.
             TRY to be as simple in your code as possible.
-            Return code wrapped in ```python ``` block, no explaination needed
+            Return code wrapped in ```python ``` block, no explanation needed
             Your code:
             """
         )

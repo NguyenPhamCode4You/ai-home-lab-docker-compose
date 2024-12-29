@@ -29,7 +29,7 @@ class RagAssistant():
             match_count=self.document_match_count)
         knowledge_context = knowledge_context[:self.max_context_tokens]
         iterations_response = ""
-        async for response_chunk in self.rag_answer.stream(knowledge_context, question, conversation_history):
+        async for response_chunk in self.rag_answer.stream(context=knowledge_context, question=question, conversation_history=conversation_history):
             yield response_chunk
             iterations_response += response_chunk
         if self.context_enricher:

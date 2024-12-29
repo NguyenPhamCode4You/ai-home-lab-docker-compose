@@ -11,7 +11,7 @@ class KeywordExtractor(Task):
             {"{context}"}
             ------
             Considerations:
-            1. Keywords should be the main entities that text is about, or refering to
+            1. Keywords should be the main entities that text is about, or referring to
             2. Should not have more than {count} keywords per text, ordered by importance
             3. Sometime keywords can be verbs, adjectives, or adverbs, put them at the beginning
 

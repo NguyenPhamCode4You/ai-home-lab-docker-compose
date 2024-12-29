@@ -17,6 +17,6 @@ class MermaidCodeWriter(Task):
             User question: {question}
             Provide the markdown in mermaid language to create a diagram that best answers the user question.
             TRY to be as simple in your code as possible.
-            Return markdown wrapped in ```mermaid ``` block, no explaination needed
+            Return markdown wrapped in ```mermaid ``` block, no explanation needed
             """
         )
