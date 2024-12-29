@@ -1,4 +1,5 @@
 import os
+from typing import List
 from .FileHanlder import for_each_file_in_folder, remove_excessive_spacing, split_markdown_header_and_content, recursive_split_chunks
 from .agents.MarkdownContextCleaner import MarkdownContextCleaner
 from .agents.KeywordExtractor import KeywordExtractor
@@ -53,6 +54,8 @@ async def clean_src_folder(
         src_folder_path: str, 
         target_folder_path: str = None,
         llm_context_cleaner: Task = None,
+        allowed_file_extensions: List[str] = None, 
+        ignored_file_pattern: List[str] = None,
         keep_folder_hierarchy: bool = False,
         context_chunk_size: int = 600):
     async def handle_clean_file(file_content: str, folder_path: str, file_name: str) -> None:
@@ -77,7 +80,7 @@ async def clean_src_folder(
                         file.write(response_chunk)
                         file.flush()
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
-    await for_each_file_in_folder(src_folder_path, handle_clean_file)
+    await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
 
 if __name__ == "__main__":
     import asyncio

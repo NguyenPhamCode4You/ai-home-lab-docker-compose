@@ -1,13 +1,15 @@
 import os
 import re
-from typing import Callable
+from typing import Callable, List
 
-async def for_each_file_in_folder(folder_path: str, executor: Callable[[str, str, str], None]) -> None:
+async def for_each_file_in_folder(folder_path: str, executor: Callable[[str, str, str], None], allowed_file_extensions: List[str] = None, ignored_file_pattern: List[str] = None):
     for root, _, files in os.walk(folder_path):
         for index, file in enumerate(files):
             print(f"Processing file {index + 1}/{len(files)}: {file} in {root} ooooooooooooooooo")
             file_path = os.path.join(root, file)
             file_name = os.path.splitext(file)[0]
+            if allowed_file_extensions is not None and ignored_file_pattern is not None and not is_allowed_file(file_path, allowed_file_extensions, ignored_file_pattern):
+                continue
             try:
                 file_content = _read_file(file_path)
             except Exception as e:
@@ -95,3 +97,18 @@ def extract_rag_sentences(text: str, min_chars = 100):
         if len(current_sentence) > 0:
             extracted_sentences.append(current_sentence)
     return extracted_sentences
+
+def is_allowed_file(file_path, allowed_file_extensions: List[str], ignored_file_pattern: List[str]):
+    if not any(file_path.endswith(ext) for ext in allowed_file_extensions):
+        return False
+    
+    if not is_allowed_path(file_path, ignored_file_pattern):
+        return False
+    
+    return True
+
+def is_allowed_path(file_path, ignored_file_pattern: List[str]):
+    if any(pattern.lower() in file_path.lower() for pattern in ignored_file_pattern):
+        return False
+    
+    return True

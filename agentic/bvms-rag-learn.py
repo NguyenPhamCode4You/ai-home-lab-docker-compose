@@ -22,4 +22,4 @@ async def insert():
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(insert())
+    asyncio.run(clean())
