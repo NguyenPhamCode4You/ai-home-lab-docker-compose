@@ -35,7 +35,7 @@ bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_rag_answer=GeneralRagAnswer(
         # llm_model=Gemini(),
-        max_context_tokens=9000, 
+        max_context_tokens=9000,
         context_chunk_size=5500,
         instruction_template="""
         You are an intelligent assistant that can provide detailed responses about a software named BVMS.
@@ -52,7 +52,7 @@ be_code_assistant = RagAssistant(
         llm_model=Ollama(model=OLLAMA_CODE_MODEL),
         max_context_tokens=10000,
         instruction_template="""
-        You are an intelligent coding assistants that can provide code explainations and code writing.
+        You are an intelligent coding assistants that can provide code explanations and code writing.
         First, analyze carefully the code below to base your answer on.
         {context}
         Here is the user question: {question}
