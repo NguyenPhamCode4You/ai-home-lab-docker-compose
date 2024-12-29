@@ -13,10 +13,10 @@ class ResearchAssistant():
             llm_summarizer: Task = None,
             image_provider: Task = None,
         ):
-        self.topic_ledger = llm_topics_ledger or ResearchTopicsLedger(topics_count=topics_count)
         self.model = llm_model or Ollama()
-        self.summarizer = llm_summarizer or FinalThoughtSummarizer()
         self.image_provider = image_provider or ImageProvider()
+        self.summarizer = llm_summarizer or FinalThoughtSummarizer()
+        self.topic_ledger = llm_topics_ledger or ResearchTopicsLedger(topics_count=topics_count)
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         topics_string = ""
