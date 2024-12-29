@@ -7,12 +7,10 @@ class ChartAssistant():
     def __init__(self,
             llm_mathplot_code_writer: MathplotCodeWriter = None,
             python_code_executor: PythonCodeExecute = None,
-            max_history_tokens_length: int = 8000,
             public_hosting_url: str = None):
         
         self.mathplot_code_writer = llm_mathplot_code_writer or MathplotCodeWriter()
         self.python_code_executor = python_code_executor or PythonCodeExecute()
-        self.max_history_tokens_length = max_history_tokens_length
         self.public_hosting_url = public_hosting_url or os.getenv("PUBLIC_HOSTING_URL")
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):

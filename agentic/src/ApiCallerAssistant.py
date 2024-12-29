@@ -11,13 +11,11 @@ class ApiCallerAssistant():
             api_caller: ApiCaller = None,
             base_url: str = None,
             bearer_token: str = None,
-            api_instructions: List[str] = [],
-            max_history_tokens_length: int = 8000):
+            api_instructions: List[str] = []):
         
         self.api_config_writter = llm_api_config_writter or ApiConfigWritter()
         self.json_summarizer = llm_json_summarizer or JSONSummarizer()
         self.api_caller = api_caller or ApiCaller(base_url=base_url, bearer_token=bearer_token)
-        self.max_history_tokens_length = max_history_tokens_length
         self.api_instructions = api_instructions
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
