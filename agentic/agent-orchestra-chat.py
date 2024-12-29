@@ -6,6 +6,8 @@ from src.ResearchAssistant import ResearchAssistant
 from src.AssistantOrchestra import AssistantOrchestra
 from src.DiagramAssistant import DiagramAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
+from src.agents.models.Ollama import Ollama
+from src.agents.constants import OLLAMA_CODE_MODEL
 
 from dotenv import load_dotenv
 import os
@@ -24,8 +26,31 @@ diagram_assistant = DiagramAssistant()
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
-    llm_rag_answer=GeneralRagAnswer(max_context_tokens=9000, context_chunk_size=5500)
+    llm_rag_answer=GeneralRagAnswer(
+        max_context_tokens=9000, 
+        context_chunk_size=5500,
+        instruction_template="""
+        You are an intelligent assistant that can provide detailed responses about a software named BVMS.
+        First, analyze carefully the below knowledge base to base your answer on.
+        {context}
+        Here is the user question: {question}
+        Try your best to assist the user with their question.
+        """
+    )
 )
+be_code_assistant = RagAssistant(
+    query_function_name="match_n8n_documents_net_micro_neo",
+    llm_rag_answer=GeneralRagAnswer(
+        llm_model=Ollama(model=OLLAMA_CODE_MODEL),
+        max_context_tokens=10000,
+        instruction_template="""
+        You are an intelligent coding assistants that can provide code explainations and code writing.
+        First, analyze carefully the code below to base your answer on.
+        {context}
+        Here is the user question: {question}
+        Try your best to assist the user with their coding question.
+        """
+    ))
 
 assistant = AssistantOrchestra()
 assistant.agents = {
@@ -34,6 +59,7 @@ assistant.agents = {
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
     "Research Assistant": {"agent": research_assistant, "context_awareness": False, "description": "This agent can generate detailed web-research on complex topics"},
     "RAG Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
+    "Code Assistant": {"agent": be_code_assistant, "context_awareness": False, "description": "This agent can provide code explanations and code writing about BVMS software"}
 }
 
 app = create_chat_backend(assistant)    

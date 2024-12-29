@@ -1,7 +1,7 @@
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
-from src.agents.models.Ollama import Ollama
 from src.RagAssistant import RagAssistant
 from src.ChatBackend import create_chat_backend
+from src.agents.models.Ollama import Ollama
 from src.agents.constants import OLLAMA_CODE_MODEL
 
 assistant = RagAssistant(
