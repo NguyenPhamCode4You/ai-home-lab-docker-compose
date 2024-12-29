@@ -21,11 +21,13 @@ async def insert_code_documents(
         for header, content in sections:
             header = header.strip().replace(":","")
             if "**Explanation**" not in content:
-                continue
-            code_block = content.split("**Explanation**")[0]
-            explaination = content.split("**Explanation**")[1]
+                code_block = content
+                explaination = content
+            else:
+                code_block = content.split("**Explanation**")[0]
+                explaination = content.split("**Explanation**")[1]
             try:
-                knowledge = f"# {header}:\n\n {code_block}"
+                knowledge = f"# {file_name} - {header}:\n\n {code_block}"
                 keywords = await keyword_extractor.run(context=knowledge)
                 metadata={"file_name": file_name, "section": header, "keywords": keywords}
                 vector_store.insert(
