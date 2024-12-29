@@ -6,7 +6,9 @@ from src.ResearchAssistant import ResearchAssistant
 from src.AssistantOrchestra import AssistantOrchestra
 from src.DiagramAssistant import DiagramAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
+from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.Ollama import Ollama
+# from src.agents.models.Gemini import Gemini
 from src.agents.constants import OLLAMA_CODE_MODEL
 
 from dotenv import load_dotenv
@@ -22,11 +24,17 @@ api_assistant = ApiCallerAssistant(
     ]
 )
 chart_assistant = ChartAssistant()
-diagram_assistant = DiagramAssistant()
+diagram_assistant = DiagramAssistant(
+    llm_mermaid_code_writter=MermaidCodeWriter(
+        # llm_model=Gemini(),
+        max_context_tokens=10000,
+    )
+)
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_rag_answer=GeneralRagAnswer(
+        # llm_model=Gemini(),
         max_context_tokens=9000, 
         context_chunk_size=5500,
         instruction_template="""
