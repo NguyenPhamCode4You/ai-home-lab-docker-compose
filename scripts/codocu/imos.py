@@ -55,7 +55,6 @@ knowledge_base = RagKnowledgeBase(
     """
 )
 
-from jobs.DocumentLinesExtractor import DocumentLinesExtractor
 from jobs.KeywordExtractor import KeywordExtractor
 from jobs.SentenceSummarizer import SentenceSummarizer
 from jobs.MarkdownProcessor import MarkdownProcessor
@@ -72,10 +71,6 @@ from jobs.MarkdownProcessor import MarkdownProcessor
     # )
     # await knowledge_base.learn(
     #     folder_path=".\operation-scape-logs-formated",
-    #     line_extractor=DocumentLinesExtractor(
-    #         url=OLLAMA_URL,
-    #         model=GENERAL_MODEL
-    #     ),
     #     keyword_extractor=KeywordExtractor(
     #         url=OLLAMA_URL,
     #         model=GENERAL_MODEL

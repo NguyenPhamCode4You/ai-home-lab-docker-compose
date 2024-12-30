@@ -2,11 +2,10 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class KeywordExtractor(Task):
-    def __init__(self, count: int = 10):
-        super().__init__(
-            task_name="keyword-extractor",
-            llm_model=Ollama(),
-            instruction_template=f"""
+    def __init__(self, count: int = 10, **kwargs):
+        kwargs["task_name"] = kwargs.get("task_name", "keyword-extractor")
+        kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
+        kwargs["instruction_template"] = kwargs.get("instruction_template", f"""
             Your task is to extract important keywords from the below context.
             {"{context}"}
             ------
@@ -35,5 +34,5 @@ class KeywordExtractor(Task):
             - No more than {count} keywords per text.
 
             Now, please extract the keywords from the following text: 
-            """
-)
+        """)
+        super().__init__(**kwargs)

@@ -2,11 +2,10 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class MarkdownContextCleaner(Task):
-    def __init__(self):
-        super().__init__(
-            task_name="markdown-context-cleaner",
-            llm_model=Ollama(),
-            instruction_template="""
+    def __init__(self, **kwargs):
+        kwargs["task_name"] = kwargs.get("task_name", "markdown-context-cleaner")
+        kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
+        kwargs["instruction_template"] = kwargs.get("instruction_template", """
             You are an expert at re-formatting markdown content for further LLM processing.
 
             1. For tables:
@@ -50,5 +49,5 @@ class MarkdownContextCleaner(Task):
 
             Now, please re-format the following text: 
             {context}
-            """
-        )
+            """)
+        super().__init__(**kwargs)

@@ -2,11 +2,10 @@ from .Task import Task
 from .models.Ollama import Ollama
 
 class QuestionForwarder(Task):
-    def __init__(self):
-        super().__init__(
-            task_name="question-forwarder",
-            llm_model=Ollama(),
-            instruction_template="""
+    def __init__(self, **kwargs):
+        kwargs["task_name"] = kwargs.get("task_name", "question-forwarder")
+        kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
+        kwargs["instruction_template"] = kwargs.get("instruction_template", """
             You are an intelligent assistant that can help user complete complex tasks.
             Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
             -----
@@ -39,5 +38,5 @@ class QuestionForwarder(Task):
             -----
             User question: {question}
             -----
-            """
-        )
+        """)
+        super().__init__(**kwargs)

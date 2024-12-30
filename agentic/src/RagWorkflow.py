@@ -12,42 +12,34 @@ async def insert_sentences(
         src_folder_path: str,
         table_name: str,
         llm_vector_store: SupabaseVectorStore = None,
-        llm_sentence_extractor: Task = None,
         llm_keyword_extractor: Task = None,
         llm_knowledge_compressor: Task = None,
         summary_max_char: int = 600,
         keyword_count: int = 10):
     async def handle_insert_file(file_content: str, folder_path: str, file_name: str) -> None:
         print(f"Inserting file {file_name} at {folder_path} ooooooooooooooooo")
-        sentence_extractor = llm_sentence_extractor or None
         keyword_extractor = llm_keyword_extractor or KeywordExtractor(count=keyword_count)
         knowledge_compressor = llm_knowledge_compressor or KnowledgeCompression(max_char=summary_max_char)
         vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
         sections = split_markdown_header_and_content(file_content)
         for header, content in sections:
             header = header.strip().replace(":","")
-            content = remove_excessive_spacing(content)
-            if sentence_extractor is not None:
-                chunks_string = await sentence_extractor.run(context=content)
-                sentences = chunks_string.split(sentence_extractor.line_delimiter) if chunks_string else []
-            else:
-                sentences = [content]
-            for sentence in sentences:
-                if not sentence or len(sentence) < 5:
-                    continue
-                try:
-                    knowledge = f"# {header}: {sentence}"
-                    keywords = await keyword_extractor.run(context=knowledge)
-                    summarize = await knowledge_compressor.run(context=knowledge)
-                    metadata={"file_name": file_name, "section": header, "keywords": keywords}
-                    vector_store.insert(
-                        table_name=table_name,
-                        content=knowledge,
-                        metadata=metadata,
-                        summarize=summarize)
-                    print(f"ooooooooooooooooo Sentence inserted success ooooooooooooooooo")
-                except Exception as e:
-                    print(f"Failed to insert sentence: {sentence}, error: {e}")
+            sentence = remove_excessive_spacing(content)
+            if not sentence or len(sentence) < 5:
+                continue
+            try:
+                knowledge = f"# {header}: {sentence}"
+                keywords = await keyword_extractor.run(context=knowledge)
+                summarize = await knowledge_compressor.run(context=knowledge)
+                metadata={"file_name": file_name, "section": header, "keywords": keywords}
+                vector_store.insert(
+                    table_name=table_name,
+                    content=knowledge,
+                    metadata=metadata,
+                    summarize=summarize)
+                print(f"ooooooooooooooooo Sentence inserted success ooooooooooooooooo")
+            except Exception as e:
+                print(f"Failed to insert sentence: {sentence}, error: {e}")
     await for_each_file_in_folder(src_folder_path, handle_insert_file)
 
 async def clean_src_folder(
