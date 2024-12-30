@@ -27,7 +27,7 @@ class Task:
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
         os.makedirs(folder_path, exist_ok=True)
-        time_str = datetime.datetime.now().strftime("%H-%M-%S")
+        time_str = datetime.datetime.now().strftime("%H-%M-%S-%f")[:-3]
         max_history_tokens = self.max_context_tokens - len(context or "")
         histories = get_chat_history_string(conversation_history, max_history_tokens)
         
@@ -69,7 +69,7 @@ class Task:
     
 def get_iternation_name(iteration_index: int = 0):
     recal_name = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
-    return f"\n\n #### 🧠 {recal_name[iteration_index]} Recall from Memory ... \n\n"
+    return f"\n\n #### 🧠 {recal_name[iteration_index]} recall from Memory to answer the question: \n\n"
 
 def HardSplitContextChunks(text: str, max_length: int = None):
     if text is None:

@@ -35,6 +35,7 @@ bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_rag_answer=GeneralRagAnswer(
         # llm_model=Gemini(),
+        allow_documents_ranking=True,
         max_context_tokens=9000,
         context_chunk_size=5500,
         instruction_template="""
@@ -50,8 +51,8 @@ be_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(model=OLLAMA_CODE_MODEL),
-        max_context_tokens=18000,
-        context_chunk_size=10000,
+        max_context_tokens=16000,
+        context_chunk_size=8000,
         allow_reflection=True,
         instruction_template="""
         You are an intelligent coding assistants that can provide code explanations and code writing.

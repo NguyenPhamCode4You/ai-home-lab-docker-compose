@@ -21,7 +21,11 @@ class SupabaseVectorStore:
         sections = self.organize_documents(documents)
         context_result = ""
         for section in sections:
-            context_result += f"""\n{section["title"]}:\n{section['context']}"""
+            title = section["title"]
+            if "#" not in title:
+                title = f"# {title}"
+            context = section["context"]
+            context_result += f"{title}\n\n{context}\n\n"
         return context_result
     
     def query(self, function_name: str, question: str, match_count: int = 200):
