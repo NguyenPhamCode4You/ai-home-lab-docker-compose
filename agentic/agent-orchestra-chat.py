@@ -9,6 +9,7 @@ from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.Ollama import Ollama
 from src.agents.constants import OLLAMA_CODE_MODEL
+from src.agents.DocumentRanking import DocumentRanking
 
 from dotenv import load_dotenv
 import os
@@ -30,8 +31,8 @@ diagram_assistant = DiagramAssistant(
 )
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(
-    allow_documents_ranking=True,
     query_function_name="match_n8n_documents_bvms_neo",
+    allow_documents_ranking=True,
     llm_rag_answer=GeneralRagAnswer(
         max_context_tokens=6000,
         instruction_template="""
@@ -45,10 +46,13 @@ bvms_rag_assistant = RagAssistant(
 )
 be_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
+    allow_documents_ranking=True,
+    llm_document_ranking=DocumentRanking(
+        llm_model=Ollama(model=OLLAMA_CODE_MODEL),
+    ),
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(model=OLLAMA_CODE_MODEL),
-        max_context_tokens=16000,
-        context_chunk_size=9000,
+        max_context_tokens=9000,
         instruction_template="""
         You are an intelligent coding assistants that can provide code explanations and code writing.
         First, analyze carefully the code below to base your answer on.
