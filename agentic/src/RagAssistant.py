@@ -32,18 +32,23 @@ class RagAssistant():
             question=question,
             function_name=self.query_function_name,
             match_count=self.document_match_count)
-        knowledge_context = knowledge_context[:self.rag_answer.max_context_tokens]
         if self.allow_documents_ranking:
-            yield f"🔍 Re-ranking documents: "
+            max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
+            yield f"📌 Re-ranking documents: "
             documents = []
-            document_index = 1
+            documents_context_length = 0
             for header, content in split_markdown_header_and_content(knowledge_context):
                 document = f"# {header}\n\n{content}"
                 score = await self.document_ranking.run(context=document, question=question, conversation_history=conversation_history)
                 score = float(score)
                 documents.append((document, score))
-                yield f"{str(document_index)} "
-                document_index += 1
+                documents_context_length += len(document)
+                percentage = int(documents_context_length / max_ranking_context_tokens * 100)
+                if percentage > 100:
+                    percentage = 100
+                yield f" ➜ {str(percentage)}%"
+                if documents_context_length > max_ranking_context_tokens:
+                    break
             documents.sort(key=lambda x: x[1], reverse=True)
             knowledge_context = "\n\n".join([doc[0] for doc in documents])
         iterations_response = ""

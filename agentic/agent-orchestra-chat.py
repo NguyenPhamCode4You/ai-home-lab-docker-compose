@@ -8,7 +8,6 @@ from src.DiagramAssistant import DiagramAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.Ollama import Ollama
-# from src.agents.models.Gemini import Gemini
 from src.agents.constants import OLLAMA_CODE_MODEL
 
 from dotenv import load_dotenv
@@ -26,18 +25,15 @@ api_assistant = ApiCallerAssistant(
 chart_assistant = ChartAssistant()
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        # llm_model=Gemini(),
         max_context_tokens=10000,
     )
 )
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(
+    allow_documents_ranking=True,
     query_function_name="match_n8n_documents_bvms_neo",
     llm_rag_answer=GeneralRagAnswer(
-        # llm_model=Gemini(),
-        allow_documents_ranking=True,
-        max_context_tokens=9000,
-        context_chunk_size=5500,
+        max_context_tokens=6000,
         instruction_template="""
         You are an intelligent assistant that can provide detailed responses about a software named BVMS.
         First, analyze carefully the below knowledge base to base your answer on.
@@ -52,8 +48,7 @@ be_code_assistant = RagAssistant(
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(model=OLLAMA_CODE_MODEL),
         max_context_tokens=16000,
-        context_chunk_size=8000,
-        allow_reflection=True,
+        context_chunk_size=9000,
         instruction_template="""
         You are an intelligent coding assistants that can provide code explanations and code writing.
         First, analyze carefully the code below to base your answer on.
