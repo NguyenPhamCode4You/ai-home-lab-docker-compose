@@ -8,8 +8,11 @@ from src.DiagramAssistant import DiagramAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.Ollama import Ollama
+from src.agents.models.ChatGpt import ChatGpt
 from src.agents.constants import OLLAMA_CODE_MODEL
 from src.agents.DocumentRanking import DocumentRanking
+from src.agents.MathplotCodeWriter import MathplotCodeWriter
+from src.agents.JSONSummarizer import JSONSummarizer
 
 from dotenv import load_dotenv
 import os
@@ -17,15 +20,24 @@ load_dotenv()
 
 api_assistant = ApiCallerAssistant(
     base_url="https://bvms-master-api-test.azurewebsites.net",
+    llm_json_summarizer=JSONSummarizer(
+        llm_model=ChatGpt(),
+    ),
     bearer_token=os.getenv("BVMS_API_TOKEN"),
     api_instructions=[
         "/Vessels/Search - Method: POST - Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.",
         "/Ports/Search - Method: POST - Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.",
     ]
 )
-chart_assistant = ChartAssistant()
+chart_assistant = ChartAssistant(
+    llm_mathplot_code_writer=MathplotCodeWriter(
+        llm_model=ChatGpt(),
+        max_context_tokens=10000,
+    )
+)
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
+        llm_model=ChatGpt(),
         max_context_tokens=10000,
     )
 )
