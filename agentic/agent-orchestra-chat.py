@@ -13,6 +13,7 @@ from src.agents.constants import OLLAMA_CODE_MODEL
 from src.agents.DocumentRanking import DocumentRanking
 from src.agents.MathplotCodeWriter import MathplotCodeWriter
 from src.agents.JSONSummarizer import JSONSummarizer
+from src.agents.ApiConfigWritter import ApiConfigWritter
 
 from dotenv import load_dotenv
 import os
@@ -20,13 +21,16 @@ load_dotenv()
 
 api_assistant = ApiCallerAssistant(
     base_url="https://bvms-master-api-test.azurewebsites.net",
+    llm_api_config_writter=ApiConfigWritter(
+        llm_model=ChatGpt(),
+    ),
     llm_json_summarizer=JSONSummarizer(
         llm_model=ChatGpt(),
     ),
     bearer_token=os.getenv("BVMS_API_TOKEN"),
     api_instructions=[
-        "/Vessels/Search - Method: POST - Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.",
-        "/Ports/Search - Method: POST - Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3, max = 5. No query in the URL.",
+        "/Vessels/Search - Method: POST - Description: Search for vessels using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL.",
+        "/Ports/Search - Method: POST - Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL.",
     ]
 )
 chart_assistant = ChartAssistant(
