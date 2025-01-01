@@ -15,24 +15,22 @@ class RagAssistant():
             llm_context_enricher: Task = None,
             llm_final_summarizer: Task = None,
             document_match_count: int = 200,
-            allow_documents_ranking: bool = False
         ):
         
         self.query_function_name = query_function_name
         self.vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
         self.rag_answer = llm_rag_answer or GeneralRagAnswer()
-        self.document_ranking = llm_document_ranking or DocumentRanking()
+        self.document_ranking = llm_document_ranking or None
         self.context_enricher = llm_context_enricher or None
         self.final_summarizer = llm_final_summarizer or None
         self.document_match_count = document_match_count
-        self.allow_documents_ranking = allow_documents_ranking
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         knowledge_context = self.vector_store.get_documents_string(
             question=question,
             function_name=self.query_function_name,
             match_count=self.document_match_count)
-        if self.allow_documents_ranking:
+        if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
             yield f"📌 Re-ranking documents: "
             documents = []
