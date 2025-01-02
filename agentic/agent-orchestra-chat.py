@@ -15,6 +15,7 @@ from src.agents.MathplotCodeWriter import MathplotCodeWriter
 from src.agents.JSONSummarizer import JSONSummarizer
 from src.agents.DocumentRanking import DocumentRanking
 from src.agents.ApiConfigWritter import ApiConfigWritter
+from src.ImageProviderAssistant import ImageProviderAssistant
 
 from dotenv import load_dotenv
 import os
@@ -45,6 +46,9 @@ diagram_assistant = DiagramAssistant(
         llm_model=ChatGpt(),
         max_context_tokens=10000,
     )
+)
+image_assistant = ImageProviderAssistant(
+    llm_model=Ollama(),
 )
 research_assistant = ResearchAssistant(topics_count=3)
 bvms_rag_assistant = RagAssistant(
@@ -86,6 +90,7 @@ assistant.agents = {
     "API Assistant": {"agent": api_assistant, "context_awareness": True, "description": "This agent can get information about Vessels and Ports"},
     "Chart Assistant": {"agent": chart_assistant, "context_awareness": True, "description": "This agent can generate data charts based on a given data"},
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
+    "Image Assistant": {"agent": image_assistant, "context_awareness": True, "description": "This agent can provide images search based on a given context"},
     "Research Assistant": {"agent": research_assistant, "context_awareness": False, "description": "This agent can generate detailed web-research on complex topics"},
     "RAG Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
     "Code Assistant": {"agent": be_code_assistant, "context_awareness": False, "description": "This agent can provide code explanations and code writing about BVMS software"}

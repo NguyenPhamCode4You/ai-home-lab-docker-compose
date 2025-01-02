@@ -13,7 +13,7 @@ Generate one final answer that combines all the previous answers to the user que
 """
 
 class Task:
-    def __init__(self, task_name: str, instruction_template: str, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, allow_reflection: bool = False):
+    def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, allow_reflection: bool = False):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
