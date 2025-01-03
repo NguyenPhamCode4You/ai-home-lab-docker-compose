@@ -69,10 +69,14 @@ estimate_question_forwarder = QuestionForwarder(
 
 estimate_question_forwarder.set_additional_instruction("""
 For every question, compose these questions to the agents:
-1. Ask the API Assistant to Search for insights about the estimate, including laycanFrom, laycanTo, profit and loss and itenerary items. Ask the agents to break down the profit and loss items accurately and each iteneray item should have name and time of arrival and time of departure.
-2. Ask the Diagram Assistant to create a gantt chart to show the timeline of the estimate, focusing on the itenerary items. Follow this guideline: 1. Each itenerary item should have a row, then use time of arrival and time of departure to show the timeline of each itenerary item as a bar.
-3. Ask the Chart Assistant to create useful charts to display the profit and loss items.
-4. Make a pie chart to compare the total freight and total expenses of the estimate.
+1. Ask the API Assistant to Search for insights about the estimate, including:
+- The total freight of all shipments in the estimate
+- A comprehensive breakdown of profit and loss
+- A list of itinerary items with their respective names, times of arrival, and times of departure? 👀
+2. Ask the Diagram Assistant to create a Time-line chart to represent the timeline of the estimate's itinerary items that use months as the time unit
+3. Ask the Chart Assistant to create a pie chart that:
+- Break down the cost structure of the estimate, use distinct colors for each cost category
+- Another pie chart to compare the total freight versus total expenses of the estimate
 """)
 
 estimate_analyzer = AssistantOrchestra(
