@@ -67,6 +67,10 @@ class Task:
             final_text += response_chunk
         return final_text
     
+    def set_additional_instruction(self, instruction: str):
+        self.instruction_template += instruction
+        return self
+    
 def get_iternation_name(iteration_index: int = 0):
     recal_name = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
     return f"\n\n #### 🧠 {recal_name[iteration_index]} recall from Memory to answer the question: \n\n"

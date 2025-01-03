@@ -28,6 +28,7 @@ api_assistant = ApiCallerAssistant(
     ),
     llm_json_summarizer=JSONSummarizer(
         llm_model=ChatGpt(),
+        max_context_tokens=15000,
     ),
     bearer_token=os.getenv("BVMS_API_TOKEN"),
     api_instructions=[
@@ -35,6 +36,23 @@ api_assistant = ApiCallerAssistant(
         "/Ports/Search - Method: POST - Description: Search for ports using keywords, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL.",
     ]
 )
+
+shipment_assistant = ApiCallerAssistant(
+    base_url="https://bvms-voyage-api-test.azurewebsites.net",
+    llm_api_config_writter=ApiConfigWritter(
+        llm_model=ChatGpt(),
+    ),
+    llm_json_summarizer=JSONSummarizer(
+        llm_model=ChatGpt(),
+        max_context_tokens=15000,
+    ),
+    bearer_token=os.getenv("BVMS_API_TOKEN"),
+    api_instructions=[
+        "/Shipments/Search - Method: POST - Description: Search for shipments using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL."
+        "/Shipments/shipmentId?shipmentId=UUID - Method: GET - Description: Get a shipment by its UUID. The UUID is a unique identifier for a shipment."
+    ]
+)
+
 chart_assistant = ChartAssistant(
     llm_mathplot_code_writer=MathplotCodeWriter(
         llm_model=ChatGpt(),
@@ -88,6 +106,7 @@ be_code_assistant = RagAssistant(
 assistant = AssistantOrchestra()
 assistant.agents = {
     "API Assistant": {"agent": api_assistant, "context_awareness": True, "description": "This agent can get information about Vessels and Ports"},
+    "Shipment Assistant": {"agent": shipment_assistant, "context_awareness": True, "description": "This agent can get information about BVMS Shipments"},
     "Chart Assistant": {"agent": chart_assistant, "context_awareness": True, "description": "This agent can generate data charts based on a given data"},
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
     "Image Assistant": {"agent": image_assistant, "context_awareness": True, "description": "This agent can provide images search based on a given context"},
