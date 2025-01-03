@@ -50,9 +50,9 @@ shipment_question_forwarder = QuestionForwarder(
 shipment_question_forwarder.set_additional_instruction("""
 For every question, compose these questions to the agents:
 1. Ask the API Assistant to Search for insights about the shipment, including laycanFrom, laycanTo, ports of load, discharge, total freight, profit and loss items. Ask the agents to break down the profit and loss items accurately for further analysis.
-2. Ask the Chart Assistant to Make a pie chart to compare the total freight and total expenses of the shipment.
+2. Ask the Diagram Assistant to create a gantt chart to show the timeline of the shipment, focusing on the ports of load and discharge. Follow this guideline: 1. Each port should have a row, then use time of arrival and time of departure to show the timeline of each port as a bar.
 3. Ask the Chart Assistant to create useful charts to display the profit and loss items.
-4. Ask the Diagram Assistant to create a gantt chart to show the timeline of the shipment.
+4. Make a pie chart to compare the total freight and total expenses of the shipment.
 """)
 shipment_analyzer = AssistantOrchestra(
     llm_question_forwarder=shipment_question_forwarder,
@@ -70,8 +70,9 @@ estimate_question_forwarder = QuestionForwarder(
 estimate_question_forwarder.set_additional_instruction("""
 For every question, compose these questions to the agents:
 1. Ask the API Assistant to Search for insights about the estimate, including laycanFrom, laycanTo, profit and loss and itenerary items. Ask the agents to break down the profit and loss items accurately and each iteneray item should have name and time of arrival and time of departure.
-2. Ask the Chart Assistant to create useful charts to display the profit and loss items.
-3. Ask the Diagram Assistant to create a gantt chart to show the timeline of the estimate, focusing on the itenerary items.
+2. Ask the Diagram Assistant to create a gantt chart to show the timeline of the estimate, focusing on the itenerary items. Follow this guideline: 1. Each itenerary item should have a row, then use time of arrival and time of departure to show the timeline of each itenerary item as a bar.
+3. Ask the Chart Assistant to create useful charts to display the profit and loss items.
+4. Make a pie chart to compare the total freight and total expenses of the estimate.
 """)
 
 estimate_analyzer = AssistantOrchestra(

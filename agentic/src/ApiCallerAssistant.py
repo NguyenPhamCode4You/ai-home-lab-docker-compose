@@ -31,7 +31,6 @@ class ApiCallerAssistant():
         api_response = await self.api_caller.run(api_path=api_path, method=method, body_object=body_object)
         if self.allowed_fields is not None:
             api_response = filter_json(api_response, self.allowed_fields)
-            print(f"filtered_response: {api_response}")
         async for summary_chunk in self.json_summarizer.stream(question=question, context=api_response):
             yield summary_chunk
 
