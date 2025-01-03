@@ -24,6 +24,7 @@ api_assistant = ApiCallerAssistant(
         max_context_tokens=15000,
     ),
     bearer_token=os.getenv("BVMS_API_TOKEN"),
+    allowed_fields=["result", "items", "freightTotalInUsds", "freightRatePerCargoInUsds", "estimateCode", "portCalls", "portName", "vesselHireCostPerDayInUsds", "vesselName", "shipments", "commenceDate", "profitAndLost.*", "iteneraryItems", "vesselName", "cargoQuantity", "cargoType", "laycanFromDate", "laycanToDate", "ports", "portName", "reasonForVisit", "profitAndLossItems", "totalValueInUsds", "type", "shipmentName", "cargoOperationTimeInDays", "countryCode", "portName", "timeOfArrival", "timeOfDeparture"],
     api_instructions=[
         "/Shipments/Search - Method: POST - Description: Search for shipments using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL."
         "/Shipments/shipmentId?shipmentId=UUID - Method: GET - Description: Get a shipment by its UUID. The UUID is a unique identifier for a shipment."
