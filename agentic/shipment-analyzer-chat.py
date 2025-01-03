@@ -4,11 +4,13 @@ from src.AssistantOrchestra import AssistantOrchestra
 from src.DiagramAssistant import DiagramAssistant
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.ChatGpt import ChatGpt
+from src.agents.models.Ollama import Ollama
 from src.agents.MathplotCodeWriter import MathplotCodeWriter
 from src.agents.JSONSummarizer import JSONSummarizer
 from src.agents.ApiConfigWritter import ApiConfigWritter
 from src.agents.QuestionForwarder import QuestionForwarder
 from src.ChatBackend import create_chat_backend
+from src.agents.GeneralRagAnswer import GeneralRagAnswer
 
 from dotenv import load_dotenv
 import os
@@ -30,6 +32,10 @@ api_assistant = ApiCallerAssistant(
         "/Shipments/shipmentId?shipmentId=UUID - Method: GET - Description: Get a shipment by its UUID. The UUID is a unique identifier for a shipment."
         "/Estimates/UUID - Method: GET - Description: Get the estimate by its UUID. The UUID is a unique identifier for an estimate."
     ]
+)
+
+general_answer = GeneralRagAnswer(
+    llm_model=Ollama(),
 )
 
 chart_assistant = ChartAssistant(
@@ -73,10 +79,10 @@ For every question, compose these questions to the agents:
 - The total freight of all shipments in the estimate
 - A comprehensive breakdown of profit and loss
 - A list of itinerary items with their respective names, times of arrival, and times of departure? 👀
-2. Ask the Diagram Assistant to create a Time-line chart to represent the timeline of the estimate's itinerary items that use months as the time unit
+2. Ask the Diagram Assistant to create a Time-line chart to represent the timeline of the estimate's itinerary items that use months as the time unit 👀
 3. Ask the Chart Assistant to create a pie chart that:
 - Break down the cost structure of the estimate, use distinct colors for each cost category
-- Another pie chart to compare the total freight versus total expenses of the estimate
+- Another pie chart to compare the total freight versus total expenses of the estimate 👀
 """)
 
 estimate_analyzer = AssistantOrchestra(
@@ -87,6 +93,7 @@ estimate_analyzer.agents = {
     "API Assistant": {"agent": api_assistant, "context_awareness": True, "description": "This agent can get information about Estimates of BVMS"},
     "Chart Assistant": {"agent": chart_assistant, "context_awareness": True, "description": "This agent can generate data charts based on a given data"},
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
+    "General Assistant": {"agent": general_answer, "context_awareness": True, "description": "This agent can answer general questions without any special cases"},
 }
 
 orchestra = AssistantOrchestra()
