@@ -29,19 +29,10 @@ class AssistantOrchestra:
         # ----------------------------------------
         for agent_name, agent_details in self.agents.items():
             agent_name_formated = f"**{remove_special_chars(agent_name)}**"
-            
             for match in re.finditer(re.escape(agent_name_formated), agent_self_questions):
                 agent_mention_index = match.start()
-                
-                # Extract the part of the text after the agent's mention
-                agent_question_part = agent_self_questions[agent_mention_index + len(agent_name_formated):]
-                
-                # Extract the question until the first occurrence of "👀" or end of string
-                agent_question = agent_question_part.split("👀")[0]
-                
-                # Check if the extracted text qualifies as a valid question
-                # if ":" in agent_question and "?" in agent_question:
-                if ":" in agent_question and "👀" in agent_question_part:
+                agent_question = agent_self_questions[agent_mention_index + len(agent_name_formated):].split("👋")[0]
+                if ":" in agent_question and "?" in agent_question:
                     agent_questions.append((agent_name, agent_question.strip(), agent_mention_index))
         # ---------------------------------------
         # 2. Order the agents based on their mention index
