@@ -1,11 +1,11 @@
 from src.ApiCallerAssistant import ApiCallerAssistant
+from src.DiagramAssistant import DiagramAssistant
 from src.ChartAssistant import ChartAssistant
 from src.AssistantOrchestra import AssistantOrchestra
-from src.DiagramAssistant import DiagramAssistant
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
-from src.agents.models.ChatGpt import ChatGpt
 from src.agents.MathplotCodeWriter import MathplotCodeWriter
 from src.agents.JSONSummarizer import JSONSummarizer
+from src.agents.models.ChatGpt import ChatGpt
 from src.ChatBackend import create_chat_backend
 
 from dotenv import load_dotenv
