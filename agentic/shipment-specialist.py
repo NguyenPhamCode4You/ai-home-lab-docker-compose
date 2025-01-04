@@ -66,20 +66,20 @@ chart_assistant = ChartAssistant(
         user_instruction="""
         1. If user ask for cost breakdown analysis, make 2 pie charts in the same figure:
         - Pie Chart 1: Expenses Breakdown:
-            + Break down all the expenses structure of the estimate.
-            + Use "#FF5722" color for "Bunker Expense Value".
-            + Use "#AB47BC" color for "Canal Tolls Value".
-            + Use "#BCAAA4" color for "Emission Expense Value".
-            + Use "#9E9E9E" color for "External Commission Value".
-            + Use "#757575" color for "Internal Commission Value".
-            + Use "#CDDC39" color for "Misc Expense Value".
-            + Use "#FFC107" color for "Cargo Expense Value".
-            + Use "#FF9800" color for "Port Expense Value".
-            + Use "#607D8B" color for "Vessel Hire Value".
+            + Break down all the expenses structure of the estimate
+            + Use "#EF5350" color for "Bunker Expense"
+            + Use "#7E57C2" color for "Emission Expense"
+            + Use "#8D6E63" color for "External Commission"
+            + Use "#2196F3" color for "Internal Commission"
+            + Use "#EC407A" color for "Misc Expense"
+            + Use "#FFC107" color for "Cargo Expense"
+            + Use "#FF9800" color for "Port Expense" and "Canal Tolls"
+            + Use "#90A4AE" color for "Vessel Hire"
         - Pie Chart 2: Profit Margin chart
-            + Display the percentage of "Total Profit Value" over the "Freight Value".
-            + Use "#2196F3" color for "Freight Value".
-            + Use "#4CAF50" color for "Total Profit Value" if it is positive, otherwise use "#EF5350" color.
+            + Display the percentage of "Total Profit" over the "Freight Value"
+            + Use "#2196F3" color for "Freight Value"
+            + Use "#4CAF50" color for "Total Profit Value" if it is positive, otherwise use "#EF5350" color
+        - Make figure background color "#171717", Label and Title color "#FFEB3B"
         """
     ),
 )
