@@ -19,28 +19,32 @@ api_assistant = ApiCallerAssistant(
         "/Estimates/UUID - Method: GET - Description: Get the estimate by its UUID. The UUID is a unique identifier for an estimate."
     ],
     allowed_fields=[
-        "result", "items", "vesselName", "estimateCode",  
-        "profitAndLost",  "freightValue", "miscRevenuesValue", "bunkerExpenseValue", "canalTollsValue", "cargoExpenseValue", "emissionExpenseValue", "externalCommissionValue", "internalCommissionValue", "miscExpenseValue", "portExpenseValue", "vesselHireValue",
-        "iteneraryItems", "portName", "cargoQuantity", "shipmentName", "countryCode", "timeOfArrival", "timeOfDeparture", "reasonForVisit"
+        "result", "items", "vesselName", "estimateCode",
+        "profitAndLost",  "freightValue", "totalProfitValue", "miscRevenuesValue", "bunkerExpenseValue", "canalTollsValue", "cargoExpenseValue", "emissionExpenseValue", "externalCommissionValue", "internalCommissionValue", "miscExpenseValue", "portExpenseValue", "vesselHireValue",
+        "iteneraryItems", "portName", "totalTimeAtPortInDays", "cargoQuantity", "shipmentName", "countryCode", "timeOfArrival", "timeOfDeparture", "reasonForVisit"
     ],
     llm_json_summarizer=JSONSummarizer(
+        llm_model=ChatGpt(),
         max_context_tokens=15000,
         user_instruction="""
         Nonetheless, provide insights about the following:
         - General information: Vessel Name, Estimate Code, etc.
-        - A comprehensive breakdown of profit and loss object (using bullet points)
+        - A comprehensive breakdown of expense in the profit and loss object (using bullet points)
+        - A Summary on the overall revenue: Focus on freightValue (Total income) and totalProfitValue (Total profit)
         - A table to display the itinerary items with their respective:
-            + Port names (1st column) - format: Port Name - Country Code
-            + Arrival Time (2nd column), format: `YYYY-MM-DD` at `HH:MM`
-            + Departure Time (3rd column), format: `YYYY-MM-DD` at `HH:MM`
-            + Shipment name - Cargo Quantity (4th column), format: Shipment Name - Cargo Quantity
-            + Reason for visit (5th column)
+            + Column Name = Port names (1st column) - Content: Port Name - Country Code
+            + Column Name = Arrival Time (2nd column), Content: `YYYY-MM-DD` at `HH:MM`
+            + Column Name = Departure Time (3rd column), Content: `YYYY-MM-DD` at `HH:MM`
+            + Column Name = Port Days (4th column), Content: Total time at port in days
+            + Column Name = Shipment name - Cargo Quantity (5th column), Content: Shipment Name - Cargo Quantity
+            + Column Name = Reason for visit (6th column), Content: Reason for visit
         """,
     ),
 )
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
         max_context_tokens=15000,
+        llm_model=ChatGpt(),
         user_instruction="""
         Example template of a good timeline diagram: (Remove itenerary with reason for visit = "Commencing")
         ```mermaid
@@ -48,15 +52,23 @@ diagram_assistant = DiagramAssistant(
             title [Vessel Name] Timeline
             dateFormat  YYYY-MM-DD
             section [Port Name] - [Country Code]
-            [Shipment name - Reason for Visit]  :a1, [Time of arrival], [Difference in days between arrival and departure]
+            Arrival  :[Time of arrival], 0d
+            [Shipment name - Reason for Visit]  :[Time of arrival], [Total time at port in days]d
+            Departure  :[Time of departure], 0d
         ```
         """,
     ),
 )
 chart_assistant = ChartAssistant(
+    show_code_stream=False,
     llm_mathplot_code_writer=MathplotCodeWriter(
         llm_model=ChatGpt(),
         max_context_tokens=15000,
+        user_instruction="""
+        Make 2 pie charts that:
+        1. Break down all the expenses structure of the estimate.
+        2. Display the percentage of "Total Profit Value" over the "Freight Value". If "Total Profit Value" is positive, use Green color, otherwise use Red color.
+        """
     ),
 )
 estimate_analyzer = AssistantOrchestra(
