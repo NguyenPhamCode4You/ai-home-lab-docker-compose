@@ -103,6 +103,8 @@ be_code_assistant = RagAssistant(
         """
     ))
 
+from EstimateSpecialist import estimate_specialist
+
 assistant = AssistantOrchestra()
 assistant.agents = {
     "API Assistant": {"agent": api_assistant, "context_awareness": True, "description": "This agent can get information about Vessels and Ports"},
@@ -112,7 +114,8 @@ assistant.agents = {
     "Image Assistant": {"agent": image_assistant, "context_awareness": True, "description": "This agent can provide images search based on a given context"},
     "Research Assistant": {"agent": research_assistant, "context_awareness": False, "description": "This agent can generate detailed web-research on complex topics"},
     "RAG Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
-    "Code Assistant": {"agent": be_code_assistant, "context_awareness": False, "description": "This agent can provide code explanations and code writing about BVMS software"}
+    "Code Assistant": {"agent": be_code_assistant, "context_awareness": False, "description": "This agent can provide code explanations and code writing about BVMS software"},
+    "Estimate Specialist": {"agent": estimate_specialist, "context_awareness": False, "description": "This agent can provide detailed analysis of BVMS Estimates"}
 }
 
 app = create_chat_backend(assistant)    

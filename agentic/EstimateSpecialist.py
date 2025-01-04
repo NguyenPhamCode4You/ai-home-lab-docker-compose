@@ -4,6 +4,7 @@ from src.ChartAssistant import ChartAssistant
 from src.AssistantOrchestra import AssistantOrchestra
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.MathplotCodeWriter import MathplotCodeWriter
+from src.agents.QuestionForwarder import QuestionForwarder
 from src.agents.JSONSummarizer import JSONSummarizer
 from src.agents.models.ChatGpt import ChatGpt
 from src.ChatBackend import create_chat_backend
@@ -84,14 +85,23 @@ chart_assistant = ChartAssistant(
         """
     ),
 )
-estimate_analyzer = AssistantOrchestra(
+estimate_specialist = AssistantOrchestra(
     agents={
         "API Assistant": {"agent": api_assistant, "description": "This agent can get information about Estimates of BVMS", "context_awareness": True},
         "Chart Assistant": {"agent": chart_assistant, "description": "This agent can generate data charts based on a given data", "context_awareness": True},
         "Diagram Assistant": {"agent": diagram_assistant, "description": "This agent can generate diagrams and workflows based on a given context", "context_awareness": True},
-    }
+    },
+    llm_question_forwarder=QuestionForwarder(
+        user_instruction="""
+        For every question, always provide the following as default:
+        1. Ask the API Assistant to provide details of the estimate with the given UUID
+        2. Ask the Diagram Assistant to provide a timeline diagram of the itenerary items
+        3. Ask the Chart Assistant to provide a cost breakdown analysis of the estimate
+        Then produce more questions to the agents according to the user's requirements.
+        """
+    )
 )
-app = create_chat_backend(estimate_analyzer)
 if __name__ == "__main__":
     import uvicorn
+    app = create_chat_backend(estimate_specialist)
     uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)
