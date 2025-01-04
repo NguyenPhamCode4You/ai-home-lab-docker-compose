@@ -16,30 +16,29 @@ api_assistant = ApiCallerAssistant(
     base_url="https://bvms-voyage-api-test.azurewebsites.net",
     bearer_token=os.getenv("BVMS_API_TOKEN"),
     api_instructions=[
-        "/Shipments/Search - Method: POST - Description: Search for shipments using keywords, but cannot search for GUID, Body = {keySearch, pageSize} with pageSize default = 3. No query in the URL."
-        "/Shipments/shipmentId?shipmentId=UUID - Method: GET - Description: Get a shipment by its UUID. The UUID is a unique identifier for a shipment."
         "/Estimates/UUID - Method: GET - Description: Get the estimate by its UUID. The UUID is a unique identifier for an estimate."
     ],
-    allowed_fields=["result", "items", "freightTotalInUsds", "freightRatePerCargoInUsds", "estimateCode", "portCalls", "portName", "vesselHireCostPerDayInUsds", "vesselName", "shipments", "commenceDate", "profitAndLost.*", "iteneraryItems", "vesselName", "cargoQuantity", "cargoType", "laycanFromDate", "laycanToDate", "ports", "portName", "reasonForVisit", "profitAndLossItems", "totalValueInUsds", "type", "shipmentName", "cargoOperationTimeInDays", "countryCode", "portName", "timeOfArrival", "timeOfDeparture"],
+    allowed_fields=[
+        "result", "items", "vesselName", "estimateCode",  
+        "profitAndLost",  "freightValue", "miscRevenuesValue", "bunkerExpenseValue", "canalTollsValue", "cargoExpenseValue", "emissionExpenseValue", "externalCommissionValue", "internalCommissionValue", "miscExpenseValue", "portExpenseValue", "vesselHireValue",
+        "iteneraryItems", "portName", "cargoQuantity", "shipmentName", "countryCode", "timeOfArrival", "timeOfDeparture", "reasonForVisit"
+    ],
     llm_json_summarizer=JSONSummarizer(
-        llm_model=ChatGpt(),
         max_context_tokens=15000,
         user_instruction="""
-        Provide insights about the following:
-        - The total freight of all shipments in the estimate
-        - A comprehensive breakdown of profit and loss object
-        - A list of itinerary items with their 
-            + Port names
-            + Times of arrival
-            + Times of departure
-            + Shipment name 
-            + Reason for visit
+        Nonetheless, provide insights about the following:
+        - A comprehensive breakdown of profit and loss object (using bullet points)
+        - A table to display the itinerary items with their respective:
+            + Port names (1st column) - format: Port Name - Country Code
+            + Arrival (2nd column), format: `YYYY-MM-DD` at `HH:MM`
+            + Departure (3rd column), format: `YYYY-MM-DD` at `HH:MM`
+            + Shipment name (4th column), format: Shipment Name - Cargo Quantity
+            + Reason for visit (5th column)
         """,
     ),
 )
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        llm_model=ChatGpt(),
         max_context_tokens=15000,
         user_instruction="""
         Example of a good timeline diagram:
