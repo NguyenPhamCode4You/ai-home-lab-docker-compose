@@ -28,17 +28,16 @@ api_assistant = ApiCallerAssistant(
         max_context_tokens=15000,
         user_instruction="""
         Nonetheless, do the following:
-        1. Start by providing a general overview of the estimate includes:
-        - Vessel Name, Estimate Code
-        - Total freight (freightValue) and Total profit (totalProfitValue)
-        2. Display the itenerary items in a table format:
-            + Column Name = Port names (1st column) - Content: Port Name - Country Code
-            + Column Name = Arrival Time (2nd column), Content: DD-MM-YYYY
-            + Column Name = Departure Time (3rd column), Content: DD-MM-YYYY
-            + Column Name = Port Days (4th column), Content: Total time at port in days
-            + Column Name = Shipment name - Cargo Quantity (5th column), Content: Shipment Name - Cargo Quantity
-            + Column Name = Reason (6th column), Content: Reason for visit
-        3. Provide a comprehensive breakdown of expense in the profit and loss object (using bullet points)
+        1. Start with [Estimate code - Vessel name] as header
+        2. Bullet point of Total freight (freightValue) and Total profit (totalProfitValue)
+        3. Next, display the itenerary items in a table format:
+            + Column Port name, Value = portName
+            + Column Arrival Time, Value = timeOfArrival (format DD-MM-YYYY)
+            + Column Departure Time, Value = timeOfDeparture (format DD-MM-YYYY)
+            + Column Port Days, Value = totalTimeAtPortInDays)
+            + Column Shipment, Value = shipmentName
+            + Column Reason, Value = reasonForVisit + cargoQuantity, eg: "Discharge 1000 Coal"
+        4. Finally, Provide a comprehensive breakdown of expense in the profit and loss object (using bullet points)
         """,
     ),
 )
@@ -52,9 +51,9 @@ diagram_assistant = DiagramAssistant(
             title [Vessel Name] Timeline
             dateFormat  DD-MM-YYYY
             section [Port Name]
-            Arrival  :[Time of arrival format], 0d
-            [Shipment name, Reason for Visit]  :[Time of arrival format], [Total time at port in days]d
-            Departure  :[Time of departure format], 0d
+            Arrive [Port Name]: [Time of Arrival], 0d
+            [Reason + (Shipment)]: [Arrival Time], [Port Days]d
+            Depart [Port Name]: [Time of Departure], 0d
         ```
         """,
     ),
