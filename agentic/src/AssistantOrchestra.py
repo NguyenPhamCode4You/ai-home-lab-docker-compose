@@ -12,8 +12,9 @@ class AssistantOrchestra:
         self,
         llm_question_forwarder: Task = None,
         llm_final_thought_summarizer: Task = None,
+        agents: dict = None,
     ):
-        self.agents = {}
+        self.agents = agents or {}
         self.question_forwarder = llm_question_forwarder or QuestionForwarder()
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
     

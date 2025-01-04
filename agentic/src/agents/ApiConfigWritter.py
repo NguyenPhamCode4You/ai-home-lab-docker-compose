@@ -1,12 +1,10 @@
 from .Task import Task
 from .models.Ollama import Ollama
 
-from .constants import OLLAMA_CODE_MODEL
-
 class ApiConfigWritter(Task):
     def __init__(self, **kwargs):
         kwargs["task_name"] = kwargs.get("task_name", "api-config-writer")
-        kwargs["llm_model"] = kwargs.get("llm_model", Ollama(model=OLLAMA_CODE_MODEL))
+        kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
             Given the following API endpoints:
             -------------------
