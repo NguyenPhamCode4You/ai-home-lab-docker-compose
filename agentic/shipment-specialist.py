@@ -24,13 +24,10 @@ api_assistant = ApiCallerAssistant(
         "iteneraryItems", "portName", "totalTimeAtPortInDays", "cargoQuantity", "shipmentName", "countryCode", "timeOfArrival", "timeOfDeparture", "reasonForVisit"
     ],
     llm_json_summarizer=JSONSummarizer(
-        llm_model=ChatGpt(),
         max_context_tokens=15000,
         user_instruction="""
         Nonetheless, provide insights about the following:
         - General information: Vessel Name, Estimate Code, etc.
-        - A comprehensive breakdown of expense in the profit and loss object (using bullet points)
-        - A Summary on the overall revenue: Focus on freightValue (Total income) and totalProfitValue (Total profit)
         - A table to display the itinerary items with their respective:
             + Column Name = Port names (1st column) - Content: Port Name - Country Code
             + Column Name = Arrival Time (2nd column), Content: `YYYY-MM-DD` at `HH:MM`
@@ -38,13 +35,14 @@ api_assistant = ApiCallerAssistant(
             + Column Name = Port Days (4th column), Content: Total time at port in days
             + Column Name = Shipment name - Cargo Quantity (5th column), Content: Shipment Name - Cargo Quantity
             + Column Name = Reason for visit (6th column), Content: Reason for visit
+        - A comprehensive breakdown of expense in the profit and loss object (using bullet points)
+        - A Summary on the overall revenue: Focus on freightValue (Total income) and totalProfitValue (Total profit)
         """,
     ),
 )
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
         max_context_tokens=15000,
-        llm_model=ChatGpt(),
         user_instruction="""
         Example template of a good timeline diagram: (Remove itenerary with reason for visit = "Commencing")
         ```mermaid
