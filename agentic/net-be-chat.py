@@ -11,8 +11,7 @@ net_be_assistant = RagAssistant(
         llm_model=Ollama(
             model=OLLAMA_CODE_MODEL,
         ),
-        context_chunk_size=5500,
-        allow_reflection=True
+        context_chunk_size=5500
     ))
 
 app = create_chat_backend(net_be_assistant)

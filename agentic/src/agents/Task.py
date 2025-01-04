@@ -1,28 +1,23 @@
-import asyncio
 import datetime
 import os
 from typing import List
 from .models.Ollama import Ollama
 
-final_thought_prompt_template = """
-You are the final thought that reflect your previous answers to the user questions.
-Here is the user question: {question}
-Your previous answers to the user questions:
-{context}
-Generate one final answer that combines all the previous answers to the user questions as your best answer to the user question.
-"""
-
 class Task:
-    def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, allow_reflection: bool = False):
+    def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, user_instruction: str = None):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
-        self.allow_reflection = allow_reflection
         self.max_context_tokens = max_context_tokens
+        self.user_instruction = user_instruction or None
+        self.state = { "context": "", "question": "", "response": "" }
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         context = str(context)[:self.max_context_tokens] if context else None
+        self.state["context"] = context
+        self.state["question"] = question
+        self.state["response"] = ""
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
@@ -32,31 +27,22 @@ class Task:
         histories = get_chat_history_string(conversation_history, max_history_tokens)
         
         with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
-            response_iterations = ""
             for index, chunk in enumerate(chunks):
                 if len(chunks) > 1:
-                    next_iteration_header = get_iternation_name(index)
+                    next_iteration_header = get_iteration_name(index)
                     yield next_iteration_header
+                    self.state["response"] += next_iteration_header
                     file.write(next_iteration_header)
                     file.flush()
-                final_prompt = self.instruction_template.format(context=chunk, question=question, histories=histories)
+                instruction = self.instruction_template
+                if self.user_instruction:
+                    instruction += f"\n\n{self.user_instruction}"
+                final_prompt = instruction.format(context=chunk, question=question, histories=histories)
                 if len(chunks) > 1:
                     final_prompt += "\n\nBe direct with your answer!\n\n"
                 async for response_chunk in self.llm_model.stream(final_prompt):
                     yield response_chunk
-                    response_iterations += response_chunk
-                    file.write(response_chunk)
-                    file.flush()
-
-            if len(chunks) > 1 and self.allow_reflection:
-                final_thought_header = f"\n\n ### 🎯 Lets have one final revise on the question ...\n\n"
-                await asyncio.sleep(1)
-                yield final_thought_header
-                file.write(final_thought_header)
-                file.flush()
-                final_thought_prompt = final_thought_prompt_template.format(context=response_iterations, question=question)
-                async for response_chunk in self.llm_model.stream(final_thought_prompt):
-                    yield response_chunk
+                    self.state["response"] += response_chunk
                     file.write(response_chunk)
                     file.flush()
 
@@ -67,13 +53,9 @@ class Task:
             final_text += response_chunk
         return final_text
     
-    def set_additional_instruction(self, instruction: str):
-        self.instruction_template += instruction
-        return self
-    
-def get_iternation_name(iteration_index: int = 0):
-    recal_name = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
-    return f"\n\n #### 🧠 {recal_name[iteration_index]} recall from Memory to answer the question: \n\n"
+def get_iteration_name(iteration_index: int = 0):
+    count_strings = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth"]
+    return f"\n\n #### 🧠 {count_strings[iteration_index]} recall from Memory to answer the question: \n\n"
 
 def HardSplitContextChunks(text: str, max_length: int = None):
     if text is None:

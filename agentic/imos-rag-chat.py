@@ -13,8 +13,7 @@ imos_simple_rag_assistant = RagAssistant(
     max_context_tokens=11000,
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(),
-        context_chunk_size=5600,
-        allow_reflection=True
+        context_chunk_size=5600
     ))
 
 imos_detailed_rag_assistant = RagAssistant(
