@@ -64,8 +64,11 @@ chart_assistant = ChartAssistant(
         max_context_tokens=15000,
         user_instruction="""
         Make 2 pie charts that:
-        1. Break down all the expenses structure of the estimate.
-        2. Display the percentage of "Total Profit Value" over the "Freight Value". If "Total Profit Value" is positive, use Green color, otherwise use Red color.
+        1. Expenses Breakdown 
+        - Break down all the expenses structure of the estimate.
+        2. Profit Margin 
+        - Display the percentage of "Total Profit Value" over the "Freight Value". 
+        - If "Total Profit Value" is positive, use Green color, otherwise use Red color.
         """
     ),
 )
