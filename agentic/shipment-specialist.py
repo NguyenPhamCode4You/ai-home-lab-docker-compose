@@ -74,12 +74,13 @@ chart_assistant = ChartAssistant(
             + Use "#EC407A" color for "Misc Expense"
             + Use "#FFC107" color for "Cargo Expense"
             + Use "#FF9800" color for "Port Expense" and "Canal Tolls"
-            + Use "#90A4AE" color for "Vessel Hire"
+            + Use "#78909C" color for "Vessel Hire"
         - Pie Chart 2: Profit Margin chart
             + Display the percentage of "Total Profit" over the "Freight Value"
             + Use "#2196F3" color for "Freight Value"
             + Use "#4CAF50" color for "Total Profit Value" if it is positive, otherwise use "#EF5350" color
-        - Make figure background color "#171717", Label and Title color "#FFEB3B"
+        - Make figure background color "#171717", Label and Title color "#FFFFFF"
+        - Remember to add some offsetting pie slices
         """
     ),
 )
