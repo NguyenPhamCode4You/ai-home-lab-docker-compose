@@ -77,7 +77,7 @@ diagram_assistant = DiagramAssistant(
 chart_assistant = ChartAssistant(
     show_code_stream=False,
     llm_mathplot_code_writer=MathplotCodeWriter(
-        llm_model=Gemini(),
+        llm_model=ChatGpt(),
         max_context_tokens=15000,
         user_instruction="""
         1. If user ask for cost breakdown analysis, make 2 pie charts in the same figure:

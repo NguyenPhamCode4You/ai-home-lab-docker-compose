@@ -19,10 +19,12 @@ class AssistantOrchestra:
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
     
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
+        is_verbose = "--verbose" in question
         agent_self_questions  = ""
         async for question_chunk in self.question_forwarder.stream(context=self.get_agents_description(), question=question, conversation_history=conversation_history):
             agent_self_questions += question_chunk
-            yield question_chunk
+            if is_verbose:
+                yield question_chunk
         
         agent_questions = []
         # ---------------------------------------
@@ -59,9 +61,9 @@ class AssistantOrchestra:
             if agent_details.get("context_awareness") == False:
                 additional_context = ""
                 
-            agent_name_question = f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"
-            yield agent_name_question
-            conversation_context += agent_name_question
+            if is_verbose:
+                yield f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"
+            
             await asyncio.sleep(2)
             # ---------------------------------------
             # 4. Execute the agent and stream the response
@@ -74,7 +76,7 @@ class AssistantOrchestra:
             except Exception as e:
                 yield f"\n\n⚠️ Agent '{agent_name}' error {e}\n\n"
 
-        if len(agent_questions) > 0:
+        if len(agent_questions) > 1:
             await asyncio.sleep(2)
             agent_names_string = ", ".join([agent_name for agent_name, _, _ in agent_questions])
             yield f"\n\n### 🤖 Thanks {agent_names_string}, lets recap on the answers ... \n\n"
@@ -91,8 +93,8 @@ class AssistantOrchestra:
                 file.write(f"\n\n## User question: {question}\n\n\n")
                 async for agent_chunk in self.stream(question, []):
                     file.write(agent_chunk)
-                    file.flush()  # Ensures real-time writing to the file
-                    print(agent_chunk, end="", flush=True)  # Real-time console output
+                    file.flush()
+                    print(agent_chunk, end="", flush=True)
         except Exception as e:
             print(f"Error logging task: {e}")
 
