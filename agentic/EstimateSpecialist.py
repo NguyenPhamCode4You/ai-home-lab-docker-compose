@@ -56,6 +56,21 @@ diagram_assistant = DiagramAssistant(
             [Reason + (Shipment)]: [Arrival Time], [Port Days]d
             Depart [Port Name]: [Time of Departure], 0d
         ```
+        2. If user ask for expense breakdown, provide a pie chart follow the below template:
+        (Remember not to include the "Total Profit" and "Freight Value" in the pie chart)
+        ```mermaid
+        pie
+            title Expenses Breakdown
+            "Bunker Expense": [Bunker Expense Value]
+            ...
+        ```
+        3. If user ask for profit margin, provide a pie chart follow the below template:
+        ```mermaid
+        pie
+            title Profit Margin
+            "Freight Value": [Freight Value]
+            "Total Profit Value": [Total Profit Value]
+        ```
         """,
     ),
 )
@@ -91,15 +106,17 @@ estimate_specialist = AssistantOrchestra(
         "Chart Assistant": {"agent": chart_assistant, "description": "This agent can generate data charts based on a given data", "context_awareness": True},
         "Diagram Assistant": {"agent": diagram_assistant, "description": "This agent can generate diagrams and workflows based on a given context", "context_awareness": True},
     },
-    llm_question_forwarder=QuestionForwarder(
-        user_instruction="""
-        For every question, always provide the following as default:
-        1. Ask the API Assistant to provide details of the estimate with the given UUID
-        2. Ask the Diagram Assistant to provide a timeline diagram of the itenerary items
-        3. Ask the Chart Assistant to provide a cost breakdown analysis of the estimate
-        Then produce more questions to the agents according to the user's requirements.
-        """
-    )
+    # llm_question_forwarder=QuestionForwarder(
+    #     user_instruction="""
+    #     For every question, always provide the following as default:
+    #     1. Ask the API Assistant to provide details of the estimate with the given UUID
+    #     2. Ask the Diagram Assistant to provide a timeline diagram of the itenerary items
+    #     3. Ask the Diagram Assistant to provide an expense breakdown
+    #     4. Ask the Diagram Assistant to provide a profit margin chart
+    #     5. Ask the Chart Assistant to provide a cost breakdown analysis of the estimate
+    #     Then produce more questions to the agents according to the user's requirements.
+    #     """
+    # )
 )
 if __name__ == "__main__":
     import uvicorn
