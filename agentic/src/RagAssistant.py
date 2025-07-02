@@ -30,6 +30,7 @@ class RagAssistant():
             question=question,
             function_name=self.query_function_name,
             match_count=self.document_match_count)
+        print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
             yield f"📌 Re-ranking documents: "

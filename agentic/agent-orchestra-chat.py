@@ -73,14 +73,10 @@ bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_document_ranking=DocumentRanking(
         llm_model=Ollama(),
-        # llm_model=Ollama(model="deepseek-coder-v2:16b-lite-base-q6_K"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        # max_context_tokens=12000,
-        # llm_model=Ollama(num_ctx=15200),
-        max_context_tokens=6000,
-        llm_model=Ollama(num_ctx=8096),
-        # llm_model=Ollama(model="llama3.2:3b-instruct-fp16"),
+        max_context_tokens=12000,
+        llm_model=Ollama(num_ctx=15200),
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
@@ -93,10 +89,10 @@ bvms_rag_assistant = RagAssistant(
 be_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_net_micro_neo",
     llm_document_ranking=DocumentRanking(
-        llm_model=Ollama(model="o1-mini"),
+        llm_model=Ollama(),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(model="o1-mini"),
+        llm_model=Ollama(num_ctx=15200),
         max_context_tokens=12000,
         instruction_template="""
         You are an intelligent coding assistants that can provide code explanations and code writing.
@@ -125,4 +121,4 @@ assistant.agents = {
 app = create_chat_backend(assistant)    
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)
+    uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)

@@ -35,6 +35,8 @@ class SupabaseVectorStore:
             "match_count": match_count,
             "filter": {}
         }
+        # print the payload as json text
+        print(f"Payload: {payload}")
         response = requests.post(
             rpc_endpoint,
             headers=self.headers,
