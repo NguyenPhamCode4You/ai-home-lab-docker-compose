@@ -13,16 +13,16 @@ networks:
     driver: bridge
 
 services:
-  dashy:
-    image: lissy93/dashy:latest
-    container_name: my-dashboard
-    networks:
-      - homelab
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./lab404.yml:/app/user-data/conf.yml
-    restart: always
+  # dashy:
+  #   image: lissy93/dashy:latest
+  #   container_name: my-dashboard
+  #   networks:
+  #     - homelab
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./lab404.yml:/app/user-data/conf.yml
+  #   restart: always
 
   # next-cloud:
   #   image: nextcloud
@@ -41,55 +41,55 @@ services:
   #     - OVERWRITEHOST=172.20.37.3:8081
   #   restart: always
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - homelab
-    volumes:
-      - ollama_storage:/root/.ollama
-    restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    healthcheck:
-      test: ["CMD-SHELL", "nvidia-smi || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   ports:
+  #     - "11434:11434"
+  #   networks:
+  #     - homelab
+  #   volumes:
+  #     - ollama_storage:/root/.ollama
+  #   restart: always
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "nvidia-smi || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 40s
 
-  open-web-ui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-web-ui
-    networks:
-      - homelab
-    ports:
-      - "11435:8080"
-    environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
-    volumes:
-      - open-webui:/app/backend/data
-    restart: always
+  # open-web-ui:
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   container_name: open-web-ui
+  #   networks:
+  #     - homelab
+  #   ports:
+  #     - "11435:8080"
+  #   environment:
+  #     - OLLAMA_BASE_URL=http://ollama:11434
+  #   volumes:
+  #     - open-webui:/app/backend/data
+  #   restart: always
 
-  n8n:
-    image: docker.n8n.io/n8nio/n8n
-    container_name: n8n
-    networks:
-      - homelab
-    ports:
-      - "5678:5678"
-    volumes:
-      - n8n_storage:/home/node/.n8n
-    environment:
-      - N8N_SECURE_COOKIE=false
-    restart: always
+  # n8n:
+  #   image: docker.n8n.io/n8nio/n8n
+  #   container_name: n8n
+  #   networks:
+  #     - homelab
+  #   ports:
+  #     - "5678:5678"
+  #   volumes:
+  #     - n8n_storage:/home/node/.n8n
+  #   environment:
+  #     - N8N_SECURE_COOKIE=false
+  #   restart: always
 
   qlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest

@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  gitlab-azure-sync:
+    build: .
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./sync_workspace:/app/sync_workspace
+      - ./gitlab_sync.log:/app/gitlab_sync.log
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - gitlab-sync-network
+
+networks:
+  gitlab-sync-network:
+    driver: bridge
