@@ -63,7 +63,8 @@ class OllamaAPI:
     def __init__(self, ollama_url: str, model: str):
         self.ollama_url = ollama_url.rstrip('/')
         self.model = model
-        self.num_ctx = 4096  # Default context window
+        self.num_ctx = 6122  # Default context window
+        self.max_content_tokens = int(self.num_ctx * 0.8)  # Reserve 20% for response and overhead
     
     async def stream(self, prompt: str):
         if not self.ollama_url or not self.model:
@@ -80,18 +81,57 @@ class OllamaAPI:
                         print(f"Error decoding chunk: {e}")
                         continue
     
-    async def generate_review(self, prompt: str) -> str:
+    async def generate_review(self, content: str, guidelines: str) -> str:
         """Generate a complete review by collecting all streaming chunks"""
+        # Prepare content with guidelines, truncating if necessary
+        prepared_prompt = self._prepare_content_for_review(content, guidelines)
+        
         output = ''
         print("🤖 AI is generating review...")
         
-        async for chunk in self.stream(prompt):
+        async for chunk in self.stream(prepared_prompt):
             if chunk:
                 output += chunk
                 print(chunk, end='', flush=True)  # Print chunk to console in real-time
         
         print("\n🤖 Review generation completed!")
         return output
+    
+    def _prepare_content_for_review(self, content: str, guidelines: str) -> str:
+        """Prepare content for review, truncating if necessary to fit context window"""
+        guidelines_tokens = self._estimate_tokens(guidelines)
+        content_tokens = self._estimate_tokens(content)
+        total_tokens = guidelines_tokens + content_tokens
+        
+        if total_tokens <= self.max_content_tokens:
+            # Content fits, return as-is with guidelines at the end
+            return f"{content}\n\n{guidelines}"
+        
+        # Content too large, need to truncate
+        available_content_tokens = self.max_content_tokens - guidelines_tokens
+        target_char_count = available_content_tokens * 4  # Convert back to characters
+        
+        if target_char_count <= 0:
+            raise ValueError("Guidelines are too long to fit in context window")
+        
+        # Truncate content and add indication of truncation
+        truncated_content = content[:target_char_count]
+        
+        # Try to truncate at a reasonable boundary (end of line)
+        last_newline = truncated_content.rfind('\n')
+        if last_newline > target_char_count * 0.8:  # If we can find a newline in the last 20%
+            truncated_content = truncated_content[:last_newline]
+        
+        print(f"⚠️  Content truncated due to context window limits. Original: {content_tokens} tokens, Truncated: {self._estimate_tokens(truncated_content)} tokens")
+        
+        # Add truncation notice and guidelines
+        result = f"{truncated_content}\n\n[... Content truncated due to length ...]\n\n{guidelines}"
+        return result
+    
+    def _estimate_tokens(self, text: str) -> int:
+        """Estimate the number of tokens in a text string"""
+        # Rough estimate: 4 characters per token on average
+        return len(text) // 4
 
 
 class CodeReviewer:
@@ -201,12 +241,9 @@ class CodeReviewer:
             print("Preparing code for AI review...")
             formatted_changes = self._format_changes_for_review(changes_data)
             
-            # Create review prompt
-            review_prompt = f"{self.guidelines}\n\n{formatted_changes}"
-            
-            # Get AI review
+            # Get AI review (guidelines will be added automatically with content length check)
             print("Generating AI review...")
-            ai_review = self._run_async_review(review_prompt)
+            ai_review = self._run_async_review(formatted_changes, self.guidelines)
             
             # Format final review comment
             review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"
@@ -219,8 +256,8 @@ class CodeReviewer:
             # print("Posting review to GitLab...")
             # self.gitlab.post_merge_request_note(project_id, mr_iid, review_comment)
             
-            print("✅ Code review completed successfully!")
-            print(f"Review posted to: {self.gitlab.gitlab_url}/merge_requests/{mr_iid}")
+            # print("✅ Code review completed successfully!")
+            # print(f"Review posted to: {self.gitlab.gitlab_url}/merge_requests/{mr_iid}")
             
             return True
             
@@ -231,14 +268,16 @@ class CodeReviewer:
             print(f"❌ Error: {str(e)}")
             return False
     
-    def _run_async_review(self, prompt: str) -> str:
+    def _run_async_review(self, content: str, guidelines: str) -> str:
         """Helper method to run the async review generation"""
-        return asyncio.run(self.ollama.generate_review(prompt))
+        return asyncio.run(self.ollama.generate_review(content, guidelines))
     
     def _get_current_timestamp(self) -> str:
         """Get current timestamp for review"""
         from datetime import datetime
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")
+    
+    
 
 
 def load_config() -> Dict[str, str]:
