@@ -60,10 +60,10 @@ class GitLabAPI:
 class OllamaAPI:
     """Handle Ollama AI interactions"""
     
-    def __init__(self, ollama_url: str, model: str):
+    def __init__(self, ollama_url: str, model: str, num_ctx: int = 6122):
         self.ollama_url = ollama_url.rstrip('/')
         self.model = model
-        self.num_ctx = 6122  # Default context window
+        self.num_ctx = num_ctx  # Configurable context window
         self.max_content_tokens = int(self.num_ctx * 0.8)  # Reserve 20% for response and overhead
     
     async def stream(self, prompt: str):
@@ -139,7 +139,7 @@ class CodeReviewer:
     
     def __init__(self, config: Dict[str, str]):
         self.gitlab = GitLabAPI(config['GITLAB_URL'], config['GITLAB_PAT'])
-        self.ollama = OllamaAPI(config['OLLAMA_URL'], config['OLLAMA_MODEL'])
+        self.ollama = OllamaAPI(config['OLLAMA_URL'], config['OLLAMA_MODEL'], int(config['OLLAMA_NUM_CTX']))
         self.reviewer_name = config.get('REVIEWER_NAME', 'AI Code Reviewer')
         self.reviewer_email = config.get('REVIEWER_EMAIL', 'ai-reviewer@example.com')
         self.guidelines = self._load_guidelines()
@@ -252,12 +252,12 @@ class CodeReviewer:
             review_comment += ai_review
             review_comment += "\n\n---\n*This review was generated automatically by AI. Please use your judgment and verify the suggestions.*"
             
-            # # Post review
-            # print("Posting review to GitLab...")
-            # self.gitlab.post_merge_request_note(project_id, mr_iid, review_comment)
+            # Post review
+            print("Posting review to GitLab...")
+            self.gitlab.post_merge_request_note(project_id, mr_iid, review_comment)
             
-            # print("✅ Code review completed successfully!")
-            # print(f"Review posted to: {self.gitlab.gitlab_url}/merge_requests/{mr_iid}")
+            print("✅ Code review completed successfully!")
+            print(f"Review posted to: {self.gitlab.gitlab_url}/merge_requests/{mr_iid}")
             
             return True
             
@@ -299,6 +299,7 @@ def load_config() -> Dict[str, str]:
     # Optional config
     config['REVIEWER_NAME'] = os.getenv('REVIEWER_NAME', 'AI Code Reviewer')
     config['REVIEWER_EMAIL'] = os.getenv('REVIEWER_EMAIL', 'ai-reviewer@example.com')
+    config['OLLAMA_NUM_CTX'] = os.getenv('OLLAMA_NUM_CTX', '6122')  # Default context window
     
     return config
 
