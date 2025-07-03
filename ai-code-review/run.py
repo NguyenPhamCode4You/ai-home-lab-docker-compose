@@ -10,6 +10,7 @@ import sys
 import argparse
 import requests
 import json
+import asyncio
 from typing import Dict, Any, Optional, List
 from dotenv import load_dotenv
 import httpx
@@ -62,6 +63,7 @@ class OllamaAPI:
     def __init__(self, ollama_url: str, model: str):
         self.ollama_url = ollama_url.rstrip('/')
         self.model = model
+        self.num_ctx = 4096  # Default context window
     
     async def stream(self, prompt: str):
         if not self.ollama_url or not self.model:
@@ -77,6 +79,19 @@ class OllamaAPI:
                     except Exception as e:
                         print(f"Error decoding chunk: {e}")
                         continue
+    
+    async def generate_review(self, prompt: str) -> str:
+        """Generate a complete review by collecting all streaming chunks"""
+        output = ''
+        print("🤖 AI is generating review...")
+        
+        async for chunk in self.stream(prompt):
+            if chunk:
+                output += chunk
+                print(chunk, end='', flush=True)  # Print chunk to console in real-time
+        
+        print("\n🤖 Review generation completed!")
+        return output
 
 
 class CodeReviewer:
@@ -191,7 +206,7 @@ class CodeReviewer:
             
             # Get AI review
             print("Generating AI review...")
-            ai_review = self.ollama.generate_review(review_prompt)
+            ai_review = self._run_async_review(review_prompt)
             
             # Format final review comment
             review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"
@@ -200,9 +215,9 @@ class CodeReviewer:
             review_comment += ai_review
             review_comment += "\n\n---\n*This review was generated automatically by AI. Please use your judgment and verify the suggestions.*"
             
-            # Post review
-            print("Posting review to GitLab...")
-            self.gitlab.post_merge_request_note(project_id, mr_iid, review_comment)
+            # # Post review
+            # print("Posting review to GitLab...")
+            # self.gitlab.post_merge_request_note(project_id, mr_iid, review_comment)
             
             print("✅ Code review completed successfully!")
             print(f"Review posted to: {self.gitlab.gitlab_url}/merge_requests/{mr_iid}")
@@ -215,6 +230,10 @@ class CodeReviewer:
         except Exception as e:
             print(f"❌ Error: {str(e)}")
             return False
+    
+    def _run_async_review(self, prompt: str) -> str:
+        """Helper method to run the async review generation"""
+        return asyncio.run(self.ollama.generate_review(prompt))
     
     def _get_current_timestamp(self) -> str:
         """Get current timestamp for review"""
