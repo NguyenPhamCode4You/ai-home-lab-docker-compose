@@ -166,26 +166,58 @@ class CodeReviewer:
         return project_id, mr_input
     
     def _format_changes_for_review(self, changes: Dict[str, Any]) -> str:
-        """Format the changes data for AI review"""
+        """Format the changes data for AI review with optimized content"""
         review_text = "# Code Changes for Review\n\n"
         
-        # Add MR basic info
-        mr_info = changes
-        review_text += f"**Title:** {mr_info.get('title', 'N/A')}\n"
-        review_text += f"**Description:** {mr_info.get('description', 'N/A')}\n"
-        review_text += f"**Source Branch:** {mr_info.get('source_branch', 'N/A')}\n"
-        review_text += f"**Target Branch:** {mr_info.get('target_branch', 'N/A')}\n\n"
+        # Add essential MR info only
+        title = changes.get('title', 'N/A')
+        description = changes.get('description', '')
         
-        # Add file changes
-        review_text += "## Changed Files\n\n"
-        for change in changes.get('changes', []):
+        review_text += f"**Title:** {title}\n"
+        if description and description.strip() and description != 'N/A':
+            # Truncate description if too long
+            if len(description) > 200:
+                description = description[:197] + "..."
+            review_text += f"**Description:** {description}\n"
+        review_text += f"**Branch:** {changes.get('source_branch', 'N/A')} → {changes.get('target_branch', 'N/A')}\n\n"
+        
+        # Add file changes with optimizations
+        file_changes = changes.get('changes', [])
+        if not file_changes:
+            return review_text + "No file changes found.\n"
+        
+        review_text += f"## Files Changed ({len(file_changes)})\n\n"
+        
+        for change in file_changes:
             file_path = change.get('new_path', change.get('old_path', 'unknown'))
-            review_text += f"### File: {file_path}\n\n"
+            file_name = file_path.split('/')[-1] if '/' in file_path else file_path
             
-            if change.get('diff'):
-                review_text += "```diff\n"
-                review_text += change['diff']
-                review_text += "\n```\n\n"
+            # Include file extension for context
+            review_text += f"### {file_name} ({file_path})\n"
+            
+            diff_content = change.get('diff', '')
+            if diff_content:
+                # Auto-truncate diff if > 200 characters
+                if len(diff_content) > 200:
+                    # Try to keep complete lines when truncating
+                    lines = diff_content.split('\n')
+                    truncated_lines = []
+                    char_count = 0
+                    
+                    for line in lines:
+                        if char_count + len(line) + 1 <= 200:  # +1 for newline
+                            truncated_lines.append(line)
+                            char_count += len(line) + 1
+                        else:
+                            break
+                    
+                    diff_content = '\n'.join(truncated_lines)
+                    if len(lines) > len(truncated_lines):
+                        diff_content += f"\n... ({len(lines) - len(truncated_lines)} more lines truncated)"
+                
+                review_text += f"```diff\n{diff_content}\n```\n\n"
+            else:
+                review_text += "*No diff content available*\n\n"
         
         return review_text
     
