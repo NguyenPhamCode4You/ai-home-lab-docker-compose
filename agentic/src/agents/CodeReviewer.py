@@ -5,6 +5,7 @@ class CodeReviewer(Task):
     def __init__(self, **kwargs):
         kwargs["task_name"] = kwargs.get("task_name", "code-reviewer")
         kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
+        kwargs["max_context_tokens"] = kwargs.get("max_context_tokens", 32000)
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
             # Code Review Guidelines
 

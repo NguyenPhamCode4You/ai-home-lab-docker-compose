@@ -10,6 +10,7 @@ class Task:
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
         self.max_context_tokens = max_context_tokens
+        print("Token length", self.max_context_tokens)
         self.user_instruction = user_instruction or None
         self.state = { "context": "", "question": "", "response": "" }
 

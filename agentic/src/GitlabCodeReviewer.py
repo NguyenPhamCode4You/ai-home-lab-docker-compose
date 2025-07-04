@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from .agents.Task import Task
 from .agents.CodeReviewer import CodeReviewer
@@ -14,48 +15,39 @@ class GitlabCodeReviewer():
             reviewer_email: str = "ai-code-reviewer@c4y.com"
         ):
             self.llm_code_reviewer = llm_code_reviewer or CodeReviewer()
-            self.gitlab_api = GitLabAPI(gitlab_url, gitlab_access_token)
+            self.gitlab_url = gitlab_url or os.getenv('GITLAB_URL', os.getenv('CI_SERVER_URL'))
+            self.gitlab_access_token = gitlab_access_token or os.getenv('GITLAB_PAT', os.getenv('GITLAB_TOKEN', os.getenv('CI_JOB_TOKEN')))
+            self.gitlab_api = GitLabAPI(self.gitlab_url, self.gitlab_access_token)
             self.reviewer_name = reviewer_name
             self.reviewer_email = reviewer_email
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         """Main method to review a merge request"""
 
+        yield f"\n\nStarting code review for question: {question}"
+        await asyncio.sleep(1)
+
         project_config_string = await Task(
             llm_model=self.llm_code_reviewer.llm_model if self.llm_code_reviewer else Ollama(),
-            instruction_template="What is the gitlab project id and merge request id? Return only the result in format project_id/merge_request_id, example is 30/180. User: {question}.",
-        ).run(context=context, question=question, conversation_history=conversation_history)
+            instruction_template="What is the gitlab project id and merge request id? Always return the result in format project_id/merge_request_id only, example is: 30/180. Here is the content to extract: {question}.",
+        ).run(question=question)
         
         project_id, mr_iid = extract_project_and_mr(project_config_string)
-        yield (f"Reviewing MR {mr_iid} in project {project_id}...")
-        
-        # Get MR data
-        yield("Fetching merge request details...")
         mr_data = self.gitlab_api.get_merge_request(project_id, mr_iid)
-        
-        # Get MR changes
-        yield("Fetching merge request changes...")
         changes_data = self.gitlab_api.get_merge_request_changes(project_id, mr_iid)
-        
-        # Extract user info
-        user_info = get_user_info(mr_data)
-        yield(f"Author: {user_info['author']['name']} ({user_info['author']['email']})")
-        if user_info['reviewer']:
-            yield(f"Reviewer: {user_info['reviewer']['name']} ({user_info['reviewer']['email']})")
-        else:
-            yield("No reviewer assigned")
-        
-        # Format changes for AI review
-        yield("Preparing code for AI review...")
         formatted_changes = format_changes_for_review(changes_data)
+        user_info = get_user_info(mr_data)
+
+        yield f"\n\n- **Author:** {user_info['author']['name']} ({user_info['author']['email']})"
+        yield f"\n\n- **Token length:** {len(formatted_changes)} chars"
+        yield f"\n\n- **Review Date:** {get_current_timestamp()}\n\n"
 
         review_comment = ""
-        
         # Format final review comment
         review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"
         review_comment += f"**Reviewed by:** {self.reviewer_name} ({self.reviewer_email})\n"
         review_comment += f"**Review Date:** {get_current_timestamp()}\n\n"
-        yield("🤖 Generating AI review...")
+        yield f"\n\n## 🤖 Generating AI review...\n\n"
 
         async for text_chunk in self.llm_code_reviewer.stream(context=formatted_changes, question=question, conversation_history=conversation_history):
             review_comment += text_chunk
