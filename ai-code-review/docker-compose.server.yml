@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  ai-code-review-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - GITLAB_URL=${GITLAB_URL}
+      - GITLAB_PAT=${GITLAB_PAT}
+      - OLLAMA_URL=${OLLAMA_URL}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - REVIEWER_NAME=${REVIEWER_NAME:-AI Code Reviewer}
+      - REVIEWER_EMAIL=${REVIEWER_EMAIL:-ai-reviewer@example.com}
+      - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-6122}
+    volumes:
+      - ./review_guidelines.txt:/app/review_guidelines.txt:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
