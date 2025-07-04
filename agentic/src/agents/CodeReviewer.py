@@ -7,12 +7,11 @@ class CodeReviewer(Task):
         kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
         kwargs["max_context_tokens"] = kwargs.get("max_context_tokens", 32000)
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
+            ## You are an expert code reviewer that is provided with this code changes:
+            {context}
+
+            ## Your task is to review the code changes base the the following guidelines:            
             # Code Review Guidelines
-
-            You are an expert code reviewer. Review code changes using this concise format:
-
-            ## Review Checklist
-
             ### 1. Code & Structure Quality: [Rate 1-10]
             Rate overall code quality, readability, maintainability, error handling, and organization.
 
@@ -36,10 +35,7 @@ class CodeReviewer(Task):
             - **BLOCKED**: Critical issues found
 
             Keep feedback constructive and actionable.
-
-            ## Now, review the following code changes:
-            {context}
-                                                    
-            ## User Additional Question: {question}
+            Also, please answer the addtional question from the user below.
+            ## User Additional request: {question}
         """)
         super().__init__(**kwargs)

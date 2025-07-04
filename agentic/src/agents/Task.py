@@ -10,7 +10,6 @@ class Task:
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
         self.max_context_tokens = max_context_tokens
-        print("Token length", self.max_context_tokens)
         self.user_instruction = user_instruction or None
         self.state = { "context": "", "question": "", "response": "" }
 
@@ -19,7 +18,11 @@ class Task:
         self.state["context"] = context
         self.state["question"] = question
         self.state["response"] = ""
+        print("Context length:", len(context or ""))
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
+        print("Number of context chunks:", len(chunks))
+        for index, chunk in enumerate(chunks):
+            print(f"Processing chunk {index + 1}/{len(chunks)} with length {len(chunk)}")
         date_str = datetime.datetime.now().strftime("%Y-%m-%d")
         folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
         os.makedirs(folder_path, exist_ok=True)
