@@ -13,7 +13,7 @@ def test_env_file():
     """Test if .env file exists and contains required variables"""
     print("Testing .env file...")
     
-    env_path = os.path.join(os.path.dirname(__file__), '.env')
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
     if not os.path.exists(env_path):
         print("❌ .env file not found")
         return False

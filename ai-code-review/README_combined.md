@@ -158,6 +158,7 @@ python src/main.py 456/123
 ```
 
 Where:
+
 - `456` is the GitLab project ID
 - `123` is the merge request IID
 
@@ -175,6 +176,7 @@ python src/main.py --help
 ```
 
 Available options:
+
 - `mr_input`: Merge Request ID or Project_ID/MR_ID format (required)
 - `--config`: Path to custom .env config file (optional, default: `.env`)
 
@@ -216,6 +218,7 @@ POST /review?project_id={project_id}&mr_id={mr_id}&should_post_comment={true|fal
 ```
 
 **Parameters:**
+
 - `project_id` (required): GitLab project ID
 - `mr_id` (required): Merge request ID/IID
 - `should_post_comment` (optional, default: false): Whether to post the review as a comment to GitLab
@@ -305,6 +308,7 @@ All configuration is done through environment variables in the `.env` file:
 The AI review is guided by the content in `review_guidelines.txt`. You can customize this file to match your team's coding standards and review criteria.
 
 The default guidelines cover:
+
 - Code quality and maintainability
 - Best practices and coding standards
 - Performance considerations
@@ -314,6 +318,7 @@ The default guidelines cover:
 ## Output
 
 The tool will:
+
 1. Fetch the merge request details and changes
 2. Generate an AI review based on the guidelines
 3. Post the review as a comment on the merge request (if requested)
@@ -348,6 +353,7 @@ Review posted to: https://gitlab.example.com/merge_requests/123
 ### API Error Responses
 
 The API returns appropriate HTTP status codes:
+
 - **200**: Success
 - **400**: Bad Request (invalid parameters)
 - **500**: Internal Server Error
@@ -380,6 +386,7 @@ ollama pull <model-name>
 ```
 
 5. **"Code reviewer not initialized"**:
+
    - Check your `.env` file configuration
    - Ensure all required environment variables are set
 
@@ -441,6 +448,7 @@ python -m pytest tests/ -v
 ## Monitoring
 
 The server includes logging for all operations. Check the console output for:
+
 - 🔍 Review start notifications
 - 📥 Data fetching progress
 - 🧠 AI review generation
