@@ -119,7 +119,7 @@ def check_server_health():
         return False
 
 def extract_review_info(text):
-    pattern = r"^review-pr-(\w+)/(\w+)$"
+    pattern = r"^review-(\w+)/(\w+)$"
     match = re.match(pattern, text.strip())
     if match:
         return match.group(1), match.group(2)
@@ -284,7 +284,7 @@ def send_telegram_message(chat_id, text, thread_id=None):
         payload = {
             "chat_id": chat_id,
             "text": text,
-            "parse_mode": "HTML"  # Allow HTML formatting
+            "parse_mode": "Markdown"  # Allow Markdown formatting
         }
         
         # Add thread ID if specified and message is in a thread
@@ -307,39 +307,36 @@ def send_telegram_message(chat_id, text, thread_id=None):
 
 def send_acknowledgment(chat_id, project_id, merge_id, thread_id=None):
     """Send acknowledgment message to user"""
-    message = f"🤖 <b>Request Accepted</b>\n\n" \
-              f"📝 Processing review for project <code>{project_id}</code>, MR <code>{merge_id}</code>\n" \
-              f"⏳ AI agent is working on it..."
+    message = f"🤖 *Request Accepted*, I am working on it..."
     
     return send_telegram_message(chat_id, message, thread_id)
 
 def send_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
     """Send result message after API processing"""
     if success:
-        message = f"✅ <b>Review Completed</b>\n\n" \
-                  f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n"
-        
-        if result_data.get("posted_to_gitlab"):
-            message += f"🔗 Review posted to GitLab: {result_data.get('merge_request_url', 'N/A')}\n"
-        
+        message = f"✅ *Review Completed*: Project: `{project_id}`, MR: `{merge_id}`\n"
+
         # Include review content from the API response
         review_content = result_data.get("review_content")
         if review_content:
-            message += f"\n📋 <b>Review Content:</b>\n"
+            message += f"📋 *Review Content:*\n"
             # Telegram has a 4096 character limit, so we need to truncate if necessary
             # Reserve space for the header and footer (roughly 200 chars)
             max_review_length = 3800
             if len(review_content) > max_review_length:
-                message += f"<pre>{review_content[:max_review_length]}...</pre>\n"
-                message += f"<i>(Review truncated - full content posted to GitLab)</i>"
+                message += f"```\n{review_content[:max_review_length]}...\n```\n"
+                message += f"_(Review truncated - full content posted to GitLab)_"
             else:
-                message += f"<pre>{review_content}</pre>"
+                message += f"```\n{review_content}\n```"
         elif result_data.get("review_summary"):
             # Fallback to summary if review_content is not available
-            message += f"\n📋 <b>Summary:</b>\n{result_data.get('review_summary')[:500]}..."
+            message += f"\n📋 *Summary:*\n{result_data.get('review_summary')[:500]}..."
+        
+        # Add confirmation that message was posted to GitLab
+        if result_data.get("posted_to_gitlab"):
+            message += f"📤 Message posted to gitlab"
     else:
-        message = f"❌ <b>Review Failed</b>\n\n" \
-                  f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n" \
+        message = f"❌ *Review Failed*: Project: `{project_id}`, MR: `{merge_id}`\n" \
                   f"💥 Error: {result_data.get('message', 'Unknown error')}"
     
     return send_telegram_message(chat_id, message, thread_id)
@@ -347,7 +344,7 @@ def send_result_message(chat_id, project_id, merge_id, success, result_data, thr
 def test_send_message():
     """Test sending a message to Telegram"""
     try:
-        test_message = "🧪 <b>Test Message</b>\n\nThis is a test message from the bot to verify messaging functionality."
+        test_message = "🧪 *Test Message*\n\nThis is a test message from the bot to verify messaging functionality."
         result = send_telegram_message(CHAT_ID, test_message, THREAD_ID)
         if result:
             print("[✅] Test message sent successfully")
@@ -411,8 +408,8 @@ def main():
                         print(f"[🩺] Checking server health before processing...")
                         if not check_server_health():
                             # Server is not healthy, send error message and skip processing
-                            error_message = f"❌ <b>Server Unavailable</b>\n\n" \
-                                          f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n" \
+                            error_message = f"❌ *Server Unavailable*\n\n" \
+                                          f"📝 Project: `{project_id}`, MR: `{merge_id}`\n" \
                                           f"💥 The review server is currently unavailable. Please try again later."
                             send_telegram_message(chat_id, error_message, message_thread_id)
                             save_processed_message(chat_id, message_id, current_update_id)
@@ -436,7 +433,7 @@ def main():
                         save_processed_message(chat_id, message_id, current_update_id)
                         print(f"[✅] Message {message_id} processed and saved")
                     else:
-                        print(f"[❌] Invalid format. Expected: review-pr-<project_id>/<merge_id>. Got: {text}")
+                        print(f"[❌] Invalid format. Expected: review-<project_id>/<merge_id>. Got: {text}")
                         # Still mark as processed to avoid reprocessing
                         save_processed_message(chat_id, message_id, current_update_id)
                 
