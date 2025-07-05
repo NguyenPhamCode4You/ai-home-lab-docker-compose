@@ -63,7 +63,7 @@ async def health_check():
 async def review_merge_request(
     project_id: str = Query(..., description="GitLab project ID"),
     mr_id: str = Query(..., description="Merge request ID/IID"),
-    should_post_comment: bool = Query(False, description="Whether to post the review as a comment to GitLab"),
+    post_review_to_gitlab: bool = Query(False, description="Whether to post the review as a comment to GitLab"),
     custom_guidelines: str = Query(None, description="Custom review guidelines (optional)")
 ):
     """
@@ -72,7 +72,7 @@ async def review_merge_request(
     Args:
         project_id: GitLab project ID
         mr_id: Merge request ID/IID
-        should_post_comment: If True, posts the review as a comment to GitLab
+        post_review_to_gitlab: If True, posts the review as a comment to GitLab
         custom_guidelines: Custom review guidelines text (optional)
     
     Returns:
@@ -120,7 +120,7 @@ async def review_merge_request(
         ai_review = await code_reviewer.ollama.generate_review(formatted_changes, guidelines)
         
         # Format final review comment
-        review_content = f"## 🤖 AI Code Review by {code_reviewer.reviewer_name}\n\n"
+        review_content = f"## 🤖 AI Code Check by {code_reviewer.reviewer_name}\n\n"
         review_content += f"**Reviewed by:** {code_reviewer.reviewer_name} ({code_reviewer.reviewer_email})\n"
         review_content += f"**Review Date:** {get_current_timestamp()}\n\n"
         review_content += ai_review
@@ -130,7 +130,7 @@ async def review_merge_request(
         merge_request_url = f"{code_reviewer.gitlab.gitlab_url}/-/merge_requests/{mr_iid}"
         
         # Post review if requested
-        if should_post_comment:
+        if post_review_to_gitlab:
             logger.info("📝 Posting review to GitLab...")
             code_reviewer.gitlab.post_merge_request_note(parsed_project_id, mr_iid, review_content)
             posted_to_gitlab = True

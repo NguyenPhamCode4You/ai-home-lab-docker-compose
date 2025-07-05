@@ -45,7 +45,7 @@ class GitlabCodeReviewer():
 
         review_comment = ""
         # Format final review comment
-        review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"
+        review_comment = f"## 🤖 AI Code Check by {self.reviewer_name}\n\n"
         review_comment += f"**Reviewed by:** {self.reviewer_name} ({self.reviewer_email})\n"
         review_comment += f"**Review Date:** {get_current_timestamp()}\n\n"
         yield f"\n\n## 🤖 Generating AI review...\n\n"

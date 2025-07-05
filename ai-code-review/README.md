@@ -236,7 +236,7 @@ curl -X POST "http://localhost:8000/review?project_id=123&mr_id=456&should_post_
 ```json
 {
   "success": true,
-  "review_content": "## 🤖 AI Code Review by AI Code Reviewer\n\n**Reviewed by:** AI Code Reviewer (ai-reviewer@example.com)\n**Review Date:** 2025-07-04 10:30:00\n\n### Summary\nThe code changes look good overall...",
+  "review_content": "## 🤖 AI Code Check by AI Code Reviewer\n\n**Reviewed by:** AI Code Reviewer (ai-reviewer@example.com)\n**Review Date:** 2025-07-04 10:30:00\n\n### Summary\nThe code changes look good overall...",
   "posted_to_gitlab": true,
   "message": "Code review generated successfully and posted to GitLab",
   "merge_request_url": "https://your-gitlab.com/-/merge_requests/456"

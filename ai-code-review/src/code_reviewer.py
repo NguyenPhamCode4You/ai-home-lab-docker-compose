@@ -62,7 +62,7 @@ class CodeReviewer:
             ai_review = self._run_async_review(formatted_changes, guidelines)
             
             # Format final review comment
-            review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"
+            review_comment = f"## 🤖 AI Code Check by {self.reviewer_name}\n\n"
             review_comment += f"**Reviewed by:** {self.reviewer_name} ({self.reviewer_email})\n"
             review_comment += f"**Review Date:** {get_current_timestamp()}\n\n"
             review_comment += ai_review
