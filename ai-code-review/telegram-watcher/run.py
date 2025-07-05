@@ -16,11 +16,15 @@ API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
 TARGET_API = os.getenv("REVIEW_API_URL", "http://localhost:8000/review")  # Default to port 8000
 
 # File to store processed messages
-PROCESSED_MESSAGES_FILE = "processed_messages.txt"
+PROCESSED_MESSAGES_FILE = os.path.join(os.getenv("DATA_DIR", "/app/data"), "processed_messages.txt")
 
 def read_processed_messages():
     """Read the set of processed message IDs from file"""
     try:
+        # Ensure the data directory exists
+        data_dir = os.path.dirname(PROCESSED_MESSAGES_FILE)
+        os.makedirs(data_dir, exist_ok=True)
+        
         if os.path.exists(PROCESSED_MESSAGES_FILE):
             with open(PROCESSED_MESSAGES_FILE, 'r') as f:
                 return set(line.strip() for line in f if line.strip())

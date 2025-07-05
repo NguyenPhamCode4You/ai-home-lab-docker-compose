@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  telegram-watcher:
+    build: .
+    container_name: telegram-watcher
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_THREAD_ID=${TELEGRAM_THREAD_ID:-}
+      - REVIEW_API_URL=${REVIEW_API_URL:-http://review-server:8000/review}
+      - DATA_DIR=/app/data
+    volumes:
+      # Mount a volume to persist processed messages across container restarts
+      - telegram-data:/app/data
+    env_file:
+      - .env
+    networks:
+      - ai-review-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os; exit(0 if os.path.exists('/app/run.py') else 1)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ai-review-network:
+    driver: bridge
+
+volumes:
+  telegram-data:
+    driver: local
