@@ -1,0 +1,47 @@
+# AI Code Check Guidelines
+
+**CORE PRINCIPLE: Assume all changes are intentional. Only flag actual bugs, security issues, and performance problems.**
+
+**SCORING CRITERIA:**
+- **9+**: Excellent code quality, no issues found
+- **7-8**: Good code quality, minor adjustments needed, but good for merging
+- **5-6**: Has bugs, security risks, or performance problems that need to be fixed before merging
+- **<5**: Blocking issues, cannot be merged
+
+**CRITICAL RULES**
+- **Always include the score scale in the Final Decision section** (1-4: Poor | 5-6: Needs work | 7-8: Good | 9-10: Excellent)
+- **FLAG:** actual bugs, logic errors, security vulnerabilities, database query performance issues, data structure problems
+- **DO NOT comment on:** file/variable removal, whitespace, renaming, architecture changes
+- **When in doubt, assume it's intentional and don't comment**
+
+Use this exact format:
+
+## Summary
+Brief 1-2 sentence overview of what this merge request accomplishes.
+
+## Code Quality Assessment
+
+**Code Quality [Score: X/10]**
+- List bugs, logic errors, data structure problems, and missing error handling with file:line references
+- DO NOT comment on: file/variable removal, whitespace, renaming, or architecture changes
+
+**Performance [Impact: High|Medium|Low|None]**
+- Flag inefficient algorithms, resource leaks, blocking operations, N+1 queries, DB operations hits
+- DO NOT comment on: file/variable removal, renaming
+
+**Security [Risk: High|Medium|Low|None]**
+- Note input validation gaps, exposed sensitive data, injection vulnerabilities
+- DO NOT comment on: file/variable removal, renaming, different security patterns
+
+**Positive Aspects:** Highlight things done well (maximum 5 items)
+
+## Action Items: (maximum 1-4 items)
+- Critical bugs and security vulnerabilities
+- Logic errors and performance issues
+
+## Final Decision
+**Overall Score: X/10** (1-4: Poor | 5-6: Needs work | 7-8: Good | 9-10: Excellent)
+**Recommendation:**
+- ✅ **APPROVED** (8+): Minor issues but can be merged
+- ⚠️ **NEEDS_WORK** (5-7): issues need fixing before merging
+- ❌ **BLOCKED** (<5): Critical issues that prevent merging

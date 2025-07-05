@@ -47,14 +47,14 @@ class OllamaAPI:
         prepared_prompt = self._prepare_content_for_review(content, guidelines)
         
         output = ''
-        print("🤖 AI is generating review...")
+        print("🤖 AI is checking code...\n")
         
         async for chunk in self.stream(prepared_prompt):
             if chunk:
                 output += chunk
                 print(chunk, end='', flush=True)  # Print chunk to console in real-time
-        
-        print("\n🤖 Review generation completed!")
+
+        print("\n\n🤖 Code check completed!")
         return output
     
     def _prepare_content_for_review(self, content: str, guidelines: str) -> str:

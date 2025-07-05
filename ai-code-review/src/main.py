@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description='AI Code Review Tool for GitLab')
     parser.add_argument('mr_input', help='Merge Request ID or Project_ID/MR_ID format')
     parser.add_argument('--config', help='Path to .env config file', default='.env')
+    parser.add_argument('--guidelines', help='Custom review guidelines text', default=None)
     
     args = parser.parse_args()
     
@@ -27,8 +28,8 @@ def main():
         # Create reviewer instance
         reviewer = CodeReviewer(config)
         
-        # Perform review
-        success = reviewer.review_merge_request(args.mr_input)
+        # Perform review with custom guidelines if provided
+        success = reviewer.review_merge_request(args.mr_input, args.guidelines)
         
         sys.exit(0 if success else 1)
         

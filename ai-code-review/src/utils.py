@@ -7,8 +7,11 @@ from typing import Dict, Any
 from datetime import datetime
 
 
-def load_guidelines() -> str:
-    """Load code review guidelines from file"""
+def load_guidelines(custom_guidelines: str = None) -> str:
+    """Load code review guidelines from file or use custom guidelines"""
+    if custom_guidelines:
+        return custom_guidelines
+    
     guidelines_path = os.path.join(os.path.dirname(__file__), 'review_guidelines.txt')
     try:
         with open(guidelines_path, 'r', encoding='utf-8') as f:
@@ -41,8 +44,8 @@ def format_changes_for_review(changes: Dict[str, Any]) -> str:
     review_text += f"**Title:** {title}\n"
     if description and description.strip() and description != 'N/A':
         # Truncate description if too long
-        if len(description) > 200:
-            description = description[:197] + "..."
+        if len(description) > 300:
+            description = description[:297] + "..."
         review_text += f"**Description:** {description}\n"
     review_text += f"**Branch:** {changes.get('source_branch', 'N/A')} → {changes.get('target_branch', 'N/A')}\n\n"
     
@@ -62,15 +65,15 @@ def format_changes_for_review(changes: Dict[str, Any]) -> str:
         
         diff_content = change.get('diff', '')
         if diff_content:
-            # Auto-truncate diff if > 200 characters
-            if len(diff_content) > 200:
+            # Auto-truncate diff if > 300 characters
+            if len(diff_content) > 300:
                 # Try to keep complete lines when truncating
                 lines = diff_content.split('\n')
                 truncated_lines = []
                 char_count = 0
                 
                 for line in lines:
-                    if char_count + len(line) + 1 <= 200:  # +1 for newline
+                    if char_count + len(line) + 1 <= 300:  # +1 for newline
                         truncated_lines.append(line)
                         char_count += len(line) + 1
                     else:

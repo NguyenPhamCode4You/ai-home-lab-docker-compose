@@ -30,12 +30,12 @@ ai-code-review/
 │   ├── code_reviewer.py    # Main orchestrator
 │   ├── gitlab_api.py       # GitLab API client
 │   ├── ollama_api.py       # Ollama AI client
-│   └── utils.py            # Utility functions
+│   ├── utils.py            # Utility functions
+│   └── review_guidelines.txt # AI review guidelines
 ├── tests/                  # Test files
 │   ├── test_server.py      # Server tests
 │   └── test_setup.py       # Setup tests
 ├── requirements.txt        # Python dependencies
-├── review_guidelines.txt   # AI review guidelines
 ├── .env.example           # Environment configuration example
 └── README.md              # This file
 ```
@@ -158,6 +158,7 @@ python src/main.py 456/123
 ```
 
 Where:
+
 - `456` is the GitLab project ID
 - `123` is the merge request IID
 
@@ -175,8 +176,10 @@ python src/main.py --help
 ```
 
 Available options:
+
 - `mr_input`: Merge Request ID or Project_ID/MR_ID format (required)
 - `--config`: Path to custom .env config file (optional, default: `.env`)
+- `--guidelines`: Custom review guidelines text (optional)
 
 #### As a Python Package
 
@@ -212,18 +215,20 @@ GET /health
 ##### Generate Code Review
 
 ```http
-POST /review?project_id={project_id}&mr_id={mr_id}&should_post_comment={true|false}
+POST /review?project_id={project_id}&mr_id={mr_id}&should_post_comment={true|false}&custom_guidelines={guidelines}
 ```
 
 **Parameters:**
+
 - `project_id` (required): GitLab project ID
 - `mr_id` (required): Merge request ID/IID
 - `should_post_comment` (optional, default: false): Whether to post the review as a comment to GitLab
+- `custom_guidelines` (optional): Custom review guidelines text to override defaults
 
-**Example Request:**
+**Example Request with Custom Guidelines:**
 
 ```bash
-curl -X POST "http://localhost:8000/review?project_id=123&mr_id=456&should_post_comment=true"
+curl -X POST "http://localhost:8000/review?project_id=123&mr_id=456&should_post_comment=true&custom_guidelines=Focus%20on%20security%20vulnerabilities%20and%20performance%20issues"
 ```
 
 **Example Response:**
@@ -302,9 +307,24 @@ All configuration is done through environment variables in the `.env` file:
 
 ## Review Guidelines
 
-The AI review is guided by the content in `review_guidelines.txt`. You can customize this file to match your team's coding standards and review criteria.
+The AI review is guided by the content in `src/review_guidelines.txt`. You can customize this file to match your team's coding standards and review criteria.
+
+Alternatively, you can provide custom guidelines at runtime:
+
+### CLI Usage with Custom Guidelines
+
+```bash
+python src/main.py 123 --guidelines "Focus on security vulnerabilities, code duplication, and performance optimizations"
+```
+
+### API Usage with Custom Guidelines
+
+```bash
+curl -X POST "http://localhost:8000/review?project_id=123&mr_id=456&custom_guidelines=Focus%20on%20security%20and%20performance"
+```
 
 The default guidelines cover:
+
 - Code quality and maintainability
 - Best practices and coding standards
 - Performance considerations
@@ -314,6 +334,7 @@ The default guidelines cover:
 ## Output
 
 The tool will:
+
 1. Fetch the merge request details and changes
 2. Generate an AI review based on the guidelines
 3. Post the review as a comment on the merge request (if requested)
@@ -348,6 +369,7 @@ Review posted to: https://gitlab.example.com/merge_requests/123
 ### API Error Responses
 
 The API returns appropriate HTTP status codes:
+
 - **200**: Success
 - **400**: Bad Request (invalid parameters)
 - **500**: Internal Server Error
@@ -380,6 +402,7 @@ ollama pull <model-name>
 ```
 
 5. **"Code reviewer not initialized"**:
+
    - Check your `.env` file configuration
    - Ensure all required environment variables are set
 
@@ -441,6 +464,7 @@ python -m pytest tests/ -v
 ## Monitoring
 
 The server includes logging for all operations. Check the console output for:
+
 - 🔍 Review start notifications
 - 📥 Data fetching progress
 - 🧠 AI review generation

@@ -25,11 +25,14 @@ class CodeReviewer:
         self.ollama = OllamaAPI(config['OLLAMA_URL'], config['OLLAMA_MODEL'], int(config['OLLAMA_NUM_CTX']))
         self.reviewer_name = config.get('REVIEWER_NAME', 'AI Code Reviewer')
         self.reviewer_email = config.get('REVIEWER_EMAIL', 'ai-reviewer@example.com')
-        self.guidelines = load_guidelines()
+        self.default_guidelines = load_guidelines()
     
-    def review_merge_request(self, mr_input: str) -> bool:
+    def review_merge_request(self, mr_input: str, custom_guidelines: str = None) -> bool:
         """Main method to review a merge request"""
         try:
+            # Use custom guidelines if provided, otherwise use default
+            guidelines = custom_guidelines if custom_guidelines else self.default_guidelines
+            
             # Parse input
             project_id, mr_iid = extract_project_and_mr(mr_input)
             print(f"Reviewing MR {mr_iid} in project {project_id}...")
@@ -56,7 +59,7 @@ class CodeReviewer:
             
             # Get AI review (guidelines will be added automatically with content length check)
             print("Generating AI review...")
-            ai_review = self._run_async_review(formatted_changes, self.guidelines)
+            ai_review = self._run_async_review(formatted_changes, guidelines)
             
             # Format final review comment
             review_comment = f"## 🤖 AI Code Review by {self.reviewer_name}\n\n"

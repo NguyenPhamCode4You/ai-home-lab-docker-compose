@@ -31,7 +31,7 @@ code_reviewer = None
 class ReviewResponse(BaseModel):
     success: bool
     review_content: Optional[str] = None
-    post_review_to_gitlab: bool = False
+    posted_to_gitlab: bool = False
     message: str
     merge_request_url: Optional[str] = None
 
@@ -59,11 +59,12 @@ async def health_check():
         message="AI Code Review API is running"
     )
 
-@app.get("/review", response_model=ReviewResponse)
+@app.post("/review", response_model=ReviewResponse)
 async def review_merge_request(
     project_id: str = Query(..., description="GitLab project ID"),
     mr_id: str = Query(..., description="Merge request ID/IID"),
-    post_review_to_gitlab: bool = Query(False, description="Whether to post the review as a comment to GitLab")
+    should_post_comment: bool = Query(False, description="Whether to post the review as a comment to GitLab"),
+    custom_guidelines: str = Query(None, description="Custom review guidelines (optional)")
 ):
     """
     Generate AI code review for a GitLab merge request
@@ -71,7 +72,8 @@ async def review_merge_request(
     Args:
         project_id: GitLab project ID
         mr_id: Merge request ID/IID
-        post_review_to_gitlab: If True, posts the review as a comment to GitLab
+        should_post_comment: If True, posts the review as a comment to GitLab
+        custom_guidelines: Custom review guidelines text (optional)
     
     Returns:
         ReviewResponse with the generated review content and status
@@ -110,9 +112,12 @@ async def review_merge_request(
         logger.info("🤖 Preparing code for AI review...")
         formatted_changes = format_changes_for_review(changes_data)
         
+        # Use custom guidelines if provided, otherwise use default
+        guidelines = custom_guidelines if custom_guidelines else code_reviewer.default_guidelines
+        
         # Generate AI review
         logger.info("🧠 Generating AI review...")
-        ai_review = await code_reviewer.ollama.generate_review(formatted_changes, code_reviewer.guidelines)
+        ai_review = await code_reviewer.ollama.generate_review(formatted_changes, guidelines)
         
         # Format final review comment
         review_content = f"## 🤖 AI Code Review by {code_reviewer.reviewer_name}\n\n"
@@ -125,7 +130,7 @@ async def review_merge_request(
         merge_request_url = f"{code_reviewer.gitlab.gitlab_url}/-/merge_requests/{mr_iid}"
         
         # Post review if requested
-        if post_review_to_gitlab:
+        if should_post_comment:
             logger.info("📝 Posting review to GitLab...")
             code_reviewer.gitlab.post_merge_request_note(parsed_project_id, mr_iid, review_content)
             posted_to_gitlab = True
@@ -134,7 +139,7 @@ async def review_merge_request(
         return ReviewResponse(
             success=True,
             review_content=review_content,
-            post_review_to_gitlab=posted_to_gitlab,
+            posted_to_gitlab=posted_to_gitlab,
             message="Code review generated successfully" + (" and posted to GitLab" if posted_to_gitlab else ""),
             merge_request_url=merge_request_url
         )
