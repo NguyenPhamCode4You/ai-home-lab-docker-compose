@@ -164,36 +164,3 @@ services:
   #     timeout: 10s
   #     retries: 3
   #     start_period: 40s
-
-  ai-code-review:
-    build:
-      context: ./ai-code-review
-      dockerfile: Dockerfile.server
-    container_name: ai-code-review
-    networks:
-      - homelab
-    ports:
-      - "8001:8000"
-    environment:
-      # GitLab Configuration
-      - GITLAB_URL=${GITLAB_URL:-https://gitlab.example.com}
-      - GITLAB_PAT=${GITLAB_PAT:-glpat-xxxxxxxxxxxxxxxxxxxx}
-
-      # Ollama Configuration (using the ollama service in this compose)
-      - OLLAMA_URL=${OLLAMA_URL:-http://ollama:11434}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3}
-      - OLLAMA_NUM_CTX=${OLLAMA_NUM_CTX:-6122}
-
-      # Reviewer Configuration
-      - REVIEWER_NAME=${REVIEWER_NAME:-AI Reviewer}
-      - REVIEWER_EMAIL=${REVIEWER_EMAIL:-ai-reviewer@example.com}
-    volumes:
-      - ./ai-code-review/logs:/app/logs
-      - ./ai-code-review/temp:/app/temp
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s

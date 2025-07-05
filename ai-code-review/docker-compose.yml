@@ -1,10 +1,14 @@
 version: "3.8"
 
+networks:
+  ai-code-review-network:
+    driver: bridge
+
 services:
   ai-code-review-server:
     build:
       context: .
-      dockerfile: Dockerfile.server
+      dockerfile: src/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -18,6 +22,8 @@ services:
     volumes:
       - ./src/review_guidelines.txt:/app/src/review_guidelines.txt:ro
       - ./logs:/app/logs
+    networks:
+      - ai-code-review-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -25,3 +31,34 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  telegram-watcher:
+    build:
+      context: ./telegram-watcher
+      dockerfile: Dockerfile
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TELEGRAM_THREAD_ID=${TELEGRAM_THREAD_ID:-}
+      - REVIEW_API_URL=${REVIEW_API_URL:-http://ai-code-review-server:8000/review}
+      - DATA_DIR=/app/data
+    volumes:
+      - ./telegram-watcher/data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - ai-code-review-network
+    depends_on:
+      - ai-code-review-server
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os; exit(0 if os.path.exists('/app/run.py') else 1)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
