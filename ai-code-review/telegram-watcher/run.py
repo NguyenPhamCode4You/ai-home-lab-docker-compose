@@ -92,6 +92,32 @@ def fetch_telegram_updates(offset=None):
         print(f"[ERROR] Failed to fetch updates: {e}")
         return []
 
+def check_server_health():
+    """Check if the review server is healthy and responding"""
+    try:
+        # Extract base URL from TARGET_API
+        if TARGET_API.endswith('/review'):
+            health_url = TARGET_API.replace('/review', '/health')
+        else:
+            # Fallback: assume the health endpoint is at the same base
+            health_url = f"{TARGET_API.rstrip('/')}/health"
+        
+        print(f"[🩺] Checking server health at: {health_url}")
+        response = requests.get(health_url, timeout=10)
+        response.raise_for_status()
+        
+        # Try to parse response as JSON, but accept any successful response
+        try:
+            result = response.json()
+            print(f"[✅] Server is healthy: {result}")
+        except:
+            print(f"[✅] Server is healthy (status: {response.status_code})")
+        
+        return True
+    except Exception as e:
+        print(f"[❌] Server health check failed: {e}")
+        return False
+
 def extract_review_info(text):
     pattern = r"^review-pr-(\w+)/(\w+)$"
     match = re.match(pattern, text.strip())
@@ -107,49 +133,47 @@ def send_to_system(project_id, merge_id):
         "post_review_to_gitlab": True  # Automatically post to GitLab
     }
     try:
-        response = requests.post(TARGET_API, params=params, timeout=30)
+        # Increased timeout to 5 minutes (300 seconds) since review requests can take very long
+        response = requests.post(TARGET_API, params=params, timeout=300)
         response.raise_for_status()
         result = response.json()
-        if result.get("success"):
+        
+        success = result.get("success", False)
+        if success:
             print(f"[✅] Review generated successfully for {project_id}/{merge_id}")
             if result.get("posted_to_gitlab"):
                 print(f"[✅] Review posted to GitLab: {result.get('merge_request_url', 'N/A')}")
         else:
             print(f"[⚠️] Review failed: {result.get('message', 'Unknown error')}")
+            
+        return success, result
     except Exception as e:
         print(f"[❌] Failed to POST: {e}")
+        return False, {"message": str(e)}
 
 def is_message_from_target(message):
     """Check if the message is from the target chat and thread"""
     if not message:
-        print(f"[DEBUG] No message in update")
         return False
     
     chat_id = message["chat"]["id"]
-    print(f"[DEBUG] Checking message from chat {chat_id} vs target {CHAT_ID}")
     
     # Check if message is from the correct chat
     if chat_id != CHAT_ID:
-        print(f"[DEBUG] Chat ID mismatch: {chat_id} != {CHAT_ID}")
         return False
     
     # If thread ID is specified, check if message is from the correct thread
     if THREAD_ID is not None:
         message_thread_id = message.get("message_thread_id")
-        print(f"[DEBUG] Checking thread {message_thread_id} vs target {THREAD_ID}")
         
         # Handle the case where we expect a thread but message has no thread
         if message_thread_id is None:
-            print(f"[⚠️] Message is not in a thread, but THREAD_ID is set to {THREAD_ID}")
-            print(f"[ℹ️] To process non-threaded messages, remove THREAD_ID from environment or set it to empty")
-            # Still return False to maintain filtering, but user is informed
+            print(f"[⚠️] Message is not in thread {THREAD_ID}, skipping")
             return False
             
         if message_thread_id != THREAD_ID:
-            print(f"[DEBUG] Thread ID mismatch: {message_thread_id} != {THREAD_ID}")
             return False
     
-    print(f"[✅] Message matches target criteria")
     return True
 
 def cleanup_old_processed_messages(max_entries=1000):
@@ -253,6 +277,87 @@ def test_message_filtering():
     except Exception as e:
         print(f"[❌] Failed to test filtering: {e}")
 
+def send_telegram_message(chat_id, text, thread_id=None):
+    """Send a message to Telegram chat"""
+    try:
+        send_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML"  # Allow HTML formatting
+        }
+        
+        # Add thread ID if specified and message is in a thread
+        if thread_id:
+            payload["message_thread_id"] = thread_id
+            
+        response = requests.post(send_url, json=payload, timeout=10)
+        response.raise_for_status()
+        result = response.json()
+        
+        if result.get("ok"):
+            print(f"[📤] Message sent successfully to chat {chat_id}")
+            return True
+        else:
+            print(f"[❌] Failed to send message: {result}")
+            return False
+    except Exception as e:
+        print(f"[❌] Error sending message: {e}")
+        return False
+
+def send_acknowledgment(chat_id, project_id, merge_id, thread_id=None):
+    """Send acknowledgment message to user"""
+    message = f"🤖 <b>Request Accepted</b>\n\n" \
+              f"📝 Processing review for project <code>{project_id}</code>, MR <code>{merge_id}</code>\n" \
+              f"⏳ AI agent is working on it..."
+    
+    return send_telegram_message(chat_id, message, thread_id)
+
+def send_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
+    """Send result message after API processing"""
+    if success:
+        message = f"✅ <b>Review Completed</b>\n\n" \
+                  f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n"
+        
+        if result_data.get("posted_to_gitlab"):
+            message += f"🔗 Review posted to GitLab: {result_data.get('merge_request_url', 'N/A')}\n"
+        
+        # Include review content from the API response
+        review_content = result_data.get("review_content")
+        if review_content:
+            message += f"\n📋 <b>Review Content:</b>\n"
+            # Telegram has a 4096 character limit, so we need to truncate if necessary
+            # Reserve space for the header and footer (roughly 200 chars)
+            max_review_length = 3800
+            if len(review_content) > max_review_length:
+                message += f"<pre>{review_content[:max_review_length]}...</pre>\n"
+                message += f"<i>(Review truncated - full content posted to GitLab)</i>"
+            else:
+                message += f"<pre>{review_content}</pre>"
+        elif result_data.get("review_summary"):
+            # Fallback to summary if review_content is not available
+            message += f"\n📋 <b>Summary:</b>\n{result_data.get('review_summary')[:500]}..."
+    else:
+        message = f"❌ <b>Review Failed</b>\n\n" \
+                  f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n" \
+                  f"💥 Error: {result_data.get('message', 'Unknown error')}"
+    
+    return send_telegram_message(chat_id, message, thread_id)
+
+def test_send_message():
+    """Test sending a message to Telegram"""
+    try:
+        test_message = "🧪 <b>Test Message</b>\n\nThis is a test message from the bot to verify messaging functionality."
+        result = send_telegram_message(CHAT_ID, test_message, THREAD_ID)
+        if result:
+            print("[✅] Test message sent successfully")
+        else:
+            print("[❌] Failed to send test message")
+        return result
+    except Exception as e:
+        print(f"[❌] Error testing message sending: {e}")
+        return False
+
 def main():
     # Validate environment variables
     validate_env_vars()
@@ -275,16 +380,11 @@ def main():
     
     print("[🤖 Bot is running...]")
     last_offset = None
-    loop_count = 0
     
     while True:
-        loop_count += 1
-        print(f"[🔄] Loop #{loop_count} - Checking for updates...")
-        
         updates = fetch_telegram_updates(offset=last_offset)
         
         if updates:
-            print(f"[📨] Processing {len(updates)} relevant updates...")
             for update in updates:
                 current_update_id = update["update_id"]
                 message = update.get("message")
@@ -303,9 +403,34 @@ def main():
                     
                     if project_id and merge_id:
                         print(f"[📝] Processing review request: {project_id}/{merge_id}")
+                        
+                        # Get thread ID from the original message for replies
+                        message_thread_id = message.get("message_thread_id")
+                        
+                        # 1. Check server health first before proceeding
+                        print(f"[🩺] Checking server health before processing...")
+                        if not check_server_health():
+                            # Server is not healthy, send error message and skip processing
+                            error_message = f"❌ <b>Server Unavailable</b>\n\n" \
+                                          f"📝 Project: <code>{project_id}</code>, MR: <code>{merge_id}</code>\n" \
+                                          f"💥 The review server is currently unavailable. Please try again later."
+                            send_telegram_message(chat_id, error_message, message_thread_id)
+                            save_processed_message(chat_id, message_id, current_update_id)
+                            continue
+                        
+                        # 2. Send acknowledgment message after health check passes
+                        print(f"[📤] Sending acknowledgment message...")
+                        ack_sent = send_acknowledgment(chat_id, project_id, merge_id, message_thread_id)
+                        
                         if THREAD_ID:
                             print(f"[🧵] Message from thread: {THREAD_ID}")
-                        send_to_system(project_id, merge_id)
+                        
+                        # 3. Process the review request
+                        success, result_data = send_to_system(project_id, merge_id)
+                        
+                        # 4. Send result message
+                        print(f"[📤] Sending result message...")
+                        result_sent = send_result_message(chat_id, project_id, merge_id, success, result_data, message_thread_id)
                         
                         # Mark message as processed
                         save_processed_message(chat_id, message_id, current_update_id)
@@ -317,10 +442,7 @@ def main():
                 
                 # Update offset to get newer messages next time
                 last_offset = current_update_id + 1
-        else:
-            print(f"[ℹ️] No relevant updates found")
         
-        print(f"[💤] Sleeping for 5 seconds... (next offset: {last_offset})")
         time.sleep(5)  # Poll every 5 seconds
 
 if __name__ == "__main__":
@@ -332,6 +454,10 @@ if __name__ == "__main__":
             test_fetch_raw_updates()
             print("\n[🧪] Testing message filtering...")
             test_message_filtering()
+            print("\n[🧪] Testing server health...")
+            check_server_health()
+            print("\n[🧪] Testing message sending...")
+            test_send_message()
         print("[🐛] Debug mode complete")
     else:
         # Normal mode - run the bot
