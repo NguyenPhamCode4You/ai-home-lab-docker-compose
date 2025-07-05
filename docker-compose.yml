@@ -168,7 +168,7 @@ services:
   ai-code-review:
     build:
       context: ./ai-code-review
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
     container_name: ai-code-review
     networks:
       - homelab

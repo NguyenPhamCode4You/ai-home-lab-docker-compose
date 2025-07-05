@@ -4,7 +4,7 @@ services:
   ai-code-review-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.server
     ports:
       - "8000:8000"
     environment:
