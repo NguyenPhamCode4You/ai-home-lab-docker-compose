@@ -115,12 +115,12 @@ async def generate_code_review(
         
         # Format final review comment
         review_icon = "📋" if review_type == "checklist" else "🤖"
-        review_title = f"## {review_icon} AI Code {'Checklist' if review_type == 'checklist' else 'Check'} by {code_reviewer.reviewer_name}\n\n"
+        review_title = f"## {review_icon} {'Checklist' if review_type == 'checklist' else 'Summary'} by {code_reviewer.reviewer_name}\n\n"
         
         review_content = review_title
-        review_content += f"**Reviewed by:** {code_reviewer.reviewer_name} ({code_reviewer.reviewer_email})\n"
-        review_content += f"**Review Date:** {get_current_timestamp()}\n"
-        review_content += f"**Review Type:** {'Checklist Review' if review_type == 'checklist' else 'Standard Review'}\n\n"
+        review_content += f"**Performed by:** {code_reviewer.reviewer_name} ({code_reviewer.reviewer_email})\n"
+        review_content += f"**Date:** {get_current_timestamp()}\n"
+        review_content += f"**Type:** {'Checklist Review' if review_type == 'checklist' else 'Summary Review'}\n\n"
         review_content += ai_review
         review_content += "\n\n---\n*This review was generated automatically by AI. Please use your judgment and verify the suggestions.*"
         

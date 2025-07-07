@@ -1,51 +1,49 @@
 # AI Code Review Checklist Guidelines
 
-**CORE PRINCIPLE: Assume all changes are intentional. Evaludate and Categorize changes into the following categories:**
+**CORE PRINCIPLE: Evaluate and code categorize changes into the following categories:**
 
-## Changes Categories
+## Review Categories
 
 ### 1. **Project Structure Changes**
-- is there any changes to the overall architecture?
+- Are there any changes to the overall architecture?
 - Are design patterns used appropriately?
 
-### 2. **Installed Dependencies**
+### 2. **Dependencies & Libraries**
 - Are new dependencies necessary and well-maintained?
 - Do they introduce security vulnerabilities or bloat?
 
-### 3. **RESTful API Updates**
-- Are new API endpoints RESTful and well-structured?
+### 3. **APIs & Controllers**
+- Are there new API endpoints added and well-structured?
 - Are response formats consistent and documented?
 
-### 4. **Business Logics Updates**
-- Are new Business Logic changes clearly implemented?
+### 4. **Business Logics**
+- Are business logic changes clearly implemented?
 - Are edge cases handled properly?
 
 ### 5. **Infrastructure & Configuration**
-- Are new components added to the infrastructure?
-- Are environment variables documented and used properly?
+- Are infrastructure changes properly implemented?
+- Are environment variables used correctly and securely?
 
-### 6. **Database & Entities**
-- Are data migrations added and properly configured?
-- Are database queries optimized and indexed properly?
+### 6. **Data Entities & DTOs**
+- Are new data structures introduced?
+- Are data fields clean and well-defined?
 
 ### 7. **Security & Concerns**
-- Is sensitive data properly protected?
-- Are potential injection attacks prevented?
+- Are potential injection attacks and vulnerabilities prevented?
+- Are authentication and authorization mechanisms secure?
 
-### 8. **Background Services**
-- Are they resilient to failures and properly monitored?
-- Are there any bottlenecks or performance issues?
+### 8. **Database Migration & Query Performance**
+- Are data migrations compatible and properly tested?
+- Are there obvious performance bottlenecks?
+- Are database queries efficient and optimized?
 
-### 9. **Testing**
-- Are unit tests & integration tests comprehensive?
-- Are edge cases tested?
+### 9. **Unit & Integration Tests**
+- Are unit tests and integration tests comprehensive?
+- Are edge cases and error scenarios tested?
 
-### 10. **Database Query & Performance**
-- Are database queries optimized for performance?
-- Are there any potential performance bottlenecks?
-
-### 11. **Overall Code Quality**
-- Is code readable and well-documented?
+### 10. **Code Quality**
+- Is code readable, well-documented, and maintainable?
+- Are naming conventions consistent throughout?
 - Is code properly structured and modular?
 
 ---
@@ -55,16 +53,16 @@
 ### Summary
 *In maximum 12 words, summarize what this change accomplishes.*
 
-### Checklist Overview
-- [ ] 1. Architecture & Design
-- [ ] 2. New Dependencies
-- [ ] 3. API Controllers
+### Checklist Overview (Mark the applicable categories with checkboxes)
+- [ ] 1. Project Structure Changes
+- [ ] 2. Dependencies & Libraries
+- [ ] 3. APIs & Controllers
 - [ ] 4. Business Logics
 - [ ] 5. Infrastructure & Configuration
-- [ ] 6. Database & Entities
+- [ ] 6. Data Entities & DTOs
 - [ ] 7. Security & Concerns
-- [ ] 8. Background Services
-- [ ] 9. Testing
+- [ ] 8. Database Migration & Query Performance
+- [ ] 9. Unit & Integration Tests
 - [ ] 10. Code Quality
 
 ### Detailed Review
@@ -72,49 +70,17 @@
 For each applicable category, provide specific findings:
 
 **Category Name**
-- **file/function**: ✅ Positive finding with brief explanation
-- **file/function**: ❌ Critical issue requiring attention
-- **file/function**: ⚠️ Concern or suggestion for improvement
+- **file/function**: ✅ Highlight methods that did well
+- **file/function**: ⚠️ Highlight methods that need improvement
+- **file/function**: ‼️ Highlight method with Critical issue requiring attention
 
-### Risk Assessment
-- **High**: Critical security/functionality issues
-- **Medium**: Performance or maintainability concerns
-- **Low**: Minor improvements or style issues
+### Risk Assessment:
+- ‼️ **High**: Critical security/functionality issues
+- ⚠️ **Medium**: Performance or maintainability concerns
+- ✅ **Low**: Minor improvements or style issues
 
-### Approval Recommendation
-- **Approve**: Ready to merge
-- **Approve with Comments**: Minor issues, can merge after review
-- **Request Changes**: Requires fixes before merging
-
+### Approval Recommendation:
+- ✅ **Approve**: Ready to merge
+- ⚠️ **Approve with Comments**: Minor issues, can merge after review
+- ‼️ **Request Changes**: Requires fixes before merging
 ---
-
-## Example Review
-
-### Summary
-Adds user authentication with JWT tokens and password hashing.
-
-### Checklist Overview
-- [x] Dependencies & Libraries
-- [x] Architecture & Design  
-- [x] API Design
-- [x] Security
-- [ ] Testing
-- [x] Code Quality
-
-### Detailed Review
-
-**Dependencies & Libraries**
-- **package.json**: ✅ Added bcrypt and jsonwebtoken - well-established libraries
-
-**Security**
-- **auth.js**: ✅ Proper password hashing with bcrypt
-- **middleware.js**: ⚠️ JWT secret should be environment variable, not hardcoded
-
-**Testing**
-- **auth.test.js**: ❌ Missing tests for authentication endpoints
-
-### Risk Assessment
-**Medium**: Hardcoded JWT secret poses security risk
-
-### Approval Recommendation
-**Request Changes**: Fix JWT secret handling before merging
