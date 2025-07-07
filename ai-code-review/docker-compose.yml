@@ -9,8 +9,6 @@ services:
     build:
       context: .
       dockerfile: src/Dockerfile
-    ports:
-      - "8000:8000"
     environment:
       - GITLAB_URL=${GITLAB_URL}
       - GITLAB_PAT=${GITLAB_PAT}
@@ -40,7 +38,7 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
       - TELEGRAM_THREAD_ID=${TELEGRAM_THREAD_ID:-}
-      - REVIEW_API_URL=${REVIEW_API_URL:-http://ai-code-review-server:8000/review}
+      - TARGET_API_URL=${TARGET_API_URL:-http://ai-code-review-server:8000}
       - DATA_DIR=/app/data
     volumes:
       - ./telegram-watcher/data:/app/data
