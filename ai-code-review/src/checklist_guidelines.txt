@@ -83,4 +83,62 @@ For each applicable category, provide specific findings:
 - ✅ **Approve**: Ready to merge
 - ⚠️ **Approve with Comments**: Minor issues, can merge after review
 - ‼️ **Request Changes**: Requires fixes before merging
+
+---
+
+## Example Review
+
+### Summary
+Adds user authentication with JWT tokens and password hashing functionality.
+
+### Checklist Overview (Mark the applicable categories with checkboxes)
+- [ ] 1. Project Structure Changes
+- [x] 2. Dependencies & Libraries
+- [x] 3. APIs & Controllers
+- [x] 4. Business Logics
+- [ ] 5. Infrastructure & Configuration
+- [x] 6. Data Entities & DTOs
+- [x] 7. Security & Concerns
+- [ ] 8. Database Migration & Query Performance
+- [x] 9. Unit & Integration Tests
+- [x] 10. Code Quality
+
+### Detailed Review
+
+**Dependencies & Libraries**
+- **package.json**: ✅ Added bcrypt and jsonwebtoken - well-established security libraries
+- **package-lock.json**: ✅ Dependencies properly locked with specific versions
+
+**APIs & Controllers**
+- **auth.controller.js**: ✅ RESTful endpoints for login/register with proper HTTP status codes
+- **auth.controller.js**: ⚠️ Missing rate limiting for authentication endpoints
+- **user.controller.js**: ✅ Proper input validation using express-validator
+
+**Business Logics**
+- **auth.service.js**: ✅ Clean separation of authentication logic from controllers
+- **auth.service.js**: ⚠️ Token expiration time should be configurable via environment variables
+
+**Data Entities & DTOs**
+- **user.model.js**: ✅ User schema with proper field validation and indexing
+- **auth.dto.js**: ✅ Clear data transfer objects for login/register requests
+
+**Security & Concerns**
+- **auth.service.js**: ✅ Proper password hashing using bcrypt with salt rounds
+- **jwt.middleware.js**: ‼️ JWT secret is hardcoded - should use environment variable
+- **auth.controller.js**: ⚠️ Missing password strength validation
+
+**Unit & Integration Tests**
+- **auth.test.js**: ✅ Comprehensive test coverage for authentication flows
+- **auth.test.js**: ⚠️ Missing edge case tests for invalid token scenarios
+
+**Code Quality**
+- **auth.service.js**: ✅ Well-documented functions with clear parameter descriptions
+- **auth.controller.js**: ✅ Consistent error handling patterns throughout
+
+### Risk Assessment:
+- ⚠️ **Medium**: Missing rate limiting could allow brute force attacks
+
+### Approval Recommendation:
+- ‼️ **Request Changes**: Fix JWT secret handling and add rate limiting before merging
+
 ---

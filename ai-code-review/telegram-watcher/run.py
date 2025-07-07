@@ -13,7 +13,7 @@ CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID", "0"))  # Convert to int
 THREAD_ID = os.getenv("TELEGRAM_THREAD_ID")  # Optional thread ID for filtering
 THREAD_ID = int(THREAD_ID) if THREAD_ID and THREAD_ID.strip() else None
 API_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
-TARGET_API = os.getenv("REVIEW_API_URL", "http://localhost:8000/review")  # Default to port 8000
+TARGET_API = os.getenv("TARGET_API_URL", "http://localhost:8000")  # Default to port 8000
 
 # File to store processed messages
 PROCESSED_MESSAGES_FILE = os.path.join(os.getenv("DATA_DIR", "/app/data"), "processed_messages.txt")
@@ -99,12 +99,7 @@ def fetch_telegram_updates(offset=None):
 def check_server_health():
     """Check if the review server is healthy and responding"""
     try:
-        # Extract base URL from TARGET_API
-        if TARGET_API.endswith('/review'):
-            health_url = TARGET_API.replace('/review', '/health')
-        else:
-            # Fallback: assume the health endpoint is at the same base
-            health_url = f"{TARGET_API.rstrip('/')}/health"
+        health_url = f"{TARGET_API}/health"
         
         print(f"[🩺] Checking server health at: {health_url}")
         response = requests.get(health_url, timeout=10)
@@ -129,7 +124,14 @@ def extract_review_info(text):
         return match.group(1), match.group(2)
     return None, None
 
-def send_to_system(project_id, merge_id):
+def extract_checklist_info(text):
+    pattern = r"^checklist-(\w+)/(\w+)$"
+    match = re.match(pattern, text.strip())
+    if match:
+        return match.group(1), match.group(2)
+    return None, None
+
+def send_review_request(project_id, merge_id):
     """Send review request to the system API using query parameters"""
     params = {
         "project_id": project_id,
@@ -138,7 +140,7 @@ def send_to_system(project_id, merge_id):
     }
     try:
         # Increased timeout to 5 minutes (300 seconds) since review requests can take very long
-        response = requests.post(TARGET_API, params=params, timeout=300)
+        response = requests.post(f"{TARGET_API}/review", params=params, timeout=300)
         response.raise_for_status()
         result = response.json()
         
@@ -149,6 +151,32 @@ def send_to_system(project_id, merge_id):
                 print(f"[✅] Review posted to GitLab: {result.get('merge_request_url', 'N/A')}")
         else:
             print(f"[⚠️] Review failed: {result.get('message', 'Unknown error')}")
+            
+        return success, result
+    except Exception as e:
+        print(f"[❌] Failed to POST: {e}")
+        return False, {"message": str(e)}
+    
+def send_checklist_request(project_id, merge_id):
+    """Send checklist request to the system API using query parameters"""
+    params = {
+        "project_id": project_id,
+        "mr_id": merge_id,
+        "post_review_to_gitlab": True  # Automatically post to GitLab
+    }
+    try:
+        # Increased timeout to 5 minutes (300 seconds) since checklist requests can take very long
+        response = requests.post(f"{TARGET_API}/checklist", params=params, timeout=300)
+        response.raise_for_status()
+        result = response.json()
+        
+        success = result.get("success", False)
+        if success:
+            print(f"[✅] Checklist generated successfully for {project_id}/{merge_id}")
+            if result.get("posted_to_gitlab"):
+                print(f"[✅] Checklist posted to GitLab: {result.get('merge_request_url', 'N/A')}")
+        else:
+            print(f"[⚠️] Checklist failed: {result.get('message', 'Unknown error')}")
             
         return success, result
     except Exception as e:
@@ -274,15 +302,21 @@ def test_message_filtering():
                         text = message.get("text", "")
                         project_id, merge_id = extract_review_info(text)
                         if project_id and merge_id:
-                            print(f"[✅] Would process: {project_id}/{merge_id}")
+                            print(f"[✅] Review Would process: {project_id}/{merge_id}")
                         else:
-                            print(f"[❌] Invalid format: {text}")
+                            print(f"[❌] Review Invalid format: {text}")
+                        
+                        project_id, merge_id = extract_checklist_info(text)
+                        if project_id and merge_id:
+                            print(f"[✅] Checklist Would process: {project_id}/{merge_id}")
+                        else:
+                            print(f"[❌] Checklist Invalid format: {text}")
         
     except Exception as e:
         print(f"[❌] Failed to test filtering: {e}")
 
 def send_telegram_message(chat_id, text, thread_id=None):
-    """Send a message to Telegram chat"""
+    """Send a message to Telegram chat with fallback formatting"""
     try:
         send_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         payload = {
@@ -304,10 +338,158 @@ def send_telegram_message(chat_id, text, thread_id=None):
             return True
         else:
             print(f"[❌] Failed to send message: {result}")
+            # If markdown parsing failed, try sending without markdown
+            if "can't parse" in str(result).lower() or "bad request" in str(result).lower():
+                print(f"[🔄] Retrying without markdown formatting...")
+                payload["parse_mode"] = None
+                # Remove markdown formatting from text
+                clean_text = text.replace('*', '').replace('_', '').replace('`', '').replace('```', '')
+                payload["text"] = clean_text
+                
+                retry_response = requests.post(send_url, json=payload, timeout=10)
+                retry_result = retry_response.json()
+                
+                if retry_result.get("ok"):
+                    print(f"[📤] Message sent successfully without markdown formatting")
+                    return True
+                else:
+                    print(f"[❌] Failed to send message even without formatting: {retry_result}")
             return False
     except Exception as e:
         print(f"[❌] Error sending message: {e}")
         return False
+
+def format_markdown_for_telegram(content, max_length=3500):
+    """
+    Convert markdown content to proper Telegram format.
+    Telegram supports basic markdown but has specific requirements.
+    """
+    if not content:
+        return ""
+    
+    # Telegram message limit is 4096 characters, reserve space for headers/footers
+    if len(content) > max_length:
+        content = content[:max_length] + "..."
+    
+    # Basic markdown conversions for Telegram
+    # Telegram supports: *bold*, _italic_, `code`, ```code blocks```
+    
+    import re
+    
+    # Convert **bold** to *bold* (Telegram uses single asterisks)
+    content = re.sub(r'\*\*(.*?)\*\*', r'*\1*', content)
+    
+    # Convert __bold__ to *bold*
+    content = re.sub(r'__(.*?)__', r'*\1*', content)
+    
+    # Handle code blocks - ensure they're properly formatted
+    # Convert ``` blocks to proper Telegram format
+    content = re.sub(r'```(\w+)?\n(.*?)```', r'```\n\2\n```', content, flags=re.DOTALL)
+    
+    # Clean up any problematic characters for Telegram markdown
+    # Remove or replace characters that might break formatting
+    content = content.replace('\\n', '\n')  # Fix escaped newlines
+    content = content.replace('\\t', '    ')  # Convert tabs to spaces
+    
+    # Limit line length to prevent formatting issues
+    lines = content.split('\n')
+    formatted_lines = []
+    for line in lines:
+        if len(line) > 100:  # Break long lines
+            # Try to break at word boundaries
+            words = line.split(' ')
+            current_line = ""
+            for word in words:
+                if len(current_line + word) < 100:
+                    current_line += word + " "
+                else:
+                    if current_line:
+                        formatted_lines.append(current_line.strip())
+                    current_line = word + " "
+            if current_line:
+                formatted_lines.append(current_line.strip())
+        else:
+            formatted_lines.append(line)
+    
+    return '\n'.join(formatted_lines)
+
+def send_review_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
+    """Send result message after review API processing"""
+    if success:
+        message = f"✅ *Review Completed*\n"
+        message += f"📁 Project: `{project_id}`\n"
+        message += f"🔀 MR: `{merge_id}`\n\n"
+
+        # Include review content from the API response
+        review_content = result_data.get("review_content")
+        checklist_content = result_data.get("checklist_content")
+        
+        if review_content:
+            formatted_content = format_markdown_for_telegram(review_content)
+            message += f"📋 *Review Content:*\n"
+            message += f"```\n{formatted_content}\n```\n"
+        elif checklist_content:
+            formatted_content = format_markdown_for_telegram(checklist_content)
+            message += f"📋 *Review Content:*\n"
+            message += f"```\n{formatted_content}\n```\n"
+        elif result_data.get("review_summary"):
+            # Fallback to summary if review_content is not available
+            summary = format_markdown_for_telegram(result_data.get('review_summary'), 500)
+            message += f"📋 *Summary:*\n{summary}\n"
+        
+        # Add confirmation that message was posted to GitLab
+        if result_data.get("posted_to_gitlab"):
+            gitlab_url = result_data.get('merge_request_url', '')
+            if gitlab_url:
+                message += f"\n🔗 [View on GitLab]({gitlab_url})"
+            else:
+                message += f"\n📤 Posted to GitLab"
+    else:
+        message = f"❌ *Review Failed*\n"
+        message += f"📁 Project: `{project_id}`\n" 
+        message += f"🔀 MR: `{merge_id}`\n"
+        message += f"💥 Error: {result_data.get('message', 'Unknown error')}"
+    
+    return send_telegram_message(chat_id, message, thread_id)
+
+def send_checklist_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
+    """Send result message after checklist API processing"""
+    if success:
+        message = f"✅ *Checklist Completed*\n"
+        message += f"📁 Project: `{project_id}`\n"
+        message += f"🔀 MR: `{merge_id}`\n\n"
+
+        # Include checklist content from the API response
+        checklist_content = result_data.get("checklist_content")
+        review_content = result_data.get("review_content")
+        
+        if checklist_content:
+            formatted_content = format_markdown_for_telegram(checklist_content)
+            message += f"📝 *Checklist Content:*\n"
+            message += f"```\n{formatted_content}\n```\n"
+        elif review_content:
+            formatted_content = format_markdown_for_telegram(review_content)
+            message += f"📝 *Checklist Content:*\n"
+            message += f"```\n{formatted_content}\n```\n"
+        elif result_data.get("checklist_summary"):
+            # Fallback to summary if checklist_content is not available
+            summary = format_markdown_for_telegram(result_data.get('checklist_summary'), 500)
+            message += f"📝 *Summary:*\n{summary}\n"
+        
+        # Add confirmation that message was posted to GitLab
+        if result_data.get("posted_to_gitlab"):
+            gitlab_url = result_data.get('merge_request_url', '')
+            if gitlab_url:
+                message += f"\n🔗 [View on GitLab]({gitlab_url})"
+            else:
+                message += f"\n📤 Posted to GitLab"
+    else:
+        message = f"❌ *Checklist Failed*\n"
+        message += f"📁 Project: `{project_id}`\n" 
+        message += f"🔀 MR: `{merge_id}`\n"
+        message += f"💥 Error: {result_data.get('message', 'Unknown error')}"
+    
+    return send_telegram_message(chat_id, message, thread_id)
 
 def send_acknowledgment(chat_id, project_id, merge_id, thread_id=None):
     """Send acknowledgment message to user"""
@@ -315,49 +497,10 @@ def send_acknowledgment(chat_id, project_id, merge_id, thread_id=None):
     
     return send_telegram_message(chat_id, message, thread_id)
 
+# Legacy function for backwards compatibility - now redirects to review function
 def send_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
-    """Send result message after API processing"""
-    if success:
-        message = f"✅ *Review Completed*: Project: `{project_id}`, MR: `{merge_id}`\n"
-
-        # Include review content from the API response
-        review_content = result_data.get("review_content")
-        if review_content:
-            message += f"📋 *Review Content:*\n"
-            # Telegram has a 4096 character limit, so we need to truncate if necessary
-            # Reserve space for the header and footer (roughly 200 chars)
-            max_review_length = 3800
-            if len(review_content) > max_review_length:
-                message += f"```\n{review_content[:max_review_length]}...\n```\n"
-                message += f"_(Review truncated - full content posted to GitLab)_"
-            else:
-                message += f"```\n{review_content}\n```"
-        elif result_data.get("review_summary"):
-            # Fallback to summary if review_content is not available
-            message += f"\n📋 *Summary:*\n{result_data.get('review_summary')[:500]}..."
-        
-        # Add confirmation that message was posted to GitLab
-        if result_data.get("posted_to_gitlab"):
-            message += f"📤 Message posted to gitlab"
-    else:
-        message = f"❌ *Review Failed*: Project: `{project_id}`, MR: `{merge_id}`\n" \
-                  f"💥 Error: {result_data.get('message', 'Unknown error')}"
-    
-    return send_telegram_message(chat_id, message, thread_id)
-
-def test_send_message():
-    """Test sending a message to Telegram"""
-    try:
-        test_message = "🧪 *Test Message*\n\nThis is a test message from the bot to verify messaging functionality."
-        result = send_telegram_message(CHAT_ID, test_message, THREAD_ID)
-        if result:
-            print("[✅] Test message sent successfully")
-        else:
-            print("[❌] Failed to send test message")
-        return result
-    except Exception as e:
-        print(f"[❌] Error testing message sending: {e}")
-        return False
+    """Legacy function - redirects to send_review_result_message for backwards compatibility"""
+    return send_review_result_message(chat_id, project_id, merge_id, success, result_data, thread_id)
 
 def main():
     # Validate environment variables
@@ -427,11 +570,11 @@ def main():
                             print(f"[🧵] Message from thread: {THREAD_ID}")
                         
                         # 3. Process the review request
-                        success, result_data = send_to_system(project_id, merge_id)
+                        success, result_data = send_review_request(project_id, merge_id)
                         
                         # 4. Send result message
                         print(f"[📤] Sending result message...")
-                        result_sent = send_result_message(chat_id, project_id, merge_id, success, result_data, message_thread_id)
+                        result_sent = send_review_result_message(chat_id, project_id, merge_id, success, result_data, message_thread_id)
                         
                         # Mark message as processed
                         save_processed_message(chat_id, message_id, current_update_id)
@@ -440,11 +583,66 @@ def main():
                         print(f"[❌] Invalid format. Expected: review-<project_id>/<merge_id>. Got: {text}")
                         # Still mark as processed to avoid reprocessing
                         save_processed_message(chat_id, message_id, current_update_id)
+
+                    project_id, merge_id = extract_checklist_info(text)
+                    if project_id and merge_id:
+                        print(f"[📝] Processing checklist request: {project_id}/{merge_id}")
+                        
+                        # Get thread ID from the original message for replies
+                        message_thread_id = message.get("message_thread_id")
+                        
+                        # 1. Check server health first before proceeding
+                        print(f"[🩺] Checking server health before processing...")
+                        if not check_server_health():
+                            # Server is not healthy, send error message and skip processing
+                            error_message = f"❌ *Server Unavailable*\n\n" \
+                                          f"📝 Project: `{project_id}`, Checklist: `{merge_id}`\n" \
+                                          f"💥 The checklist server is currently unavailable. Please try again later."
+                            send_telegram_message(chat_id, error_message, message_thread_id)
+                            save_processed_message(chat_id, message_id, current_update_id)
+                            continue
+                        
+                        # 2. Send acknowledgment message after health check passes
+                        print(f"[📤] Sending acknowledgment message...")
+                        ack_sent = send_acknowledgment(chat_id, project_id, merge_id, message_thread_id)
+                        
+                        if THREAD_ID:
+                            print(f"[🧵] Message from thread: {THREAD_ID}")
+                        
+                        # 3. Process the checklist request
+                        success, result_data = send_checklist_request(project_id, merge_id)
+                        
+                        # 4. Send result message
+                        print(f"[📤] Sending result message...")
+                        result_sent = send_checklist_result_message(chat_id, project_id, merge_id, success, result_data, message_thread_id)
+                        
+                        # Mark message as processed
+                        save_processed_message(chat_id, message_id, current_update_id)
+                        print(f"[✅] Message {message_id} processed and saved")
+                    else:
+                        print(f"[❌] Invalid format. Expected: checklist-<project_id>/<merge_id>. Got: {text}")
+                        # Still mark as processed to avoid reprocessing
+                        save_processed_message(chat_id, message_id, current_update_id)
+                    
                 
                 # Update offset to get newer messages next time
                 last_offset = current_update_id + 1
         
         time.sleep(5)  # Poll every 5 seconds
+
+def test_send_message():
+    """Test sending a message to Telegram"""
+    try:
+        test_message = "🧪 *Test Message*\n\nThis is a test message from the bot to verify messaging functionality."
+        result = send_telegram_message(CHAT_ID, test_message, THREAD_ID)
+        if result:
+            print("[✅] Test message sent successfully")
+        else:
+            print("[❌] Failed to send test message")
+        return result
+    except Exception as e:
+        print(f"[❌] Error testing message sending: {e}")
+        return False
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--debug":
