@@ -379,6 +379,10 @@ def format_markdown_for_telegram(content, max_length=3500):
     # Convert __bold__ to *bold*
     content = re.sub(r'__(.*?)__', r'*\1*', content)
     
+    # Remove hash symbols from headers and add proper spacing
+    # Convert ### Header to just Header with newlines
+    content = re.sub(r'^#{1,6}\s+(.+)$', r'\n*\1*\n', content, flags=re.MULTILINE)
+    
     # Handle checklist items - convert [ ] and [x] to emojis for better visibility
     content = re.sub(r'- \[ \]', '☐', content)  # Empty checkbox
     content = re.sub(r'- \[x\]', '✅', content)  # Checked checkbox
