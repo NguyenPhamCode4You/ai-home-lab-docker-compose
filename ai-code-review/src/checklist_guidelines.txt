@@ -1,0 +1,120 @@
+# AI Code Review Checklist Guidelines
+
+**CORE PRINCIPLE: Assume all changes are intentional. Evaludate and Categorize changes into the following categories:**
+
+## Changes Categories
+
+### 1. **Project Structure Changes**
+- is there any changes to the overall architecture?
+- Are design patterns used appropriately?
+
+### 2. **Installed Dependencies**
+- Are new dependencies necessary and well-maintained?
+- Do they introduce security vulnerabilities or bloat?
+
+### 3. **RESTful API Updates**
+- Are new API endpoints RESTful and well-structured?
+- Are response formats consistent and documented?
+
+### 4. **Business Logics Updates**
+- Are new Business Logic changes clearly implemented?
+- Are edge cases handled properly?
+
+### 5. **Infrastructure & Configuration**
+- Are new components added to the infrastructure?
+- Are environment variables documented and used properly?
+
+### 6. **Database & Entities**
+- Are data migrations added and properly configured?
+- Are database queries optimized and indexed properly?
+
+### 7. **Security & Concerns**
+- Is sensitive data properly protected?
+- Are potential injection attacks prevented?
+
+### 8. **Background Services**
+- Are they resilient to failures and properly monitored?
+- Are there any bottlenecks or performance issues?
+
+### 9. **Testing**
+- Are unit tests & integration tests comprehensive?
+- Are edge cases tested?
+
+### 10. **Database Query & Performance**
+- Are database queries optimized for performance?
+- Are there any potential performance bottlenecks?
+
+### 11. **Overall Code Quality**
+- Is code readable and well-documented?
+- Is code properly structured and modular?
+
+---
+
+## Response Format
+
+### Summary
+*In maximum 12 words, summarize what this change accomplishes.*
+
+### Checklist Overview
+- [ ] 1. Architecture & Design
+- [ ] 2. New Dependencies
+- [ ] 3. API Controllers
+- [ ] 4. Business Logics
+- [ ] 5. Infrastructure & Configuration
+- [ ] 6. Database & Entities
+- [ ] 7. Security & Concerns
+- [ ] 8. Background Services
+- [ ] 9. Testing
+- [ ] 10. Code Quality
+
+### Detailed Review
+
+For each applicable category, provide specific findings:
+
+**Category Name**
+- **file/function**: ✅ Positive finding with brief explanation
+- **file/function**: ❌ Critical issue requiring attention
+- **file/function**: ⚠️ Concern or suggestion for improvement
+
+### Risk Assessment
+- **High**: Critical security/functionality issues
+- **Medium**: Performance or maintainability concerns
+- **Low**: Minor improvements or style issues
+
+### Approval Recommendation
+- **Approve**: Ready to merge
+- **Approve with Comments**: Minor issues, can merge after review
+- **Request Changes**: Requires fixes before merging
+
+---
+
+## Example Review
+
+### Summary
+Adds user authentication with JWT tokens and password hashing.
+
+### Checklist Overview
+- [x] Dependencies & Libraries
+- [x] Architecture & Design  
+- [x] API Design
+- [x] Security
+- [ ] Testing
+- [x] Code Quality
+
+### Detailed Review
+
+**Dependencies & Libraries**
+- **package.json**: ✅ Added bcrypt and jsonwebtoken - well-established libraries
+
+**Security**
+- **auth.js**: ✅ Proper password hashing with bcrypt
+- **middleware.js**: ⚠️ JWT secret should be environment variable, not hardcoded
+
+**Testing**
+- **auth.test.js**: ❌ Missing tests for authentication endpoints
+
+### Risk Assessment
+**Medium**: Hardcoded JWT secret poses security risk
+
+### Approval Recommendation
+**Request Changes**: Fix JWT secret handling before merging
