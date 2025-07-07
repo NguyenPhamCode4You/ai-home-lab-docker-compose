@@ -371,9 +371,6 @@ def format_markdown_for_telegram(content, max_length=3500):
     if len(content) > max_length:
         content = content[:max_length] + "..."
     
-    # Basic markdown conversions for Telegram
-    # Telegram supports: *bold*, _italic_, `code`, ```code blocks```
-    
     import re
     
     # Convert **bold** to *bold* (Telegram uses single asterisks)
@@ -382,36 +379,50 @@ def format_markdown_for_telegram(content, max_length=3500):
     # Convert __bold__ to *bold*
     content = re.sub(r'__(.*?)__', r'*\1*', content)
     
-    # Handle code blocks - ensure they're properly formatted
-    # Convert ``` blocks to proper Telegram format
-    content = re.sub(r'```(\w+)?\n(.*?)```', r'```\n\2\n```', content, flags=re.DOTALL)
+    # Handle checklist items - convert [ ] and [x] to emojis for better visibility
+    content = re.sub(r'- \[ \]', '☐', content)  # Empty checkbox
+    content = re.sub(r'- \[x\]', '✅', content)  # Checked checkbox
+    content = re.sub(r'- \[X\]', '✅', content)  # Checked checkbox (uppercase)
     
-    # Clean up any problematic characters for Telegram markdown
-    # Remove or replace characters that might break formatting
+    # Handle code blocks properly - for short code snippets, use inline code
+    # For longer blocks, keep them as code blocks but ensure proper formatting
+    def replace_code_blocks(match):
+        code_content = match.group(2) if match.group(2) else match.group(1)
+        if len(code_content.strip()) < 100:  # Short code snippets as inline
+            return f"`{code_content.strip()}`"
+        else:  # Long code blocks
+            return f"```\n{code_content.strip()}\n```"
+    
+    # Handle both ``` and single ` code formats
+    content = re.sub(r'```(\w+)?\n(.*?)```', replace_code_blocks, content, flags=re.DOTALL)
+    
+    # Clean up formatting issues
     content = content.replace('\\n', '\n')  # Fix escaped newlines
     content = content.replace('\\t', '    ')  # Convert tabs to spaces
     
-    # Limit line length to prevent formatting issues
-    lines = content.split('\n')
-    formatted_lines = []
-    for line in lines:
-        if len(line) > 100:  # Break long lines
-            # Try to break at word boundaries
-            words = line.split(' ')
-            current_line = ""
-            for word in words:
-                if len(current_line + word) < 100:
-                    current_line += word + " "
-                else:
-                    if current_line:
-                        formatted_lines.append(current_line.strip())
-                    current_line = word + " "
-            if current_line:
-                formatted_lines.append(current_line.strip())
-        else:
-            formatted_lines.append(line)
+    # Handle bullet points - ensure they're properly formatted
+    content = re.sub(r'^(\s*)- ', r'\1• ', content, flags=re.MULTILINE)
+    content = re.sub(r'^(\s*)\* ', r'\1• ', content, flags=re.MULTILINE)
     
-    return '\n'.join(formatted_lines)
+    # Clean up excessive whitespace but preserve structure
+    lines = content.split('\n')
+    cleaned_lines = []
+    prev_empty = False
+    
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            if not prev_empty:  # Allow one empty line
+                cleaned_lines.append('')
+                prev_empty = True
+        else:
+            cleaned_lines.append(line.rstrip())  # Remove trailing spaces
+            prev_empty = False
+    
+    # Join and ensure we don't end with empty lines
+    result = '\n'.join(cleaned_lines).rstrip()
+    
+    return result
 
 def send_review_result_message(chat_id, project_id, merge_id, success, result_data, thread_id=None):
     """Send result message after review API processing"""
@@ -427,11 +438,11 @@ def send_review_result_message(chat_id, project_id, merge_id, success, result_da
         if review_content:
             formatted_content = format_markdown_for_telegram(review_content)
             message += f"📋 *Review Content:*\n"
-            message += f"```\n{formatted_content}\n```\n"
+            message += f"{formatted_content}\n"
         elif checklist_content:
             formatted_content = format_markdown_for_telegram(checklist_content)
             message += f"📋 *Review Content:*\n"
-            message += f"```\n{formatted_content}\n```\n"
+            message += f"{formatted_content}\n"
         elif result_data.get("review_summary"):
             # Fallback to summary if review_content is not available
             summary = format_markdown_for_telegram(result_data.get('review_summary'), 500)
@@ -466,11 +477,11 @@ def send_checklist_result_message(chat_id, project_id, merge_id, success, result
         if checklist_content:
             formatted_content = format_markdown_for_telegram(checklist_content)
             message += f"📝 *Checklist Content:*\n"
-            message += f"```\n{formatted_content}\n```\n"
+            message += f"{formatted_content}\n"
         elif review_content:
             formatted_content = format_markdown_for_telegram(review_content)
             message += f"📝 *Checklist Content:*\n"
-            message += f"```\n{formatted_content}\n```\n"
+            message += f"{formatted_content}\n"
         elif result_data.get("checklist_summary"):
             # Fallback to summary if checklist_content is not available
             summary = format_markdown_for_telegram(result_data.get('checklist_summary'), 500)
