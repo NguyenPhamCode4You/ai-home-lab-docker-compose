@@ -1,20 +1,35 @@
-# Confluence to Markdown Exporter
+# 🔒 READ-ONLY Confluence to Markdown Exporter
 
-A Python script to extract all pages from a Confluence workspace and convert them to Markdown format.
+A **READ-ONLY** Python script to extract all pages from a Confluence workspace and convert them to Markdown format.
+
+## ⚠️ SAFETY GUARANTEE ⚠️
+
+**This project is 100% READ-ONLY:**
+
+- ✅ **ONLY reads** data from your Confluence space
+- ✅ **NEVER writes, modifies, or deletes** any Confluence content
+- ✅ **Only creates local files** on your computer
+- ✅ **Your Confluence space remains completely unchanged**
+- ✅ Uses only GET requests to the Confluence API
 
 ## Features
 
-- Extract all pages from a Confluence workspace using API
-- Convert Confluence pages to clean Markdown format
-- Preserve page hierarchy and structure
+- Extract all pages from a Confluence workspace using READ-ONLY API calls
+- Convert Confluence pages to clean Markdown format locally
+- Preserve page hierarchy and structure in exported files
 - Support for authentication via API token
 - Two versions available: full-featured and simplified
+- Complete safety - no risk to your Confluence data
 
 ## Available Scripts
 
-1. **confluence_exporter.py** - Full-featured exporter (requires additional dependencies)
-2. **simple_exporter.py** - Simplified exporter using only basic libraries
-3. **test_connection.py** - Test your Confluence connection before running the exporter
+1. **confluence_exporter.py** - Full-featured READ-ONLY exporter (requires additional dependencies)
+2. **simple_exporter.py** - Simplified READ-ONLY exporter using only basic libraries ⭐ **Recommended**
+3. **test_connection.py** - Test your Confluence connection (READ-ONLY) before running the exporter
+
+**All scripts are READ-ONLY and will never modify your Confluence space.**
+
+📖 **For detailed safety information, see [SAFETY.md](SAFETY.md)**
 
 ## Setup
 
@@ -43,19 +58,21 @@ CONFLUENCE_SPACE_KEY=your-space-key
 
 ## Usage
 
-### Quick Start (Recommended)
+### Quick Start (Recommended - 100% Safe)
 
-1. Test your connection first:
+1. Test your READ-ONLY connection first:
 
 ```bash
 python test_connection.py
 ```
 
-2. Run the simplified exporter:
+2. Run the simplified READ-ONLY exporter:
 
 ```bash
 python simple_exporter.py
 ```
+
+**Both scripts are READ-ONLY and will not modify your Confluence space in any way.**
 
 ### Full-Featured Exporter
 

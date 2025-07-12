@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
-Simple Confluence Page Fetcher
+READ-ONLY Simple Confluence Page Exporter
+
+⚠️  SAFETY NOTICE: This script is READ-ONLY ⚠️
+- This script ONLY reads data from Confluence
+- It does NOT write, modify, or delete any content in Confluence
+- It only creates local Markdown files on your computer
+- Your Confluence space remains completely unchanged
 
 A simplified script to fetch pages from Confluence using basic requests
-and convert them to Markdown.
+and convert them to Markdown locally.
 """
 
 import os
@@ -22,10 +28,16 @@ load_dotenv()
 
 
 class SimpleConfluenceExporter:
-    """Simplified Confluence exporter using requests library."""
+    """READ-ONLY Confluence exporter using requests library - never writes to Confluence."""
     
     def __init__(self):
-        """Initialize the exporter with configuration."""
+        """Initialize the READ-ONLY exporter with configuration."""
+        print("⚠️  READ-ONLY MODE: This script will NOT modify your Confluence space ⚠️")
+        print("   - Only reads pages from Confluence")
+        print("   - Creates local Markdown files only")
+        print("   - Your Confluence data remains unchanged")
+        print()
+        
         self.confluence_url = os.getenv('CONFLUENCE_URL')
         self.token = os.getenv('CONFLUENCE_TOKEN')
         self.username = os.getenv('CONFLUENCE_USERNAME')
@@ -37,7 +49,7 @@ class SimpleConfluenceExporter:
         if not all([self.confluence_url, self.token, self.username, self.space_key]):
             raise ValueError("Missing required configuration. Please check your .env file.")
         
-        # Setup API base URL
+        # Setup API base URL for READ-ONLY operations
         self.api_url = f"{self.confluence_url}/wiki/rest/api"
         self.auth = (self.username, self.token)
         
@@ -50,16 +62,17 @@ class SimpleConfluenceExporter:
         print(f"Output directory: {self.output_dir.absolute()}")
     
     def make_request(self, endpoint: str, params: Dict = None) -> Dict:
-        """Make authenticated request to Confluence API."""
+        """Make authenticated READ-ONLY request to Confluence API."""
         url = f"{self.api_url}/{endpoint}"
         
+        # Only allow GET requests for safety
         try:
             response = requests.get(url, auth=self.auth, params=params, timeout=30)
             response.raise_for_status()
             return response.json()
             
         except requests.exceptions.RequestException as e:
-            print(f"API request failed: {str(e)}")
+            print(f"READ-ONLY API request failed: {str(e)}")
             raise
     
     def get_all_pages(self) -> List[Dict]:

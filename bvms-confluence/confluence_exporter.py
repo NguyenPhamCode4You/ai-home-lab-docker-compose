@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
-Confluence to Markdown Exporter
+READ-ONLY Confluence to Markdown Exporter
+
+⚠️  SAFETY NOTICE: This script is READ-ONLY ⚠️
+- This script ONLY reads data from Confluence
+- It does NOT write, modify, or delete any content in Confluence
+- It only creates local Markdown files on your computer
+- Your Confluence space remains completely unchanged
 
 This script connects to a Confluence workspace and exports all pages
-from a specified space, converting them to Markdown format.
+from a specified space, converting them to Markdown format locally.
 """
 
 import os
@@ -25,10 +31,16 @@ load_dotenv()
 
 
 class ConfluenceExporter:
-    """Main class for exporting Confluence pages to Markdown."""
+    """READ-ONLY Confluence exporter - only reads data, never writes to Confluence."""
     
     def __init__(self):
-        """Initialize the exporter with configuration from environment variables."""
+        """Initialize the READ-ONLY exporter with configuration from environment variables."""
+        print("⚠️  READ-ONLY MODE: This script will NOT modify your Confluence space ⚠️")
+        print("   - Only reads pages from Confluence")
+        print("   - Creates local Markdown files only")
+        print("   - Your Confluence data remains unchanged")
+        print()
+        
         self.confluence_url = os.getenv('CONFLUENCE_URL')
         self.token = os.getenv('CONFLUENCE_TOKEN')
         self.username = os.getenv('CONFLUENCE_USERNAME')
@@ -40,7 +52,7 @@ class ConfluenceExporter:
         if not all([self.confluence_url, self.token, self.username, self.space_key]):
             raise ValueError("Missing required configuration. Please check your .env file.")
         
-        # Initialize Confluence client
+        # Initialize Confluence client in READ-ONLY mode
         self.confluence = Confluence(
             url=self.confluence_url,
             username=self.username,

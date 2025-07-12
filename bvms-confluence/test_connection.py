@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """
+READ-ONLY Confluence Connection Test
+
+⚠️  SAFETY NOTICE: This script is READ-ONLY ⚠️
+- This script ONLY reads data from Confluence for testing
+- It does NOT write, modify, or delete any content in Confluence
+- It only tests connectivity and displays basic information
+- Your Confluence space remains completely unchanged
+
 Test script to verify Confluence connection and basic functionality.
 """
 
@@ -10,7 +18,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def test_confluence_connection():
-    """Test the connection to Confluence API."""
+    """Test the READ-ONLY connection to Confluence API."""
     confluence_url = os.getenv('CONFLUENCE_URL')
     token = os.getenv('CONFLUENCE_TOKEN')
     username = os.getenv('CONFLUENCE_USERNAME')
@@ -20,14 +28,18 @@ def test_confluence_connection():
         print("❌ Missing configuration. Please check your .env file.")
         return False
     
+    print("🔒 READ-ONLY Connection Test")
     print(f"Testing connection to: {confluence_url}")
     print(f"Username: {username}")
     print(f"Space: {space_key}")
+    print("(This test will NOT modify any data)")
+    print()
     
-    # Test API connection
+    # Test API connection with READ-ONLY request
     api_url = f"{confluence_url}/wiki/rest/api/space/{space_key}"
     
     try:
+        # Only GET request for safety
         response = requests.get(
             api_url,
             auth=(username, token),
@@ -50,7 +62,7 @@ def test_confluence_connection():
         return False
 
 def test_page_fetch():
-    """Test fetching a few pages from the space."""
+    """Test fetching a few pages from the space (READ-ONLY)."""
     confluence_url = os.getenv('CONFLUENCE_URL')
     token = os.getenv('CONFLUENCE_TOKEN')
     username = os.getenv('CONFLUENCE_USERNAME')
@@ -64,6 +76,7 @@ def test_page_fetch():
     }
     
     try:
+        # Only GET request for safety
         response = requests.get(
             api_url,
             auth=(username, token),
@@ -88,9 +101,14 @@ def test_page_fetch():
         return False
 
 def main():
-    """Run all tests."""
-    print("Confluence Exporter - Connection Test")
-    print("=" * 40)
+    """Run all READ-ONLY tests."""
+    print("🔒 Confluence Exporter - READ-ONLY Connection Test")
+    print("=" * 50)
+    print("⚠️  This test will NOT modify your Confluence space")
+    print("   - Only reads data for testing connectivity")
+    print("   - Your Confluence data remains unchanged")
+    print("=" * 50)
+    print()
     
     # Test connection
     if not test_confluence_connection():
@@ -103,7 +121,8 @@ def main():
         return 1
     
     print()
-    print("✅ All tests passed! You can now run the main exporter.")
+    print("✅ All READ-ONLY tests passed! You can now run the main exporter.")
+    print("🔒 Remember: The exporters are READ-ONLY and won't modify your Confluence space.")
     return 0
 
 if __name__ == "__main__":
