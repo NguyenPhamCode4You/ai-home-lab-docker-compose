@@ -13,8 +13,18 @@ services:
       dockerfile: Dockerfile.bvms
     env_file:
       - .env
-    volumes:
-      - ./logs:/app/logs
+    networks:
+      - ai-agentic-chat
+    restart: unless-stopped
+
+  imos-rag-chat:
+    ports:
+      - 9002:8001
+    build:
+      context: .
+      dockerfile: Dockerfile.imos
+    env_file:
+      - .env
     networks:
       - ai-agentic-chat
     restart: unless-stopped

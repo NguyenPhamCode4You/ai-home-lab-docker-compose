@@ -1,39 +1,27 @@
-from src.agents.GeneralRagAnswer import GeneralRagAnswer
-from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 from src.agents.models.Ollama import Ollama
-from src.agents.models.ChatGpt import ChatGpt
-from src.agents.models.Gemini import Gemini
-from src.agents.models.Perplexity import Perplexity
+from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.RagAssistant import RagAssistant
 from src.ChatBackend import create_chat_backend
-from src.agents.Task import Task
+from src.agents.DocumentRanking import DocumentRanking
 
-imos_simple_rag_assistant = RagAssistant(
-    query_function_name="match_n8n_documents_ops_neo",
-    max_context_tokens=11000,
-    llm_rag_answer=GeneralRagAnswer(
+imos_rag_assistant = RagAssistant(
+    query_function_name="match_n8n_documents_imos_neo",
+    llm_document_ranking=DocumentRanking(
         llm_model=Ollama(),
-        context_chunk_size=5600
+    ),
+    llm_rag_answer=GeneralRagAnswer(
+        llm_model=Ollama(num_ctx=28000),
+        max_context_tokens=32000,
+        instruction_template="""
+        You are an intelligent assistant that can provide detailed answers about a software named IMOS, which is a Marinetime software of VESON.
+        First, analyze carefully the below knowledge base to base your answer on.
+        {context}
+        Here is the user question: {question}
+        Try your best to assist the user with their question. Be as detailed and accurate as possible.
+        """
     ))
 
-imos_detailed_rag_assistant = RagAssistant(
-    query_function_name="match_n8n_documents_ops_neo",
-    max_context_tokens=15000,
-    llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(),
-        context_chunk_size=5600,
-    ),
-    llm_context_enricher=Task(
-        task_name="imos-rag-context-enricher",
-        llm_model=Perplexity(),
-        instruction_template="{question}",
-    ),
-    llm_final_summarizer=FinalThoughtSummarizer(
-        llm_model=Gemini(),
-        context_chunk_size=15000
-    ))
-
-app = create_chat_backend(imos_simple_rag_assistant)    
+app = create_chat_backend(imos_rag_assistant)    
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=300)
+    uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
