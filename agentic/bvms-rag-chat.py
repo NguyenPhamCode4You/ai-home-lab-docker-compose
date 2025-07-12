@@ -37,7 +37,7 @@ assistant.agents = {
     "BVMS Knowledge Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
 }
 
-app = create_chat_backend(assistant)    
+app = create_chat_backend(bvms_rag_assistant)    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
