@@ -16,7 +16,7 @@ async def clean():
 async def insert():
     await insert_sentences(
         src_folder_path=cleaned_folder_path,
-        table_name="n8n_documents_bvms_neo",
+        table_name="n8n_documents_imos_neo",
         summary_max_char=600, keyword_count=20)
     print("Insert done")
 
