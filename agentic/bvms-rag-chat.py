@@ -1,8 +1,11 @@
 from src.agents.models.Ollama import Ollama
+from src.DiagramAssistant import DiagramAssistant
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
+from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.RagAssistant import RagAssistant
 from src.ChatBackend import create_chat_backend
 from src.agents.DocumentRanking import DocumentRanking
+from src.AssistantOrchestra import AssistantOrchestra
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -21,7 +24,20 @@ bvms_rag_assistant = RagAssistant(
         """
     ))
 
-app = create_chat_backend(bvms_rag_assistant)    
+diagram_assistant = DiagramAssistant(
+    llm_mermaid_code_writter=MermaidCodeWriter(
+        llm_model=Ollama(num_ctx=28000),
+        max_context_tokens=32000,
+    )
+)
+
+assistant = AssistantOrchestra()
+assistant.agents = {
+    "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
+    "BVMS Knowledge Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
+}
+
+app = create_chat_backend(assistant)    
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
