@@ -5,7 +5,7 @@ from src.ChatBackend import create_chat_backend
 from src.agents.DocumentRanking import DocumentRanking
 
 bvms_rag_assistant = RagAssistant(
-    query_function_name="match_n8n_documents_net_micro_neo",
+    query_function_name="match_n8n_documents_bvms_neo",
     llm_document_ranking=DocumentRanking(
         llm_model=Ollama(),
     ),
