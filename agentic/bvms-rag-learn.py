@@ -1,6 +1,6 @@
 import os
-src_folder_path = os.path.join("docs", "bvms")
-cleaned_folder_path = os.path.join("docs", "bvms-cleaned")
+src_folder_path = os.path.join("docs", "output")
+cleaned_folder_path = os.path.join("docs", "output-cleaned")
 
 from src.RagWorkflow import clean_src_folder, insert_sentences
 from src.agents.MarkdownContextCleaner import MarkdownContextCleaner
