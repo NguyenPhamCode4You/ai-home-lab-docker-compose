@@ -84,6 +84,15 @@ async def clean_src_folder(
                     print(cleaned_content)
                     file.write(cleaned_content)
                     file.flush()
+        
+        # Check content length after processing and remove if too small
+        with open(target_file_path, "r", encoding="utf-8") as check_file:
+            content_length = len(check_file.read())
+        min_content_threshold = context_chunk_size // 2
+        if content_length < min_content_threshold:
+            os.remove(target_file_path)
+            print(f"File {target_file_name} removed - content length {content_length} chars is below threshold {min_content_threshold} chars")
+        else:
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
     await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
 
