@@ -62,19 +62,100 @@ def split_markdown_header_and_content(text):
     return header_content_pairs
 
 def recursive_split_chunks(document: str, char: str = ".", limit: int = 600):
-    sentences = document.split(char)
-    paragraphs = []
-    paragraph = ""
-    while len(sentences) > 0:
-        sentence = sentences.pop(0)
-        if len(paragraph) + len(sentence) < limit:
-            paragraph += f"{sentence}. "
-        else:
-            paragraphs.append(paragraph)
-            paragraph = f"{sentence}. "
-    if len(paragraph) > 0:
-        paragraphs.append(paragraph)
-    return paragraphs
+    """
+    Recursively split document into chunks under the specified limit.
+    Uses multiple splitting strategies with fallback options.
+    """
+    if not document or len(document.strip()) == 0:
+        return []
+    
+    # If document is already under limit, return as-is
+    if len(document) <= limit:
+        return [document.strip()]
+    
+    # Define splitting delimiters in order of preference
+    delimiters = [
+        "\n\n",    # Paragraph breaks
+        ". ",      # Sentence endings
+        "! ",      # Exclamation sentences
+        "? ",      # Question sentences
+        "; ",      # Semicolon breaks
+        ", ",      # Comma breaks
+        " ",       # Word breaks
+        ""         # Character-by-character (last resort)
+    ]
+    
+    def split_by_delimiter(text: str, delimiter: str, limit: int):
+        """Split text by delimiter and combine into chunks under limit"""
+        if not delimiter:  # Character-by-character splitting
+            chunks = []
+            current_chunk = ""
+            for char in text:
+                if len(current_chunk + char) <= limit:
+                    current_chunk += char
+                else:
+                    if current_chunk.strip():
+                        chunks.append(current_chunk.strip())
+                    current_chunk = char
+            if current_chunk.strip():
+                chunks.append(current_chunk.strip())
+            return [chunk for chunk in chunks if chunk.strip()]
+        
+        # Split by delimiter
+        parts = text.split(delimiter)
+        chunks = []
+        current_chunk = ""
+        
+        for i, part in enumerate(parts):
+            # Reconstruct delimiter except for last part
+            part_with_delimiter = part + (delimiter if i < len(parts) - 1 else "")
+            
+            # Check if current part alone exceeds limit
+            if len(part_with_delimiter) > limit:
+                # Save current chunk if not empty
+                if current_chunk.strip():
+                    chunks.append(current_chunk.strip())
+                    current_chunk = ""
+                
+                # Recursively split the oversized part with next delimiter
+                next_delimiter_index = delimiters.index(delimiter) + 1
+                if next_delimiter_index < len(delimiters):
+                    sub_chunks = split_by_delimiter(part_with_delimiter, delimiters[next_delimiter_index], limit)
+                    chunks.extend(sub_chunks)
+                else:
+                    # Last resort: just add it (shouldn't happen with character splitting)
+                    chunks.append(part_with_delimiter.strip())
+            else:
+                # Check if adding this part would exceed limit
+                if len(current_chunk + part_with_delimiter) > limit:
+                    # Save current chunk and start new one
+                    if current_chunk.strip():
+                        chunks.append(current_chunk.strip())
+                    current_chunk = part_with_delimiter
+                else:
+                    # Add to current chunk
+                    current_chunk += part_with_delimiter
+        
+        # Add remaining chunk
+        if current_chunk.strip():
+            chunks.append(current_chunk.strip())
+        
+        return [chunk for chunk in chunks if chunk.strip()]
+    
+    # Start with the specified delimiter or first one if not provided
+    start_delimiter = char if char in delimiters else delimiters[0]
+    start_index = delimiters.index(start_delimiter) if start_delimiter in delimiters else 0
+    
+    # Try splitting with each delimiter starting from the specified one
+    for delimiter in delimiters[start_index:]:
+        chunks = split_by_delimiter(document, delimiter, limit)
+        
+        # Check if all chunks are under limit
+        if all(len(chunk) <= limit for chunk in chunks):
+            return chunks
+    
+    # Fallback: return original document if all strategies fail (shouldn't happen)
+    return [document.strip()]
 
 def extract_rag_sentences(text: str, min_chars = 100):
     extracted_sentences = []
