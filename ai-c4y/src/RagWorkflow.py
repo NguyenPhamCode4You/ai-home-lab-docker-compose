@@ -77,8 +77,10 @@ async def clean_src_folder(
                 for chunk in chunks:
                     markdown = f"# {target_file_name} - {header}\n{chunk}"
                     cleaned_content = await clean_content_directly(cleaner, markdown)
-                    if target_file_name not in cleaned_content:
+                    if not cleaned_content.startswith("# "):
                         cleaned_content = f"# {target_file_name} - {header}\n{cleaned_content}\n\n"
+                    if not cleaned_content.endswith("\n\n"):
+                        cleaned_content = cleaned_content.rstrip() + "\n\n"
                     print(cleaned_content)
                     file.write(cleaned_content)
                     file.flush()
