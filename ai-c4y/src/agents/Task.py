@@ -1,5 +1,3 @@
-import datetime
-import os
 from typing import List
 from .models.Ollama import Ollama
 
@@ -18,37 +16,24 @@ class Task:
         self.state["context"] = context
         self.state["question"] = question
         self.state["response"] = ""
-        print("Context length:", len(context or ""))
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
-        print("Number of context chunks:", len(chunks))
-        for index, chunk in enumerate(chunks):
-            print(f"Processing chunk {index + 1}/{len(chunks)} with length {len(chunk)}")
-        date_str = datetime.datetime.now().strftime("%Y-%m-%d")
-        folder_path = os.path.join(os.getcwd(), "logs", self.task_name, date_str)
-        os.makedirs(folder_path, exist_ok=True)
-        time_str = datetime.datetime.now().strftime("%H-%M-%S-%f")[:-3]
         max_history_tokens = self.max_context_tokens - len(context or "")
         histories = get_chat_history_string(conversation_history, max_history_tokens)
         
-        with open(os.path.join(folder_path, f"{time_str}.md"), "w", encoding="utf-8") as file:
-            for index, chunk in enumerate(chunks):
-                if len(chunks) > 1:
-                    next_iteration_header = get_iteration_name(index)
-                    yield next_iteration_header
-                    self.state["response"] += next_iteration_header
-                    file.write(next_iteration_header)
-                    file.flush()
-                instruction = self.instruction_template
-                if self.user_instruction:
-                    instruction += f"\n\n{self.user_instruction}"
-                final_prompt = instruction.format(context=chunk, question=question, histories=histories)
-                if len(chunks) > 1:
-                    final_prompt += "\n\nBe direct with your answer!\n\n"
-                async for response_chunk in self.llm_model.stream(final_prompt):
-                    yield response_chunk
-                    self.state["response"] += response_chunk
-                    file.write(response_chunk)
-                    file.flush()
+        for index, chunk in enumerate(chunks):
+            if len(chunks) > 1:
+                next_iteration_header = get_iteration_name(index)
+                yield next_iteration_header
+                self.state["response"] += next_iteration_header
+            instruction = self.instruction_template
+            if self.user_instruction:
+                instruction += f"\n\n{self.user_instruction}"
+            final_prompt = instruction.format(context=chunk, question=question, histories=histories)
+            if len(chunks) > 1:
+                final_prompt += "\n\nBe direct with your answer!\n\n"
+            async for response_chunk in self.llm_model.stream(final_prompt):
+                yield response_chunk
+                self.state["response"] += response_chunk
 
     async def run(self, context: str = None, question: str = None, conversation_history: list = None):
         final_text = ""

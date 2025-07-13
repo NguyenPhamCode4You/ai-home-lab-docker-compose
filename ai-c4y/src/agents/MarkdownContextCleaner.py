@@ -42,11 +42,13 @@ class MarkdownContextCleaner(Task):
             4. For repeated values: Keep only one instance of the value.
             5. For lists: Convert items to numbering format.
 
+            
+                                                    
             Important:
             1. DO NOT include noise or irrelevant information, for example: ads, comments, page navigation, hyperlink, citations, references.
-            2. Just return the written content, no extra explanation needed.
-            3. Keep the markdown header as is, only re-format the content.
-
+            2. Just return the formatted content, no extra explanation needed.
+            3. ALWAYS Keep the markdown header as is, only re-format the content.
+            
             Now, please re-format the following text: 
             {context}
             """)

@@ -50,6 +50,15 @@ async def clean_src_folder(
         ignored_file_pattern: List[str] = None,
         keep_folder_hierarchy: bool = False,
         context_chunk_size: int = 600):
+    
+    async def clean_content_directly(cleaner: Task, content: str) -> str:
+        """Direct content cleaning without Task's internal logging"""
+        instruction = cleaner.instruction_template.format(context=content)
+        result = ""
+        async for response_chunk in cleaner.llm_model.stream(instruction):
+            result += response_chunk
+        return result
+    
     async def handle_clean_file(file_content: str, folder_path: str, file_name: str) -> None:
         print(f"Cleaning file {file_name} at {folder_path} ooooooooooooooooo ")
         cleaner = llm_context_cleaner or MarkdownContextCleaner()
@@ -57,7 +66,7 @@ async def clean_src_folder(
         if keep_folder_hierarchy:
             adjusted_folder_path = os.path.join(adjusted_folder_path, folder_path)
         os.makedirs(adjusted_folder_path, exist_ok=True)
-        target_file_name = file_name.strip().split(".")[0] + ".md"
+        target_file_name = file_name + ".md"
         target_file_path = os.path.join(adjusted_folder_path, target_file_name)
         with open(target_file_path, "w", encoding="utf-8") as file:
             sections = split_markdown_header_and_content(file_content)
@@ -67,10 +76,10 @@ async def clean_src_folder(
                 chunks = recursive_split_chunks(document=content, char=".", limit=context_chunk_size)
                 for chunk in chunks:
                     markdown = f"# {target_file_name} - {header}\n{chunk}"
-                    async for response_chunk in cleaner.stream(context=markdown):
-                        print(response_chunk, end="", flush=True)
-                        file.write(response_chunk)
-                        file.flush()
+                    cleaned_content = await clean_content_directly(cleaner, markdown)
+                    print(cleaned_content)
+                    file.write(cleaned_content)
+                    file.flush()
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
     await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
 
