@@ -57,7 +57,7 @@ async def clean_src_folder(
         if keep_folder_hierarchy:
             adjusted_folder_path = os.path.join(adjusted_folder_path, folder_path)
         os.makedirs(adjusted_folder_path, exist_ok=True)
-        target_file_name = file_name.strip() + ".md"
+        target_file_name = file_name.strip().split(".")[0] + ".md"
         target_file_path = os.path.join(adjusted_folder_path, target_file_name)
         with open(target_file_path, "w", encoding="utf-8") as file:
             sections = split_markdown_header_and_content(file_content)
@@ -65,19 +65,12 @@ async def clean_src_folder(
                 header = header.strip()
                 content = remove_excessive_spacing(content)
                 chunks = recursive_split_chunks(document=content, char=".", limit=context_chunk_size)
-                for index, chunk in enumerate(chunks):
-                    print(f"\n\nProcessing chunk {index + 1}/{len(chunks)} with length {len(chunk)}\n\n")
-                    markdown = f"\n# {target_file_name} - {header}\n{chunk}"
-                    final_response = ""
+                for chunk in chunks:
+                    markdown = f"# {target_file_name} - {header}\n{chunk}"
                     async for response_chunk in cleaner.stream(context=markdown):
-                        if not response_chunk or len(response_chunk.strip()) < 5:
-                            continue
                         print(response_chunk, end="", flush=True)
-                        final_response += response_chunk
-                    if header not in final_response:
-                        final_response = f"\n# {target_file_name} - {header}\n{final_response}"
-                    file.write(final_response)
-                    file.flush()
+                        file.write(response_chunk)
+                        file.flush()
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
     await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
 

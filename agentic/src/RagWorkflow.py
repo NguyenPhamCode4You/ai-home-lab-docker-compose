@@ -65,15 +65,12 @@ async def clean_src_folder(
                 header = header.strip()
                 content = remove_excessive_spacing(content)
                 chunks = recursive_split_chunks(document=content, char=".", limit=context_chunk_size)
-                for index, chunk in enumerate(chunks):
-                    print(f"Processing chunk {index + 1}/{len(chunks)} with length {len(chunk)}")
-                    response = ""
-                    async for response_chunk in cleaner.stream(context=chunk):
+                for chunk in chunks:
+                    markdown = f"# {target_file_name} - {header}\n{chunk}"
+                    async for response_chunk in cleaner.stream(context=markdown):
                         print(response_chunk, end="", flush=True)
-                        response += response_chunk
-                    markdown = f"\n# {target_file_name} - {header}\n{response}"
-                    file.write(markdown)
-                    file.flush()
+                        file.write(response_chunk)
+                        file.flush()
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
     await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
 
