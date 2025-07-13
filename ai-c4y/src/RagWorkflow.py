@@ -88,7 +88,7 @@ async def clean_src_folder(
         # Check content length after processing and remove if too small
         with open(target_file_path, "r", encoding="utf-8") as check_file:
             content_length = len(check_file.read())
-        min_content_threshold = context_chunk_size // 2
+        min_content_threshold = context_chunk_size * 1.5
         if content_length < min_content_threshold:
             os.remove(target_file_path)
             print(f"File {target_file_name} removed - content length {content_length} chars is below threshold {min_content_threshold} chars")
