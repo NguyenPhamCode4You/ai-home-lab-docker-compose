@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+markdown
+matplotlib
+httpx
+serpapi
+google-search-results
+bs4
+firecrawl-py
+openai
+google-generativeai
+aiohttp
