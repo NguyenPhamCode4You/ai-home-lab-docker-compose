@@ -19,8 +19,8 @@ diagram_assistant = DiagramAssistant(
 assistant = AssistantOrchestra()
 assistant.agents = {
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
-    "BVMS Rag Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
-    "IMOS Rag Assistant": {"agent": imos_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named IMOS from Vesson"},
+    "BVMS Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
+    "IMOS Assistant": {"agent": imos_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named IMOS from Vesson"},
 }
 
 if __name__ == "__main__":
