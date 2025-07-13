@@ -21,7 +21,7 @@ imos_rag_assistant = RagAssistant(
         """
     ))
 
-app = create_chat_backend(imos_rag_assistant)    
 if __name__ == "__main__":
     import uvicorn
+    app = create_chat_backend(imos_rag_assistant)
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)

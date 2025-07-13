@@ -4,7 +4,7 @@ from .models.Ollama import Ollama
 class MarkdownContextCleaner(Task):
     def __init__(self, **kwargs):
         kwargs["task_name"] = kwargs.get("task_name", "markdown-context-cleaner")
-        kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
+        kwargs["llm_model"] = kwargs.get("llm_model", Ollama(num_ctx=32000))
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
             You are an expert at re-formatting markdown content for further LLM processing.
 

@@ -19,11 +19,11 @@ diagram_assistant = DiagramAssistant(
 assistant = AssistantOrchestra()
 assistant.agents = {
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
-    "BVMS Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS"},
-    "IMOS Assistant": {"agent": imos_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named IMOS from Vesson"},
+    "BVMS Rag Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
+    "IMOS Rag Assistant": {"agent": imos_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named IMOS from Vesson"},
 }
 
-app = create_chat_backend(assistant)    
 if __name__ == "__main__":
     import uvicorn
+    app = create_chat_backend(assistant)
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
