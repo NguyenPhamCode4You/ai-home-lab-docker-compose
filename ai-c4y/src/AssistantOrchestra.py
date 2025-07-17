@@ -63,6 +63,8 @@ class AssistantOrchestra:
                 
             if is_verbose:
                 yield f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"
+            else:
+                yield f"\n\n"
             
             await asyncio.sleep(2)
             # ---------------------------------------

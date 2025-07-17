@@ -11,7 +11,7 @@ load_dotenv()
 
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        llm_model=Ollama(model='qwen2.5-coder:14b', num_ctx=22000),
+        llm_model=Ollama(model='qwen2.5-coder:32b', num_ctx=22000),
         max_context_tokens=22000,
     )
 )
