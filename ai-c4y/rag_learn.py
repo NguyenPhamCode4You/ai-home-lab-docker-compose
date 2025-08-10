@@ -16,6 +16,10 @@ async def insert():
         summary_max_char=600, keyword_count=20)
     print("Insert done")
 
+async def main():
+    await clean()
+    await insert()
+
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(insert())
+    asyncio.run(main())
