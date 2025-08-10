@@ -24,6 +24,34 @@ services:
       - ./lab404.yml:/app/user-data/conf.yml
     restart: always
 
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    networks:
+      - homelab
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD=123456 #optional
+      - SUDO_PASSWORD=123456 #optional
+      - SUDO_PASSWORD_HASH= #optional
+      - DEFAULT_WORKSPACE=/config/workspace #optional
+      - PWA_APPNAME=code-server #optional
+    volumes:
+      - ./code-server/config:/config
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - 8441:8443
+      - 8001:8001
+    restart: unless-stopped
+
   # next-cloud:
   #   image: nextcloud
   #   container_name: next-cloud
@@ -51,13 +79,13 @@ services:
     volumes:
       - ollama_storage:/root/.ollama
     restart: always
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     healthcheck:
       test: ["CMD-SHELL", "nvidia-smi || exit 1"]
       interval: 30s
@@ -78,18 +106,18 @@ services:
       - open-webui:/app/backend/data
     restart: always
 
-  # n8n:
-  #   image: docker.n8n.io/n8nio/n8n
-  #   container_name: n8n
-  #   networks:
-  #     - homelab
-  #   ports:
-  #     - "5678:5678"
-  #   volumes:
-  #     - n8n_storage:/home/node/.n8n
-  #   environment:
-  #     - N8N_SECURE_COOKIE=false
-  #   restart: always
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    networks:
+      - homelab
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    environment:
+      - N8N_SECURE_COOKIE=false
+    restart: always
 
   qlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
