@@ -36,3 +36,5 @@ bvms-cleaned
 bvms-learned
 
 code-server/config
+
+llama-rpc/models/*.gguf

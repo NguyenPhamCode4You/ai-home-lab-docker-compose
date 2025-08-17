@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  main:
+    image: evilfreelancer/llama.cpp-rpc:latest
+    restart: unless-stopped
+    volumes:
+      - ./models:/app/models
+    environment:
+      # Operation mode (RPC client in API server format)
+      APP_MODE: server
+      # Path to the model weights, preloaded inside the container
+      APP_MODEL: /app/models/tinyllama-1.1b-chat-v1.0.Q4_0.gguf
+      # Addresses of the RPC servers the client will interact with
+      APP_RPC_BACKENDS: backend-cuda:50052,backend-cpu:50052
+    ports:
+      - "8122:8080"
+
+  backend-cpu:
+    image: evilfreelancer/llama.cpp-rpc:latest
+    restart: unless-stopped
+    environment:
+      # Operation mode (RPC server)
+      APP_MODE: backend
+      # Amount of system RAM available to the RPC server (in Megabytes)
+      APP_MEM: 1024
+
+  backend-cuda:
+    image: evilfreelancer/llama.cpp-rpc:latest-cuda
+    restart: "unless-stopped"
+    environment:
+      # Operation mode (RPC server)
+      APP_MODE: backend
+      # Amount of GPU memory available to the RPC server (in Megabytes)
+      APP_MEM: 2048
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
