@@ -1,0 +1,491 @@
+Read the content following carefully. Then recap in 200 words maximum about what it does.
+
+Content:
+
+# IMOS-Evaluating-Log-Files.md - IMOS Authentication-Messaging Service Log
+Note: If your organization currently runs separate Authentication and Messaging Services, Veson Nautical recommends that you combine them. To learn more, contact Veson Nautical via the [Help Center](https://vesonjira.atlassian.net/servicedesk/customer/portals).
+To help troubleshoot any of the following areas, you can evaluate the IMOS Authentication-Messaging Service Log:
+1. Interfaces, including Messaging Service connection to email servers and shared network drives
+2. Authentication Service connection to the IMOS database
+3. Scheduled tasks performance
+
+# IMOS-Evaluating-Log-Files.md - File Location and Naming
+By default, the IMOS Authentication-Messaging Service Log is located in the **imos/services/logs/** directory. Log file names are formatted as: **imosmsg-*****Environment*****.*****yyyymmdd*****.txt**
+
+# IMOS-Evaluating-Log-Files.md - Configuration
+To configure the IMOS Authentication-Messaging Service Log, update the following sections of the **imosmsg.exe.config** file:
+Section: &lt;appSettings&gt;: Key Name logFileName: Value Options *Directory*\*File Name*: Description Changes the log's directory and base file name.
+Section: &lt;appSettings&gt;: Key Name logLevel: Value Options - debug, - production: Description - **debug**: Outputs a high volume of system messages.
+
+# IMOS-Evaluating-Log-Files.md - Configuration
+may result in very large log file sizes.
+1. production: Outputs a lower volume of system messages.
+maxRolloverLogs: Integer, Determines the maximum quantity of log files retained in the log directory; when the maximum quantity is exceeded, IMOS automatically deletes the oldest log file(s).
+imosEnvironments: environment: Environment, Enables an IMOS environment for the Messaging Service.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+The IMOS Authentication-Messaging Service Log captures all error messages from both the Authentication Service and the Messaging Service components of the combined service.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+Some errors may result in a fatal error, stopping one or both services from functioning correctly.
+Error Message: User *Username* not found.: Service Type: Auth: Error Type: Non-fatal: Error Explanation: The user is not active in the IMOS environment.: IT Administrator Next Steps: Make sure that the user is correctly using IMOS or Windows authentication to sign into IMOS.
+Error Message: Failed to initialize listeners.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+exception: System.Exception: Messaging service is disabled at imosmsg.ImosMessageServer.LoginService(String env) at Veson.Libs.Messaging.MessagingControl.StartProcessors(Func`2 pubSubDataAdapterFactory, Func`2 msgDataAdapterFactory,
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+Func`2 contextBuilderFactory, Msg: The Messaging Service is disabled for the IMOS environment. Make sure that the Messaging Service is enabled., Severity: Fatal
+Msg: Exception caught in listener &lt;env&gt;: System.IO.IOException: The handshake failed due to an unexpected packet format., Severity: Non-fatal
+Msg: Incoming Message Listener type POP or IMAP failed to connect. Make sure that the: 1. Connection protocol is correct: POP or IMAP 2. Port number for connection protocol is correct 3. Username and password are correct.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+does username require @domain.com? SSL is correctly used, SSL or TLS port number is correct.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+Google requires TLS port numbers.
+Failed to initialize listeners, exception: System.ArgumentException: The directory name *Z*:\*Path*\*To*\*Directory* is invalid, Msg, Fatal, Incoming Message Listener type directory does not exist.
+1. Make sure that the directory specified as the Incoming Message Listener exists.
+2. If the directory is mapped, make sure that the user running the Messaging Service (default NTAUTHORITY\SYSTEM) correctly maps the drive.
+3. If using UNC fileshare path names.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+Make sure that the Messaging Service has rights to access the share drive. Failed to initialize listeners.
+
+# IMOS-Evaluating-Log-Files.md - Common Errors
+Exclusive application lock held by host *Computer Name*: Msg: Fatal: A Windows process, tyically the Crash Reporter, is locking the Messaging Service, preventing it from correctly restarting. Make sure that all Windows crash report processes are closed and you are not debugging the process.
+
+# IMOS-Evaluating-Log-Files.md - IMOS Shell Log
+To help diagnose database errors, shell failures, or system-wide defects, you can evaluate the IMOS Shell Log.
+
+# IMOS-Evaluating-Log-Files.md - File Location and Naming
+To access IMOS Shell Log files, with the credentials of the user experiencing the issue, do either of the following: 1. Sign in to IMOS: On the IMOS7 menu, select About Veson Nautical IMOS and then click. The latest IMOS Shell Log file appears. 2. Sign in to Windows: Open Windows Explorer and enter %temp% into the location field. The user's temp directory appears; sort by date to find the latest IMOS Shell Log file. Log file names are formatted as: imoslog.*****Environment*****.*****yyyymmdd*****.txt
+
+# IMOS-Evaluating-Log-Files.md - Log Line Types
+In a log file, each line contains structured information about a message.
+
+# IMOS-Evaluating-Log-Files.md - IMOS Log Line
+IMOS log lines provide human-readable information about IMOS activities or performance. For example, after performing a query to load a list, IMOS might report: **Receivables Summary: Applying data view took 0.01 seconds.** This message shows where performance bottlenecks may be occurring in your IMOS installation. 
+IMOS log lines are formatted as: **[*****Type*****]&nbsp;*****Level&nbsp;yymmdd&nbsp;hh:mm:ss.uuu&nbsp;Body***
+
+# IMOS-Evaluating-Log-Files.md - SQL Log Line
+SQL log lines provide information about SQL queries performed by the shell on the IMOS database. SQL log lines are scrubbed of parametric data; however, in the case of an error, the log lines still enable you to verify that IMOS is querying the correct tables. SQL log lines are formatted as: **[*****Type*****] *****Level yymmdd hh:mm:ss.uuu Body***.
+
+# IMOS-Evaluating-Log-Files.md - VXP Log Line
+VXP log lines provide the VXP message ID as well as a human-readable description of the action that is occurring. For example, a VXP log line might say: **Start AuthRequest Conversation 811ab13b-a847-4b96-827d-8aa4ff1f9169 from to Server:localhost:5225.** You can use this information to confirm that the IMOS shell is configured to converse with the correct IMOS Authentication-Messaging Service. VXP log lines are formatted as: **[*****Type*****]*****Level yymmdd hh:mm:ss.uuu*****[*****ID*****]*****Body**.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust FX Rate
+To adjust the FX rate, follow these steps:
+1. Check the form and make sure that exchange rates are entered for the Eff Date from which you want to adjust exchange rates. (This is the date to enter in the Accounting Date To field.)
+2. Check the form and make sure that there is an entry in the Exch Diff field for the date range for which you want to adjust exchange rates.
+3. In the Accounting Date From and Accounting Date To fields, enter the date range for which you want to adjust exchange rates, from step 1.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust FX Rate
+(This checks the Accounting Date of transactions.)
+1. In the **Action** field, select **Adjust AP/AR**.
+2. As needed, apply filters for **Company(s)**, **Curr(s)**, **Counterparty(s)**, or **Counterparty Type(s)**.
+3. Click to . A list of all invoices with an open balance appears. Line items that are in the base currency are in red text. No adjustments will be made for these lines; they are for information only.
+4. Line items that have a different currency than the base currency are in black text.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust FX Rate
+These are the lines for which temporary adjustments will be posted.
+1. Scroll through the list and review the items in black text.
+2. If all amounts appear correct, click to save. A Payment is automatically created against the original invoice for the amount in the Adjustment column, and then a Payment Reversal is created for the next date. The account set in **Exch Diff** is used as the clearing account for these two transactions. They can be seen in the Payments section.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Advance
+To adjust the AP/AR account balance, follow these steps:
+1. Check the form and make sure that exchange rates are entered for the **Eff Date** from which you want to adjust exchange rates. (This is the date to enter in the **Accounting Date To** field.)
+2. Check the form and make sure that there is an entry in the **Exch Diff** field for the date range for which you want to adjust exchange rates.
+3. In the **Accounting Date From** and **Accounting Date To** fields,
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Advance
+enter the date range for which you want to adjust exchange rates, from step 1.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Advance
+In the **Action** field, select **Adjust Advance**. The adjustment is based on the current existing advanced payments/receipts made in non-base-currencies. As needed, apply filters for **Company(s)**, **Curr(s)**, **Counterparty(s)**, or **Counterparty Type(s)**. Click to . A list of payments that has been made to non-base-currency banks appears. Line items that do not have a **Close Exch Rate** are in red text.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Advance
+No adjustments will be made for these lines; go back to check the Exchange Rates, as in step 1. After new exchange rates are entered, you need to close the Period FX Adjustment form and reopen it to see the changes.
+1. Line items that have the necessary information are in black text. These are the lines for which adjustment Journal Entries will be posted.
+2. Scroll through the list and review the items in black text.
+3. If all amounts appear correct, select the line items to adjust, and click to save.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Advance
+A Journal Entry ending in **X** is automatically created against the AP or AR account. In , you see that the Journal Entries have adjusted the ending balance for the base currency based on the current exchange rates.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank
+To adjust the Bank balance, follow these steps:
+1. Check the form and make sure that exchange rates are entered for the **Eff Date** from which you want to adjust exchange rates. (This is the date to enter in the **Accounting Date To** field.)
+2. Check the form and make sure that there is an entry in the **Exch Diff** field for the date range for which you want to adjust exchange rates.
+3. In the **Accounting Date From** and **Accounting Date To** fields, enter the date range for which you want to adjust exchange rates.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank from step 1.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank
+In the **Action** field, select **Adjust Bank**. The adjustment is based on the current existing payments/receipts made to non-base-currency banks.
+As needed, apply filters for **Company(s)**, **Curr(s)**, **Counterparty(s)**, or **Counterparty Type(s)**.
+Click to . A list of payments that has been made to non-base-currency banks appears.
+Line items that do not have a **Close Exch Rate** are in red text.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank
+No adjustments will be made for these lines; go back to check the Exchange Rates as in step 1. After new exchange rates are entered, you need to close the Period FX Adjustment form and reopen it to see the changes. Line items that have necessary information are in black text.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank
+These are the lines for which adjustment Journal Entries will be posted.
+1. Opening balance line items that reflect the Exchange Rate are labeled **Adjust Bank (Beginning Balance)**.
+2. Scroll through the list and review the items in black text.
+3. If all amounts appear correct, select the line items to adjust, and click to save. A Journal Entry ending in **X** is automatically created against the corresponding bank code.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjust Bank
+In s, you will see that the Journal Entries have adjusted the ending balance for the base currency based on the current exchange rates.
+1. In the example below, a payment of $10,000 in SGD is adjusted. 
+2. When the payment was made, the exchange rate for USD:SGD was 1.2, so $8,333 USD was debited. 
+3. However, the exchange rate is now 1.25, so a Journal Entry of 333.33 has been posted automatically to adjust the USD balance to be $8,000.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Clear Balance
+To clear the balance, follow these steps:
+1. Check the form and make sure that there is an entry in the **Exch Diff** field for the date range for which you want to clear the balance.
+2. In the **Accounting Date From** and **Accounting Date To** fields, enter the date range for which you want to clear the balance. **Accounting Date To** will be the posting date of the balance clear transaction.
+3. In the **Action** field, select **Clear Balance**.
+4. As needed.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Clear Balance
+apply filters for Company(s), Curr(s), Counterparty(s), or Counterparty Type(s).
+1. Click to. A list is generated of all invoices with a zero invoice currency balance and a non-zero base currency balance.
+2. Scroll through the list and review the items.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Clear Balance
+these are the lines for which permanent adjustments will be posted.
+1. If all amounts appear correct, click to save.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Clear Balance
+A Payment is automatically created against the original invoice for the amount in the Adjustment column. No reversal is created; these are permanent adjustments to clear balances on invoices caused by foreign exchange differences. The account set in **Exch Diff** is used as the clearing account for this transaction. It can be seen in the Payments section.
+
+# IMOS-On-Prem-Period-FX-Adjustments.md - Adjustment Calculations
+Adjustments are calculated as follows:
+1. Adjust AP/AR: ((Amount - Amount Paid) / Exch Rate) - ((Amount - Amount Paid) / Close Exch Rate)
+2. Adjust Advance: (Advanced Paid/Received Amount / Exch Rate) - (Advanced Paid/Received Amount / Close Exch Rate)
+3. Adjust Bank: (Payment/Receipt Amount / Exch Rate) - (Payment/Receipt Amount / Close Exch Rate)
+4. Clear Balance: (Ttl Base Amt - Ttl Base Paid)
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Calculating Exposure Using a&nbsp;Benchmark Estimate
+You&nbsp;can create a Benchmark Estimate to mark to market a Cargo contract when there is no $/ton index available but there are relevant $/day (TC) and bunker indices. If there were a published index in $/ton, you could do the following calculation to find the future value of your contract: Net P&amp;L = (Market Freight Rate/Ton - Contract Freight Rate/Ton) * Contract Qty. However, as there are only $/day and bunker indices, you can estimate the Net P&amp;L of the contract arising from shifts in the prices of these indices using the benchmark calculation.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Bunker Exposure
+The bunker exposure is calculated as follows: Bunker Exposure = (Fuel 1 Rate - Fuel 1 Market Rate) * Benchmark Fuel 1 consumption tons + (Fuel 2 Rate - Fuel 2 Market Rate) * Benchmark Fuel 2 consumption tons + &hellip;
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - TC Exposure
+The TC exposure question is: What Freight Rate would you need to pay for someone’s vessel on the market to carry your cargo for you, given the forward bunker rate? The answer is: The owner of the vessel would have to earn the same TCE from transporting your cargo as the Time Charter rate on the same route. To use a Voyage Estimate to manually find that Freight Rate, you have to fix the TCE to be equal to the market rate (by selecting the TCE check box on the Voyage Estimate and entering the value in the TCE field), and also change the bunker rates to the market bunker rates.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - TC Exposure
+Net P&amp;L = (Market Freight rate/ton - Contract Freight rate/ton) * Contract Qty, TC Exposure = Net P&amp;L - Bunker Exposure.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Multi-Cargo Benchmark Estimate
+With configuration flag **CFGEnableMultiCargoBenchmarkEstimates**, multiple Cargoes can be added to a Benchmark Estimate and scheduled on a voyage. The TCE and Bunker price from the multi-cargo Benchmark Estimate are used for the M2M valuation the same way it is used for the standard Benchmark Estimate. The bunker tonnage and voyage days are prorated out to the Cargoes based on the CP quantities. Cargoes created from a multi-cargo Benchmark Estimate are linked by a **Benchmark Link ID** field on the Cargo.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linked Cargoes
+1. Exposure details are synced across linked Cargoes.
+2. Changing any of the following synced fields on the Exposure tab of a linked Cargo updates the other linked Cargoes: Exposure Basis Month, Strategy, Overriding TCE, Bunker Estimate grid, Bunker Exposure Breakdown grid.
+3. Changing any of the following fields on a linked Cargo breaks the link; when it is broken, it cannot be restored.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linked Cargoes
+The Cargoes must be re-created from the Benchmark Estimate to reestablish the link.
+1. Exposure Method
+2. Benchmark M2M Basis
+3. Use Benchmark Adjustment Table
+If one linked Cargo is removed, the link with the other Cargoes remains.
+A multi-cargo Benchmark Estimate can only be selected from the Exposure tab if the Cargo is linked to the multi-cargo benchmark estimate through the Benchmark Link ID.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linking a Benchmark Estimate and a Cargo
+The following workflow describes how a trader can create a Cargo using a Voyage Estimate and link them so that the Mark-to-Market of the Cargo is using that Estimate.
+1. Create a Voyage Estimate.
+**Note**: The vessel does not need to be the actual vessel that will perform the Cargo contract. In many cases, traders will use standard benchmark vessels and standard ballasting positions for this stage.
+2. On the Voyage Estimate: Select the **Benchmark **check box at the top right of the form.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linking a Benchmark Estimate and a Cargo
+The **Fix Contract** button appears on the toolbar.
+1. Click and then click **Fix Cargo**.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linking a Benchmark Estimate and a Cargo
+A Cargo contract is created with the information from the CP Terms Details form.
+1. On the Cargo Exposure tab: The Exposure Method is set to Benchmark Estimate by default, and the Voyage Estimate that generated the Cargo is linked there.
+2. Set the TC Route, Correlation, and Benchmark Bunker Curve.
+3. If you want to use a different Benchmark Estimate at a later stage to evaluate the Cargo Exposure more accurately.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Linking a Benchmark Estimate and a Cargo
+you can insert a new line and select a different Estimate in the Benchmark Estimate table. When a voyage with multiple Cargoes is scheduled, all linked Cargoes are pulled into the voyage.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Creating a Voyage Estimate from a Cargo-Linked Benchmark
+You can create a Voyage Estimate from a Cargo based on the linked Benchmark Estimate. 1. On the Cargo toolbar, click **Estimate** and then click **Add Cargo To New Estimate From Benchmark**. 2. A new Voyage Estimate appears in an Estimate Worksheet. Changing A Benchmark.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+Using the Trading Profile, you can dynamically change a Benchmark Estimate Itinerary according to the Cargo and use it in the exposure calculation.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+1. Create a Benchmark Estimate.
+2. On CP Terms Details, specify all the itinerary options.
+3. Verify that the Freight Type is **Flat Rate**.
+4. On the Benchmark Estimate toolbar, click&nbsp;, then click&nbsp;**Fix Cargo**.
+5. On the newly created Cargo, set the Freight Type to **Use Price Matrix**.
+6. On the Cargo [Pricing tab](https://vesonjira.atlassian.net/wiki/spaces/help/pages/67083041/IMOS+-+Pricing+Tab+-+Cargo), click the **Update from Opts** button and update all the pricing details.
+7. On the Cargo Exposure tab, set the **Benchmark Route** and **Correlation**.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo and the **Benchmark Bunker Curve**, if relevant.
+On the Trading Profile, select the **Overwrite Itinerary on Benchmark Est** check box.
+Related Configuration Flags: Name/Flag: **Enable Benchmark Estimate**: CFGEnableBenchmarkEstimate, Description: In Voyage Estimate Details view, under Estimate Summary, a **Benchmark** check box appears.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+To mark an Estimate as a Benchmark Estimate, select the check box. Benchmark Estimates must have exactly one cargo, and they cannot be fixed.
+On [COA](https://vesonjira.atlassian.net/wiki/spaces/help/pages/67082641/IMOS+-+Exposure+Tab+-+Cargo+COA) and Cargo/VC In forms, an **Exposure tab** appears.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+If a cargo is linked to a Benchmark Estimate via the Exposure tab, the market rate will be used as the TCE in the Benchmark Estimate and back-calculate the $/ton rate in the Trading Profit and Loss. In Cargo Matching, when creating a New Program, a Create Estimate From Benchmark check box appears.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+if you select the check box, the Benchmark Estimate linked to the cargo will be used as the basis for the Estimate.
+Enable Multi Cargo Benchmark Estimates: CFGEnableMultiCargoBenchmarkEstimates, When enabled along with CFGEnableBenchmarkEstimate, lifts the requirement that Benchmark Estimates must have exactly one cargo.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+Further, causes Cargoes created from the same Benchmark Estimate to be linked and sync exposure information. Cannot be enabled alongside **CFGEnableCargoBooking**.
+1. **Lock Initial Estimate**: CFGLockInitialEstimate: Locks the initial Benchmark Estimate after the Cargo contract is created. When the Cargo contract is Confirmed, it can be edited, but the corresponding Initial estimate is locked. For all other statuses, the Initial estimate can be edited, but Freight Type and Frt Rate fields on the Cargo cannot.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+They must be updated from the Initial estimate (applies when **CFGSyncCargoWithInitialEstimate** is ON).
+1. Sync Cargo With Initial Estimate: CFGSyncCargoWithInitialEstimate: Syncs the Cargo with the Initial Estimate, as long as there is only one Cargo and one Initial Estimate.
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+if the same Initial Estimate is used for multiple Cargoes, one:many will not be synced when the Initial Estimate is updated.
+If the Estimate has two Cargoes linked to it, the Open Contract button on the toolbar is named Contracts and has two options:
+1. **Open Contract** opens the first Cargo.
+2. **Open Related Cargoes** opens a selection window with all Cargoes that have that Estimate as their Initial Estimate.
+When a VC In is set to use a TCOV Benchmark Estimate,
+
+# IMOS-On-Prem-Working-With-Benchmark-Voyage-Estimates.md - Changing a Benchmark Estimate Itinerary to Match a Cargo
+the VC In will not be updated when a change is made to the Initial Estimate. When CFGLockInitialEstimate is also enabled, and there are multiple Cargoes that use the Benchmark Estimate as the Initial Estimate, this flag is ignored: The Estimate can be edited and saved.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Creating a New Rule Set
+From the **Task &amp; Alert Rule Set List**, you can manage Task &amp; Alert Rule Sets; the list is accessible from the Data Center, under **Other**. Rule Sets are made up of rules that define warning Alerts, error Alerts, or Tasks to appear in the of , / COA (Alerts only), / , TC / , / Booking, and forms. To create a new Rule Set: 1. On the **Task &amp; Alert Rule Set List**, click . 2. Complete the fields on the Task &amp;
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Creating a New Rule Set
+Alert Rule Set form to define the Rule Set. Select the form or object that the Rule Set Applies To. Tasks and Alerts can appear: On a form: Cargo/VC In, COA: Owner is the COA Coordinator, and Effective From/To dates are compared with the COA Start date, Time Charter, Voyage: The Voyage Manager and any linked Cargo/VC In Booking, Voyage Estimate, On any form that includes an object. Tasks and Alerts will only be displayed on forms. For example, a Vessel is an object, which means that you can create rules with Vessel fields.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Creating a New Rule Set
+but validation will take place in one of the forms such as the Voyage Manager or Estimate rather than on the Vessel itself.
+**Address Book**
+1. Cargo Name
+2. Port
+3. Vessel
+Category: Select a.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Rules consist of **Conditions** (or **Groups** of Conditions) and **Results**.
+1. Each **Condition** consists of a Variable, an Operator, and a Value, for example, Use this Rule if X is on or before Y.
+2. **Groups** of Conditions are evaluated together, like a part of a formula enclosed in parentheses, for example, Use this Rule if (X = Y or X = Z).
+**Results** can be either Alerts (either Errors or Warnings) or Tasks.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Each line in the Results grid consists of a Result, a Type, and a Value. To add rules: On the Task & Alert Rule Set form, click. Enter a Name and a Description. Under Use this rule if, add Conditions and/or Groups of Conditions. For each Condition, select the following: Variable (up to 64 characters): Relevant to most freight contracts; determines the Operators and Values available. If it can be defined by a Data Center list, the Values available will come from it, and it will autocomplete.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+For example, in Cargo Rule Sets, for specific cargoes, Cargo Type will be the selection list for the Values. Otherwise, the Value field will be free text. 
+1. If it could refer to an item in a list, the items are numbered sequentially, and the numbers can be selected in a field next to the Variable name. For example, in Voyage Rule Sets, the second Ops Coordinator would be Ops Coordinator 2. To use any of the possible Values, for example, any Ops Coordinator, leave this field blank.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+The field is only available when an indexable Variable is selected, that is, one that has a one-to-many relationship with a Cargo, VC In, Voyage Estimate, Time Charter, or Voyage.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Voyage may only have one TCO Code, but it might have multiple Ops Coordinators.
+1. Any custom elements created appear when the tables to which they are added, or joined tables, are selected in a rule.
+2. Tables that are joined appear at the top of the drop-down menu; they start with **&gt;** and end with **...** (for example, **&gt;**.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Vessel...**).** **Note**: Joins are not available for Cargo Rule Sets. If a join is one-to-many, a drop-down menu appears to the left of the variable. Depending on the value selected, for the Rule Set to evaluate to true, the condition must be true for **Any** (default), **All**, or **No** records in the join. For **Cargo** Rule Sets only: appear, preceded by **UDF (Cargo)**. **Boolean variables** appear (those that can be True or False). Other Rules in the contract appear, preceded by **Rule:**.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+These can be used to efficiently have multiple Rules depend on the same set of base variables, but with variations.
+1. Operator
+2. Value
+To add, insert, or delete Conditions or Groups, do one of the following: Click ... to the right of Conditions/Groups and then click Add Condition, Insert Condition, Add Group, Insert Group, or Delete Condition.
+Click Add Condition or Add Group under the list of Conditions. 
+A new Condition or Group is added to the previous one.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+to change from and to or, click and to the left of the condition and then click or.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Conditions will be read in sequence. To change the sequence of Conditions or Groups, click ... to the right of Conditions/Groups and then click **Move Condition Up**, **Move Condition Down**, **Move Group Up**, or **Move Group Down**.
+Stop processing if true: Select to stop processing when a rule is true. Otherwise,
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+the entire table will be read to find all true rules. The results from rules evaluating to true will be stored on the contract as saved values. 1. Run this rule once per (for Time Charter, Voyage, or Voyage Estimate Rule Sets only): Select one of the following. By default, the Applies To object is selected.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+For example, on a Voyage Rule, Voyage is selected by default; for each Voyage for which the Rule evaluates to true, the are generated. You can select a one-to-many join from the drop-down menu. For example, on a Voyage Rule, you can select VoyageBunkerLifting; for each Bunker Lifting for which the Rule evaluates to true, the are generated. On each resulting Task, you must complete the field Results. Enter the Results. Result: Determines the Types and Values available.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Options are:
+**Alert**:
+**Type**: Determines how the message appears on the Tasks &amp; Alerts or Alerts&nbsp;panel.
+1. **Error - Prevent Saving**: Cannot be acknowledged; prevents form saving until the error is corrected; appears at the top of the list.
+2. **Error**: Cannot be acknowledged; appears at the top of the list.
+3. **Warning - Not Acknowledgeable**: Cannot be acknowledged.
+4. **Warning - Acknowledgeable**: Can be acknowledged.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+The acknowledged alert gets truncated on the form.
+1. Value: Do one of the following: Enter a free-text message. To enter an&nbsp;,&nbsp;using Report Designer fields,&nbsp;that defines the Alert Value, right-click the Alert line and then click&nbsp;**Expression**.
+2. Owner&nbsp;(for Rule Sets that apply to Time Charter, Voyage, or Voyage Estimate only): Assigns the Alert to a role, but you can reassign it by the Alert.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+When set to **Default**, the Alert is assigned to the Rule Set Owner.
+1. **Task** (for Rule Sets that apply to Cargo/VC In, Time Charter, Voyage, and Voyage Estimate only): **Type**: . After you select the Type, complete the Task form: Right-click the Task line and then click **Edit Task**.
+2. **When rule is no longer true, update task status to**: Select **Do Not Update** (default) or a status (**Not Started**, **In Progress**, **Completed**, **Cancelled**, or **Follow Up**). Generate one task per - **Generate one task per**: This field is required if, on the Rule form,
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+is set to a one-to-many join.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+It defines the unique ID, for each of which are generated. Click the field to open. 
+1. Start typing the name of the field that you want to use as the unique ID. For example, for a Voyage Rule run once per Bunker Lifting, you can use **LiftingID** as the unique ID for each lifting.
+2. As you type, a drop-down menu appears; you must select an option that starts with **_RunOnceObjects**.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+For example, select **_RunOnceObjects.Voyage_VoyageBunkerLifting.LiftingID**.
+1. Click **OK**.
+2. For a **Start Date** and a **Due Date**, you can select a date field variable, like Voyage Commence Date on the Voyage Manager, plus or minus a number of days (or business days only), hours, and/or minutes.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+If a date would land on a nonworking day (a weekend day or a date from a specified Holiday Calendar), you can set it to use the previous or next business day. For rules that have been created using a Rule Set, the following fields can be edited: 1. Task Name, 2. Category, 3. Priority, 4. Description, 5. Value: Defaults to the Task Name from the Task form. To enter a , using Report Designer fields, that defines the Task Value, right-click the Task line and then click Expression. For example, a Task named "Verify Extra Freight Terms with".
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+ChtrSpecialist: when true, will create a Task that is populated with the name of the Chartering Specialist.
+Owner (for Rule Sets that apply to Time Charter, Voyage, or Voyage Estimate only): Assigns the Task to a role, but you can reassign it by the Task form.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+When set to **Default**, the Task is assigned to the Rule Set Owner.
+1. To edit Rules, do any of the following.
+2. To add a Rule above another Rule, right-click the Rule in the navigation tree at the right, and then click **Insert**.
+3. To add a Rule to the end of the current list of Rules, either click to create a new, blank rule or click to create a copy of the current Rule.
+4. To view a different Rule, click (previous) or (next) or double-click it in the navigation tree.
+5. Rules will be read in sequence. To change the sequence.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+1. To edit a Result, right-click its line and then click **Edit Task** or **Edit Alert**.
+2. To add an attachment, right-click the Result line and click .
+3. To update the Task & .
+right-click a Rule in the tree and then click **Move Up** or **Move Down**.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Adding Rules
+Alert Rule Set after a change, click.
+1. To save the Rule Set, save the Task & Alert Rule Set form.
+
+# IMOS-On-Prem-Task-and-Alert-Rule-Set-List.md - Reporting on Task and Alert Rule Sets
+In the Task & Alert Rule Set List, to create a report of all rules within each selected rule set, select list lines and then click . In the , to create a report on rules-based Alerts, do the following:
+1. 
+2. 
+Select the Cargo, Time Charter, Voyage, or Voyage Estimate primary table.
+3. Click the + button to join the Alert table. You can view the table's available fields in the .
+
+# IMOS-On-Prem-Payment-Batches.md - Creating a Payment Batch
+To create a batch of payments:
+1. Do one of the following: On the Payables Summary, select their check boxes and then click the **Create Batch** link at the top of the list.
+2. On the Payment Batches list, click.
+3. On the Create New Payment Batch form, complete at least the following fields: Batch No., Batch Date, Bank.
+**Note**: To restrict a bank from being used in payment batches, on the Remittance Information tab of its record, select the **Res. PB** check box.
+Click **OK**.
+
+# IMOS-On-Prem-Payment-Batches.md - Assigning Batch Numbers
+To assign Batch Numbers to payments:
+1. On the Payables Summary, select the check boxes for the payments and then click the **Assign Batch No.** link at the top of the list.
+2. On the Available Payment Batches form, select the check box of the batch and click **OK**. Payment Batch
+3. After a Batch Number is assigned, the Payment Batch form opens. To open this form, do one of the following: Click its link in the **Pay Batch No.** column of the Payables Summary.
+4. On the Financials module center, under Transactions.
+
+# IMOS-On-Prem-Payment-Batches.md - Assigning Batch Numbers
+1. To open the form for an individual invoice, right-click its line and then click **Invoice Details**.
+2. To send the batch to the bank, click .
+
+# IMOS-On-Prem-Payment-Batches.md - Deleting a Batch
+A Payment Batch can be deleted even after it is sent if there are no longer any payable invoices assigned to the batch. This can happen, for example, when a payment or an invoice is reversed. On the Payment Batch form, click.
+
+# IMOS-On-Prem-Payment-Batches.md - Clearing Batch Numbers
+To clear Batch Numbers: 1. On the Payables Summary, select their check boxes, and then click the **Clear Batch No.** link at the top of the list. 2. A message asks you to confirm. Click **Yes**.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+To view the Payment Batches List: On the Financials module center, under Transactions, click Payment Batch - **List**. At the top of the Payables Summary, click the Batch List link. For each Payment Batch, the list includes the Batch No., Status, Description, Memo, Batch Date, Bank, and Bank Currency. To view or edit the Payment Batch, click the Batch No. link to open the Payment Batch form. Related Configuration Flags: Name/Flag: **Batch Payment Supported** CFGBatchPaymentSupported: Description: Enables Payment Batch options.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+The Payables Summary shows all invoices that are not paid in full and has an additional column of check boxes to select invoices for payment. Additionally, two links, **Assign Batch No.** and **Clear Batch No.**, are added to the top of the list. After a Batch Number is assigned, the Payment Batch form opens.
+CFGPaymentBatchResponse: Extends Payment Batch functionality (CFGBatchPaymentSupported) to allow the import of XML message responses, including status updates and error information, from third party systems.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+This flag also adds: 1. A Payment Batch List Error(s) column, which displays a comma-separated list of all errors existing on each Payment Batch, 2. A Payment Batch form Error column, which displays the corresponding error message of each detail line. The errorMessage tag can be used to specify the error message at the batch or payment level.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+When this tag is present, the status in the &lt;payment&gt;
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+Require Pay Method in Payment Batch: CFGRequirePayMethodInPaymentBatch: Displays a warning if Payment Method is blank for any of the invoices when sending the batch to the bank.
+Paybatch Split Incomplete Invoices: CFGPaybatchSplitIncompleteInvoices: Activates functionality where a payment can be spread across multiple vendor banks in the same batch.
+Extended Payment Batch Export: CFGExtendedPaymentBatchExport: Determines whether to export additional.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+fields (like counterparty address,
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+bank address, etc.) when payment batch is sent to the bank.
+Batch Payment Counterparty Validation: CFGBatchPaymentCounterpartyValidation: Requires that Payment Batches contain consistent counterparty and remittance information for all payments included.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+Moves Pay Date to the top of the Payment Batch form and applies this date to all invoices included in the batch.
+Limit Payment Batch Import Validation: CFGLimitPaymentBatchImportValidation: When enabled, values in payAmount and invoiceTransNo are neither required nor considered when importing paymentBatchImport XML files.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+When the XML is imported, the original amounts will be paid as specified in the batch.
+Restrict Negative Batch Payments: CFGRestrictNegativeBatchPayments: When enabled, Payment Batches cannot be sent to the bank if the total amount to be paid is less than or equal to 0.
+Batch Payment Currency Validation: CFGBatchPaymentCurrencyValidation: When enabled, Payment Batches must contain consistent currency for all payments included.
+Default Payment Batch Payment Method: CFGDefaultPaymentBatchPaymentMethod: When set to a Method from the form.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+on the Payment Batch form, the Payment Method field automatically populates with that value and is editable. If the receiver Bank is updated on the Payment Batch, the Payment Method is cleared and must be reentered. 
+Enable Invoice Accrual Percentage: CFGEnableInvoiceAccrualPercentage: When enabled, an Accrual % field appears and can be used to anticipate bad debt on the following receivable invoices. Accrual % defaults to blank.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+Blank is interpreted as 100%.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+You can manually set Accrual % to any value greater than 0. An Update button appears so that you can modify Accrual % on invoices that are posted; prior to posting, you can save the invoice to update its Accrual %. The Accrual % value has no effect on posting; the full invoice amount is always posted. On the: 1. Invoices with Accrual % values of 100% or blank are handled normally. 2. Amounts for invoices with Accrual % values other than 100% are split between three lines: The top summary line shows the accrual amount = (original invoice amount &times;
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+If you expand the summary line, the next line shows the original invoice amount. The line below shows Provision for Bad Debt = (original invoice amount &minus; accrual amount). On, for invoices with Accrual % less than or greater than 100, the amount accrued = original invoice amount less provision for bad debt.
+1. CFGAutoAdjustAccrualPercentage: Applies only when CFGEnableInvoiceAccrualPercentage is enabled.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+as invoice payments are received, the invoice Accrual % is automatically evaluated and increased when necessary to ensure that the sum of payments is not greater than the accrual amount.
+Payment Batch Approval Needed: CFGPaymentBatchApprovalNeeded: When set to 1 or more, the new approval process/multiple approvers process is enabled.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+The value indicates the number of approvers needed before a batch is considered fully approved and can be sent to the bank. Approvers must have the **Approve a Batch Payment** selected, under Actions in Financials. To support the Payment Batch approval process: 1. On the Payment Batch form: **Approve** and **Reject** buttons appear.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+1. An Approval Status field appears, populated with the Approval Status.
+2. In the Payment Batches list: A column of check boxes and Approve links appear to approve one or more Payment Batches at a time.
+3. An Approval Status column appears.
+4. In the Payment Batch Export XML, an approvalUsers section appears, which includes information about the approval user and approval date.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+In the Report Designer, a new table appears: Object Approval. It displays an audit trail of the approvals/rejections in each batch.
+Enable Remittance Instructions: CFGEnableRemittanceInstructions, When enabled, a new Instructions field will be added to the form.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+Free-text instructions entered here will be populated in the Remittance Instructions field in the Payment Batch, as well as in the Remittance Instructions and Payment Batch Remittance Instructions columns in the Payment Batch List and, respectively.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+The Instructions will also be exported in the companyBankExport and paymentBatchExport notifications.
+1. Batch Payment Company Validation: CFGBatchPaymentCompanyValidation: When enabled, all invoices to be paid by a Payment Batch must be of the same company.
+2. CFGAggregatedPayBatchVendorPayment: When enabled, IMOS (Payment Batch) will aggregate multiple payments to the same vendor into one set of payment instructions for the bank.
+
+# IMOS-On-Prem-Payment-Batches.md - Payment Batches List
+The following must match on all payments in order for them to be aggregated: Company, Account, Pay Date, Currency, Payment Method, Receiver Bank, Receiver Account No.
+Default Pay Batch ID Template: CFGDefaultPayBatchIDTemplate, When enabled and CFGBatchPaymentSupported is enabled, sets the template for how the Payment Batch ID will default based on the available variables. Available variables: @BatchDate@, @UserInitials@, @UserBatchCount@.
+
