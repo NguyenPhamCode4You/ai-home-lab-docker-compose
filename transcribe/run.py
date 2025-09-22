@@ -29,14 +29,16 @@ import os
 import sys
 import json
 import requests
+import time
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, Tuple
 
 import torch
 from transformers import pipeline, AutoProcessor, AutoModelForSpeechSeq2Seq
 import librosa
 import numpy as np
 import imageio_ffmpeg as ffmpeg
+from tqdm import tqdm
 
 
 class VideoTranscriber:
@@ -140,35 +142,67 @@ class VideoTranscriber:
             if not os.path.exists(temp_audio_path):
                 raise Exception(f"Audio file was not created: {temp_audio_path}")
            
-            print(f"Loading audio file with librosa...")
-            # Load audio with librosa in chunks to handle large files
+            print(f"Loading audio file...")
+            # Load audio with memory-efficient processing
             try:
                 # First, get file info to check size
                 file_size = os.path.getsize(temp_audio_path)
                 print(f"Audio file size: {file_size / (1024*1024):.1f} MB")
                
-                # Always use soundfile for better memory efficiency with large files
-                print("Using memory-efficient audio loading...")
+                # Use soundfile for better memory efficiency with large files
+                print("Loading audio with progress monitoring...")
                 import soundfile as sf
                
                 # Read audio file info first
                 info = sf.info(temp_audio_path)
-                print(f"Audio duration: {info.duration:.1f} seconds")
-                print(f"Sample rate: {info.samplerate} Hz")
-                print(f"Channels: {info.channels}")
+                duration = info.duration
+                sample_rate = info.samplerate
+                channels = info.channels
+                
+                print(f"Audio duration: {duration:.1f} seconds")
+                print(f"Sample rate: {sample_rate} Hz")
+                print(f"Channels: {channels}")
                
-                # Read the entire file at once (soundfile is more efficient than librosa for this)
-                audio_array, sample_rate = sf.read(temp_audio_path)
+                # For very large files (> 100MB), consider chunked loading
+                if file_size > 100 * 1024 * 1024:  # 100MB
+                    print("Large file detected, using chunked loading...")
+                    # Load in chunks to manage memory
+                    chunk_size = sample_rate * 60  # 1 minute chunks
+                    audio_chunks = []
+                    
+                    with tqdm(total=int(info.frames), desc="Loading audio", unit="samples") as pbar:
+                        with sf.SoundFile(temp_audio_path) as f:
+                            while True:
+                                chunk = f.read(chunk_size)
+                                if chunk.size == 0:
+                                    break
+                                audio_chunks.append(chunk)
+                                pbar.update(len(chunk))
+                    
+                    # Concatenate chunks
+                    print("Combining audio chunks...")
+                    audio_array = np.concatenate(audio_chunks, axis=0)
+                else:
+                    # Load entire file for smaller files
+                    print("Loading entire audio file...")
+                    audio_array, sample_rate = sf.read(temp_audio_path)
                
                 # Convert to mono if stereo
                 if len(audio_array.shape) > 1:
                     print("Converting stereo to mono...")
                     audio_array = np.mean(audio_array, axis=1)
                
-                # Resample to 16kHz if needed using librosa (which is optimized for this)
+                # Resample to 16kHz if needed using librosa (with progress)
                 if sample_rate != 16000:
                     print(f"Resampling from {sample_rate}Hz to 16kHz...")
-                    audio_array = librosa.resample(audio_array, orig_sr=sample_rate, target_sr=16000)
+                    with tqdm(desc="Resampling", unit="samples") as pbar:
+                        audio_array = librosa.resample(
+                            audio_array, 
+                            orig_sr=sample_rate, 
+                            target_sr=16000,
+                            res_type='kaiser_best'  # High quality resampling
+                        )
+                        pbar.update(len(audio_array))
                    
             except Exception as e:
                 print(f"Error loading with soundfile: {e}")
@@ -191,19 +225,109 @@ class VideoTranscriber:
                 os.remove(temp_audio_path)
             sys.exit(1)
    
+    def split_audio_into_chunks(self, audio_array: np.ndarray, chunk_duration: int = 30, sample_rate: int = 16000) -> List[Tuple[np.ndarray, float, float]]:
+        """Split audio array into chunks of specified duration.
+        
+        Returns:
+            List of tuples containing (audio_chunk, start_time, end_time)
+        """
+        chunk_samples = chunk_duration * sample_rate
+        total_samples = len(audio_array)
+        chunks = []
+        
+        for i in range(0, total_samples, chunk_samples):
+            chunk = audio_array[i:i + chunk_samples]
+            start_time = i / sample_rate
+            end_time = min((i + chunk_samples) / sample_rate, total_samples / sample_rate)
+            chunks.append((chunk, start_time, end_time))
+        
+        return chunks
+    
+    def transcribe_audio_chunk(self, audio_chunk: np.ndarray, start_time: float, end_time: float) -> Dict[str, Any]:
+        """Transcribe a single audio chunk."""
+        try:
+            # Transcribe chunk with timestamps
+            result = self.whisper_pipeline(audio_chunk)
+            
+            # Adjust timestamps to be relative to the full audio
+            if "chunks" in result and result["chunks"]:
+                for chunk in result["chunks"]:
+                    if "timestamp" in chunk and chunk["timestamp"]:
+                        # Adjust the timestamps
+                        if len(chunk["timestamp"]) >= 2:
+                            chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
+                            chunk["timestamp"][1] = (chunk["timestamp"][1] or (end_time - start_time)) + start_time
+                        elif len(chunk["timestamp"]) == 1:
+                            chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
+            
+            return result
+            
+        except Exception as e:
+            print(f"Error transcribing chunk {start_time:.1f}s-{end_time:.1f}s: {e}")
+            # Return empty result for failed chunks
+            return {"text": "", "chunks": []}
+    
     def transcribe_audio(self, audio_array: np.ndarray) -> Dict[str, Any]:
-        """Transcribe audio using Whisper large v3."""
-        print("Transcribing audio...")
-       
+        """Transcribe audio using Whisper large v3 with chunked processing."""
+        total_duration = len(audio_array) / 16000
+        print(f"Transcribing audio (duration: {total_duration:.1f}s)...")
+        
         if self.whisper_pipeline is None:
             self.load_whisper_model()
-       
+        
         try:
-            # Transcribe with timestamps
-            result = self.whisper_pipeline(audio_array)
-            print("Transcription completed successfully!")
-            return result
-           
+            # Split audio into chunks
+            chunks = self.split_audio_into_chunks(audio_array, chunk_duration=30)
+            print(f"Processing {len(chunks)} chunks of ~30 seconds each...")
+            
+            # Initialize results
+            all_text = []
+            all_chunks = []
+            
+            # Process chunks with progress bar
+            start_time = time.time()
+            
+            with tqdm(total=len(chunks), desc="Transcribing", unit="chunk") as pbar:
+                for i, (chunk_audio, chunk_start, chunk_end) in enumerate(chunks):
+                    # Update progress bar description with current time range
+                    pbar.set_description(f"Transcribing [{self._format_timestamp(chunk_start)}-{self._format_timestamp(chunk_end)}]")
+                    
+                    # Transcribe chunk
+                    chunk_result = self.transcribe_audio_chunk(chunk_audio, chunk_start, chunk_end)
+                    
+                    # Collect results
+                    if chunk_result.get("text"):
+                        all_text.append(chunk_result["text"])
+                    
+                    if chunk_result.get("chunks"):
+                        all_chunks.extend(chunk_result["chunks"])
+                    
+                    # Update progress
+                    pbar.update(1)
+                    
+                    # Show elapsed time and ETA
+                    elapsed = time.time() - start_time
+                    if i > 0:
+                        avg_time_per_chunk = elapsed / (i + 1)
+                        eta = avg_time_per_chunk * (len(chunks) - i - 1)
+                        pbar.set_postfix({
+                            'elapsed': f"{elapsed:.0f}s",
+                            'eta': f"{eta:.0f}s",
+                            'avg': f"{avg_time_per_chunk:.1f}s/chunk"
+                        })
+            
+            # Combine all results
+            combined_result = {
+                "text": " ".join(all_text),
+                "chunks": all_chunks
+            }
+            
+            total_elapsed = time.time() - start_time
+            print(f"Transcription completed successfully in {total_elapsed:.1f}s!")
+            print(f"Processing speed: {total_duration/total_elapsed:.2f}x real-time")
+            
+            return combined_result
+            
         except Exception as e:
             print(f"Error during transcription: {e}")
             sys.exit(1)
@@ -345,6 +469,8 @@ This document contains the transcription of the provided video file.
 
     def transcribe_video(self, video_path: str, output_path: Optional[str] = None, use_ollama: bool = True) -> str:
         """Main function to transcribe video and format output."""
+        overall_start_time = time.time()
+        
         # Validate input
         if not os.path.exists(video_path):
             print(f"Error: Video file '{video_path}' not found!")
@@ -353,13 +479,30 @@ This document contains the transcription of the provided video file.
         if not video_path.lower().endswith('.mp4'):
             print("Warning: File does not have .mp4 extension, attempting to process anyway...")
        
+        print(f"\n=== Starting Video Transcription ===")
+        print(f"Input file: {video_path}")
+        print(f"Device: {self.device}")
+        print(f"Ollama formatting: {'Enabled' if use_ollama else 'Disabled'}")
+        print("="*50)
+        
         # Extract audio
+        print("\nStep 1/3: Audio Extraction")
+        step_start = time.time()
         audio_array = self.extract_audio_from_video(video_path)
+        step_duration = time.time() - step_start
+        print(f"Audio extraction completed in {step_duration:.1f}s\n")
        
         # Transcribe
+        print("Step 2/3: Audio Transcription")
+        step_start = time.time()
         transcription_result = self.transcribe_audio(audio_array)
+        step_duration = time.time() - step_start
+        print(f"Audio transcription completed in {step_duration:.1f}s\n")
        
         # Format output based on user preference
+        print("Step 3/3: Text Formatting")
+        step_start = time.time()
+        
         if use_ollama:
             formatted_text = self.format_with_ollama(transcription_result)
         else:
@@ -380,6 +523,9 @@ This document contains the transcription of the provided video file.
                     structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
            
             formatted_text = self._basic_markdown_format(structured_text)
+        
+        step_duration = time.time() - step_start
+        print(f"Text formatting completed in {step_duration:.1f}s\n")
        
         # Save output
         if output_path is None:
@@ -389,7 +535,19 @@ This document contains the transcription of the provided video file.
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(formatted_text)
        
-        print(f"Transcription saved to: {output_path}")
+        # Final summary
+        total_duration = time.time() - overall_start_time
+        audio_duration = len(audio_array) / 16000
+        
+        print("=" * 50)
+        print("=== Transcription Complete ===")
+        print(f"Output file: {output_path}")
+        print(f"Audio duration: {audio_duration:.1f}s")
+        print(f"Total processing time: {total_duration:.1f}s")
+        print(f"Overall processing speed: {audio_duration/total_duration:.2f}x real-time")
+        print(f"Word count: ~{len(transcription_result.get('text', '').split())} words")
+        print("=" * 50)
+        
         return formatted_text
 
 
