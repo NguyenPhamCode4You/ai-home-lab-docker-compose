@@ -601,34 +601,56 @@ This document contains the transcription of the provided video file.
         print("Step 3/3: Text Formatting")
         step_start = time.time()
         
+        # Save raw transcription first (before Ollama formatting)
+        raw_output_path = None
+        if output_path is None:
+            video_name = Path(video_path).stem
+            raw_output_path = f"{video_name}_raw_transcription.md"
+        else:
+            # Insert "_raw" before the file extension
+            output_path_obj = Path(output_path)
+            raw_output_path = output_path_obj.parent / f"{output_path_obj.stem}_raw{output_path_obj.suffix}"
+        
+        # Create raw transcription content
+        text = transcription_result.get("text", "")
+        chunks = transcription_result.get("chunks", [])
+        
+        raw_structured_text = "Raw Transcription:\n" + text + "\n\n"
+        
+        if chunks:
+            raw_structured_text += "Timestamped Segments:\n"
+            for i, chunk in enumerate(chunks):
+                timestamp = chunk.get("timestamp", [0, 0])
+                chunk_text = chunk.get("text", "")
+                start_time = self._format_timestamp(timestamp[0])
+                end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
+                raw_structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
+        
+        raw_formatted_text = self._basic_markdown_format(raw_structured_text)
+        
+        # Save raw transcription
+        with open(raw_output_path, 'w', encoding='utf-8') as f:
+            f.write(raw_formatted_text)
+        print(f"Raw transcription saved to: {raw_output_path}")
+        
+        # Now proceed with Ollama formatting if requested
         if use_ollama:
+            print("Processing with Ollama formatting...")
             formatted_text = self.format_with_ollama(transcription_result)
         else:
-            print("Skipping Ollama formatting, using basic format...")
-            # Create basic formatted output with timestamps
-            text = transcription_result.get("text", "")
-            chunks = transcription_result.get("chunks", [])
-           
-            structured_text = "Raw Transcription:\n" + text + "\n\n"
-           
-            if chunks:
-                structured_text += "Timestamped Segments:\n"
-                for i, chunk in enumerate(chunks):
-                    timestamp = chunk.get("timestamp", [0, 0])
-                    chunk_text = chunk.get("text", "")
-                    start_time = self._format_timestamp(timestamp[0])
-                    end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
-                    structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
-           
-            formatted_text = self._basic_markdown_format(structured_text)
+            print("Skipping Ollama formatting, using raw transcription...")
+            formatted_text = raw_formatted_text
         
         step_duration = time.time() - step_start
         print(f"Text formatting completed in {step_duration:.1f}s\n")
        
-        # Save output
+        # Save final output (Ollama formatted or raw)
         if output_path is None:
             video_name = Path(video_path).stem
-            output_path = f"{video_name}_transcription.md"
+            if use_ollama:
+                output_path = f"{video_name}_transcription_ollama.md"
+            else:
+                output_path = f"{video_name}_transcription.md"
        
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(formatted_text)
@@ -639,7 +661,11 @@ This document contains the transcription of the provided video file.
         
         print("=" * 50)
         print("=== Transcription Complete ===")
-        print(f"Output file: {output_path}")
+        print(f"Raw transcription: {raw_output_path}")
+        if use_ollama:
+            print(f"Ollama formatted: {output_path}")
+        else:
+            print(f"Final output: {output_path}")
         print(f"Audio duration: {audio_duration:.1f}s")
         print(f"Total processing time: {total_duration:.1f}s")
         print(f"Overall processing speed: {audio_duration/total_duration:.2f}x real-time")
