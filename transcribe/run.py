@@ -50,6 +50,7 @@ class VideoTranscriber:
         self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
         self.whisper_pipeline = None
         self.ollama_url = "http://localhost:11434/api/generate"
+        self.ollama_chat_url = "http://localhost:11434/api/chat"
        
         print(f"Using device: {self.device}")
         if self.device == "cpu":
@@ -73,18 +74,24 @@ class VideoTranscriber:
            
             processor = AutoProcessor.from_pretrained(model_id)
            
-            # Create pipeline
+            # Create pipeline with better settings for chunked processing
             self.whisper_pipeline = pipeline(
                 "automatic-speech-recognition",
                 model=model,
                 tokenizer=processor.tokenizer,
                 feature_extractor=processor.feature_extractor,
-                max_new_tokens=128,
-                chunk_length_s=30,
-                batch_size=16,
-                return_timestamps=True,
+                max_new_tokens=200,  # Reduced to avoid token limit issues
+                chunk_length_s=15,   # Reduced to avoid timeout
+                batch_size=4,        # Further reduced for stability
+                return_timestamps="word",  # Word-level timestamps
                 torch_dtype=self.torch_dtype,
                 device=self.device,
+                # Language and task settings to avoid warnings
+                generate_kwargs={
+                    "language": "en",  # Force English to avoid auto-detection
+                    "task": "transcribe",  # Transcribe instead of translate
+                    "forced_decoder_ids": None,  # Let model handle this
+                }
             )
            
             print("Whisper model loaded successfully!")
@@ -215,6 +222,16 @@ class VideoTranscriber:
                 print("Temporary audio file cleaned up")
            
             print(f"Audio extracted successfully! Duration: {len(audio_array)/16000:.2f} seconds")
+            print(f"Audio array shape: {audio_array.shape}")
+            print(f"Audio sample rate: 16000 Hz")
+            print(f"Audio min/max values: {audio_array.min():.3f}/{audio_array.max():.3f}")
+            
+            # Check if audio has actual content (not just silence)
+            audio_rms = np.sqrt(np.mean(audio_array**2))
+            print(f"Audio RMS level: {audio_rms:.6f}")
+            if audio_rms < 0.001:
+                print("WARNING: Audio RMS is very low - might be silence!")
+            
             return audio_array
            
         except Exception as e:
@@ -225,7 +242,7 @@ class VideoTranscriber:
                 os.remove(temp_audio_path)
             sys.exit(1)
    
-    def split_audio_into_chunks(self, audio_array: np.ndarray, chunk_duration: int = 30, sample_rate: int = 16000) -> List[Tuple[np.ndarray, float, float]]:
+    def split_audio_into_chunks(self, audio_array: np.ndarray, chunk_duration: int = 15, sample_rate: int = 16000) -> List[Tuple[np.ndarray, float, float]]:
         """Split audio array into chunks of specified duration.
         
         Returns:
@@ -246,13 +263,41 @@ class VideoTranscriber:
     def transcribe_audio_chunk(self, audio_chunk: np.ndarray, start_time: float, end_time: float) -> Dict[str, Any]:
         """Transcribe a single audio chunk."""
         try:
-            # Transcribe chunk with timestamps
-            result = self.whisper_pipeline(audio_chunk)
+            # Skip empty or very short chunks
+            if len(audio_chunk) < 1600:  # Less than 0.1 seconds
+                return {"text": "", "chunks": []}
+            
+            # For very long chunks, trim to avoid token limit issues
+            max_chunk_length = 15 * 16000  # 15 seconds at 16kHz
+            if len(audio_chunk) > max_chunk_length:
+                print(f"Warning: Trimming chunk from {len(audio_chunk)/16000:.1f}s to 15s")
+                audio_chunk = audio_chunk[:max_chunk_length]
+                end_time = start_time + 15
+            
+            # Transcribe chunk with explicit parameters to avoid configuration issues
+            result = self.whisper_pipeline(
+                audio_chunk,
+                generate_kwargs={
+                    "language": "en",
+                    "task": "transcribe",
+                    "max_new_tokens": 200
+                }
+            )
+            
+            # Debug: Print result structure
+            if not result or not result.get("text"):
+                print(f"Warning: Empty result for chunk {start_time:.1f}s-{end_time:.1f}s")
+                print(f"Result keys: {list(result.keys()) if result else 'None'}")
+                return {"text": "", "chunks": []}
             
             # Adjust timestamps to be relative to the full audio
             if "chunks" in result and result["chunks"]:
                 for chunk in result["chunks"]:
                     if "timestamp" in chunk and chunk["timestamp"]:
+                        # Convert tuple to list if needed for modification
+                        if isinstance(chunk["timestamp"], tuple):
+                            chunk["timestamp"] = list(chunk["timestamp"])
+                        
                         # Adjust the timestamps
                         if len(chunk["timestamp"]) >= 2:
                             chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
@@ -260,10 +305,20 @@ class VideoTranscriber:
                         elif len(chunk["timestamp"]) == 1:
                             chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
             
+            # Create chunks from the text if none exist
+            if "chunks" not in result or not result["chunks"]:
+                if result.get("text"):
+                    result["chunks"] = [{
+                        "text": result["text"],
+                        "timestamp": [start_time, end_time]
+                    }]
+            
             return result
             
         except Exception as e:
             print(f"Error transcribing chunk {start_time:.1f}s-{end_time:.1f}s: {e}")
+            import traceback
+            traceback.print_exc()
             # Return empty result for failed chunks
             return {"text": "", "chunks": []}
     
@@ -277,8 +332,8 @@ class VideoTranscriber:
         
         try:
             # Split audio into chunks
-            chunks = self.split_audio_into_chunks(audio_array, chunk_duration=30)
-            print(f"Processing {len(chunks)} chunks of ~30 seconds each...")
+            chunks = self.split_audio_into_chunks(audio_array, chunk_duration=15)
+            print(f"Processing {len(chunks)} chunks of ~15 seconds each...")
             
             # Initialize results
             all_text = []
@@ -294,6 +349,13 @@ class VideoTranscriber:
                     
                     # Transcribe chunk
                     chunk_result = self.transcribe_audio_chunk(chunk_audio, chunk_start, chunk_end)
+                    
+                    # Debug: Log chunk results
+                    chunk_text = chunk_result.get("text", "")
+                    if chunk_text.strip():
+                        print(f"  Chunk {i+1}: '{chunk_text[:50]}...' ({len(chunk_text)} chars)")
+                    else:
+                        print(f"  Chunk {i+1}: NO TEXT DETECTED")
                     
                     # Collect results
                     if chunk_result.get("text"):
@@ -317,14 +379,24 @@ class VideoTranscriber:
                         })
             
             # Combine all results
+            combined_text = " ".join(all_text).strip()
             combined_result = {
-                "text": " ".join(all_text),
+                "text": combined_text,
                 "chunks": all_chunks
             }
             
             total_elapsed = time.time() - start_time
             print(f"Transcription completed successfully in {total_elapsed:.1f}s!")
             print(f"Processing speed: {total_duration/total_elapsed:.2f}x real-time")
+            print(f"Total transcribed text length: {len(combined_text)} characters")
+            print(f"Number of chunks with text: {len([t for t in all_text if t.strip()])}")
+            
+            if not combined_text:
+                print("WARNING: No text was transcribed! This might indicate:")
+                print("  - Audio file has no speech")
+                print("  - Audio quality is too poor")
+                print("  - Model loading failed")
+                print("  - Wrong audio format/sample rate")
             
             return combined_result
             
@@ -369,24 +441,50 @@ Here is the transcription to format:
 Please provide a clean, well-organized markdown version:"""
 
         try:
-            # Send request to Ollama
-            payload = {
-                "model": "gemma3:4b-it-q8_0",
+            # First try the chat API (newer format)
+            chat_payload = {
+                "model": "gemma3:12b",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "stream": False
+            }
+           
+            print(f"Trying Ollama chat API...")
+            response = requests.post(self.ollama_chat_url, json=chat_payload, timeout=300)
+           
+            if response.status_code == 200:
+                result = response.json()
+                formatted_text = result.get("message", {}).get("content", "")
+                if formatted_text:
+                    print("Ollama formatting completed successfully!")
+                    return formatted_text
+            
+            # Fallback to generate API
+            print(f"Chat API failed ({response.status_code}), trying generate API...")
+            generate_payload = {
+                "model": "gemma2:2b",
                 "prompt": prompt,
                 "stream": False
             }
            
-            response = requests.post(self.ollama_url, json=payload, timeout=300)
+            response = requests.post(self.ollama_url, json=generate_payload, timeout=300)
            
             if response.status_code == 200:
                 result = response.json()
                 formatted_text = result.get("response", "")
-                print("Ollama formatting completed successfully!")
-                return formatted_text
-            else:
-                print(f"Error from Ollama API: {response.status_code}")
-                print("Falling back to basic formatting...")
-                return self._basic_markdown_format(structured_text)
+                if formatted_text:
+                    print("Ollama formatting completed successfully!")
+                    return formatted_text
+            
+            print(f"Error from Ollama API: {response.status_code}")
+            if response.text:
+                print(f"Response: {response.text[:200]}...")
+            print("Falling back to basic formatting...")
+            return self._basic_markdown_format(structured_text)
                
         except requests.exceptions.RequestException as e:
             print(f"Error connecting to Ollama: {e}")
