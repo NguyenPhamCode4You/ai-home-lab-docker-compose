@@ -38,3 +38,6 @@ bvms-learned
 *.mp4
 
 *.mp3
+code-server/config
+
+llama-rpc/models/*.gguf
