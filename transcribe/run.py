@@ -32,6 +32,8 @@ import requests
 import time
 from pathlib import Path
 from typing import Optional, Dict, Any, List, Tuple
+import tempfile
+import shutil
 
 import torch
 from transformers import pipeline, AutoProcessor, AutoModelForSpeechSeq2Seq
@@ -322,8 +324,8 @@ class VideoTranscriber:
             # Return empty result for failed chunks
             return {"text": "", "chunks": []}
     
-    def transcribe_audio(self, audio_array: np.ndarray) -> Dict[str, Any]:
-        """Transcribe audio using Whisper large v3 with chunked processing."""
+    def transcribe_audio(self, audio_array: np.ndarray, progress_file: str = None, raw_output_path: str = None) -> Dict[str, Any]:
+        """Transcribe audio using Whisper large v3 with chunked processing and incremental saving."""
         total_duration = len(audio_array) / 16000
         print(f"Transcribing audio (duration: {total_duration:.1f}s)...")
         
@@ -335,43 +337,91 @@ class VideoTranscriber:
             chunks = self.split_audio_into_chunks(audio_array, chunk_duration=15)
             print(f"Processing {len(chunks)} chunks of ~15 seconds each...")
             
-            # Initialize results
-            all_text = []
-            all_chunks = []
+            # Load existing progress if available
+            progress_data = self._load_existing_progress(progress_file) if progress_file else {
+                'completed_chunks': [],
+                'all_text': [],
+                'all_chunks': [],
+                'total_chunks': len(chunks),
+                'audio_duration': total_duration
+            }
+            
+            # Update progress data
+            progress_data['total_chunks'] = len(chunks)
+            progress_data['audio_duration'] = total_duration
+            
+            # Determine starting point
+            completed_chunk_indices = set(progress_data.get('completed_chunks', []))
+            start_index = len(completed_chunk_indices)
+            
+            if start_index > 0:
+                print(f"Resuming from chunk {start_index + 1} (already completed: {start_index}/{len(chunks)})")
+            
+            # Initialize results from existing progress
+            all_text = progress_data.get('all_text', [])
+            all_chunks = progress_data.get('all_chunks', [])
             
             # Process chunks with progress bar
             start_time = time.time()
             
-            with tqdm(total=len(chunks), desc="Transcribing", unit="chunk") as pbar:
+            with tqdm(total=len(chunks), initial=start_index, desc="Transcribing", unit="chunk") as pbar:
                 for i, (chunk_audio, chunk_start, chunk_end) in enumerate(chunks):
+                    # Skip already completed chunks
+                    if i in completed_chunk_indices:
+                        continue
+                        
                     # Update progress bar description with current time range
                     pbar.set_description(f"Transcribing [{self._format_timestamp(chunk_start)}-{self._format_timestamp(chunk_end)}]")
                     
-                    # Transcribe chunk
-                    chunk_result = self.transcribe_audio_chunk(chunk_audio, chunk_start, chunk_end)
-                    
-                    # Debug: Log chunk results
-                    chunk_text = chunk_result.get("text", "")
-                    if chunk_text.strip():
-                        print(f"  Chunk {i+1}: '{chunk_text[:50]}...' ({len(chunk_text)} chars)")
-                    else:
-                        print(f"  Chunk {i+1}: NO TEXT DETECTED")
-                    
-                    # Collect results
-                    if chunk_result.get("text"):
-                        all_text.append(chunk_result["text"])
-                    
-                    if chunk_result.get("chunks"):
-                        all_chunks.extend(chunk_result["chunks"])
+                    try:
+                        # Transcribe chunk
+                        chunk_result = self.transcribe_audio_chunk(chunk_audio, chunk_start, chunk_end)
+                        
+                        # Debug: Log chunk results
+                        chunk_text = chunk_result.get("text", "")
+                        if chunk_text.strip():
+                            print(f"  Chunk {i+1}: '{chunk_text[:50]}...' ({len(chunk_text)} chars)")
+                        else:
+                            print(f"  Chunk {i+1}: NO TEXT DETECTED")
+                        
+                        # Collect results
+                        if chunk_result.get("text"):
+                            all_text.append(chunk_result["text"])
+                        
+                        if chunk_result.get("chunks"):
+                            all_chunks.extend(chunk_result["chunks"])
+                        
+                        # Mark chunk as completed
+                        progress_data['completed_chunks'].append(i)
+                        progress_data['all_text'] = all_text
+                        progress_data['all_chunks'] = all_chunks
+                        
+                        # Save progress after each chunk
+                        if progress_file:
+                            self._save_progress(progress_file, progress_data)
+                        
+                        # Save current transcript state
+                        if raw_output_path:
+                            self._save_current_transcript(progress_data, raw_output_path)
+                        
+                    except Exception as chunk_error:
+                        print(f"Error processing chunk {i+1}: {chunk_error}")
+                        print("Continuing with next chunk...")
+                        # Still mark as "completed" to avoid infinite retry
+                        progress_data['completed_chunks'].append(i)
+                        if progress_file:
+                            self._save_progress(progress_file, progress_data)
                     
                     # Update progress
                     pbar.update(1)
                     
                     # Show elapsed time and ETA
                     elapsed = time.time() - start_time
-                    if i > 0:
-                        avg_time_per_chunk = elapsed / (i + 1)
-                        eta = avg_time_per_chunk * (len(chunks) - i - 1)
+                    completed_now = len(progress_data['completed_chunks'])
+                    if completed_now > start_index:
+                        avg_time_per_chunk = elapsed / (completed_now - start_index)
+                        remaining_chunks = len(chunks) - completed_now
+                        eta = avg_time_per_chunk * remaining_chunks
                         pbar.set_postfix({
                             'elapsed': f"{elapsed:.0f}s",
                             'eta': f"{eta:.0f}s",
@@ -386,10 +436,20 @@ class VideoTranscriber:
             }
             
             total_elapsed = time.time() - start_time
+            completed_chunks = len(progress_data['completed_chunks'])
             print(f"Transcription completed successfully in {total_elapsed:.1f}s!")
             print(f"Processing speed: {total_duration/total_elapsed:.2f}x real-time")
             print(f"Total transcribed text length: {len(combined_text)} characters")
+            print(f"Completed chunks: {completed_chunks}/{len(chunks)}")
             print(f"Number of chunks with text: {len([t for t in all_text if t.strip()])}")
+            
+            # Clean up progress file if transcription is complete
+            if progress_file and completed_chunks == len(chunks):
+                try:
+                    os.remove(progress_file)
+                    print(f"Cleaned up progress file: {progress_file}")
+                except:
+                    pass
             
             if not combined_text:
                 print("WARNING: No text was transcribed! This might indicate:")
@@ -402,6 +462,7 @@ class VideoTranscriber:
             
         except Exception as e:
             print(f"Error during transcription: {e}")
+            print(f"Progress has been saved. You can resume by running the script again.")
             sys.exit(1)
    
     def format_with_ollama(self, transcription_result: Dict[str, Any]) -> str:
@@ -513,6 +574,73 @@ This document contains the transcription of the provided video file.
 ---
 *Generated using Whisper large v3 and processed automatically*
 """
+    
+    def _create_incremental_save_file(self, video_path: str) -> str:
+        """Create a temporary file for incremental saving of transcription progress."""
+        video_name = Path(video_path).stem
+        temp_file = f"{video_name}_transcription_progress.json"
+        return temp_file
+    
+    def _load_existing_progress(self, progress_file: str) -> Dict[str, Any]:
+        """Load existing transcription progress from file."""
+        if os.path.exists(progress_file):
+            try:
+                with open(progress_file, 'r', encoding='utf-8') as f:
+                    progress = json.load(f)
+                print(f"Found existing progress file with {len(progress.get('completed_chunks', []))} completed chunks")
+                return progress
+            except Exception as e:
+                print(f"Error loading progress file: {e}")
+                print("Starting fresh transcription...")
+        return {
+            'completed_chunks': [],
+            'all_text': [],
+            'all_chunks': [],
+            'total_chunks': 0,
+            'video_path': '',
+            'audio_duration': 0
+        }
+    
+    def _save_progress(self, progress_file: str, progress_data: Dict[str, Any]):
+        """Save current transcription progress to file."""
+        try:
+            with open(progress_file, 'w', encoding='utf-8') as f:
+                json.dump(progress_data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"Warning: Could not save progress: {e}")
+    
+    def _save_current_transcript(self, progress_data: Dict[str, Any], output_path: str):
+        """Save current transcript state to output file."""
+        try:
+            # Combine all text and chunks
+            combined_text = " ".join(progress_data.get('all_text', [])).strip()
+            all_chunks = progress_data.get('all_chunks', [])
+            
+            # Create structured text
+            structured_text = "Raw Transcription:\n" + combined_text + "\n\n"
+            
+            if all_chunks:
+                structured_text += "Timestamped Segments:\n"
+                for chunk in all_chunks:
+                    timestamp = chunk.get("timestamp", [0, 0])
+                    chunk_text = chunk.get("text", "")
+                    start_time = self._format_timestamp(timestamp[0])
+                    end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
+                    structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
+            
+            # Add progress info
+            completed_chunks = len(progress_data.get('completed_chunks', []))
+            total_chunks = progress_data.get('total_chunks', 0)
+            if total_chunks > 0:
+                structured_text += f"\n--- Progress: {completed_chunks}/{total_chunks} chunks completed ({completed_chunks/total_chunks*100:.1f}%) ---\n"
+            
+            # Format and save
+            formatted_text = self._basic_markdown_format(structured_text)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(formatted_text)
+                
+        except Exception as e:
+            print(f"Warning: Could not save current transcript: {e}")
    
     def process_existing_transcript(self, transcript_path: str, output_path: Optional[str] = None) -> str:
         """Process an existing transcript file with Ollama formatting."""
@@ -590,10 +718,21 @@ This document contains the transcription of the provided video file.
         step_duration = time.time() - step_start
         print(f"Audio extraction completed in {step_duration:.1f}s\n")
        
+        # Set up incremental saving
+        progress_file = self._create_incremental_save_file(video_path)
+        
+        # Determine raw output path early
+        if output_path is None:
+            video_name = Path(video_path).stem
+            raw_output_path = f"{video_name}_raw_transcription.md"
+        else:
+            output_path_obj = Path(output_path)
+            raw_output_path = output_path_obj.parent / f"{output_path_obj.stem}_raw{output_path_obj.suffix}"
+        
         # Transcribe
         print("Step 2/3: Audio Transcription")
         step_start = time.time()
-        transcription_result = self.transcribe_audio(audio_array)
+        transcription_result = self.transcribe_audio(audio_array, progress_file, str(raw_output_path))
         step_duration = time.time() - step_start
         print(f"Audio transcription completed in {step_duration:.1f}s\n")
        
@@ -601,17 +740,8 @@ This document contains the transcription of the provided video file.
         print("Step 3/3: Text Formatting")
         step_start = time.time()
         
-        # Save raw transcription first (before Ollama formatting)
-        raw_output_path = None
-        if output_path is None:
-            video_name = Path(video_path).stem
-            raw_output_path = f"{video_name}_raw_transcription.md"
-        else:
-            # Insert "_raw" before the file extension
-            output_path_obj = Path(output_path)
-            raw_output_path = output_path_obj.parent / f"{output_path_obj.stem}_raw{output_path_obj.suffix}"
-        
-        # Create raw transcription content
+        # Raw transcription was already saved incrementally during processing
+        # Create final version without progress indicators
         text = transcription_result.get("text", "")
         chunks = transcription_result.get("chunks", [])
         
@@ -628,10 +758,10 @@ This document contains the transcription of the provided video file.
         
         raw_formatted_text = self._basic_markdown_format(raw_structured_text)
         
-        # Save raw transcription
+        # Save final clean raw transcription (without progress indicators)
         with open(raw_output_path, 'w', encoding='utf-8') as f:
             f.write(raw_formatted_text)
-        print(f"Raw transcription saved to: {raw_output_path}")
+        print(f"Final raw transcription saved to: {raw_output_path}")
         
         # Now proceed with Ollama formatting if requested
         if use_ollama:
