@@ -126,7 +126,7 @@ The regulation is designed to make alternative fuels and technologies more econo
 
 ## 6. Practical Example: The Power of Blending
 
-**[17:30]** The video discusses a practical scenario: what if a vessel starts with a compliance deficit from using only fossil fuel? The goal is to reach a "net-zero" compliance balance by blending in a biofuel.
+**[17:30]** The video discusses a practical scenario: achieving a "net-zero" compliance balance by blending biofuel with traditional fossil fuel. This process involves a clear trade-off between operational costs and regulatory penalties.
 
 ```mermaid
 graph TD
@@ -134,25 +134,28 @@ graph TD
         A[Voyage with 100% Fossil Fuel] --> B{Compliance Deficit (-)};
     end
     subgraph "Action"
-        C{Click "Comply to Zero"} --> D[Calculate Required Biofuel];
+        C("Click 'Comply to Zero'") --> D[Calculate Required Biofuel];
     end
-    subgraph "Outcome"
+    subgraph "Financial Outcome"
         E[Substitute Fossil Fuel with Biofuel] --> F{Compliance Balance = 0};
         E --> G[Bunker Costs Increase];
         E --> H[ETS Costs Decrease];
     end
+
     B --> C;
-    F & G & H --> I[New Voyage P&L];
+    F & G & H --> I((New Voyage P&L));
 ```
 
-1.  **Initial State**: A voyage using only MGO results in a negative compliance balance (a deficit).
-2.  **Action**: A user wants to comply. The system calculates the exact amount of MGO that needs to be replaced with a biofuel (like Bio-MGO) to make the `Compliance Balance` equal to zero. **[18:00]**
-3.  **Economic Impact**:
-    - **FuelEU Penalty**: Becomes zero.
-    - **Bunker Costs**: Increase, as biofuels are typically more expensive than their fossil counterparts. **[18:45]**
-    - **ETS Costs**: Decrease, because biofuels are often zero-rated under the EU ETS, meaning no emission allowances are needed for the CO2 they emit when burned. **[19:45]**
+The workflow is as follows:
 
-The final result is a trade-off. The company avoids the FuelEU penalty but incurs higher bunker costs, partially offset by savings on ETS allowances. This allows for a clear financial analysis of the decision to decarbonize.
+1.  **Initial State**: A voyage using only MGO results in a negative compliance balance (a deficit).
+2.  **Action**: **[18:00]** The system calculates the precise amount of MGO to replace with a biofuel (like Bio-MGO) to neutralize the compliance balance to zero.
+3.  **Economic Impact**:
+    - **FuelEU Penalty**: Avoided entirely.
+    - **Bunker Costs**: **[18:45]** Increase due to the higher price of biofuels.
+    - **ETS Costs**: **[19:45]** Decrease because biofuels are often zero-rated under the EU ETS.
+
+This allows for a clear financial analysis of the decision to decarbonize, balancing higher fuel costs against savings from avoided penalties.
 
 ---
 
