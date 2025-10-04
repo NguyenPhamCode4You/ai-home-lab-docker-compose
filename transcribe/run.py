@@ -456,20 +456,27 @@ class VideoTranscriber:
         structured_text = "Transcription with Segment Timestamps:\n" + text + "\n\n"
        
         # Prepare prompt for Ollama
-        prompt = f"""Please format the following video transcription into a well-structured markdown document that is easy to read and follow.
+        prompt = f"""Please create a comprehensive, fact-based educational document from the following video transcription. Transform this raw transcript into a well-structured knowledge resource.
 
-Include:
-1. A brief summary at the top
-2. Main topics/sections with headers
-3. Key points organized logically
-4. Timestamps where relevant
-5. Clean formatting with proper markdown syntax
+Requirements:
+1. Write a concise, factual document covering all content discussed in the recording
+2. Enrich the knowledge with your own expertise - add context, explanations, and related information that would help readers understand the topics better
+3. Make it simple to understand and illustrative using:
+   - Tables for comparisons or data
+   - Diagrams (in mermaid digram language)
+   - Examples to clarify concepts
+   - Equations or formulas when relevant (using proper markdown math syntax)
+4. Include timestamps on important points so viewers can jump to the video to hear more details (format: **[MM:SS]** for emphasis)
+5. Structure with clear headers, subheaders, and logical flow
+6. Use proper markdown formatting throughout
 
-Here is the transcription to format:
+Create an educational resource that stands alone as a comprehensive guide while still referencing the source video through timestamps.
+
+Here is the transcription to transform:
 
 {structured_text}
 
-Please provide a clean, well-organized markdown version:"""
+Please provide a well-organized, educational markdown document:"""
 
         try:
             # First try the chat API (newer format)
