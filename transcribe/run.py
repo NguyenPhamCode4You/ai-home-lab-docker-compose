@@ -292,28 +292,7 @@ class VideoTranscriber:
                 print(f"Result keys: {list(result.keys()) if result else 'None'}")
                 return {"text": "", "chunks": []}
             
-            # Adjust timestamps to be relative to the full audio
-            if "chunks" in result and result["chunks"]:
-                for chunk in result["chunks"]:
-                    if "timestamp" in chunk and chunk["timestamp"]:
-                        # Convert tuple to list if needed for modification
-                        if isinstance(chunk["timestamp"], tuple):
-                            chunk["timestamp"] = list(chunk["timestamp"])
-                        
-                        # Adjust the timestamps
-                        if len(chunk["timestamp"]) >= 2:
-                            chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
-                            chunk["timestamp"][1] = (chunk["timestamp"][1] or (end_time - start_time)) + start_time
-                        elif len(chunk["timestamp"]) == 1:
-                            chunk["timestamp"][0] = (chunk["timestamp"][0] or 0) + start_time
-            
-            # Create chunks from the text if none exist
-            if "chunks" not in result or not result["chunks"]:
-                if result.get("text"):
-                    result["chunks"] = [{
-                        "text": result["text"],
-                        "timestamp": [start_time, end_time]
-                    }]
+            # We no longer need to adjust word-level timestamps since we're not using them
             
             return result
             
@@ -341,7 +320,6 @@ class VideoTranscriber:
             progress_data = self._load_existing_progress(progress_file) if progress_file else {
                 'completed_chunks': [],
                 'all_text': [],
-                'all_chunks': [],
                 'total_chunks': len(chunks),
                 'audio_duration': total_duration
             }
@@ -359,7 +337,6 @@ class VideoTranscriber:
             
             # Initialize results from existing progress
             all_text = progress_data.get('all_text', [])
-            all_chunks = progress_data.get('all_chunks', [])
             
             # Process chunks with progress bar
             start_time = time.time()
@@ -384,17 +361,20 @@ class VideoTranscriber:
                         else:
                             print(f"  Chunk {i+1}: NO TEXT DETECTED")
                         
-                        # Collect results
+                        # Collect results with segment timestamp
                         if chunk_result.get("text"):
-                            all_text.append(chunk_result["text"])
+                            # Add segment timestamp at the beginning of the text
+                            segment_timestamp = f"[{self._format_timestamp(chunk_start)} - {self._format_timestamp(chunk_end)}] "
+                            timestamped_text = segment_timestamp + chunk_result["text"].strip()
+                            all_text.append(timestamped_text)
                         
-                        if chunk_result.get("chunks"):
-                            all_chunks.extend(chunk_result["chunks"])
+                        # We no longer collect detailed chunks for word-level timestamps
+                        # if chunk_result.get("chunks"):
+                        #     all_chunks.extend(chunk_result["chunks"])
                         
                         # Mark chunk as completed
                         progress_data['completed_chunks'].append(i)
                         progress_data['all_text'] = all_text
-                        progress_data['all_chunks'] = all_chunks
                         
                         # Save progress after each chunk
                         if progress_file:
@@ -428,11 +408,11 @@ class VideoTranscriber:
                             'avg': f"{avg_time_per_chunk:.1f}s/chunk"
                         })
             
-            # Combine all results
-            combined_text = " ".join(all_text).strip()
+            # Combine all results - now each text segment already has timestamps
+            combined_text = "\n\n".join(all_text).strip()
             combined_result = {
                 "text": combined_text,
-                "chunks": all_chunks
+                "chunks": []  # No longer using detailed word-level chunks
             }
             
             total_elapsed = time.time() - start_time
@@ -469,21 +449,11 @@ class VideoTranscriber:
         """Format transcription using local Ollama model."""
         print("Formatting transcription with Ollama...")
        
-        # Extract text and timestamps
+        # Extract text (already includes segment timestamps)
         text = transcription_result.get("text", "")
-        chunks = transcription_result.get("chunks", [])
        
-        # Create a structured representation
-        structured_text = "Raw Transcription:\n" + text + "\n\n"
-       
-        if chunks:
-            structured_text += "Timestamped Segments:\n"
-            for i, chunk in enumerate(chunks):
-                timestamp = chunk.get("timestamp", [0, 0])
-                chunk_text = chunk.get("text", "")
-                start_time = self._format_timestamp(timestamp[0])
-                end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
-                structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
+        # Create a structured representation - text already contains timestamps
+        structured_text = "Transcription with Segment Timestamps:\n" + text + "\n\n"
        
         # Prepare prompt for Ollama
         prompt = f"""Please format the following video transcription into a well-structured markdown document that is easy to read and follow.
@@ -595,7 +565,6 @@ This document contains the transcription of the provided video file.
         return {
             'completed_chunks': [],
             'all_text': [],
-            'all_chunks': [],
             'total_chunks': 0,
             'video_path': '',
             'audio_duration': 0
@@ -612,21 +581,11 @@ This document contains the transcription of the provided video file.
     def _save_current_transcript(self, progress_data: Dict[str, Any], output_path: str):
         """Save current transcript state to output file."""
         try:
-            # Combine all text and chunks
-            combined_text = " ".join(progress_data.get('all_text', [])).strip()
-            all_chunks = progress_data.get('all_chunks', [])
+            # Combine all text (already includes segment timestamps)
+            combined_text = "\n\n".join(progress_data.get('all_text', [])).strip()
             
-            # Create structured text
-            structured_text = "Raw Transcription:\n" + combined_text + "\n\n"
-            
-            if all_chunks:
-                structured_text += "Timestamped Segments:\n"
-                for chunk in all_chunks:
-                    timestamp = chunk.get("timestamp", [0, 0])
-                    chunk_text = chunk.get("text", "")
-                    start_time = self._format_timestamp(timestamp[0])
-                    end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
-                    structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
+            # Create structured text - no need for separate timestamped segments
+            structured_text = "Transcription with Segment Timestamps:\n" + combined_text + "\n\n"
             
             # Add progress info
             completed_chunks = len(progress_data.get('completed_chunks', []))
@@ -743,18 +702,8 @@ This document contains the transcription of the provided video file.
         # Raw transcription was already saved incrementally during processing
         # Create final version without progress indicators
         text = transcription_result.get("text", "")
-        chunks = transcription_result.get("chunks", [])
         
-        raw_structured_text = "Raw Transcription:\n" + text + "\n\n"
-        
-        if chunks:
-            raw_structured_text += "Timestamped Segments:\n"
-            for i, chunk in enumerate(chunks):
-                timestamp = chunk.get("timestamp", [0, 0])
-                chunk_text = chunk.get("text", "")
-                start_time = self._format_timestamp(timestamp[0])
-                end_time = self._format_timestamp(timestamp[1]) if len(timestamp) > 1 else "end"
-                raw_structured_text += f"[{start_time} - {end_time}]: {chunk_text.strip()}\n"
+        raw_structured_text = "Transcription with Segment Timestamps:\n" + text + "\n\n"
         
         raw_formatted_text = self._basic_markdown_format(raw_structured_text)
         
