@@ -30,14 +30,13 @@ Transcription with Segment Timestamps:
 
 [02:45 - 03:00] To burn the fossil fuel, it will generate CO2, CH4, and N2O, which is also greenhouse gas, but all of them are calculated into the equation.
 
-[03:00 - 03:15] So basically, these are the constants that they have these values different from bunker type to bunker type. And finally, if they sum up everything in here, we will have a representation.
+[03:15 - 03:30] well-to-weak greenhouse gas calculated for CO2 per megajoules which is 90.7 so basically what it communicates is that in order
 
 [03:15 - 03:30] well-to-weak greenhouse gas calculated for CO2 per megajoules which is 90.7 so basically what it communicates is that in order
 
 [03:30 - 03:45] to have 1 megajoules of energy for the vessel to use. The entire process from extracting the fuel until it is burned to create the energy will generate 90 grams
 
 [03:45 - 04:00] of CO2 into the atmosphere okay so these two value is the one that our calculation heavily rely on the LCV is the amount of
-
 [04:00 - 04:15] megajoule generated per gram of fuel and the well-to-weak greenhouse gas is the amount of CO2 equivalent per megajoule generated. And in order
 
 [04:15 - 04:30] With these two values in mind, so if a vessel needs like 10,000 of tanks to go for the voyage, and 2,000 is burned inside Europe, and 8,000 is burned outside, so we can calculate

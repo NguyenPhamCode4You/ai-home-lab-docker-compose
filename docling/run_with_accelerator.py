@@ -29,8 +29,8 @@ from docling.document_converter import DocumentConverter, PdfFormatOption
 
 
 def main():
-    input_doc_path = r"C:/Users/Nguyen/Downloads/HP-ZBook-Power-16-G11-QuickSpecs.pdf"
-    output_file = "HP-ZBook-Power-16-G11-QuickSpecs.md"
+    input_doc_path = r"THESIS ECG METHODS.pdf"
+    output_file = "THESIS ECG METHODS.md"
 
     # Explicitly set the accelerator
     # accelerator_options = AcceleratorOptions(
