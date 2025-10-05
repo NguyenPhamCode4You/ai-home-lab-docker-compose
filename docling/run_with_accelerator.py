@@ -29,8 +29,8 @@ from docling.document_converter import DocumentConverter, PdfFormatOption
 
 
 def main():
-    input_doc_path = r"THESIS ECG METHODS.pdf"
-    output_file = "THESIS ECG METHODS.md"
+    input_doc_path = r"Wiley - Methods of multivariate analysis.pdf"
+    output_file = "Wiley - Methods of multivariate analysis.md"
 
     # Explicitly set the accelerator
     # accelerator_options = AcceleratorOptions(
