@@ -29,8 +29,8 @@ from docling.document_converter import DocumentConverter, PdfFormatOption
 
 
 def main():
-    input_doc_path = r"Wiley - Methods of multivariate analysis.pdf"
-    output_file = "Wiley - Methods of multivariate analysis.md"
+    input_doc_path = r"ESSF_SAPS_WS1_Report_on_FuelEU_calculation.pdf"
+    output_file = "ESSF_SAPS_WS1_Report_on_FuelEU_calculation.md"
 
     # Explicitly set the accelerator
     # accelerator_options = AcceleratorOptions(
