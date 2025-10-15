@@ -1,9 +1,8 @@
-# Azure Production Deployment Guide
+# Production Deployment Guide on Azure Cloud
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Deployment Workflow](#deployment-workflow)
 - [Prerequisites](#prerequisites)
 - [Detailed Steps](#detailed-steps)
 - [Troubleshooting](#troubleshooting)
@@ -13,7 +12,17 @@
 
 ## Overview
 
-This guide provides comprehensive step-by-step instructions for deploying applications to Azure Cloud using Azure DevOps, Terraform, and Managed Identity authentication. The deployment process includes infrastructure provisioning, database setup, and backend service deployment with high availability using failover groups.
+This guide provides comprehensive step-by-step instructions for deploying applications to Azure Cloud using:
+
+- Azure DevOps CICD
+- Terraform
+- Managed Identity authentication
+
+The deployment process includes:
+
+- Infrastructure generation with Terraform
+- Database setup with failover groups
+- Service deployment with high availability
 
 ### Key Technologies
 
@@ -21,49 +30,6 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 - **Azure DevOps**: Pipelines, Environments, Variable Groups, Service Connections
 - **Managed Identity**: User-Assigned Managed Identity for authentication
 - **Terraform**: Infrastructure as Code (IaC)
-- **SQL Failover Groups**: High availability and disaster recovery
-
----
-
-## Deployment Workflow
-
-```mermaid
-graph TD
-    A[Start] --> B[Step 1-2: Create Resource Group & Environment]
-    B --> C[Step 3: Create Managed Identity]
-    C --> D[Step 4: Assign Contributor Rights]
-    D --> E[Step 5: Assign Terraform Backend Permissions]
-    E --> F[Step 6: Create Service Connection]
-    F --> G[Step 7: Run Terraform Pipeline]
-    G --> H[Step 8: Approve Private Endpoints]
-    H --> I[Step 9: Configure Variable Groups]
-    I --> J[Step 10: Deploy Backend Services]
-    J --> K[Step 11: Import Database]
-    K --> L[Step 12: Configure Failover Group]
-    L --> M[Step 13: Rerun Terraform for Diagnostics]
-    M --> N[Deployment Complete]
-
-    style A fill:#90EE90
-    style N fill:#90EE90
-    style G fill:#FFE4B5
-    style J fill:#FFE4B5
-    style K fill:#FFE4B5
-```
-
-### Deployment Phases
-
-```mermaid
-stateDiagram-v2
-    [*] --> Setup: Azure Infrastructure Setup
-    Setup --> Identity: Managed Identity & Permissions
-    Identity --> Infrastructure: Terraform Deployment
-    Infrastructure --> Network: Network Configuration
-    Network --> Configuration: Variable Groups Setup
-    Configuration --> Application: Backend Deployment
-    Application --> Database: Database Setup
-    Database --> HighAvailability: Failover Configuration
-    HighAvailability --> [*]: Deployment Complete
-```
 
 ---
 
@@ -324,20 +290,6 @@ Grant the Managed Identity access to read and write Terraform state files in the
    - Confirm both roles are assigned:
      - ✅ Reader
      - ✅ Storage Blob Data Contributor
-
-#### Permission Matrix
-
-```mermaid
-graph LR
-    A[Managed Identity] -->|Reader| B[Storage Account]
-    A -->|Storage Blob Data Contributor| C[Blob Container]
-    C --> D[Terraform State Files]
-
-    style A fill:#ADD8E6
-    style B fill:#FFE4B5
-    style C fill:#FFE4B5
-    style D fill:#90EE90
-```
 
 ---
 
