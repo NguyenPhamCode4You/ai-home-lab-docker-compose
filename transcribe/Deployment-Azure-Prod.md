@@ -52,7 +52,7 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 
 ## Workflow Diagram
 
-### Resources Initialization and Permissions Setup
+### Step 1-6: Resources Initialization and Permissions Setup
 
 Step 1 to Step 6: Setup Azure resources and permissions
 
@@ -65,7 +65,7 @@ graph TD
     C -->|Blob Data Contributor| E
 ```
 
-Setp 7 to Step 12: Deploy infrastructure and applications
+### Step 7-12: Deploy infrastructure and applications
 
 ```mermaid
 graph TD
