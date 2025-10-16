@@ -410,25 +410,36 @@ sequenceDiagram
     participant User
     participant Pipeline as Azure DevOps Pipeline
     participant Terraform
-    participant Azure as Azure Cloud
     participant Storage as Terraform Backend
+    participant Azure as Azure Cloud
 
     User->>Pipeline: Run Terraform Pipeline
-    Pipeline->>Pipeline: Grant Permissions
-    Pipeline->>Storage: Initialize Backend
-    Storage-->>Pipeline: State File Retrieved
+    Pipeline->>User: Request Permissions
+    User->>Pipeline: Grant Permissions
+
     Pipeline->>Terraform: Terraform Init
+    Terraform->>Storage: Initialize Backend
+    Storage-->>Terraform: State File Retrieved
     Terraform->>Terraform: Download Providers
+    Terraform-->>Pipeline: Init Complete
+
     Pipeline->>Terraform: Terraform Plan
+    Terraform->>Storage: Read Current State
+    Storage-->>Terraform: State Data
     Terraform->>Azure: Query Existing Resources
     Azure-->>Terraform: Current State
-    Terraform->>Terraform: Generate Plan
-    Pipeline->>User: Display Plan
+    Terraform->>Terraform: Generate Execution Plan
+    Terraform-->>Pipeline: Plan Generated
+    Pipeline->>User: Display Plan (Review Changes)
+
+    User->>Pipeline: Approve (Implicit)
     Pipeline->>Terraform: Terraform Apply
-    Terraform->>Azure: Create Resources
-    Azure-->>Terraform: Resources Created
+    Terraform->>Azure: Create/Update Resources
+    Azure-->>Terraform: Resources Created/Updated
     Terraform->>Storage: Update State File
-    Pipeline->>User: Deployment Complete
+    Storage-->>Terraform: State Saved
+    Terraform-->>Pipeline: Apply Complete
+    Pipeline->>User: Deployment Complete ✅
 ```
 
 #### Troubleshooting
