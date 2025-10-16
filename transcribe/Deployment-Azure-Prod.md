@@ -9,6 +9,8 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 - **Managed Identity**: User-Assigned Managed Identity for authentication
 - **Terraform**: Infrastructure as Code (IaC)
 
+### [Reference Videos](https://drive.google.com/drive/folders/1cAQ1XH7f-3gcCAs7CkMvychSNhKSWnUw?usp=sharing)
+
 ---
 
 ## Architecture
@@ -77,7 +79,7 @@ graph TD
     N[EF Migrations] -->|Updates Schema| I
 ```
 
-## Detailed Steps
+# Detailed Steps
 
 ### **Step 1: Create New Resource Group in Azure**
 
@@ -1144,11 +1146,6 @@ To verify failover functionality:
 ---
 
 ### **Step 13: Rerun Terraform for Diagnostic Settings**
-
-**Duration**: ~5 minutes  
-**Status**: Not validated as of October 2, 2025
-
-#### Purpose
 
 Rerun the Terraform pipeline to apply diagnostic settings to both primary and secondary databases now that they exist in the failover group.
 
