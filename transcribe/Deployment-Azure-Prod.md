@@ -54,8 +54,6 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 
 ### Step 1-6: Resources Initialization and Permissions Setup
 
-Step 1 to Step 6: Setup Azure resources and permissions
-
 ```mermaid
 graph TD
     A[Azure DevOps Pipeline] -->|Uses| B[Service Connection]
