@@ -65,13 +65,15 @@ graph TD
 
 ```mermaid
 graph TD
+    A[Azure DevOps] -->|Runs| F[Terraform Pipeline]
+    A -->|Runs| L[Application Pipeline]
     F[Terraform Pipeline] -->|Creates| G[Azure Resources]
-    G --> H[App Services]
     G --> I[SQL Database]
     H -->|Private Endpoints| J[Virtual Network]
     I -->|Failover Group| K[Secondary Region]
-    L[Deployment Pipeline] -->|Deploys Code| H
+    L[Application Pipeline] -->|Deploys Code| H
     M[Database Import] -->|Imports Data| I
+    G --> H[App Services]
     N[EF Migrations] -->|Updates Schema| I
 ```
 
