@@ -1052,15 +1052,6 @@ graph LR
     SS --> SDB
 
     PDB -.->|Geo-Replication| SDB
-
-    %% Styling
-    style APP fill:#f5f5f5,stroke:#666,stroke-width:2px
-    style RW fill:#90EE90,stroke:#2d8659,stroke-width:2px
-    style RO fill:#87CEEB,stroke:#4682b4,stroke-width:2px
-    style PS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
-    style SS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
-    style PDB fill:#FFD700,stroke:#DAA520,stroke-width:2px
-    style SDB fill:#FFD700,stroke:#DAA520,stroke-width:2px
 ```
 
 #### Replication Process
