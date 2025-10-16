@@ -4,8 +4,6 @@
 
 This guide provides comprehensive step-by-step instructions for deploying applications to Azure Cloud using:
 
-### Key Technologies
-
 - **Azure Cloud Services**: Resource Groups, App Services, SQL Database, Storage Accounts
 - **Azure DevOps**: Pipelines, Repositories, Environments, Variable Groups, Service Connections
 - **Managed Identity**: User-Assigned Managed Identity for authentication
@@ -13,7 +11,7 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 
 ---
 
-## Deployment Architecture
+## Architecture
 
 ![Architecture Diagram](reliable-web-app-dotnet-5136bfe2-589d-4d6a-9f90-dff1a7c8ef8c.svg)
 
