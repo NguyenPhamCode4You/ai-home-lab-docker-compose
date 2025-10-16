@@ -189,7 +189,7 @@ Example: mi-bvms-dev, mi-bvms-test, mi-bvms-prod
 
 ---
 
-### **Step 4: Assign Contributor Rights to Managed Identity**
+### **Step 4: Assign Resouce Group's Contributor Right to Managed Identity**
 
 Grant the Managed Identity permissions to create and manage resources within the resource group.
 
@@ -237,7 +237,7 @@ Grant the Managed Identity permissions to create and manage resources within the
 
 ---
 
-### **Step 5: Assign Terraform Backend Permissions**
+### **Step 5: Assign Terraform's Reader & Blob Contributor to Managed Identity**
 
 Grant the Managed Identity access to read and write Terraform state files in the backend storage account.
 
@@ -345,11 +345,6 @@ This service connection allows Azure DevOps to:
 ---
 
 ### **Step 7: Create Infrastructure from Terraform Pipeline**
-
-**Duration**: ~5-15 minutes (depending on resources)  
-**Video Reference**: [00:00 - 01:10]
-
-#### Purpose
 
 Execute the Terraform pipeline to provision all required Azure infrastructure, including App Services, networking, and supporting resources.
 
