@@ -13,7 +13,7 @@ This guide provides comprehensive step-by-step instructions for deploying applic
 
 ## Architecture
 
-![Architecture Diagram](reliable-web-app-dotnet-5136bfe2-589d-4d6a-9f90-dff1a7c8ef8c.svg)
+![Architecture Diagram](architect.png)
 
 ---
 
