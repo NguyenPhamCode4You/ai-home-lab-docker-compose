@@ -1,35 +1,30 @@
-# Production Deployment Guide on Azure Cloud
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Detailed Steps](#detailed-steps)
-- [Troubleshooting](#troubleshooting)
-- [Reference Links](#reference-links)
-
----
+# BVMS Production Deployment Guide on Azure Cloud
 
 ## Overview
 
 This guide provides comprehensive step-by-step instructions for deploying applications to Azure Cloud using:
 
-- Azure DevOps CICD
-- Terraform
-- Managed Identity authentication
-
-The deployment process includes:
-
-- Infrastructure generation with Terraform
-- Database setup with failover groups
-- Service deployment with high availability
-
 ### Key Technologies
 
 - **Azure Cloud Services**: Resource Groups, App Services, SQL Database, Storage Accounts
-- **Azure DevOps**: Pipelines, Environments, Variable Groups, Service Connections
+- **Azure DevOps**: Pipelines, Repositories, Environments, Variable Groups, Service Connections
 - **Managed Identity**: User-Assigned Managed Identity for authentication
 - **Terraform**: Infrastructure as Code (IaC)
+
+---
+
+## Deployment Architecture
+
+![Architecture Diagram](reliable-web-app-dotnet-5136bfe2-589d-4d6a-9f90-dff1a7c8ef8c.svg)
+
+---
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Detailed Steps](#detailed-steps)
+- [Troubleshooting](#troubleshooting)
+- [Reference Links](#reference-links)
 
 ---
 
@@ -55,13 +50,38 @@ The deployment process includes:
 
 ---
 
+## Workflow Diagram
+
+### Resources Initialization and Permissions Setup
+
+Step 1 to Step 6: Setup Azure resources and permissions
+
+```mermaid
+graph TD
+    A[Azure DevOps Pipeline] -->|Uses| B[Service Connection]
+    B -->|Authenticates via| C[Managed Identity]
+    C -->|Contributor Access| D[Resource Group]
+    C -->|Reader Access| E[Terraform Storage]
+    C -->|Blob Data Contributor| E
+```
+
+Setp 7 to Step 12: Deploy infrastructure and applications
+
+```mermaid
+graph TD
+    F[Terraform Pipeline] -->|Creates| G[Azure Resources]
+    G --> H[App Services]
+    G --> I[SQL Database]
+    H -->|Private Endpoints| J[Virtual Network]
+    I -->|Failover Group| K[Secondary Region]
+    L[Deployment Pipeline] -->|Deploys Code| H
+    M[Database Import] -->|Imports Data| I
+    N[EF Migrations] -->|Updates Schema| I
+```
+
 ## Detailed Steps
 
 ### **Step 1: Create New Resource Group in Azure**
-
-**Duration**: ~2 minutes
-
-#### Purpose
 
 Create a dedicated resource group to organize and manage all Azure resources for the environment.
 
@@ -97,11 +117,6 @@ Example: rg-bvms-dev, rg-bvms-test, rg-bvms-prod
 ---
 
 ### **Step 2: Create Environment in Azure DevOps**
-
-**Duration**: ~1 minute  
-**Video Reference**: [00:00 - 00:50]
-
-#### Purpose
 
 Create an Azure DevOps environment to manage deployment targets and approvals.
 
@@ -139,10 +154,6 @@ Create an Azure DevOps environment to manage deployment targets and approvals.
 
 ### **Step 3: Create Managed Identity**
 
-**Duration**: ~3 minutes
-
-#### Purpose
-
 Create a User-Assigned Managed Identity for secure authentication between Azure DevOps and Azure resources.
 
 #### Naming Convention
@@ -170,13 +181,6 @@ Example: mi-bvms-dev, mi-bvms-test, mi-bvms-prod
    - Click "Review + Create"
    - Click "Create"
 
-3. **Note the Identity Details**
-   - After creation, open the Managed Identity
-   - Note down:
-     - **Client ID**
-     - **Object (principal) ID**
-     - **Resource ID**
-
 #### Recommended Identities (as of 4.9.2025)
 
 | Environment | Identity Name  | Purpose                      |
@@ -188,11 +192,6 @@ Example: mi-bvms-dev, mi-bvms-test, mi-bvms-prod
 ---
 
 ### **Step 4: Assign Contributor Rights to Managed Identity**
-
-**Duration**: ~2 minutes  
-**Video Reference**: [00:00 - 01:30]
-
-#### Purpose
 
 Grant the Managed Identity permissions to create and manage resources within the resource group.
 
@@ -242,11 +241,6 @@ Grant the Managed Identity permissions to create and manage resources within the
 
 ### **Step 5: Assign Terraform Backend Permissions**
 
-**Duration**: ~3 minutes  
-**Video Reference**: [01:30 - 03:30]
-
-#### Purpose
-
 Grant the Managed Identity access to read and write Terraform state files in the backend storage account.
 
 #### Required Roles
@@ -294,11 +288,6 @@ Grant the Managed Identity access to read and write Terraform state files in the
 ---
 
 ### **Step 6: Create Service Connection in Azure DevOps**
-
-**Duration**: ~2 minutes  
-**Video Reference**: [03:30 - 05:30]
-
-#### Purpose
 
 Create a service connection to allow Azure DevOps pipelines to authenticate with Azure using the Managed Identity.
 
@@ -350,23 +339,6 @@ This service connection allows Azure DevOps to:
 - Use the Managed Identity's permissions
 - Access Terraform backend storage
 - Authenticate securely without storing credentials
-
-#### Architecture Diagram
-
-```mermaid
-graph TD
-    A[Azure DevOps Pipeline] -->|Uses| B[Service Connection]
-    B -->|Authenticates via| C[Managed Identity]
-    C -->|Contributor Access| D[Resource Group]
-    C -->|Reader Access| E[Terraform Storage]
-    C -->|Blob Data Contributor| E
-
-    style A fill:#0078D4
-    style B fill:#ADD8E6
-    style C fill:#FFD700
-    style D fill:#90EE90
-    style E fill:#FFE4B5
-```
 
 #### Reference Documentation
 
