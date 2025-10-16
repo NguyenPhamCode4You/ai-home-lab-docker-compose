@@ -970,11 +970,6 @@ sequenceDiagram
 
 ### **Step 12: Add Database to Failover Group**
 
-**Duration**: ~10-30 minutes (depending on database size)  
-**Video Reference**: [01:00 - 01:57]
-
-#### Purpose
-
 Add the newly imported database to the failover group to enable high availability and automatic failover to the secondary region.
 
 #### Background
@@ -1027,50 +1022,61 @@ Failover groups provide:
 
 ```mermaid
 graph TB
-    subgraph "Primary Region"
-        A[Primary SQL Server]
-        B[Database 1]
-        C[Database 2]
-        D[Your New Database]
-
-        A --> B
-        A --> C
-        A --> D
+    subgraph APP["Application Layer"]
+        APP1[Application]
+        APP2[Read-Only Queries]
     end
 
-    subgraph "Failover Group"
-        E[Listener Endpoint]
-        F[Read-Write Listener]
-        G[Read-Only Listener]
-
-        E --> F
-        E --> G
+    subgraph FG["Failover Group Listener"]
+        RW[Read-Write Listener<br/>tcp://fg-name.database.windows.net]
+        RO[Read-Only Listener<br/>tcp://fg-name.secondary.database.windows.net]
     end
 
-    subgraph "Secondary Region"
-        H[Secondary SQL Server]
-        I[Database 1 Replica]
-        J[Database 2 Replica]
-        K[Your New Database Replica]
+    subgraph PRIMARY["Primary Region - East US"]
+        PS[Primary SQL Server<br/>sql-bvms-eastus]
+        PDB1[(Database 1)]
+        PDB2[(Database 2)]
+        PDB3[(Your New Database)]
 
-        H --> I
-        H --> J
-        H --> K
+        PS --- PDB1
+        PS --- PDB2
+        PS --- PDB3
     end
 
-    F -.->|Automatic Failover| A
-    F -.->|On Failure| H
-    G --> H
+    subgraph SECONDARY["Secondary Region - West US"]
+        SS[Secondary SQL Server<br/>sql-bvms-westus]
+        SDB1[(Database 1 Replica)]
+        SDB2[(Database 2 Replica)]
+        SDB3[(Your New Database Replica)]
 
-    B -->|Geo-Replication| I
-    C -->|Geo-Replication| J
-    D -->|Geo-Replication| K
+        SS --- SDB1
+        SS --- SDB2
+        SS --- SDB3
+    end
 
-    style E fill:#0078D4
-    style F fill:#90EE90
-    style G fill:#ADD8E6
-    style D fill:#FFD700
-    style K fill:#FFD700
+    %% Application connections
+    APP1 -->|Normal Operations| RW
+    APP2 -->|Read Queries| RO
+
+    %% Listener routing
+    RW -.->|Active Connection| PS
+    RW -.->|Auto Failover on Outage| SS
+    RO -->|Always Routes to| SS
+
+    %% Geo-Replication
+    PDB1 ==>|Async Geo-Replication| SDB1
+    PDB2 ==>|Async Geo-Replication| SDB2
+    PDB3 ==>|Async Geo-Replication| SDB3
+
+    %% Styling
+    style RW fill:#90EE90,stroke:#2d8659,stroke-width:3px
+    style RO fill:#87CEEB,stroke:#4682b4,stroke-width:3px
+    style PS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
+    style SS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
+    style PDB3 fill:#FFD700,stroke:#DAA520,stroke-width:3px
+    style SDB3 fill:#FFD700,stroke:#DAA520,stroke-width:3px
+    style APP1 fill:#f5f5f5,stroke:#666,stroke-width:2px
+    style APP2 fill:#f5f5f5,stroke:#666,stroke-width:2px
 ```
 
 #### Replication Process
@@ -1078,20 +1084,46 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant Admin
+    participant Portal as Azure Portal
     participant FG as Failover Group
-    participant Primary as Primary Database
-    participant Secondary as Secondary Database
+    participant Primary as Primary SQL Server
+    participant PDB as Primary Database
+    participant SDB as Secondary Database
+    participant Secondary as Secondary SQL Server
 
-    Admin->>FG: Add Database
-    FG->>Primary: Initiate Replication
-    Primary->>Primary: Create Snapshot
-    Primary->>Secondary: Initial Data Seeding
-    Secondary->>Secondary: Restore Snapshot
+    Admin->>Portal: Navigate to Failover Group
+    Admin->>Portal: Click "Add Database"
+    Admin->>Portal: Select Database & Save
+
+    Portal->>FG: Update Configuration
+    FG->>Primary: Initiate Replication Setup
+
+    Primary->>PDB: Lock for Snapshot
+    PDB->>PDB: Create Consistent Snapshot
+    Primary-->>FG: Snapshot Ready
+
+    FG->>Secondary: Prepare for Replication
+    Primary->>SDB: Transfer Snapshot (Initial Seeding)
+
+    Note over Primary,Secondary: Large databases may take hours for initial seeding
+
+    SDB->>SDB: Restore Database Structure
+    SDB->>SDB: Apply Data from Snapshot
+    SDB-->>Secondary: Database Restored
+
     Secondary-->>FG: Seeding Complete
-    Primary->>Secondary: Continuous Replication
-    FG-->>Admin: Database Synchronized
+    FG->>Admin: Status: Seeding Complete
 
-    Note over Primary,Secondary: Ongoing: Transaction Log Replication
+    activate Primary
+    activate Secondary
+    Primary->>SDB: Continuous Transaction Log Shipping
+    Note over Primary,Secondary: Ongoing: Asynchronous Geo-Replication<br/>RPO: Typically < 5 seconds<br/>RTO: Typically < 30 seconds
+    deactivate Primary
+    deactivate Secondary
+
+    FG->>Admin: Status: Synchronized ✅
+
+    Note over Admin,FG: Database now protected with automatic failover
 ```
 
 #### Replication Status Explained
@@ -1108,11 +1140,11 @@ sequenceDiagram
 
 After adding to failover group:
 
-- [ ] Database appears in failover group database list
-- [ ] Replication status shows "Synchronized"
-- [ ] Secondary database exists in secondary SQL server
-- [ ] Application can connect via failover group endpoint
-- [ ] Test read-only endpoint connects to secondary
+- ✅ Database appears in failover group database list
+- ✅ Replication status shows "Synchronized"
+- ✅ Secondary database exists in secondary SQL server
+- ✅ Application can connect via failover group endpoint
+- ✅ Test read-only endpoint connects to secondary
 
 #### Testing Failover (Optional - Non-Production Only)
 
