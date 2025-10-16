@@ -333,10 +333,10 @@ Example: bvms-dev, bvms-test, bvms-prod
 
 This service connection allows Azure DevOps to:
 
-- Deploy resources to the specified resource group
-- Use the Managed Identity's permissions
-- Access Terraform backend storage
-- Authenticate securely without storing credentials
+- ✅ Deploy resources to the specified resource group
+- ✅ Use the Managed Identity's permissions
+- ✅ Access Terraform backend storage
+- ✅ Authenticate securely without storing credentials
 
 #### Reference Documentation
 
