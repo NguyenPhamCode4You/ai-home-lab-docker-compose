@@ -1021,62 +1021,46 @@ Failover groups provide:
 #### Failover Group Architecture
 
 ```mermaid
-graph TB
-    subgraph APP["Application Layer"]
-        APP1[Application]
-        APP2[Read-Only Queries]
+graph LR
+    %% Application Layer
+    APP[Application]
+
+    %% Failover Group Listeners
+    RW[Read-Write Listener]
+    RO[Read-Only Listener]
+
+    %% Primary Region
+    subgraph PRIMARY["Primary Region"]
+        PS[Primary SQL Server]
+        PDB[(Your Database)]
     end
 
-    subgraph FG["Failover Group Listener"]
-        RW[Read-Write Listener<br/>tcp://fg-name.database.windows.net]
-        RO[Read-Only Listener<br/>tcp://fg-name.secondary.database.windows.net]
+    %% Secondary Region
+    subgraph SECONDARY["Secondary Region"]
+        SS[Secondary SQL Server]
+        SDB[(Database Replica)]
     end
 
-    subgraph PRIMARY["Primary Region - East US"]
-        PS[Primary SQL Server<br/>sql-bvms-eastus]
-        PDB1[(Database 1)]
-        PDB2[(Database 2)]
-        PDB3[(Your New Database)]
+    %% Clean connections
+    APP --> RW
+    APP --> RO
 
-        PS --- PDB1
-        PS --- PDB2
-        PS --- PDB3
-    end
+    RW --> PS
+    RO --> SS
 
-    subgraph SECONDARY["Secondary Region - West US"]
-        SS[Secondary SQL Server<br/>sql-bvms-westus]
-        SDB1[(Database 1 Replica)]
-        SDB2[(Database 2 Replica)]
-        SDB3[(Your New Database Replica)]
+    PS --> PDB
+    SS --> SDB
 
-        SS --- SDB1
-        SS --- SDB2
-        SS --- SDB3
-    end
-
-    %% Application connections
-    APP1 -->|Normal Operations| RW
-    APP2 -->|Read Queries| RO
-
-    %% Listener routing
-    RW -.->|Active Connection| PS
-    RW -.->|Auto Failover on Outage| SS
-    RO -->|Always Routes to| SS
-
-    %% Geo-Replication
-    PDB1 ==>|Async Geo-Replication| SDB1
-    PDB2 ==>|Async Geo-Replication| SDB2
-    PDB3 ==>|Async Geo-Replication| SDB3
+    PDB -.->|Geo-Replication| SDB
 
     %% Styling
-    style RW fill:#90EE90,stroke:#2d8659,stroke-width:3px
-    style RO fill:#87CEEB,stroke:#4682b4,stroke-width:3px
+    style APP fill:#f5f5f5,stroke:#666,stroke-width:2px
+    style RW fill:#90EE90,stroke:#2d8659,stroke-width:2px
+    style RO fill:#87CEEB,stroke:#4682b4,stroke-width:2px
     style PS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
     style SS fill:#0078D4,stroke:#005a9e,stroke-width:2px,color:#fff
-    style PDB3 fill:#FFD700,stroke:#DAA520,stroke-width:3px
-    style SDB3 fill:#FFD700,stroke:#DAA520,stroke-width:3px
-    style APP1 fill:#f5f5f5,stroke:#666,stroke-width:2px
-    style APP2 fill:#f5f5f5,stroke:#666,stroke-width:2px
+    style PDB fill:#FFD700,stroke:#DAA520,stroke-width:2px
+    style SDB fill:#FFD700,stroke:#DAA520,stroke-width:2px
 ```
 
 #### Replication Process
