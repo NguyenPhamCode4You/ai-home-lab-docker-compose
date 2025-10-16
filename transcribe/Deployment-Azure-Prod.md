@@ -916,21 +916,35 @@ If your application auto-applies migrations:
 ```mermaid
 sequenceDiagram
     participant Admin
+    participant Storage as Azure Blob Storage
     participant Backup as Backup File (.bacpac)
     participant Primary as Primary SQL Server
     participant App as Application
 
-    Admin->>Primary: Connect (Direct)
-    Admin->>Backup: Locate .bacpac File
-    Admin->>Primary: Import Database
+    Admin->>Storage: Access Storage Account
+    Storage->>Backup: Locate .bacpac File
+    Backup-->>Admin: .bacpac Downloaded
+
+    Admin->>Primary: Connect (Direct Endpoint)
+    Primary-->>Admin: Connection Established
+
+    Admin->>Primary: Initiate Import Operation
+
+    Primary->>Primary: Create Database
     Primary->>Primary: Restore Schema
-    Primary->>Primary: Import Data
-    Primary-->>Admin: Import Complete
+    Primary->>Primary: Import Data & Indexes
+    Primary-->>Admin: Import Complete ✅
+
+    Note over Admin,Primary: Database ready, now apply migrations
+
     Admin->>App: Trigger EF Migrations
-    App->>Primary: Apply Migrations
+    App->>Primary: Connect to Database
+    Primary-->>App: Connection Established
+    App->>Primary: Apply Schema Migrations
     Primary->>Primary: Update Schema
-    Primary-->>App: Migrations Applied
-    App-->>Admin: Database Ready
+    Primary->>Primary: Apply Data Migrations
+    Primary-->>App: Migrations Applied ✅
+    App-->>Admin: Database Ready for Use
 ```
 
 #### Connection Comparison
@@ -1183,29 +1197,6 @@ These settings must be applied after databases are added to failover groups beca
 | **Blocks**                      | Blocking queries            | Log Analytics |
 | **Deadlocks**                   | Deadlock information        | Log Analytics |
 
-#### Terraform Flow for Diagnostic Settings
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Pipeline as Terraform Pipeline
-    participant TF as Terraform
-    participant Azure
-
-    User->>Pipeline: Run Pipeline (Step 13)
-    Pipeline->>TF: Terraform Plan
-    TF->>Azure: Check Existing Resources
-    Azure-->>TF: Resources Exist
-    TF->>TF: Detect Diagnostic Settings Needed
-    TF->>User: Show Plan (Add Diagnostics)
-    Pipeline->>TF: Terraform Apply
-    TF->>Azure: Create Diagnostic Settings (Primary DB)
-    TF->>Azure: Create Diagnostic Settings (Secondary DB)
-    Azure-->>TF: Diagnostic Settings Created
-    TF->>Pipeline: Update Complete
-    Pipeline->>User: Success
-```
-
 #### Verification
 
 Check that diagnostic settings are active:
@@ -1232,142 +1223,6 @@ If Terraform step is not available or doesn't work:
 2. **For Secondary Database**
    - Repeat the same process
    - Use same Log Analytics workspace or region-specific workspace
-
----
-
-## Deployment Completion Checklist
-
-Use this checklist to verify successful deployment:
-
-### Azure Resources
-
-- [ ] Resource group created and accessible
-- [ ] Managed Identity created with appropriate permissions
-- [ ] Service connection configured in Azure DevOps
-- [ ] All infrastructure deployed via Terraform
-- [ ] App Services running and healthy
-- [ ] Private endpoints approved and connected
-- [ ] SQL Databases created in both regions
-- [ ] Failover group configured and synchronized
-- [ ] Diagnostic settings enabled on databases
-
-### Azure DevOps
-
-- [ ] Environment created and secured
-- [ ] Variable groups created for all regions
-- [ ] Database connection strings use failover group endpoints
-- [ ] Backend deployment pipeline executed successfully
-- [ ] All pipelines have necessary permissions
-
-### Database
-
-- [ ] Database imported from backup
-- [ ] Entity Framework migrations applied
-- [ ] Database added to failover group
-- [ ] Replication status: Synchronized
-- [ ] Secondary database accessible
-
-### Application
-
-- [ ] Backend application deployed and running
-- [ ] Health endpoint returning 200 OK
-- [ ] Application can connect to database
-- [ ] Application logs show no errors
-- [ ] Environment variables configured correctly
-
-### Testing
-
-- [ ] Application accessible via URL
-- [ ] Database read/write operations work
-- [ ] Authentication/authorization functional
-- [ ] API endpoints responding correctly
-- [ ] Monitoring and logging active
-
----
-
-## Deployment Timeline Summary
-
-| Step | Task                            | Duration  | Can Parallelize |
-| ---- | ------------------------------- | --------- | --------------- |
-| 1    | Create Resource Group           | 2 min     | ✅              |
-| 2    | Create Environment              | 1 min     | ✅              |
-| 3    | Create Managed Identity         | 3 min     | ✅              |
-| 4    | Assign Contributor Rights       | 2 min     | ❌              |
-| 5    | Assign Terraform Permissions    | 3 min     | ❌              |
-| 6    | Create Service Connection       | 2 min     | ❌              |
-| 7    | Run Terraform Pipeline          | 10-15 min | ❌              |
-| 8    | Approve Private Endpoints       | 5 min     | ✅              |
-| 9    | Configure Variable Groups       | 10-15 min | ✅              |
-| 10   | Deploy Backend Services         | 5-10 min  | ❌              |
-| 11   | Import Database & Migrations    | 10-20 min | ❌              |
-| 12   | Add to Failover Group           | 10-30 min | ❌              |
-| 13   | Rerun Terraform for Diagnostics | 5 min     | ❌              |
-
-**Total Estimated Time**: 68-113 minutes (~1-2 hours)
-
-_Note: Actual time varies based on database size, network speed, and resource complexity._
-
----
-
-## Troubleshooting
-
-### Common Issues and Solutions
-
-#### Permission Errors
-
-**Symptom**: "Access denied" or "Insufficient permissions"
-
-**Solutions**:
-
-- Verify you have Owner role on resource group
-- Check Managed Identity has correct role assignments
-- Ensure service connection is using correct identity
-- Review Azure DevOps pipeline permissions
-
-#### Terraform Failures
-
-**Symptom**: Terraform apply fails with resource conflicts
-
-**Solutions**:
-
-- Check if resources with same name already exist
-- Verify Terraform backend state is accessible
-- Ensure no other pipeline is running simultaneously
-- Review Terraform state lock
-
-#### Database Connection Issues
-
-**Symptom**: Application cannot connect to database
-
-**Solutions**:
-
-- Verify using failover group endpoint (not direct server)
-- Check SQL firewall rules allow App Service
-- Verify connection string in variable group
-- Ensure database is in failover group
-- Test connection from App Service console
-
-#### Private Endpoint Not Connecting
-
-**Symptom**: Private endpoint remains pending or failed
-
-**Solutions**:
-
-- Approve the connection manually in Azure Portal
-- Check virtual network configuration
-- Verify subnet has correct delegations
-- Ensure no network security group blocking traffic
-
-#### Replication Not Synchronizing
-
-**Symptom**: Secondary database stuck in "Seeding" or "Not synchronized"
-
-**Solutions**:
-
-- Check network connectivity between regions
-- Verify sufficient DTU/vCore on both databases
-- Monitor replication lag in Azure Portal
-- Check for long-running transactions on primary
 
 ---
 
