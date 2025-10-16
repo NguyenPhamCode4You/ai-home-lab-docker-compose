@@ -544,11 +544,6 @@ graph TB
 
 ### **Step 9: Create and Configure Variable Groups**
 
-**Duration**: ~10-15 minutes  
-**Video Reference**: [00:00 - 06:16]
-
-#### Purpose
-
 Create variable groups in Azure DevOps to store environment-specific configuration values, including database connection strings, endpoints, and application settings.
 
 #### Overview
@@ -654,37 +649,13 @@ For multi-region deployments:
 3. Update description if needed
 4. Click "**Save**"
 
-#### Variable Group Structure
-
-```mermaid
-graph TD
-    A[Variable Groups] --> B[dev-region1-variables]
-    A --> C[dev-region2-variables]
-    A --> D[test-region1-variables]
-    A --> E[prod-region1-variables]
-    A --> F[prod-region2-variables]
-
-    B --> G[Database Connections]
-    B --> H[App Service Configs]
-    B --> I[Key Vault URLs]
-    B --> J[Storage Accounts]
-
-    style A fill:#0078D4
-    style B fill:#90EE90
-    style C fill:#90EE90
-    style D fill:#FFE4B5
-    style E fill:#FFB6C1
-    style F fill:#FFB6C1
-```
-
 #### Best Practices
 
 ✅ **DO:**
 
-- Use Failover Group endpoints for database connections
+- Use listener endpoint for database connections
 - Mark sensitive values as "Secret"
 - Use consistent naming conventions
-- Document variable purposes in descriptions
 - Test connection strings before saving
 
 ❌ **DON'T:**
@@ -701,11 +672,6 @@ graph TD
 ---
 
 ### **Step 10: Deploy Backend Services**
-
-**Duration**: ~5-10 minutes  
-**Video Reference**: [00:00 - 01:52]
-
-#### Purpose
 
 Deploy the backend application code to Azure App Services using the Azure DevOps deployment pipeline.
 
@@ -752,44 +718,58 @@ Deploy the backend application code to Azure App Services using the Azure DevOps
    - Check pipeline completion status: ✅ Succeeded
    - Note the deployed version/build number
 
-#### Pipeline Stages Overview
-
-```mermaid
-graph LR
-    A[Source Code] --> B[Build]
-    B --> C[Unit Tests]
-    C --> D[Package]
-    D --> E[Deploy to App Service]
-    E --> F[Health Check]
-    F --> G[Smoke Tests]
-
-    style A fill:#ADD8E6
-    style B fill:#FFE4B5
-    style C fill:#FFE4B5
-    style E fill:#90EE90
-    style G fill:#90EE90
-```
-
 #### Deployment Flow
 
 ```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant ADO as Azure DevOps
-    participant Build as Build Agent
-    participant AppSvc as App Service
-    participant VG as Variable Group
+graph TB
+    Start([Pipeline Start<br/>build-and-deploy-backend.yml]) --> TestParam{testSuit<br/>Parameter}
 
-    Dev->>ADO: Trigger Pipeline
-    ADO->>Build: Start Build Job
-    Build->>Build: Compile Code
-    Build->>Build: Run Tests
-    Build->>Build: Create Artifact
-    ADO->>VG: Load Variables
-    ADO->>AppSvc: Deploy Artifact
-    AppSvc->>AppSvc: Start Application
-    AppSvc-->>ADO: Deployment Status
-    ADO-->>Dev: Success Notification
+    %% Test Stage
+    TestParam -->|All/UnitTests| UnitTests[<b>Stage: UnitTests</b><br/>Infrastructure + Business]
+    TestParam -->|All/IntegrationTests| IntegTests[<b>Stage: IntegrationTests</b><br/>Business Integration]
+    TestParam -->|None| BuildStage
+
+    UnitTests --> BuildStage
+    IntegTests --> BuildStage
+
+    %% Build Stage
+    BuildStage[<b>Stage: Build & Publish</b>] --> ServiceParam{serviceName<br/>Parameter}
+
+    ServiceParam -->|All/MasterData| BuildMD[Build MasterData<br/>dotnet publish → artifact]
+    ServiceParam -->|All/OrderRequest| BuildOR[Build OrderRequest<br/>dotnet publish → artifact]
+
+    BuildMD --> DeployStage
+    BuildOR --> DeployStage
+
+    %% Deploy Stage
+    DeployStage[<b>Stage: Deploy</b>] --> Region1[<b>Job: Region1</b><br/>Load region1 variables]
+    DeployStage --> Region2[<b>Job: Region2</b><br/>Load region2 variables]
+
+    %% Region 1
+    Region1 --> R1Service{Deploy<br/>Service}
+    R1Service -->|MasterData| R1MD[Download artifact<br/>Prepare appsettings<br/>Deploy to Azure App Service]
+    R1Service -->|OrderRequest| R1OR[Download artifact<br/>Prepare appsettings<br/>Deploy to Azure App Service]
+
+    %% Region 2
+    Region2 --> R2Service{Deploy<br/>Service}
+    R2Service -->|MasterData| R2MD[Download artifact<br/>Prepare appsettings<br/>Deploy to Azure App Service]
+    R2Service -->|OrderRequest| R2OR[Download artifact<br/>Prepare appsettings<br/>Deploy to Azure App Service]
+
+    R1MD --> End([Pipeline Complete])
+    R1OR --> End
+    R2MD --> End
+    R2OR --> End
+
+    %% Styling
+    classDef stageClass fill:#4a90e2,stroke:#2e5c8a,stroke-width:3px,color:#fff
+    classDef jobClass fill:#f5a623,stroke:#d68910,stroke-width:2px,color:#000
+    classDef actionClass fill:#7ed321,stroke:#5fa319,stroke-width:2px,color:#000
+    classDef decisionClass fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+
+    class UnitTests,IntegTests,BuildStage,DeployStage stageClass
+    class Region1,Region2 jobClass
+    class BuildMD,BuildOR,R1MD,R1OR,R2MD,R2OR actionClass
+    class TestParam,ServiceParam,R1Service,R2Service decisionClass
 ```
 
 #### What Gets Deployed
