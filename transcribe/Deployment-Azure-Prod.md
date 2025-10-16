@@ -455,10 +455,6 @@ sequenceDiagram
 
 ### **Step 8: Approve Private Endpoint Connections**
 
-**Duration**: ~5 minutes per App Service
-
-#### Purpose
-
 Approve private endpoint connections to establish secure private networking between App Services and other Azure resources.
 
 #### Background
@@ -535,13 +531,9 @@ graph TB
     B -.->|Private Connection| D
     B -.->|Private Connection| E
 
-    C -->|Approved| F
-    D -->|Approved| G
-    E -->|Approved| H
-
-    style C fill:#90EE90
-    style D fill:#90EE90
-    style E fill:#90EE90
+    C -->|Manual Approval| F
+    D -->|Auto Approved| G
+    E -->|Auto Approved| H
 ```
 
 #### Reference Documentation
