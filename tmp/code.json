@@ -1,0 +1,170 @@
+{
+  "id": 2959,
+  "iid": 1171,
+  "project_id": 30,
+  "title": "feat: implement thread-safe pipeline behavior for MediatR requests",
+  "description": "### 1. Story\nWhen I write integration tests, which try to create many estimates at the same time. I found a bug. For example:\n- I trying to create 5 estimates at the same time\n- My expect: 5 estimate created and show normally in UI\n- Actual: there is only 1 estimate. (But in database we could see 5 estimates have the same `estimateCode` and `versionNumber` is **1**)\n\n![image](/uploads/da8584a1f318f4049fdc35ba51305e13/image.png)\n\n### 2. Why?\nI found the problem is `EstimateCode` and `EstimateName` are generated from other information in database (estimate count, ...).\n\n![image](/uploads/d2f50b9adefad239c1ce6f2f47aab541/image.png)\n\nBut it didn't handle any thread-safe here. So we got race-condition.\n\n### 3. Solution\nI solved this problem by lock other threads, to make sure just only one thread can run this function at the moment.\nC# provide lock statement (Monitor), Semaphore, ... to handle this. I prefer to use Semaphore here, cause we are in asynchronous context.\nI want to implement this to other MediatR functions (optional), so I add PipelineBehavior to MediatR.\n\n### 4. How to use it?\nIf you want to add thread-safe for a MediatR task, your MediatR request must implement IHasConcurrentKey and provide the key in there. Then before MediatR task run, it should wait for the key to be released (Mean there is no same task running).\n\n\n### 5. Evindence\n\nScenario:\nThese LOC used to create 5 estimates parallel:\n\n![image](/uploads/e93dc781eaa27d28d430e98efa44ec32/image.png)\n\nBefore fix: It has only one row on UI, but has 5 rows in database.\n\n![image](/uploads/bb781a27b4b57a69fd7cc4c1029c6e8b/image.png)\n![image](/uploads/b60d56a2542fd1fd76555abbde4266f0/image.png)\n\nAfter fix: It barely work!\n\n![image](/uploads/0721cec8f853f60b8c64cb264af08dbd/image.png)\n![image](/uploads/3b9272b165962b071ef55cfeb87f003b/image.png)",
+  "state": "opened",
+  "created_at": "2025-10-16T15:43:57.807Z",
+  "updated_at": "2025-10-16T15:43:57.807Z",
+  "merged_by": null,
+  "merge_user": null,
+  "merged_at": null,
+  "closed_by": null,
+  "closed_at": null,
+  "target_branch": "dev",
+  "source_branch": "fix/add-thread-safe-to-create-estimate",
+  "user_notes_count": 0,
+  "upvotes": 0,
+  "downvotes": 0,
+  "author": {
+    "id": 38,
+    "username": "quang.trieu",
+    "name": "quang.trieu",
+    "state": "active",
+    "avatar_url": "https://secure.gravatar.com/avatar/18520abfe709b373bb8e0ec270f48ff2?s=80&d=identicon",
+    "web_url": "https://git.code4you.com/quang.trieu"
+  },
+  "assignees": [
+    {
+      "id": 38,
+      "username": "quang.trieu",
+      "name": "quang.trieu",
+      "state": "active",
+      "avatar_url": "https://secure.gravatar.com/avatar/18520abfe709b373bb8e0ec270f48ff2?s=80&d=identicon",
+      "web_url": "https://git.code4you.com/quang.trieu"
+    }
+  ],
+  "assignee": {
+    "id": 38,
+    "username": "quang.trieu",
+    "name": "quang.trieu",
+    "state": "active",
+    "avatar_url": "https://secure.gravatar.com/avatar/18520abfe709b373bb8e0ec270f48ff2?s=80&d=identicon",
+    "web_url": "https://git.code4you.com/quang.trieu"
+  },
+  "reviewers": [
+    {
+      "id": 21,
+      "username": "nguyen.pham",
+      "name": "nguyen.pham",
+      "state": "active",
+      "avatar_url": "https://secure.gravatar.com/avatar/f572b221a3b7ef87c345afb1b1512557?s=80&d=identicon",
+      "web_url": "https://git.code4you.com/nguyen.pham"
+    }
+  ],
+  "source_project_id": 30,
+  "target_project_id": 30,
+  "labels": [],
+  "draft": false,
+  "work_in_progress": false,
+  "milestone": null,
+  "merge_when_pipeline_succeeds": false,
+  "merge_status": "can_be_merged",
+  "detailed_merge_status": "mergeable",
+  "sha": "538d340d78b948dc902ade567d6f0db547cca9e4",
+  "merge_commit_sha": null,
+  "squash_commit_sha": null,
+  "discussion_locked": null,
+  "should_remove_source_branch": null,
+  "force_remove_source_branch": true,
+  "reference": "!1171",
+  "references": {
+    "short": "!1171",
+    "relative": "!1171",
+    "full": "bbc-bvms/bbc-bvms-net-back-end-modular!1171"
+  },
+  "web_url": "https://git.code4you.com/bbc-bvms/bbc-bvms-net-back-end-modular/-/merge_requests/1171",
+  "time_stats": {
+    "time_estimate": 0,
+    "total_time_spent": 0,
+    "human_time_estimate": null,
+    "human_total_time_spent": null
+  },
+  "squash": false,
+  "task_completion_status": {
+    "count": 0,
+    "completed_count": 0
+  },
+  "has_conflicts": false,
+  "blocking_discussions_resolved": true,
+  "subscribed": true,
+  "changes_count": "6",
+  "latest_build_started_at": null,
+  "latest_build_finished_at": null,
+  "first_deployed_to_production_at": null,
+  "pipeline": null,
+  "head_pipeline": null,
+  "diff_refs": {
+    "base_sha": "7edb6cda7f9cc7a30dd3124ba0daed050d972bcd",
+    "head_sha": "538d340d78b948dc902ade567d6f0db547cca9e4",
+    "start_sha": "64a2cc51dcb080d1eef354a8bfdeaee5b9e08dc7"
+  },
+  "merge_error": null,
+  "user": {
+    "can_merge": true
+  },
+  "changes": [
+    {
+      "diff": "@@ -0,0 +1,9 @@\n+namespace Business.Common.ThreadSafeMediator;\n+\n+public static class AppConcurrentKeys\n+{\n+    public static string CreateEstimate()\n+    {\n+        return nameof(CreateEstimate);\n+    }\n+}\n\\ No newline at end of file\n",
+      "new_path": "Core/Business/Common/ThreadSafeMediator/AppConcurrentKeys.cs",
+      "old_path": "Core/Business/Common/ThreadSafeMediator/AppConcurrentKeys.cs",
+      "a_mode": "0",
+      "b_mode": "100644",
+      "new_file": true,
+      "renamed_file": false,
+      "deleted_file": false
+    },
+    {
+      "diff": "@@ -0,0 +1,39 @@\n+using System.Collections.Concurrent;\n+using MediatR;\n+\n+namespace Business.Common.ThreadSafeMediator;\n+\n+public class ConcurrentPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>\n+    where TRequest : notnull\n+{\n+    // ReSharper disable once StaticMemberInGenericType\n+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> KeyToLocker = [];\n+\n+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)\n+    {\n+        if (request is IHasConcurrentKey { ConcurrentKey: { Length: > 0, } key, })\n+        {\n+            var locker = KeyToLocker.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));\n+\n+            await locker.WaitAsync(cancellationToken);\n+\n+            try\n+            {\n+                return await next();\n+            }\n+            finally\n+            {\n+                locker.Release();\n+\n+                // Clean up unused semaphores if nobody waiting\n+                if (locker.CurrentCount == 1)\n+                {\n+                    KeyToLocker.TryRemove(key, out var removedSemaphore);\n+                    removedSemaphore?.Dispose();\n+                }\n+            }\n+        }\n+\n+        return await next();\n+    }\n+}\n\\ No newline at end of file\n",
+      "new_path": "Core/Business/Common/ThreadSafeMediator/ConcurrentPipelineBehavior.cs",
+      "old_path": "Core/Business/Common/ThreadSafeMediator/ConcurrentPipelineBehavior.cs",
+      "a_mode": "0",
+      "b_mode": "100644",
+      "new_file": true,
+      "renamed_file": false,
+      "deleted_file": false
+    },
+    {
+      "diff": "@@ -0,0 +1,6 @@\n+namespace Business.Common.ThreadSafeMediator;\n+\n+public interface IHasConcurrentKey\n+{\n+    public string ConcurrentKey { get; }\n+}\n\\ No newline at end of file\n",
+      "new_path": "Core/Business/Common/ThreadSafeMediator/IHasConcurrentKey.cs",
+      "old_path": "Core/Business/Common/ThreadSafeMediator/IHasConcurrentKey.cs",
+      "a_mode": "0",
+      "b_mode": "100644",
+      "new_file": true,
+      "renamed_file": false,
+      "deleted_file": false
+    },
+    {
+      "diff": "@@ -0,0 +1,11 @@\n+using Microsoft.Extensions.DependencyInjection;\n+\n+namespace Business.Common.ThreadSafeMediator;\n+\n+public static class ThreadSafeMediatorInstaller\n+{\n+    public static MediatRServiceConfiguration AddThreadSafePipelineBehavior(this MediatRServiceConfiguration configuration)\n+    {\n+        return configuration.AddOpenBehavior(typeof(ConcurrentPipelineBehavior<,>));\n+    }\n+}\n\\ No newline at end of file\n",
+      "new_path": "Core/Business/Common/ThreadSafeMediator/Installer.cs",
+      "old_path": "Core/Business/Common/ThreadSafeMediator/Installer.cs",
+      "a_mode": "0",
+      "b_mode": "100644",
+      "new_file": true,
+      "renamed_file": false,
+      "deleted_file": false
+    },
+    {
+      "diff": "@@ -1,4 +1,5 @@\n using AutoMapper;\n+using Business.Common.ThreadSafeMediator;\n using Core.Business.TaskAlert.RuleEvaluation;\n using Core.Domain.Commons;\n using Core.Domain.Constants;\n@@ -13,12 +14,13 @@ namespace Core.Business\n {\n     public class CreateVoyageEstimate\n     {\n-        public class Request : IRequest<EstimateCrudDto>\n+        public class Request : IRequest<EstimateCrudDto>, IHasConcurrentKey\n         {\n             public required EstimateCrudDto ParamBody { get; set; }\n             public bool IsDuplicate { get; set; } = false;\n             public string? CreatedById { get; set; }\n             public string? OfficeId { get; set; }\n+            public string ConcurrentKey => AppConcurrentKeys.CreateEstimate();\n         }\n \n         public class Response : IRequestHandler<Request, EstimateCrudDto>\n",
+      "new_path": "Core/Business/VoyageManagement/Estimate/CreateVoyageEstimate.cs",
+      "old_path": "Core/Business/VoyageManagement/Estimate/CreateVoyageEstimate.cs",
+      "a_mode": "100644",
+      "b_mode": "100644",
+      "new_file": false,
+      "renamed_file": false,
+      "deleted_file": false
+    },
+    {
+      "diff": "@@ -1,3 +1,4 @@\n+using Business.Common.ThreadSafeMediator;\n using Core.Domain.VoyageManagement.Dtos;\n using Core.Domain.VoyageManagement.Entities;\n using MediatR;\n@@ -16,7 +17,11 @@ namespace Core.Business\n         public static void Configure(IServiceCollection services)\n         {\n             // Apply MediaR Scanning to find all assemblies Requests and Responses\n-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Setup).Assembly));\n+            services.AddMediatR(cfg =>\n+            {\n+                cfg.RegisterServicesFromAssembly(typeof(Setup).Assembly);\n+                cfg.AddThreadSafePipelineBehavior();\n+            });\n             services.AddValidatorsFromAssembly(typeof(Setup).Assembly);\n \n             services.AddTransient<IPipelineBehavior<UpdateShipmentById.Request, ShipmentDto>,\n",
+      "new_path": "Core/Business/Setup.cs",
+      "old_path": "Core/Business/Setup.cs",
+      "a_mode": "100644",
+      "b_mode": "100644",
+      "new_file": false,
+      "renamed_file": false,
+      "deleted_file": false
+    }
+  ],
+  "overflow": false
+}
