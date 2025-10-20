@@ -16,80 +16,891 @@
 
 The CLR type system is the foundation of .NET. Every type in C# derives from `System.Object`.
 
+```mermaid
+graph TD
+    A[System.Object] --> B[Value Types]
+    A --> C[Reference Types]
+    B --> D[Built-in: int, bool, double]
+    B --> E[Structs]
+    B --> F[Enums]
+    C --> G[Classes]
+    C --> H[Interfaces]
+    C --> I[Delegates]
+    C --> J[Arrays]
+```
+
+**Simple Explanation:** Think of the type system as a family tree where `System.Object` is the great-grandparent of all types in C#.
+
 ```csharp
-// Everything is an object
+// Everything is an object - even simple numbers!
 int number = 42;
 object obj = number; // Valid - int derives from object
 Console.WriteLine(obj.GetType()); // System.Int32
+
+// This works for ANY type
+string text = "Hello";
+bool flag = true;
+DateTime date = DateTime.Now;
+
+// They all have methods from System.Object
+Console.WriteLine(number.ToString());
+Console.WriteLine(text.GetHashCode());
+Console.WriteLine(flag.Equals(true));
 ```
 
 ### Type Categories
 
-1. **Value Types** - Stored on stack (usually), contain actual data
-2. **Reference Types** - Stored on heap, contain references to data
+```mermaid
+graph LR
+    A[C# Types] --> B[Value Types]
+    A --> C[Reference Types]
+    B --> D[Stored on Stack<br/>Contains actual data<br/>Copied by value]
+    C --> E[Stored on Heap<br/>Contains reference/pointer<br/>Copied by reference]
+```
+
+**Key Difference:**
+
+- **Value Types** - Like a **photocopy** of a document (you get the actual content)
+- **Reference Types** - Like a **bookmark** to a document (you get the location, not the content)
 
 ---
 
 ## 2. Value Types Deep Dive
 
+### What is a Value Type?
+
+**Simple Analogy:** A value type is like having **cash in your wallet**. When you give someone $10, you give them the actual money, not a note saying where the money is.
+
+### Memory Layout Diagram
+
+```mermaid
+graph TB
+    subgraph Stack
+        A[int x = 10]
+        B[int y = x]
+        C[bool flag = true]
+    end
+
+    style A fill:#90EE90
+    style B fill:#90EE90
+    style C fill:#90EE90
+```
+
 ### Characteristics
 
-- Stored on stack (when local variables) or inline in objects
-- Contains actual data
-- Derived from `System.ValueType`
-- Cannot be null (unless Nullable<T>)
-- Passed by value (copy) by default
+- ✅ Stored on stack (when local variables) or inline in objects
+- ✅ Contains **actual data** (not a pointer)
+- ✅ Derived from `System.ValueType`
+- ✅ Cannot be null (unless `Nullable<T>` or `T?`)
+- ✅ Passed by value (copied) by default
+- ✅ No inheritance (structs are sealed)
 
 ### Built-in Value Types
 
 ```csharp
-// Integral types
-byte b = 255;           // 8-bit unsigned
-sbyte sb = -128;        // 8-bit signed
+// 🔰 BEGINNER: Basic value types
+byte b = 255;           // 8-bit unsigned (0 to 255)
+sbyte sb = -128;        // 8-bit signed (-128 to 127)
 short s = 32767;        // 16-bit signed
 ushort us = 65535;      // 16-bit unsigned
-int i = 2147483647;     // 32-bit signed
+int i = 2147483647;     // 32-bit signed (most common)
 uint ui = 4294967295;   // 32-bit unsigned
-long l = 9223372036854775807;  // 64-bit signed
+long l = 9223372036854775807;   // 64-bit signed
 ulong ul = 18446744073709551615; // 64-bit unsigned
 
-// Floating point
-float f = 3.14f;        // 32-bit
-double d = 3.14159;     // 64-bit
-decimal dec = 3.14159m; // 128-bit (financial calculations)
+float f = 3.14f;        // 32-bit floating point
+double d = 3.14159;     // 64-bit floating point (default for decimals)
+decimal m = 3.14159M;   // 128-bit precise decimal (for money!)
 
-// Other
-bool flag = true;       // Boolean
-char c = 'A';          // Unicode character
-DateTime dt = DateTime.Now; // Struct!
-Guid guid = Guid.NewGuid(); // Struct!
+char c = 'A';           // 16-bit Unicode character
+bool flag = true;       // 8-bit true/false
+
+// 🎯 INTERMEDIATE: Why does the type matter?
+int small = 100;
+long big = small;       // ✅ Implicit conversion (safe - no data loss)
+
+long bigNumber = 1000000000;
+int smallNumber = (int)bigNumber; // ⚠️ Explicit cast (might lose data)
+
+// 💰 IMPORTANT: Use decimal for money!
+decimal price = 19.99M;  // ✅ Accurate for financial calculations
+double wrongPrice = 19.99; // ❌ Might have rounding errors!
+
+Console.WriteLine(price);      // 19.99
+Console.WriteLine(wrongPrice); // 19.990000000000002 (floating point error)
+```
+
+### Value Type Behavior - Copy by Value
+
+```mermaid
+sequenceDiagram
+    participant Original as int x = 10
+    participant Copy as int y = x
+
+    Note over Original: x contains 10
+    Original->>Copy: Copy value (10)
+    Note over Copy: y now contains 10
+    Note over Copy: y = 20
+    Note over Original: x still contains 10
+    Note over Copy: y now contains 20
+```
+
+```csharp
+// 🔰 BEGINNER: Understanding "copy by value"
+int x = 10;
+int y = x;      // y gets a COPY of x's value
+
+y = 20;         // Changing y doesn't affect x
+
+Console.WriteLine($"x = {x}"); // x = 10 (unchanged!)
+Console.WriteLine($"y = {y}"); // y = 20
+
+// 🎯 INTERMEDIATE: This works with structs too
+DateTime date1 = new DateTime(2025, 1, 1);
+DateTime date2 = date1;  // date2 gets a COPY
+
+date2 = date2.AddDays(10); // Changing date2
+
+Console.WriteLine(date1); // 2025-01-01 (unchanged!)
+Console.WriteLine(date2); // 2025-01-11
 ```
 
 ### Custom Value Types (Structs)
 
 ```csharp
+// 🔰 BEGINNER: Simple struct
 public struct Point
 {
-    public int X { get; set; }
-    public int Y { get; set; }
+    public int X;
+    public int Y;
 
     public Point(int x, int y)
     {
         X = x;
         Y = y;
     }
-
-    public double DistanceFromOrigin()
-    {
-        return Math.Sqrt(X * X + Y * Y);
-    }
 }
 
 // Usage
-Point p1 = new Point(3, 4);
-Point p2 = p1; // Creates a COPY
-p2.X = 10;
-Console.WriteLine($"p1.X: {p1.X}, p2.X: {p2.X}"); // p1.X: 3, p2.X: 10
+Point p1 = new Point(10, 20);
+Point p2 = p1;  // COPY of p1
+
+p2.X = 99;      // Change p2
+
+Console.WriteLine($"p1.X = {p1.X}"); // 10 (unchanged!)
+Console.WriteLine($"p2.X = {p2.X}"); // 99
+
+// 🎯 INTERMEDIATE: Readonly struct (immutable, more efficient)
+public readonly struct Money
+{
+    public decimal Amount { get; }
+    public string Currency { get; }
+
+    public Money(decimal amount, string currency)
+    {
+        Amount = amount;
+        Currency = currency;
+    }
+
+    // Methods can return new instances
+    public Money Add(Money other)
+    {
+        if (Currency != other.Currency)
+            throw new InvalidOperationException("Currency mismatch");
+
+        return new Money(Amount + other.Amount, Currency);
+    }
+}
+
+// 🚀 ADVANCED: Ref struct (stack-only, high performance)
+public ref struct StackOnlyBuffer
+{
+    private Span<byte> buffer;
+
+    public StackOnlyBuffer(Span<byte> data)
+    {
+        buffer = data;
+    }
+
+    // Can NEVER be boxed or stored on heap
+    // Can't be used as field in regular class
+    // Perfect for high-performance scenarios
+}
+```
+
+---
+
+## 3. Reference Types Deep Dive
+
+### What is a Reference Type?
+
+**Simple Analogy:** A reference type is like a **house address**. When you give someone your address, you're not giving them the house - you're giving them directions to the same house. Multiple people can have the same address and all refer to the same house.
+
+### Memory Layout Diagram
+
+```mermaid
+graph TB
+    subgraph Stack
+        A[ref1<br/>0x1234]
+        B[ref2<br/>0x1234]
+    end
+
+    subgraph Heap
+        C[Person Object<br/>at 0x1234<br/>Name: John<br/>Age: 30]
+    end
+
+    A -.-> C
+    B -.-> C
+
+    style A fill:#FFB6C1
+    style B fill:#FFB6C1
+    style C fill:#87CEEB
+```
+
+### Characteristics
+
+- ✅ Stored on **heap**
+- ✅ Variable contains a **reference** (memory address) to the data
+- ✅ Can be **null**
+- ✅ Supports **inheritance**
+- ✅ Passed by reference (multiple variables can point to same object)
+- ✅ Requires garbage collection
+
+### Built-in Reference Types
+
+```csharp
+// 🔰 BEGINNER: Common reference types
+string text = "Hello";      // String
+object obj = new object();  // Base object
+int[] numbers = new int[5]; // Array
+List<int> list = new();     // Collection
+
+// 🎯 INTERMEDIATE: Reference behavior
+string[] names1 = { "Alice", "Bob" };
+string[] names2 = names1;  // names2 points to SAME array
+
+names2[0] = "Charlie";     // Modify through names2
+
+Console.WriteLine(names1[0]); // "Charlie" (same object!)
+Console.WriteLine(names2[0]); // "Charlie"
+```
+
+### Reference Type Behavior Diagram
+
+```mermaid
+sequenceDiagram
+    participant Var1 as Person p1
+    participant Heap as Heap Memory
+    participant Var2 as Person p2
+
+    Note over Var1: p1 = new Person()
+    Var1->>Heap: Create object at 0x1000
+    Note over Heap: {Name: "John", Age: 30}
+
+    Note over Var2: p2 = p1
+    Var1->>Var2: Copy reference (0x1000)
+
+    Note over Var2: p2.Age = 31
+    Var2->>Heap: Modify object at 0x1000
+    Note over Heap: {Name: "John", Age: 31}
+
+    Note over Var1,Var2: Both p1 and p2 see Age = 31!
+```
+
+### Custom Reference Types (Classes)
+
+```csharp
+// 🔰 BEGINNER: Simple class
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}
+
+// Usage - demonstrates reference behavior
+Person person1 = new Person("John", 30);
+Person person2 = person1;  // Both point to SAME object
+
+person2.Age = 31;  // Modify through person2
+
+Console.WriteLine(person1.Age); // 31 (same object!)
+Console.WriteLine(person2.Age); // 31
+
+// 🎯 INTERMEDIATE: Null reference
+Person person3 = null;  // Reference to nothing
+// person3.Name;  // ❌ NullReferenceException!
+
+if (person3 != null)  // Always check!
+{
+    Console.WriteLine(person3.Name);
+}
+
+// Or use null-conditional operator
+Console.WriteLine(person3?.Name); // null (no exception)
+
+// 🚀 ADVANCED: Inheritance (only reference types)
+public class Employee : Person
+{
+    public string Department { get; set; }
+
+    public Employee(string name, int age, string department)
+        : base(name, age)
+    {
+        Department = department;
+    }
+}
+
+Employee emp = new Employee("Alice", 25, "IT");
+Person p = emp;  // ✅ Polymorphism - Employee IS A Person
+```
+
+---
+
+## 4. Value vs Reference: Side-by-Side Comparison
+
+```mermaid
+graph TD
+    subgraph "Value Type Example"
+        A1[int x = 10]
+        A2[int y = x]
+        A3[y = 20]
+        A1 -.-> A4[x = 10]
+        A2 -.-> A5[y = 20]
+    end
+
+    subgraph "Reference Type Example"
+        B1[Person p1 = new Person]
+        B2[Person p2 = p1]
+        B3[p2.Age = 31]
+        B1 -.-> B4[Heap: Age = 31]
+        B2 -.-> B4
+    end
+
+    style A4 fill:#90EE90
+    style A5 fill:#90EE90
+    style B4 fill:#87CEEB
+```
+
+### Complete Example
+
+```csharp
+// 🔰 BEGINNER: Understanding the difference
+
+// VALUE TYPE - Independent copies
+int value1 = 100;
+int value2 = value1;
+value2 = 200;
+
+Console.WriteLine($"value1: {value1}"); // 100 (independent!)
+Console.WriteLine($"value2: {value2}"); // 200
+
+// REFERENCE TYPE - Shared object
+var list1 = new List<int> { 1, 2, 3 };
+var list2 = list1;
+list2.Add(4);
+
+Console.WriteLine(list1.Count); // 4 (shared!)
+Console.WriteLine(list2.Count); // 4
+
+// 🎯 INTERMEDIATE: Method parameters
+void ModifyValue(int num)
+{
+    num = 999;  // Only modifies the copy
+}
+
+void ModifyReference(List<int> list)
+{
+    list.Add(999);  // Modifies the original object!
+}
+
+int myNum = 10;
+ModifyValue(myNum);
+Console.WriteLine(myNum); // 10 (unchanged)
+
+var myList = new List<int> { 1, 2, 3 };
+ModifyReference(myList);
+Console.WriteLine(myList.Count); // 4 (changed!)
+```
+
+---
+
+## 5. Boxing and Unboxing
+
+### What is Boxing?
+
+**Simple Explanation:** Boxing is when you put a value type (like an `int`) into a reference type box (like `object`). This creates a copy on the heap.
+
+```mermaid
+graph LR
+    A[Stack<br/>int value = 42] -->|Boxing| B[Heap<br/>object boxed<br/>contains 42]
+    B -->|Unboxing| C[Stack<br/>int unboxed = 42]
+
+    style A fill:#90EE90
+    style B fill:#87CEEB
+    style C fill:#90EE90
+```
+
+### Boxing Examples
+
+```csharp
+// 🔰 BEGINNER: Basic boxing
+int number = 42;        // Value type on stack
+object boxed = number;  // Boxing - copies to heap
+
+Console.WriteLine(boxed.GetType()); // System.Int32
+
+// 🎯 INTERMEDIATE: Boxing happens implicitly
+ArrayList oldList = new ArrayList();
+oldList.Add(10);   // ❌ Boxing! int -> object
+oldList.Add(20);   // ❌ Boxing! int -> object
+oldList.Add(30);   // ❌ Boxing! int -> object
+// Performance issue: 3 heap allocations!
+
+// ✅ Better: Use generic collection (no boxing)
+List<int> newList = new List<int>();
+newList.Add(10);  // ✅ No boxing!
+newList.Add(20);  // ✅ No boxing!
+newList.Add(30);  // ✅ No boxing!
+
+// 🚀 ADVANCED: Hidden boxing scenarios
+int x = 10;
+Console.WriteLine(x); // ❌ Boxing (WriteLine takes object)
+
+// Better
+Console.WriteLine(x.ToString()); // ✅ No boxing (explicit string)
+
+// Interface implementation causes boxing
+public struct MyStruct : IComparable
+{
+    public int Value;
+
+    public int CompareTo(object obj)  // ❌ object parameter
+    {
+        return Value.CompareTo(((MyStruct)obj).Value);
+    }
+}
+
+MyStruct s1 = new MyStruct { Value = 5 };
+MyStruct s2 = new MyStruct { Value = 10 };
+
+int result = s1.CompareTo(s2);  // ❌ Boxing of s2!
+
+// Better: Use generic interface
+public struct MyBetterStruct : IComparable<MyBetterStruct>
+{
+    public int Value;
+
+    public int CompareTo(MyBetterStruct other)  // ✅ No boxing
+    {
+        return Value.CompareTo(other.Value);
+    }
+}
+```
+
+### Unboxing Examples
+
+```csharp
+// 🔰 BEGINNER: Basic unboxing
+object boxed = 42;              // Boxing
+int unboxed = (int)boxed;       // Unboxing - explicit cast required
+
+// ❌ Wrong type unboxing throws exception
+object boxedInt = 42;
+// long wrong = (long)boxedInt; // InvalidCastException!
+
+// ✅ Correct: unbox to same type first
+long correct = (int)boxedInt;   // Works
+
+// 🎯 INTERMEDIATE: Pattern matching for safe unboxing
+object mystery = GetSomeValue();
+
+if (mystery is int intValue)
+{
+    Console.WriteLine($"It's an int: {intValue}");
+}
+else if (mystery is string strValue)
+{
+    Console.WriteLine($"It's a string: {strValue}");
+}
+
+// 🚀 ADVANCED: Performance comparison
+// Slow - boxing/unboxing in loop
+object boxedNumber = 0;
+for (int i = 0; i < 1000000; i++)
+{
+    boxedNumber = (int)boxedNumber + 1;  // Unbox, add, box
+}
+
+// Fast - no boxing
+int plainNumber = 0;
+for (int i = 0; i < 1000000; i++)
+{
+    plainNumber = plainNumber + 1;  // No boxing!
+}
+// This is ~10x faster!
+```
+
+### Performance Impact Visualization
+
+```mermaid
+graph TB
+    subgraph "Without Boxing - Fast"
+        A1[Stack: int x = 0] --> A2[Stack: int y = x + 1]
+        A2 --> A3[Stack: int z = y + 1]
+    end
+
+    subgraph "With Boxing - Slow"
+        B1[Stack: int x = 0] -->|Box| B2[Heap: object = 0]
+        B2 -->|Unbox| B3[Stack: int temp = 0]
+        B3 --> B4[Stack: int temp2 = temp + 1]
+        B4 -->|Box| B5[Heap: object = 1]
+        B5 -->|Unbox| B6[Stack: int temp3 = 1]
+    end
+
+    style A1 fill:#90EE90
+    style A2 fill:#90EE90
+    style A3 fill:#90EE90
+    style B2 fill:#FFB6C1
+    style B5 fill:#FFB6C1
+```
+
+---
+
+## 6. Parameter Passing
+
+### Pass by Value (Default)
+
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant Method
+    participant Original as Original Variable
+
+    Note over Caller: int x = 10
+    Caller->>Method: Pass copy of value (10)
+    Note over Method: parameter = 10
+    Method->>Method: parameter = 99
+    Note over Method: parameter = 99
+    Note over Original: x still = 10
+```
+
+```csharp
+// 🔰 BEGINNER: Value types passed by value
+void ModifyValue(int number)
+{
+    number = 99;  // Modifies the copy only
+}
+
+int x = 10;
+ModifyValue(x);
+Console.WriteLine(x);  // 10 (unchanged)
+
+// 🎯 INTERMEDIATE: Reference types passed by value (reference is copied)
+void ModifyReference(Person person)
+{
+    person.Age = 99;  // ✅ Modifies original object
+    person = new Person("New", 1);  // ❌ Only changes local copy
+}
+
+Person p = new Person("John", 30);
+ModifyReference(p);
+Console.WriteLine(p.Name);  // "John" (reference not changed)
+Console.WriteLine(p.Age);   // 99 (object was modified)
+```
+
+### Pass by Reference (ref keyword)
+
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant Method
+
+    Note over Caller: int x = 10
+    Caller->>Method: Pass reference to x
+    Method->>Method: Modify x directly
+    Note over Method: x = 99
+    Note over Caller: x = 99 (changed!)
+```
+
+```csharp
+// 🔰 BEGINNER: ref with value types
+void ModifyWithRef(ref int number)
+{
+    number = 99;  // Modifies the original!
+}
+
+int x = 10;
+ModifyWithRef(ref x);  // Must use 'ref' keyword
+Console.WriteLine(x);  // 99 (changed!)
+
+// 🎯 INTERMEDIATE: ref with reference types
+void ReplaceObject(ref Person person)
+{
+    person = new Person("New Person", 1);  // ✅ Replaces original reference
+}
+
+Person p = new Person("John", 30);
+ReplaceObject(ref p);
+Console.WriteLine(p.Name);  // "New Person" (reference was changed!)
+
+// 🚀 ADVANCED: ref returns (C# 7.0+)
+public ref int FindFirst(int[] numbers, int target)
+{
+    for (int i = 0; i < numbers.Length; i++)
+    {
+        if (numbers[i] == target)
+            return ref numbers[i];  // Return reference to array element
+    }
+    throw new InvalidOperationException("Not found");
+}
+
+int[] arr = { 1, 2, 3, 4, 5 };
+ref int element = ref FindFirst(arr, 3);
+element = 99;  // Modifies array directly!
+Console.WriteLine(arr[2]);  // 99
+```
+
+### Out Parameters
+
+```csharp
+// 🔰 BEGINNER: out parameters
+bool TryParse(string input, out int result)
+{
+    return int.TryParse(input, out result);
+}
+
+// Must assign before return
+string userInput = "123";
+if (TryParse(userInput, out int number))
+{
+    Console.WriteLine($"Parsed: {number}");
+}
+
+// 🎯 INTERMEDIATE: Out variable declaration (C# 7.0+)
+if (int.TryParse("456", out int value))
+{
+    Console.WriteLine(value);  // 456
+}
+// 'value' is still in scope here
+
+// Multiple out parameters
+bool Divide(int a, int b, out int quotient, out int remainder)
+{
+    if (b == 0)
+    {
+        quotient = 0;
+        remainder = 0;
+        return false;
+    }
+
+    quotient = a / b;
+    remainder = a % b;
+    return true;
+}
+
+if (Divide(10, 3, out int q, out int r))
+{
+    Console.WriteLine($"10 / 3 = {q} remainder {r}");  // 3 remainder 1
+}
+
+// 🚀 ADVANCED: Discard out parameters you don't need
+if (int.TryParse("789", out _))  // _ means "I don't care"
+{
+    Console.WriteLine("Valid integer, but I don't need the value");
+}
+```
+
+### In Parameters (Read-only Reference)
+
+```csharp
+// 🚀 ADVANCED: 'in' keyword (C# 7.2+) - pass by readonly reference
+public readonly struct LargeStruct
+{
+    public readonly double X, Y, Z;
+    public readonly double A, B, C;
+    // ... many fields
+
+    public LargeStruct(double x, double y, double z, double a, double b, double c)
+    {
+        X = x; Y = y; Z = z;
+        A = a; B = b; C = c;
+    }
+}
+
+// ❌ Slow - copies entire struct
+double Calculate(LargeStruct data)
+{
+    return data.X + data.Y;
+}
+
+// ✅ Fast - passes by reference, no copy
+double CalculateFast(in LargeStruct data)
+{
+    // data.X = 5;  // ❌ Compiler error - readonly!
+    return data.X + data.Y;
+}
+
+LargeStruct big = new LargeStruct(1, 2, 3, 4, 5, 6);
+double result = CalculateFast(in big);  // No copy!
+```
+
+---
+
+## 7. When to Use Struct vs Class
+
+### Decision Flow
+
+```mermaid
+graph TD
+    A[Need a new type?] --> B{Small data<br/>16 bytes or less?}
+    B -->|No| C[Use CLASS]
+    B -->|Yes| D{Immutable?}
+    D -->|No| C
+    D -->|Yes| E{Represents<br/>single value?}
+    E -->|No| C
+    E -->|Yes| F[Use STRUCT]
+
+    style F fill:#90EE90
+    style C fill:#87CEEB
+```
+
+### Guidelines
+
+```csharp
+// ✅ GOOD: Use struct for small, immutable value-like types
+public readonly struct Point
+{
+    public double X { get; }
+    public double Y { get; }
+
+    public Point(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
+public readonly struct Money
+{
+    public decimal Amount { get; }
+    public string Currency { get; }
+
+    public Money(decimal amount, string currency)
+    {
+        Amount = amount;
+        Currency = currency;
+    }
+}
+
+// ❌ BAD: Large mutable struct
+public struct BadStruct  // DON'T DO THIS
+{
+    public int Field1, Field2, Field3, Field4;
+    public double Field5, Field6, Field7, Field8;
+    public string Field9, Field10;  // More than 16 bytes!
+
+    public void Mutate()  // ❌ Mutating struct
+    {
+        Field1 = 999;
+    }
+}
+
+// ✅ GOOD: Use class for complex types
+public class Person
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public DateTime BirthDate { get; set; }
+    public Address Address { get; set; }  // Complex object
+
+    // Methods, events, etc.
+}
+
+// 🎯 REAL-WORLD EXAMPLES:
+
+// ✅ Struct - represents single primitive value
+public readonly struct Temperature
+{
+    public double Celsius { get; }
+
+    public double Fahrenheit => Celsius * 9 / 5 + 32;
+
+    public Temperature(double celsius)
+    {
+        Celsius = celsius;
+    }
+}
+
+// ✅ Class - represents entity with identity
+public class Customer
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List<Order> Orders { get; set; }
+
+    // Business logic
+    public decimal GetTotalSpent()
+    {
+        return Orders.Sum(o => o.Total);
+    }
+}
+```
+
+### Performance Comparison
+
+| Aspect      | Struct                  | Class                 |
+| ----------- | ----------------------- | --------------------- |
+| Allocation  | Stack (if local)        | Heap                  |
+| Copy cost   | Copies all data         | Copies reference only |
+| GC pressure | None                    | Yes                   |
+| Inheritance | No                      | Yes                   |
+| Null        | No (unless Nullable<T>) | Yes                   |
+| Best for    | Small, immutable values | Complex entities      |
+
+```csharp
+// 🚀 ADVANCED: Benchmark example
+[MemoryDiagnoser]
+public class StructVsClass
+{
+    private const int Iterations = 1000000;
+
+    public struct PointStruct
+    {
+        public double X, Y;
+    }
+
+    public class PointClass
+    {
+        public double X, Y;
+    }
+
+    [Benchmark]
+    public void CreateStructs()
+    {
+        for (int i = 0; i < Iterations; i++)
+        {
+            var p = new PointStruct { X = i, Y = i };
+        }
+        // No heap allocations!
+    }
+
+    [Benchmark]
+    public void CreateClasses()
+    {
+        for (int i = 0; i < Iterations; i++)
+        {
+            var p = new PointClass { X = i, Y = i };
+        }
+        // 1,000,000 heap allocations + GC!
+    }
+}
+// Struct is ~10x faster for this scenario
 ```
 
 ### Readonly Structs (C# 7.2+)
