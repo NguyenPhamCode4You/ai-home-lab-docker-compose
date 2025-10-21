@@ -23,7 +23,7 @@ graph LR
     A[Delegate Variable] -->|Points to| B[Method 1]
     A -->|Can point to| C[Method 2]
     A -->|Can point to| D[Method 3]
-    
+
     style A fill:#87CEEB
     style B fill:#90EE90
     style C fill:#90EE90
@@ -85,11 +85,11 @@ graph TB
         B[Method Pointer<br/>IntPtr]
         C[Invocation List<br/>Delegate[]]
     end
-    
+
     A -.-> D[Person Instance]
     B -.-> E[SayHello Method]
     C -.-> F[Chain of Delegates]
-    
+
     style A fill:#FFB6C1
     style B fill:#87CEEB
     style C fill:#90EE90
@@ -101,10 +101,10 @@ public sealed class MathOperation : System.MulticastDelegate
 {
     // Constructor
     public MathOperation(object target, IntPtr method);
-    
+
     // Synchronous invocation
     public int Invoke(int x, int y);
-    
+
     // Asynchronous invocation (legacy)
     public IAsyncResult BeginInvoke(int x, int y, AsyncCallback callback, object state);
     public int EndInvoke(IAsyncResult result);
@@ -125,7 +125,7 @@ void InspectDelegate()
 {
     Calculator calc = new();
     MathOperation op = calc.Add;
-    
+
     Console.WriteLine($"Target: {op.Target}");  // Calculator instance
     Console.WriteLine($"Method: {op.Method.Name}");  // "Add"
     Console.WriteLine($"Is static: {op.Method.IsStatic}");  // False
@@ -143,12 +143,12 @@ sequenceDiagram
     participant Method1
     participant Method2
     participant Method3
-    
+
     Caller->>Delegate: Invoke("Hello")
     Delegate->>Method1: LogToConsole("Hello")
     Delegate->>Method2: LogToFile("Hello")
     Delegate->>Method3: LogToDatabase("Hello")
-    
+
     Note over Delegate: All methods called in sequence
 ```
 
@@ -156,13 +156,13 @@ sequenceDiagram
 // 🔰 BEGINNER: Multicast delegate basics
 public delegate void Logger(string message);
 
-void LogToConsole(string message) 
+void LogToConsole(string message)
     => Console.WriteLine($"Console: {message}");
 
-void LogToFile(string message) 
+void LogToFile(string message)
     => File.AppendAllText("log.txt", $"{message}\n");
 
-void LogToDatabase(string message) 
+void LogToDatabase(string message)
     => Console.WriteLine($"DB: {message}");
 
 // Combine delegates using += operator
@@ -225,7 +225,7 @@ graph LR
     A --> C[Method 2<br/>returns 12]
     A --> D[Method 3<br/>returns 42]
     D --> E[Final Result: 42]
-    
+
     style B fill:#FFB6C1
     style C fill:#FFB6C1
     style D fill:#90EE90
@@ -236,16 +236,16 @@ graph LR
 // 🔰 BEGINNER: Return value problem
 public delegate int Calculator(int x, int y);
 
-int Add(int x, int y) 
-{ 
-    Console.WriteLine("Add called"); 
-    return x + y; 
+int Add(int x, int y)
+{
+    Console.WriteLine("Add called");
+    return x + y;
 }
 
-int Multiply(int x, int y) 
-{ 
-    Console.WriteLine("Multiply called"); 
-    return x * y; 
+int Multiply(int x, int y)
+{
+    Console.WriteLine("Multiply called");
+    return x * y;
 }
 
 Calculator calc = Add;
@@ -291,19 +291,19 @@ int average = (int)results.Average();  // 9
 // 🎯 INTERMEDIATE: Exception handling in multicast
 public delegate void EventHandler(string message);
 
-void Handler1(string msg) 
-{ 
-    Console.WriteLine("Handler1: " + msg); 
+void Handler1(string msg)
+{
+    Console.WriteLine("Handler1: " + msg);
 }
 
-void Handler2(string msg) 
-{ 
-    throw new Exception("Handler2 failed!"); 
+void Handler2(string msg)
+{
+    throw new Exception("Handler2 failed!");
 }
 
-void Handler3(string msg) 
-{ 
-    Console.WriteLine("Handler3: " + msg); 
+void Handler3(string msg)
+{
+    Console.WriteLine("Handler3: " + msg);
 }
 
 EventHandler handler = Handler1;
@@ -379,72 +379,217 @@ foreach (Action a in action.GetInvocationList())
 
 ## 2. Built-in Delegates
 
+### Built-in Delegate Types Overview
+
+```mermaid
+graph TB
+    A[Built-in Delegates] --> B[Action<br/>void Return]
+    A --> C[Func<br/>Has Return Value]
+    A --> D[Predicate<br/>Returns bool]
+    A --> E[EventHandler<br/>For Events]
+
+    B --> B1[Action<br/>Action&lt;T&gt;<br/>Action&lt;T1,T2&gt;]
+    C --> C1[Func&lt;TResult&gt;<br/>Func&lt;T,TResult&gt;<br/>Func&lt;T1,T2,TResult&gt;]
+    D --> D1[Predicate&lt;T&gt;<br/>T => bool]
+    E --> E1[EventHandler<br/>EventHandler&lt;T&gt;]
+
+    style B fill:#FFB6C1
+    style C fill:#90EE90
+    style D fill:#87CEEB
+    style E fill:#FFD700
+```
+
 ### Action<T> - No Return Value
 
-```csharp
-// Action: void method with 0-16 parameters
-Action action = () => Console.WriteLine("No parameters");
-Action<int> printInt = x => Console.WriteLine(x);
-Action<int, string> print = (x, s) => Console.WriteLine($"{s}: {x}");
+**Simple Explanation:** Use `Action` when you want to **do something** but don't need to return a value.
 
-action();
-printInt(42);
-print(42, "Answer");
+```csharp
+// 🔰 BEGINNER: Action basics
+Action greet = () => Console.WriteLine("Hello!");
+greet();  // Hello!
+
+Action<string> greetPerson = name => Console.WriteLine($"Hello, {name}!");
+greetPerson("Alice");  // Hello, Alice!
+
+Action<int, string> print = (age, name) =>
+    Console.WriteLine($"{name} is {age} years old");
+print(25, "Bob");  // Bob is 25 years old
+
+// 🎯 INTERMEDIATE: Action with multiple parameters (up to 16!)
+Action<int, string, bool, double> complex = (id, name, active, salary) =>
+{
+    Console.WriteLine($"ID: {id}");
+    Console.WriteLine($"Name: {name}");
+    Console.WriteLine($"Active: {active}");
+    Console.WriteLine($"Salary: {salary:C}");
+};
+
+complex(123, "Charlie", true, 75000.50);
+
+// 🚀 ADVANCED: Using Action as callback
+void ProcessData(int[] data, Action<int> callback)
+{
+    foreach (int item in data)
+    {
+        callback(item);
+    }
+}
+
+ProcessData(new[] { 1, 2, 3, 4, 5 }, num => Console.WriteLine(num * 2));
+// Output: 2, 4, 6, 8, 10
 ```
 
 ### Func<T> - With Return Value
 
-```csharp
-// Func: method with return value, 0-16 parameters
-// Last type parameter is RETURN TYPE
-Func<int> getNumber = () => 42;
-Func<int, int> square = x => x * x;
-Func<int, int, int> add = (x, y) => x + y;
-Func<string, int, bool> contains = (s, n) => s.Contains(n.ToString());
+**Simple Explanation:** Use `Func` when you want to **calculate and return** a value.
 
-int num = getNumber(); // 42
-int squared = square(5); // 25
-int sum = add(3, 4); // 7
-bool hasDigit = contains("hello123", 1); // true
+```csharp
+// 🔰 BEGINNER: Func basics (last type parameter is RETURN type)
+Func<int> getRandom = () => new Random().Next(100);
+int random = getRandom();  // Random number 0-99
+
+Func<int, int> square = x => x * x;
+int result = square(5);  // 25
+
+Func<int, int, int> add = (x, y) => x + y;
+int sum = add(3, 4);  // 7
+
+Func<string, int, bool> contains = (text, digit) => text.Contains(digit.ToString());
+bool hasDigit = contains("hello123", 1);  // true
+
+// 🎯 INTERMEDIATE: Func in LINQ
+List<int> numbers = new() { 1, 2, 3, 4, 5 };
+
+Func<int, bool> isEven = n => n % 2 == 0;
+Func<int, int> triple = n => n * 3;
+
+var evenTripled = numbers.Where(isEven)   // [2, 4]
+                         .Select(triple)  // [6, 12]
+                         .ToList();
+
+// 🚀 ADVANCED: Func as factory method
+Func<string, Person> createPerson = name => new Person { Name = name, Age = 0 };
+
+Person p1 = createPerson("Alice");
+Person p2 = createPerson("Bob");
+
+// Func returning Func (higher-order function)
+Func<int, Func<int, int>> createMultiplier = factor =>
+    (number => number * factor);
+
+Func<int, int> multiplyBy10 = createMultiplier(10);
+Func<int, int> multiplyBy5 = createMultiplier(5);
+
+Console.WriteLine(multiplyBy10(7));  // 70
+Console.WriteLine(multiplyBy5(7));   // 35
 ```
 
 ### Predicate<T> - Boolean Test
 
+**Simple Explanation:** `Predicate<T>` is just `Func<T, bool>` - used to test if something meets a condition.
+
 ```csharp
-// Predicate: Func<T, bool> - used for testing
+// 🔰 BEGINNER: Predicate basics
+Predicate<int> isPositive = x => x > 0;
 Predicate<int> isEven = x => x % 2 == 0;
 Predicate<string> isEmpty = s => string.IsNullOrEmpty(s);
 
-bool even = isEven(4); // true
-bool empty = isEmpty(""); // true
+Console.WriteLine(isPositive(5));   // true
+Console.WriteLine(isEven(4));       // true
+Console.WriteLine(isEmpty(""));     // true
 
-// Used in List.FindAll, Array.FindAll, etc.
-List<int> numbers = new() { 1, 2, 3, 4, 5, 6 };
-List<int> evenNumbers = numbers.FindAll(isEven); // [2, 4, 6]
-```
+// 🎯 INTERMEDIATE: Predicate with collections
+List<int> numbers = new() { -2, -1, 0, 1, 2, 3, 4, 5, 6 };
 
-### Comparison<T> - Compare Two Values
+List<int> positive = numbers.FindAll(isPositive);     // [1, 2, 3, 4, 5, 6]
+List<int> evenPositive = positive.FindAll(isEven);    // [2, 4, 6]
 
-```csharp
-// Comparison: (T, T) => int
-Comparison<int> descendingOrder = (x, y) => y.CompareTo(x);
+int firstEven = numbers.Find(isEven);                 // -2
+bool anyPositive = numbers.Exists(isPositive);        // true
+bool allPositive = numbers.TrueForAll(isPositive);    // false
 
-List<int> numbers = new() { 3, 1, 4, 1, 5, 9 };
-numbers.Sort(descendingOrder); // [9, 5, 4, 3, 1, 1]
+// 🚀 ADVANCED: Combining predicates
+Predicate<int> isPositiveAndEven = x => isPositive(x) && isEven(x);
+
+// Or using composition
+Predicate<int> CombinePredicates(Predicate<int> p1, Predicate<int> p2)
+{
+    return x => p1(x) && p2(x);
+}
+
+Predicate<int> combined = CombinePredicates(isPositive, isEven);
+List<int> filtered = numbers.FindAll(combined);  // [2, 4, 6]
 ```
 
 ---
 
 ## 3. Events
 
-### Event Pattern
+### What is an Event?
+
+**Simple Analogy:** An event is like a **doorbell**. The publisher (house) has a doorbell button. Subscribers (people) can register to be notified when the doorbell rings. When someone presses the button, all registered people are notified.
+
+### Event Subscription Flow
+
+```mermaid
+sequenceDiagram
+    participant Publisher as Stock (Publisher)
+    participant Event as PriceChanged Event
+    participant Sub1 as Monitor 1
+    participant Sub2 as Monitor 2
+
+    Sub1->>Event: Subscribe (+=)
+    Sub2->>Event: Subscribe (+=)
+
+    Note over Publisher: Price changes
+    Publisher->>Event: Raise Event
+    Event->>Sub1: Notify (OnPriceChanged)
+    Event->>Sub2: Notify (OnPriceChanged)
+
+    Sub1->>Event: Unsubscribe (-=)
+
+    Note over Publisher: Price changes again
+    Publisher->>Event: Raise Event
+    Event->>Sub2: Notify (only Sub2)
+
+    style Publisher fill:#87CEEB
+    style Event fill:#FFD700
+    style Sub1 fill:#90EE90
+    style Sub2 fill:#90EE90
+```
+
+### Event vs Delegate Comparison
+
+```mermaid
+graph TB
+    subgraph "Delegate (Field)"
+        A1[Public Field] --> A2[Can be assigned =]
+        A2 --> A3[Can be invoked<br/>from outside]
+        A3 --> A4[❌ Not safe]
+    end
+
+    subgraph "Event (Encapsulated)"
+        B1[Public Event] --> B2[Can only += or -=]
+        B2 --> B3[Can only be invoked<br/>from inside class]
+        B3 --> B4[✅ Safe]
+    end
+
+    style A4 fill:#FF6347
+    style B4 fill:#90EE90
+```
+
+### Event Pattern (Standard .NET Pattern)
 
 ```csharp
-// EventArgs subclass for custom data
+// 🔰 BEGINNER: Complete event pattern
+
+// Step 1: Create custom EventArgs
 public class PriceChangedEventArgs : EventArgs
 {
     public decimal OldPrice { get; }
     public decimal NewPrice { get; }
+    public decimal Change => NewPrice - OldPrice;
+    public decimal ChangePercent => (Change / OldPrice) * 100;
 
     public PriceChangedEventArgs(decimal oldPrice, decimal newPrice)
     {
@@ -453,13 +598,13 @@ public class PriceChangedEventArgs : EventArgs
     }
 }
 
-// Publisher
+// Step 2: Publisher class with event
 public class Stock
 {
     private string symbol;
     private decimal price;
 
-    // Event delegate
+    // Event using EventHandler<T> delegate
     public event EventHandler<PriceChangedEventArgs> PriceChanged;
 
     public string Symbol
@@ -477,27 +622,358 @@ public class Stock
             {
                 decimal oldPrice = price;
                 price = value;
+                // Raise event when price changes
                 OnPriceChanged(new PriceChangedEventArgs(oldPrice, value));
             }
         }
     }
 
     // Protected virtual method to raise event
+    // Pattern: On{EventName}
     protected virtual void OnPriceChanged(PriceChangedEventArgs e)
     {
+        // Null-conditional operator ensures no NullReferenceException
         PriceChanged?.Invoke(this, e);
     }
 }
 
-// Subscriber
+// Step 3: Subscriber class
 public class StockMonitor
 {
-    public StockMonitor(Stock stock)
+    private readonly string name;
+
+    public StockMonitor(string name, Stock stock)
     {
+        this.name = name;
+        // Subscribe to event
         stock.PriceChanged += OnPriceChanged;
     }
 
+    // Event handler method
     private void OnPriceChanged(object sender, PriceChangedEventArgs e)
+    {
+        Stock stock = (Stock)sender;
+        Console.WriteLine($"[{name}] {stock.Symbol}: ${e.OldPrice} -> ${e.NewPrice}");
+        Console.WriteLine($"  Change: ${e.Change:F2} ({e.ChangePercent:F2}%)");
+    }
+}
+
+// Usage
+Stock msft = new Stock { Symbol = "MSFT", Price = 300.00m };
+
+StockMonitor monitor1 = new StockMonitor("Monitor1", msft);
+StockMonitor monitor2 = new StockMonitor("Monitor2", msft);
+
+msft.Price = 310.50m;  // Both monitors notified
+// Output:
+// [Monitor1] MSFT: $300.00 -> $310.50
+//   Change: $10.50 (3.50%)
+// [Monitor2] MSFT: $300.00 -> $310.50
+//   Change: $10.50 (3.50%)
+```
+
+### Event Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Publisher (Stock)"
+        A[Price Property] --> B{Price Changed?}
+        B -->|Yes| C[OnPriceChanged]
+        C --> D[PriceChanged Event]
+    end
+
+    subgraph "Event Infrastructure"
+        D --> E[Invocation List]
+        E --> F[Handler 1]
+        E --> G[Handler 2]
+        E --> H[Handler N]
+    end
+
+    subgraph "Subscribers"
+        F --> I[Monitor 1.OnPriceChanged]
+        G --> J[Monitor 2.OnPriceChanged]
+        H --> K[Logger.OnPriceChanged]
+    end
+
+    style A fill:#87CEEB
+    style D fill:#FFD700
+    style E fill:#FFB6C1
+    style I fill:#90EE90
+    style J fill:#90EE90
+    style K fill:#90EE90
+```
+
+### 🎯 INTERMEDIATE: Custom Event Accessors
+
+```csharp
+// For thread-safe event subscription or custom logic
+public class ThreadSafePublisher
+{
+    private EventHandler<PriceChangedEventArgs> priceChanged;
+    private readonly object lockObject = new object();
+
+    public event EventHandler<PriceChangedEventArgs> PriceChanged
+    {
+        add
+        {
+            lock (lockObject)
+            {
+                priceChanged += value;
+                Console.WriteLine($"Subscriber added. Total: {priceChanged?.GetInvocationList().Length ?? 0}");
+            }
+        }
+        remove
+        {
+            lock (lockObject)
+            {
+                priceChanged -= value;
+                Console.WriteLine($"Subscriber removed. Total: {priceChanged?.GetInvocationList().Length ?? 0}");
+            }
+        }
+    }
+
+    protected virtual void OnPriceChanged(PriceChangedEventArgs e)
+    {
+        EventHandler<PriceChangedEventArgs> handler;
+        lock (lockObject)
+        {
+            handler = priceChanged;
+        }
+        handler?.Invoke(this, e);
+    }
+}
+```
+
+### 🚀 ADVANCED: Weak Event Pattern (Prevent Memory Leaks)
+
+```csharp
+// Problem: Event subscriptions create strong references
+// If subscriber isn't unsubscribed, it won't be garbage collected
+
+// Solution: Weak event pattern
+public class WeakEventManager<TEventArgs> where TEventArgs : EventArgs
+{
+    private readonly List<WeakReference<EventHandler<TEventArgs>>> handlers = new();
+
+    public void AddHandler(EventHandler<TEventArgs> handler)
+    {
+        handlers.Add(new WeakReference<EventHandler<TEventArgs>>(handler));
+    }
+
+    public void RemoveHandler(EventHandler<TEventArgs> handler)
+    {
+        handlers.RemoveAll(wr =>
+        {
+            if (wr.TryGetTarget(out var target))
+            {
+                return target == handler;
+            }
+            return true; // Remove dead references
+        });
+    }
+
+    public void RaiseEvent(object sender, TEventArgs e)
+    {
+        // Clean up dead references and invoke live ones
+        handlers.RemoveAll(wr =>
+        {
+            if (wr.TryGetTarget(out var handler))
+            {
+                handler(sender, e);
+                return false; // Keep
+            }
+            return true; // Remove dead reference
+        });
+    }
+}
+
+// Usage
+public class WeakEventPublisher
+{
+    private readonly WeakEventManager<PriceChangedEventArgs> priceChangedManager = new();
+
+    public event EventHandler<PriceChangedEventArgs> PriceChanged
+    {
+        add => priceChangedManager.AddHandler(value);
+        remove => priceChangedManager.RemoveHandler(value);
+    }
+
+    protected virtual void OnPriceChanged(PriceChangedEventArgs e)
+    {
+        priceChangedManager.RaiseEvent(this, e);
+    }
+}
+```
+
+---
+
+## 4. Lambda Expressions & Closures
+
+### Lambda Expression Syntax
+
+```mermaid
+graph LR
+    A[Lambda Expression] --> B[Parameters]
+    A --> C[=> Operator]
+    A --> D[Body]
+
+    B --> B1["() - No params<br/>(x) - One param<br/>(x,y) - Multiple"]
+    D --> D1["Single expression<br/>x => x * 2<br/><br/>Statement block<br/>x => { return x * 2; }"]
+
+    style A fill:#87CEEB
+    style B1 fill:#90EE90
+    style D1 fill:#FFB6C1
+```
+
+```csharp
+// 🔰 BEGINNER: Lambda basics
+
+// No parameters
+Action greet = () => Console.WriteLine("Hello!");
+
+// One parameter (parentheses optional)
+Func<int, int> square = x => x * x;
+Func<int, int> squareAlt = (x) => x * x;  // Same thing
+
+// Multiple parameters (parentheses required)
+Func<int, int, int> add = (x, y) => x + y;
+
+// Expression body (returns value automatically)
+Func<int, bool> isEven = x => x % 2 == 0;
+
+// Statement body (explicit return)
+Func<int, string> describe = x =>
+{
+    if (x < 0) return "negative";
+    if (x == 0) return "zero";
+    return "positive";
+};
+
+// 🎯 INTERMEDIATE: Type inference
+var multiply = (int x, int y) => x * y;  // C# 10+
+var getValue = () => 42;  // Type inferred from return
+
+// Discard parameters
+Func<int, int, int> ignoreSecond = (x, _) => x * 2;
+
+// 🚀 ADVANCED: Attributes on lambdas (C# 10+)
+var lambda = [CustomAttribute] (int x) => x * 2;
+
+// Return type specification
+var explicitReturn = int (x) => x * 2;
+```
+
+### Closures (Capturing Variables)
+
+**Simple Explanation:** A closure is when a lambda **remembers** variables from outside its scope.
+
+```mermaid
+graph TB
+    A[Method Scope] --> B[Local Variable: factor]
+    A --> C[Lambda Expression]
+    C --> D[Captures 'factor']
+    D -.Reference.-> B
+
+    E[Lambda Executed Later] --> D
+    E -.Still has access to.-> B
+
+    style C fill:#87CEEB
+    style D fill:#FFB6C1
+    style E fill:#90EE90
+```
+
+```csharp
+// 🔰 BEGINNER: Simple closure
+Func<int, int> CreateMultiplier(int factor)
+{
+    // Lambda captures 'factor' from outer scope
+    return x => x * factor;
+}
+
+var multiplyBy10 = CreateMultiplier(10);
+var multiplyBy5 = CreateMultiplier(5);
+
+Console.WriteLine(multiplyBy10(7));  // 70
+Console.WriteLine(multiplyBy5(7));   // 35
+
+// 🎯 INTERMEDIATE: Closure pitfall in loops
+List<Func<int>> functions = new();
+
+// ❌ WRONG: All closures capture same variable!
+for (int i = 0; i < 5; i++)
+{
+    functions.Add(() => i);  // Captures 'i'
+}
+
+foreach (var func in functions)
+{
+    Console.Write(func() + " ");  // 5 5 5 5 5 (all print 5!)
+}
+
+// ✅ CORRECT: Capture loop variable in local
+List<Func<int>> correctFunctions = new();
+
+for (int i = 0; i < 5; i++)
+{
+    int local = i;  // Create local copy
+    correctFunctions.Add(() => local);
+}
+
+foreach (var func in correctFunctions)
+{
+    Console.Write(func() + " ");  // 0 1 2 3 4 (correct!)
+}
+
+// 🚀 ADVANCED: Multiple variables captured
+Func<int, int, int> CreateRangeChecker(int min, int max)
+{
+    return (value, @default) =>
+    {
+        // Captures both 'min' and 'max'
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    };
+}
+
+var clamp = CreateRangeChecker(0, 100);
+Console.WriteLine(clamp(150, 50));  // 100
+Console.WriteLine(clamp(-10, 50));  // 0
+Console.WriteLine(clamp(50, 0));    // 50
+```
+
+### Closure Memory Implications
+
+```csharp
+// ⚠️ Be careful with closures - they extend object lifetime!
+
+public class DataProcessor
+{
+    private byte[] largeData = new byte[1000000]; // 1MB
+
+    public Action CreateProcessor()
+    {
+        // This lambda captures 'this' (the entire DataProcessor instance)
+        return () => Console.WriteLine(largeData.Length);
+
+        // Even if you only need largeData.Length, the ENTIRE
+        // DataProcessor instance (including the 1MB array) stays in memory
+        // as long as the returned Action is referenced!
+    }
+}
+
+// ✅ Better: Only capture what you need
+public class BetterDataProcessor
+{
+    private byte[] largeData = new byte[1000000];
+
+    public Action CreateProcessor()
+    {
+        int length = largeData.Length;  // Copy just the value
+        return () => Console.WriteLine(length);
+        // Now only the int is captured, not the entire object
+    }
+}
     {
         Stock stock = (Stock)sender;
         Console.WriteLine($"{stock.Symbol}: {e.OldPrice} -> {e.NewPrice}");
