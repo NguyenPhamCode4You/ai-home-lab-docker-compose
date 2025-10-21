@@ -565,83 +565,275 @@ var query = dbContext.Persons // IQueryable
 
 ## 4. Standard Query Operators
 
-### Filtering
+### LINQ Operators Overview
+
+```mermaid
+graph TB
+    A[LINQ Operators] --> B[Filtering]
+    A --> C[Projection]
+    A --> D[Sorting]
+    A --> E[Grouping]
+    A --> F[Joining]
+    A --> G[Aggregation]
+    A --> H[Quantifiers]
+    A --> I[Partitioning]
+
+    B --> B1[Where<br/>OfType]
+    C --> C1[Select<br/>SelectMany]
+    D --> D1[OrderBy<br/>ThenBy<br/>Reverse]
+    E --> E1[GroupBy<br/>ToLookup]
+    F --> F1[Join<br/>GroupJoin]
+    G --> G1[Count<br/>Sum<br/>Min<br/>Max<br/>Average]
+    H --> H1[Any<br/>All<br/>Contains]
+    I --> I1[Take<br/>Skip<br/>TakeLast<br/>SkipLast]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFB6C1
+    style D fill:#FFD700
+    style E fill:#DDA0DD
+```
+
+### Filtering Operators
+
+**Simple Explanation:** Filtering is like using a **sieve** - only items matching your condition pass through.
+
+```mermaid
+graph LR
+    A[1,2,3,4,5,6,7,8,9,10] -->|Where x > 5| B[6,7,8,9,10]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+```
 
 ```csharp
-// Where - filter elements
+// 🔰 BEGINNER: Where - filter elements
+var people = GetPeople();
 var adults = people.Where(p => p.Age >= 18);
+var adults2 = people.Where(p => p.Age >= 18 && p.IsActive);
 
-// OfType - filter by type
-object[] mixed = { 1, "hello", 2, "world", 3 };
-var numbers = mixed.OfType<int>(); // { 1, 2, 3 }
-var strings = mixed.OfType<string>(); // { "hello", "world" }
+// Multiple conditions
+var filtered = people
+    .Where(p => p.Age >= 18)
+    .Where(p => p.City == "Seattle")
+    .Where(p => p.Salary > 50000);
+
+// 🎯 INTERMEDIATE: OfType - filter by type
+object[] mixed = { 1, "hello", 2, "world", 3, 4.5, true };
+var integers = mixed.OfType<int>();    // { 1, 2, 3 }
+var strings = mixed.OfType<string>();  // { "hello", "world" }
+var doubles = mixed.OfType<double>();  // { 4.5 }
+
+// Useful for heterogeneous collections
+List<Animal> animals = new()
+{
+    new Dog { Name = "Buddy" },
+    new Cat { Name = "Whiskers" },
+    new Dog { Name = "Max" }
+};
+
+var dogs = animals.OfType<Dog>(); // Only dogs
+
+// 🚀 ADVANCED: Where with index
+var itemsWithIndex = people
+    .Select((person, index) => new { person, index })
+    .Where(x => x.index % 2 == 0) // Even indices
+    .Select(x => x.person);
 ````
 
-### Projection
+### Projection Operators
+
+**Simple Explanation:** Projection is like a **factory assembly line** - transform each item into a new shape.
+
+```mermaid
+graph LR
+    A["Person Objects<br/>{Name, Age, City}"] -->|Select p => p.Name| B["String Array<br/>{Alice, Bob, Charlie}"]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+```
 
 ```csharp
-// Select - transform elements
+// 🔰 BEGINNER: Select - transform elements
+var people = GetPeople();
 var names = people.Select(p => p.Name);
+var ages = people.Select(p => p.Age);
 
-// SelectMany - flatten nested collections
-var allPhones = people.SelectMany(p => p.PhoneNumbers);
+// Project to anonymous type
+var summary = people.Select(p => new
+{
+    p.Name,
+    p.Age,
+    IsAdult = p.Age >= 18
+});
 
-// Example: Get all phone numbers from all people
+// 🎯 INTERMEDIATE: SelectMany - flatten nested collections
 class Person
 {
     public string Name { get; set; }
     public List<string> PhoneNumbers { get; set; }
+    public List<Address> Addresses { get; set; }
 }
 
 List<Person> people = new()
 {
     new() { Name = "Alice", PhoneNumbers = new() { "111", "222" } },
-    new() { Name = "Bob", PhoneNumbers = new() { "333" } }
+    new() { Name = "Bob", PhoneNumbers = new() { "333" } },
+    new() { Name = "Charlie", PhoneNumbers = new() { "444", "555", "666" } }
 };
 
-var phones = people.SelectMany(p => p.PhoneNumbers);
-// Result: { "111", "222", "333" }
+// Select returns List<List<string>> (nested)
+var nestedPhones = people.Select(p => p.PhoneNumbers);
+// Result: { {"111", "222"}, {"333"}, {"444", "555", "666"} }
 
-// With index
-var indexed = people.Select((p, index) => new { Index = index, Name = p.Name });
+// SelectMany flattens to List<string>
+var allPhones = people.SelectMany(p => p.PhoneNumbers);
+// Result: { "111", "222", "333", "444", "555", "666" }
+
+// 🚀 ADVANCED: SelectMany with result selector
+var phoneOwners = people.SelectMany(
+    person => person.PhoneNumbers,
+    (person, phone) => new { person.Name, Phone = phone }
+);
+// Result: { {Name: "Alice", Phone: "111"}, {Name: "Alice", Phone: "222"}, ... }
+
+// SelectMany with index
+var indexed = people.SelectMany((person, index) =>
+    person.PhoneNumbers.Select(phone => new
+    {
+        PersonIndex = index,
+        person.Name,
+        Phone = phone
+    })
+);
 ```
 
-### Sorting
+### SelectMany Visualization
+
+```mermaid
+graph TB
+    A[People Collection] --> B[Alice<br/>Phones: 111, 222]
+    A --> C[Bob<br/>Phones: 333]
+    A --> D[Charlie<br/>Phones: 444, 555, 666]
+
+    B -->|SelectMany| E[111]
+    B -->|SelectMany| F[222]
+    C -->|SelectMany| G[333]
+    D -->|SelectMany| H[444]
+    D -->|SelectMany| I[555]
+    D -->|SelectMany| J[666]
+
+    E --> K[Flattened Collection<br/>111, 222, 333, 444, 555, 666]
+    F --> K
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+
+    style A fill:#87CEEB
+    style K fill:#90EE90
+```
+
+### Sorting Operators
 
 ```csharp
-// OrderBy, OrderByDescending
-var sorted = people.OrderBy(p => p.Age);
-var descending = people.OrderByDescending(p => p.Age);
+// 🔰 BEGINNER: OrderBy, OrderByDescending
+var people = GetPeople();
+var byAge = people.OrderBy(p => p.Age);
+var byAgeDesc = people.OrderByDescending(p => p.Age);
 
-// ThenBy - secondary sort
+// 🎯 INTERMEDIATE: ThenBy - secondary sort
 var sorted = people
-    .OrderBy(p => p.LastName)
-    .ThenBy(p => p.FirstName);
+    .OrderBy(p => p.City)         // Primary: by city
+    .ThenBy(p => p.LastName)      // Secondary: by last name
+    .ThenBy(p => p.FirstName);    // Tertiary: by first name
+
+var multiSort = people
+    .OrderByDescending(p => p.IsActive)  // Active first
+    .ThenBy(p => p.Department)           // Then by department
+    .ThenByDescending(p => p.Salary);    // Then by salary (high to low)
 
 // Reverse
 var reversed = people.Reverse();
+
+// 🚀 ADVANCED: Custom comparer
+var customSort = people.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase);
+
+// Case-insensitive sort
+var names = new[] { "alice", "Bob", "CHARLIE", "dave" };
+var sorted1 = names.OrderBy(n => n); // alice, Bob, CHARLIE, dave (case-sensitive)
+var sorted2 = names.OrderBy(n => n, StringComparer.OrdinalIgnoreCase); // alice, Bob, CHARLIE, dave
 ```
 
-### Grouping
+### Grouping Operators
+
+**Simple Explanation:** Grouping is like **sorting laundry** - separate items into piles based on a category.
+
+```mermaid
+graph TB
+    A[People] --> B[Group by City]
+    B --> C[Seattle Group<br/>Alice, Bob]
+    B --> D[Portland Group<br/>Charlie]
+    B --> E[Boston Group<br/>Dave, Eve]
+
+    style A fill:#87CEEB
+    style C fill:#90EE90
+    style D fill:#FFB6C1
+    style E fill:#FFD700
+```
 
 ```csharp
-// GroupBy - group by key
-var grouped = people.GroupBy(p => p.City);
+// 🔰 BEGINNER: GroupBy - group by key
+var people = GetPeople();
+var byCity = people.GroupBy(p => p.City);
 
-foreach (var group in grouped)
+foreach (var group in byCity)
 {
-    Console.WriteLine($"City: {group.Key}");
+    Console.WriteLine($"City: {group.Key}, Count: {group.Count()}");
     foreach (var person in group)
     {
         Console.WriteLine($"  {person.Name}");
     }
 }
+// Output:
+// City: Seattle, Count: 2
+//   Alice
+//   Bob
+// City: Portland, Count: 1
+//   Charlie
 
-// GroupBy with result selector
-var cityCounts = people.GroupBy(
+// 🎯 INTERMEDIATE: GroupBy with result selector
+var citySummary = people.GroupBy(
     p => p.City,
-    (city, persons) => new { City = city, Count = persons.Count() }
+    (city, persons) => new
+    {
+        City = city,
+        Count = persons.Count(),
+        AverageAge = persons.Average(p => p.Age),
+        Names = string.Join(", ", persons.Select(p => p.Name))
+    }
 );
+
+// GroupBy with element selector
+var cityNames = people.GroupBy(
+    p => p.City,           // Key selector
+    p => p.Name            // Element selector (only Name in groups)
+);
+
+// 🚀 ADVANCED: ToLookup - like GroupBy but immediate execution
+var lookup = people.ToLookup(p => p.City);
+
+// Lookup is like Dictionary<TKey, IEnumerable<TElement>>
+var seattlePeople = lookup["Seattle"];  // O(1) lookup
+var portlandPeople = lookup["Portland"];
+
+// Multiple key grouping
+var multiGroup = people.GroupBy(p => new { p.City, p.Department });
+
+foreach (var group in multiGroup)
+{
+    Console.WriteLine($"City: {group.Key.City}, Dept: {group.Key.Department}");
+}
 ```
 
 ### Joining
