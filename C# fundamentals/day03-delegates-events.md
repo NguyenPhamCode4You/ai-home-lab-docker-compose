@@ -23,11 +23,6 @@ graph LR
     A[Delegate Variable] -->|Points to| B[Method 1]
     A -->|Can point to| C[Method 2]
     A -->|Can point to| D[Method 3]
-
-    style A fill:#bbdefb,stroke:#333,stroke-width:2px
-    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -89,10 +84,6 @@ graph TB
     A -.-> D[Person Instance]
     B -.-> E[SayHello Method]
     C -.-> F[Chain of Delegates]
-
-    style A fill:#ffccbc,stroke:#333,stroke-width:2px
-    style B fill:#bbdefb,stroke:#333,stroke-width:2px
-    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -225,11 +216,6 @@ graph LR
     A --> C[Method 2<br/>returns 12]
     A --> D[Method 3<br/>returns 42]
     D --> E[Final Result: 42]
-
-    style B fill:#ffccbc,stroke:#333,stroke-width:2px
-    style C fill:#ffccbc,stroke:#333,stroke-width:2px
-    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style E fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -392,11 +378,6 @@ graph TB
     C --> C1[Func TResult<br/>Func T TResult<br/>Func T1 T2 TResult]
     D --> D1[Predicate T<br/>T to bool]
     E --> E1[EventHandler<br/>EventHandler T]
-
-    style B fill:#ffccbc,stroke:#333,stroke-width:2px
-    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style D fill:#bbdefb,stroke:#333,stroke-width:2px
-    style E fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ### Action<T> - No Return Value
@@ -551,11 +532,6 @@ sequenceDiagram
     Note over Publisher: Price changes again
     Publisher->>Event: Raise Event
     Event->>Sub2: Notify (only Sub2)
-
-    style Publisher fill:#bbdefb,stroke:#333,stroke-width:2px
-    style Event fill:#fff9c4,stroke:#333,stroke-width:2px
-    style Sub1 fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style Sub2 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Event vs Delegate Comparison
@@ -573,9 +549,6 @@ graph TB
         B2 --> B3[Can only be invoked<br/>from inside class]
         B3 --> B4[Safe]
     end
-
-    style A4 fill:#ef9a9a,stroke:#333,stroke-width:2px
-    style B4 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Event Pattern (Standard .NET Pattern)
@@ -694,13 +667,6 @@ graph TB
         G --> J[Monitor 2.OnPriceChanged]
         H --> K[Logger.OnPriceChanged]
     end
-
-    style A fill:#87CEEB
-    style D fill:#FFD700
-    style E fill:#FFB6C1
-    style I fill:#90EE90
-    style J fill:#90EE90
-    style K fill:#90EE90
 ```
 
 ### 🎯 INTERMEDIATE: Custom Event Accessors
@@ -819,10 +785,6 @@ graph LR
 
     B --> B1["() - No params<br/>(x) - One param<br/>(x,y) - Multiple"]
     D --> D1["Single expression<br/>x => x * 2<br/><br/>Statement block<br/>x => { return x * 2; }"]
-
-    style A fill:#87CEEB
-    style B1 fill:#90EE90
-    style D1 fill:#FFB6C1
 ```
 
 ```csharp
@@ -876,10 +838,6 @@ graph TB
 
     E[Lambda Executed Later] --> D
     E -.Still has access to.-> B
-
-    style C fill:#87CEEB
-    style D fill:#FFB6C1
-    style E fill:#90EE90
 ```
 
 ```csharp
