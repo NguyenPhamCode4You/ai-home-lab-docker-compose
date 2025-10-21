@@ -29,19 +29,19 @@ graph TB
 
     subgraph "Heap (Slower, Large Size)"
         D[Person Object<br/>Name: John<br/>Age: 30]
-        E[int[] Array<br/>1000 elements]
+        E[int Array<br/>1000 elements]
         F[String: Hello]
     end
 
     C -.Reference.-> D
     C -.Reference.-> E
 
-    style A fill:#90EE90
-    style B fill:#90EE90
-    style C fill:#90EE90
-    style D fill:#87CEEB
-    style E fill:#87CEEB
-    style F fill:#87CEEB
+    style A fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style D fill:#bbdefb,stroke:#333,stroke-width:2px
+    style E fill:#bbdefb,stroke:#333,stroke-width:2px
+    style F fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### The Stack
@@ -161,17 +161,17 @@ graph TB
     end
 
     subgraph "Heap"
-        H1["Container Object (0x1000)<br/>━━━━━━━━━━━━<br/>Object Header<br/>Value: int = 10<br/>Location: Point (x=5, y=5)<br/>Owner: ref to 0x2000"]
-        H2["Person Object (0x2000)<br/>━━━━━━━━━━━━<br/>Name: string<br/>Age: int = 30"]
+        H1["Container Object (0x1000)<br/>Object Header<br/>Value: int = 10<br/>Location: Point x=5 y=5<br/>Owner: ref to 0x2000"]
+        H2["Person Object (0x2000)<br/>Name: string<br/>Age: int = 30"]
     end
 
     S2 -.-> H1
     H1 -.Owner.-> H2
 
-    style S1 fill:#90EE90
-    style S2 fill:#90EE90
-    style H1 fill:#87CEEB
-    style H2 fill:#FFB6C1
+    style S1 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style S2 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style H1 fill:#bbdefb,stroke:#333,stroke-width:2px
+    style H2 fill:#ffccbc,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -233,9 +233,9 @@ graph LR
     C -->|Move live<br/>objects| C1[Compacted Memory]
     C -->|Update<br/>references| C2[Updated Pointers]
 
-    style A fill:#90EE90
-    style B fill:#FFB6C1
-    style C fill:#87CEEB
+    style A fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### How GC Works
@@ -312,12 +312,12 @@ graph TD
     C -->|Not reachable| F[Collected]
     D -->|Not reachable| G[Collected slowly]
 
-    style B fill:#FFB6C1
-    style C fill:#FFD700
-    style D fill:#90EE90
-    style E fill:#FF6347
-    style F fill:#FF6347
-    style G fill:#FF6347
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#fff9c4,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style F fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style G fill:#ef9a9a,stroke:#333,stroke-width:2px
 ```
 
 ### Generation Details
@@ -413,9 +413,9 @@ graph TB
     E --> F[Dispose called automatically]
     F --> G[Resources freed immediately]
 
-    style D fill:#FFB6C1
-    style E fill:#90EE90
-    style G fill:#87CEEB
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style E fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style G fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -618,10 +618,10 @@ graph TD
     A --> D[Cached Objects<br/>Never Removed]
     A --> E[Unmanaged Resources<br/>Not Disposed]
 
-    style B fill:#FF6347
-    style C fill:#FF6347
-    style D fill:#FF6347
-    style E fill:#FF6347
+    style B fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style C fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style D fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style E fill:#ef9a9a,stroke:#333,stroke-width:2px
 ```
 
 ```csharp

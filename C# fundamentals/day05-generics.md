@@ -21,20 +21,20 @@
 ```mermaid
 graph TB
     subgraph "Before Generics (C# 1.0)"
-        A1[ArrayList] -->|Add int| B1[Box int -> object]
-        A1 -->|Add string| B2[Box string -> object]
-        A1 -->|Get item| C1[Unbox object -> int]
-        B1 --> D1[❌ Performance Loss<br/>❌ No Type Safety<br/>❌ Runtime Errors]
+        A1[ArrayList] -->|Add int| B1[Box int to object]
+        A1 -->|Add string| B2[Box string to object]
+        A1 -->|Get item| C1[Unbox object to int]
+        B1 --> D1[Performance Loss<br/>No Type Safety<br/>Runtime Errors]
     end
 
     subgraph "With Generics (C# 2.0+)"
-        E1[List&lt;int&gt;] -->|Add int| F1[No Boxing]
+        E1[List int] -->|Add int| F1[No Boxing]
         E1 -->|Get item| G1[No Casting]
-        F1 --> H1[✅ Performance<br/>✅ Type Safe<br/>✅ Compile-time Errors]
+        F1 --> H1[Performance<br/>Type Safe<br/>Compile-time Errors]
     end
 
-    style D1 fill:#FF6347
-    style H1 fill:#90EE90
+    style D1 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style H1 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -82,18 +82,18 @@ for (int i = 0; i < 1000000; i++)
 
 ```mermaid
 graph LR
-    A[Generic Type<br/>Container&lt;T&gt;] --> B[Container&lt;int&gt;]
-    A --> C[Container&lt;string&gt;]
-    A --> D[Container&lt;Person&gt;]
+    A[Generic Type<br/>Container T] --> B[Container int]
+    A --> C[Container string]
+    A --> D[Container Person]
 
     B --> E[Separate IL Code]
     C --> F[Separate IL Code]
     D --> G[Separate IL Code]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#FFD700
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ### Generic Classes
@@ -262,14 +262,14 @@ var oldest = people.MaxBy(p => p.Age); // Bob
 
 ```mermaid
 graph TB
-    A[Pair&lt;TFirst, TSecond&gt;] --> B[Pair&lt;int, string&gt;<br/>1, One]
-    A --> C[Pair&lt;double, double&gt;<br/>10.5, 20.3]
-    A --> D[Pair&lt;string, Person&gt;<br/>Alice, PersonObj]
+    A[Pair TFirst TSecond] --> B[Pair int string<br/>1, One]
+    A --> C[Pair double double<br/>10.5, 20.3]
+    A --> D[Pair string Person<br/>Alice, PersonObj]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#FFD700
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -356,13 +356,13 @@ graph TB
     F --> F1[Must implement<br/>specific interface]
     G --> G1[Type parameter U must be<br/>assignable to T]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#FFD700
-    style E fill:#DDA0DD
-    style F fill:#87CEFA
-    style G fill:#F0E68C
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#fff9c4,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
+    style F fill:#b3e5fc,stroke:#333,stroke-width:2px
+    style G fill:#f0f4c3,stroke:#333,stroke-width:2px
 ```
 
 ### Where Clauses
@@ -529,8 +529,8 @@ graph TD
     B -->|BaseClass| F[Does T inherit from BaseClass?]
     B -->|IInterface| G[Does T implement IInterface?]
 
-    C -->|Yes| H[✅ Valid]
-    C -->|No| I[❌ Compile Error]
+    C -->|Yes| H[Valid]
+    C -->|No| I[Compile Error]
     D -->|Yes| H
     D -->|No| I
     E -->|Yes| H
@@ -540,8 +540,8 @@ graph TD
     G -->|Yes| H
     G -->|No| I
 
-    style H fill:#90EE90
-    style I fill:#FF6347
+    style H fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style I fill:#ef9a9a,stroke:#333,stroke-width:2px
 ```
 
 ### Constraint Combinations
@@ -721,21 +721,21 @@ graph TB
     end
 
     subgraph "Covariance out T - Reading"
-        E["IEnumerable&lt;Dog&gt;<br/>(Specific)"] -->|"Can assign to"| F["IEnumerable&lt;Animal&gt;<br/>(General)"]
+        E["IEnumerable Dog<br/>(Specific)"] -->|"Can assign to"| F["IEnumerable Animal<br/>(General)"]
         F -->|"Can read as"| G[Animal items]
-        G -->|"Safe because"| H["Dog IS-AN Animal<br/>✅ Type-safe"]
+        G -->|"Safe because"| H["Dog IS-AN Animal<br/>Type-safe"]
     end
 
     subgraph "Contravariance in T - Writing"
-        I["Action&lt;Animal&gt;<br/>(General)"] -->|"Can assign to"| J["Action&lt;Dog&gt;<br/>(Specific)"]
+        I["Action Animal<br/>(General)"] -->|"Can assign to"| J["Action Dog<br/>(Specific)"]
         J -->|"Can write"| K[Dog items]
-        K -->|"Safe because"| L["Dog can be treated as Animal<br/>✅ Type-safe"]
+        K -->|"Safe because"| L["Dog can be treated as Animal<br/>Type-safe"]
     end
 
-    style E fill:#90EE90
-    style F fill:#87CEEB
-    style I fill:#FFB6C1
-    style J fill:#FFD700
+    style E fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style F fill:#bbdefb,stroke:#333,stroke-width:2px
+    style I fill:#ffccbc,stroke:#333,stroke-width:2px
+    style J fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ### Variance Flow Diagram
@@ -745,22 +745,22 @@ graph LR
     A[Type Hierarchy] --> B[Covariance: out T]
     A --> C[Contravariance: in T]
 
-    B --> B1["Output only<br/>IEnumerable&lt;out T&gt;"]
-    B --> B2["Read from collection<br/>Func&lt;out TResult&gt;"]
-    B --> B3["Derived → Base<br/>Dog → Animal"]
+    B --> B1["Output only<br/>IEnumerable out T"]
+    B --> B2["Read from collection<br/>Func out TResult"]
+    B --> B3["Derived to Base<br/>Dog to Animal"]
 
-    C --> C1["Input only<br/>IComparable&lt;in T&gt;"]
-    C --> C2["Write to parameter<br/>Action&lt;in T&gt;"]
-    C --> C3["Base → Derived<br/>Animal → Dog"]
+    C --> C1["Input only<br/>IComparable in T"]
+    C --> C2["Write to parameter<br/>Action in T"]
+    C --> C3["Base to Derived<br/>Animal to Dog"]
 
-    B1 --> D["✅ Can return more<br/>specific types"]
-    C1 --> E["✅ Can accept more<br/>general types"]
+    B1 --> D["Can return more<br/>specific types"]
+    C1 --> E["Can accept more<br/>general types"]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style E fill:#FFB6C1
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#ffccbc,stroke:#333,stroke-width:2px
 ```
 
 ### Covariance (out keyword)

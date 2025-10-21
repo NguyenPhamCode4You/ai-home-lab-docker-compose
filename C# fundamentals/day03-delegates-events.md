@@ -24,10 +24,10 @@ graph LR
     A -->|Can point to| C[Method 2]
     A -->|Can point to| D[Method 3]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#90EE90
-    style D fill:#90EE90
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -83,16 +83,16 @@ graph TB
     subgraph "Delegate Instance"
         A[Target Object<br/>null for static]
         B[Method Pointer<br/>IntPtr]
-        C[Invocation List<br/>Delegate[]]
+        C[Invocation List<br/>Delegate Array]
     end
 
     A -.-> D[Person Instance]
     B -.-> E[SayHello Method]
     C -.-> F[Chain of Delegates]
 
-    style A fill:#FFB6C1
-    style B fill:#87CEEB
-    style C fill:#90EE90
+    style A fill:#ffccbc,stroke:#333,stroke-width:2px
+    style B fill:#bbdefb,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -226,10 +226,10 @@ graph LR
     A --> D[Method 3<br/>returns 42]
     D --> E[Final Result: 42]
 
-    style B fill:#FFB6C1
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style E fill:#87CEEB
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -388,15 +388,15 @@ graph TB
     A --> D[Predicate<br/>Returns bool]
     A --> E[EventHandler<br/>For Events]
 
-    B --> B1[Action<br/>Action&lt;T&gt;<br/>Action&lt;T1,T2&gt;]
-    C --> C1[Func&lt;TResult&gt;<br/>Func&lt;T,TResult&gt;<br/>Func&lt;T1,T2,TResult&gt;]
-    D --> D1[Predicate&lt;T&gt;<br/>T => bool]
-    E --> E1[EventHandler<br/>EventHandler&lt;T&gt;]
+    B --> B1[Action<br/>Action T<br/>Action T1 T2]
+    C --> C1[Func TResult<br/>Func T TResult<br/>Func T1 T2 TResult]
+    D --> D1[Predicate T<br/>T to bool]
+    E --> E1[EventHandler<br/>EventHandler T]
 
-    style B fill:#FFB6C1
-    style C fill:#90EE90
-    style D fill:#87CEEB
-    style E fill:#FFD700
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style D fill:#bbdefb,stroke:#333,stroke-width:2px
+    style E fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ### Action<T> - No Return Value
@@ -552,10 +552,10 @@ sequenceDiagram
     Publisher->>Event: Raise Event
     Event->>Sub2: Notify (only Sub2)
 
-    style Publisher fill:#87CEEB
-    style Event fill:#FFD700
-    style Sub1 fill:#90EE90
-    style Sub2 fill:#90EE90
+    style Publisher fill:#bbdefb,stroke:#333,stroke-width:2px
+    style Event fill:#fff9c4,stroke:#333,stroke-width:2px
+    style Sub1 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style Sub2 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Event vs Delegate Comparison
@@ -565,17 +565,17 @@ graph TB
     subgraph "Delegate (Field)"
         A1[Public Field] --> A2[Can be assigned =]
         A2 --> A3[Can be invoked<br/>from outside]
-        A3 --> A4[❌ Not safe]
+        A3 --> A4[Not safe]
     end
 
     subgraph "Event (Encapsulated)"
         B1[Public Event] --> B2[Can only += or -=]
         B2 --> B3[Can only be invoked<br/>from inside class]
-        B3 --> B4[✅ Safe]
+        B3 --> B4[Safe]
     end
 
-    style A4 fill:#FF6347
-    style B4 fill:#90EE90
+    style A4 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style B4 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Event Pattern (Standard .NET Pattern)

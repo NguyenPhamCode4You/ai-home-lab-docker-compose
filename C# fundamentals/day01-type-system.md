@@ -56,6 +56,12 @@ graph LR
     A --> C[Reference Types]
     B --> D[Stored on Stack<br/>Contains actual data<br/>Copied by value]
     C --> E[Stored on Heap<br/>Contains reference/pointer<br/>Copied by reference]
+
+    style A fill:#e1f5ff,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#f1f8e9,stroke:#333,stroke-width:1px
+    style E fill:#ffe0b2,stroke:#333,stroke-width:1px
 ```
 
 **Key Difference:**
@@ -81,9 +87,9 @@ graph TB
         C[bool flag = true]
     end
 
-    style A fill:#90EE90
-    style B fill:#90EE90
-    style C fill:#90EE90
+    style A fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Characteristics
@@ -252,9 +258,9 @@ graph TB
     A -.-> C
     B -.-> C
 
-    style A fill:#FFB6C1
-    style B fill:#FFB6C1
-    style C fill:#87CEEB
+    style A fill:#ffccbc,stroke:#333,stroke-width:2px
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Characteristics
@@ -382,9 +388,9 @@ graph TD
         B2 -.-> B4
     end
 
-    style A4 fill:#90EE90
-    style A5 fill:#90EE90
-    style B4 fill:#87CEEB
+    style A4 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style A5 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B4 fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Complete Example
@@ -441,9 +447,9 @@ graph LR
     A[Stack<br/>int value = 42] -->|Boxing| B[Heap<br/>object boxed<br/>contains 42]
     B -->|Unboxing| C[Stack<br/>int unboxed = 42]
 
-    style A fill:#90EE90
-    style B fill:#87CEEB
-    style C fill:#90EE90
+    style A fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B fill:#bbdefb,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Boxing Examples
@@ -563,11 +569,11 @@ graph TB
         B5 -->|Unbox| B6[Stack: int temp3 = 1]
     end
 
-    style A1 fill:#90EE90
-    style A2 fill:#90EE90
-    style A3 fill:#90EE90
-    style B2 fill:#FFB6C1
-    style B5 fill:#FFB6C1
+    style A1 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style A2 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style A3 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B2 fill:#ffccbc,stroke:#333,stroke-width:2px
+    style B5 fill:#ffccbc,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -766,8 +772,8 @@ graph TD
     E -->|No| C
     E -->|Yes| F[Use STRUCT]
 
-    style F fill:#90EE90
-    style C fill:#87CEEB
+    style F fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Guidelines

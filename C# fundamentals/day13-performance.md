@@ -29,11 +29,11 @@ graph TB
     H -->|Yes| A
     H -->|No| I[Done]
 
-    style A fill:#FFD700
-    style B fill:#87CEEB
-    style C fill:#90EE90
-    style F fill:#90EE90
-    style I fill:#90EE90
+    style A fill:#fff9c4,stroke:#333,stroke-width:2px
+    style B fill:#bbdefb,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style F fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style I fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Memory Allocation Comparison
@@ -41,20 +41,20 @@ graph TB
 ```mermaid
 graph LR
     subgraph "String Concatenation (N=1000)"
-        A1[String +] --> B1[1000 allocations<br/>~500KB<br/>❌ O n²]
+        A1[String +] --> B1[1000 allocations<br/>~500KB<br/>On²]
     end
 
     subgraph "StringBuilder"
-        A2[StringBuilder] --> B2[~5 allocations<br/>~10KB<br/>✅ On]
+        A2[StringBuilder] --> B2[~5 allocations<br/>~10KB<br/>On]
     end
 
-    subgraph "Span<T>"
-        A3[Span&lt;T&gt;] --> B3[0 allocations<br/>Stack only<br/>✅✅ On]
+    subgraph "Span T"
+        A3[Span T] --> B3[0 allocations<br/>Stack only<br/>On]
     end
 
-    style B1 fill:#FF6347
-    style B2 fill:#FFD700
-    style B3 fill:#90EE90
+    style B1 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style B2 fill:#fff9c4,stroke:#333,stroke-width:2px
+    style B3 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### Setup

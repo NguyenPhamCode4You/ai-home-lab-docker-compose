@@ -28,12 +28,12 @@ graph TB
     E --> E1[GC<br/>Memory Leaks<br/>Optimization]
     F --> F1[Microservices<br/>CQRS<br/>Event Driven]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFD700
-    style D fill:#FFB6C1
-    style E fill:#DDA0DD
-    style F fill:#87CEFA
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#fff9c4,stroke:#333,stroke-width:2px
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
+    style F fill:#b3e5fc,stroke:#333,stroke-width:2px
 ```
 
 ### System Architecture Patterns
@@ -62,9 +62,9 @@ graph TB
         B3 --> E3[Consumer 3]
     end
 
-    style A1 fill:#FFD700
-    style A2 fill:#90EE90
-    style B3 fill:#87CEEB
+    style A1 fill:#fff9c4,stroke:#333,stroke-width:2px
+    style A2 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B3 fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### CQRS Pattern
@@ -81,10 +81,10 @@ graph LR
 
     E -.Sync.-> F
 
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style E fill:#FFD700
-    style F fill:#87CEEB
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#fff9c4,stroke:#333,stroke-width:2px
+    style F fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Language Fundamentals

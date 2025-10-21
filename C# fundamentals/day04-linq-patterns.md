@@ -25,16 +25,16 @@ graph TB
     A --> D[LINQ to XML]
     A --> E[PLINQ]
 
-    B --> F[In-Memory Collections<br/>IEnumerable&lt;T&gt;]
-    C --> G[Database<br/>IQueryable&lt;T&gt;]
+    B --> F[In-Memory Collections<br/>IEnumerable T]
+    C --> G[Database<br/>IQueryable T]
     D --> H[XML Documents<br/>XElement/XDocument]
-    E --> I[Parallel Processing<br/>ParallelQuery&lt;T&gt;]
+    E --> I[Parallel Processing<br/>ParallelQuery T]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#FFD700
-    style E fill:#DDA0DD
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#fff9c4,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -101,10 +101,10 @@ graph LR
     H --> I[Results]
     E --> I
 
-    style A fill:#87CEEB
-    style C fill:#90EE90
-    style D fill:#FFB6C1
-    style G fill:#FFD700
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style G fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -248,10 +248,10 @@ graph TB
 
     C --> C1[ToList<br/>ToArray<br/>ToDictionary<br/>ToHashSet<br/>Count<br/>Sum<br/>Min<br/>Max<br/>Average<br/>First/FirstOrDefault<br/>Single/SingleOrDefault<br/>Any<br/>All]
 
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style B1 fill:#E0FFE0
-    style C1 fill:#FFE0E0
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style B1 fill:#e8f5e9,stroke:#333,stroke-width:1px
+    style C1 fill:#ffebee,stroke:#333,stroke-width:1px
 ```
 
 ```csharp
@@ -313,10 +313,10 @@ graph TB
         B3 -->|Only matching data| B4[Result]
     end
 
-    style A2 fill:#FF6347
-    style A3 fill:#FF6347
-    style B2 fill:#90EE90
-    style B3 fill:#90EE90
+    style A2 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style A3 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style B2 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style B3 fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ### IEnumerable<T> - In-Memory Queries
@@ -478,11 +478,11 @@ graph TD
     F --> G[Execute on Database]
     G --> H[Return Results]
 
-    style B fill:#FFB6C1
-    style C fill:#FFB6C1
-    style D fill:#90EE90
-    style F fill:#90EE90
-    style G fill:#90EE90
+    style B fill:#ffccbc,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style F fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style G fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp
@@ -587,11 +587,11 @@ graph TB
     H --> H1[Any<br/>All<br/>Contains]
     I --> I1[Take<br/>Skip<br/>TakeLast<br/>SkipLast]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFB6C1
-    style D fill:#FFD700
-    style E fill:#DDA0DD
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D fill:#fff9c4,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
 ```
 
 ### Filtering Operators
@@ -602,8 +602,8 @@ graph TB
 graph LR
     A[1,2,3,4,5,6,7,8,9,10] -->|Where x > 5| B[6,7,8,9,10]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
 ```
 
 ```csharp

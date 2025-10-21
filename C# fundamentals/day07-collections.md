@@ -17,24 +17,24 @@
 ```mermaid
 graph TB
     A[IEnumerable&lt;T&gt;<br/>Basic iteration] --> B[ICollection&lt;T&gt;<br/>Add, Remove, Count]
-    B --> C[IList&lt;T&gt;<br/>Index access]
-    B --> D[ISet&lt;T&gt;<br/>Unique items]
-    B --> E[IDictionary&lt;TKey,TValue&gt;<br/>Key-value pairs]
+    B --> C[IList T<br/>Index access]
+    B --> D[ISet T<br/>Unique items]
+    B --> E[IDictionary TKey TValue<br/>Key-value pairs]
 
-    C --> C1[List&lt;T&gt;]
+    C --> C1[List T]
     C --> C2[Array]
 
-    D --> D1[HashSet&lt;T&gt;]
-    D --> D2[SortedSet&lt;T&gt;]
+    D --> D1[HashSet T]
+    D --> D2[SortedSet T]
 
-    E --> E1[Dictionary&lt;TKey,TValue&gt;]
-    E --> E2[SortedDictionary&lt;TKey,TValue&gt;]
+    E --> E1[Dictionary TKey TValue]
+    E --> E2[SortedDictionary TKey TValue]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFD700
-    style D fill:#FFB6C1
-    style E fill:#DDA0DD
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#fff9c4,stroke:#333,stroke-width:2px
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
 ```
 
 ### Collection Selection Guide
@@ -44,24 +44,24 @@ graph TD
     A[Need Collection?] --> B{Access Pattern?}
 
     B -->|Sequential| C{Duplicates?}
-    B -->|By Index| D[Use List&lt;T&gt;]
-    B -->|By Key| E[Use Dictionary&lt;TKey,TValue&gt;]
-    B -->|Unique Items| F[Use HashSet&lt;T&gt;]
+    B -->|By Index| D[Use List T]
+    B -->|By Key| E[Use Dictionary TKey TValue]
+    B -->|Unique Items| F[Use HashSet T]
 
-    C -->|Allowed| G[Use List&lt;T&gt;]
-    C -->|Not Allowed| H[Use HashSet&lt;T&gt;]
+    C -->|Allowed| G[Use List T]
+    C -->|Not Allowed| H[Use HashSet T]
 
-    D --> D1[✅ O1 access by index<br/>Fast iteration]
-    E --> E1[✅ O1 lookup by key<br/>Fast retrieval]
-    F --> F1[✅ O1 lookup<br/>No duplicates]
-    G --> G1[✅ O1 add at end<br/>On insertion order]
-    H --> H1[✅ O1 add/contains<br/>Unordered]
+    D --> D1[O1 access by index<br/>Fast iteration]
+    E --> E1[O1 lookup by key<br/>Fast retrieval]
+    F --> F1[O1 lookup<br/>No duplicates]
+    G --> G1[O1 add at end<br/>On insertion order]
+    H --> H1[O1 add/contains<br/>Unordered]
 
-    style D fill:#90EE90
-    style E fill:#FFB6C1
-    style F fill:#FFD700
-    style G fill:#90EE90
-    style H fill:#FFD700
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#ffccbc,stroke:#333,stroke-width:2px
+    style F fill:#fff9c4,stroke:#333,stroke-width:2px
+    style G fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style H fill:#fff9c4,stroke:#333,stroke-width:2px
 ```
 
 ### IEnumerable<T>

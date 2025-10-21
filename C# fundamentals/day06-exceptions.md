@@ -21,7 +21,7 @@
 graph TB
     A[System.Object] --> B[System.Exception]
     B --> C[SystemException]
-    B --> D[ApplicationException<br/>❌ Don't inherit!]
+    B --> D[ApplicationException<br/>Do not inherit!]
 
     C --> E[ArgumentException]
     C --> F[InvalidOperationException]
@@ -36,11 +36,11 @@ graph TB
     I --> I2[DirectoryNotFoundException]
     I --> I3[EndOfStreamException]
 
-    style B fill:#87CEEB
-    style C fill:#90EE90
-    style D fill:#FF6347
-    style E fill:#FFD700
-    style I fill:#FFB6C1
+    style B fill:#bbdefb,stroke:#333,stroke-width:2px
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style D fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style E fill:#fff9c4,stroke:#333,stroke-width:2px
+    style I fill:#ffccbc,stroke:#333,stroke-width:2px
 ```
 
 ### Exception Flow Diagram
@@ -200,12 +200,12 @@ graph TD
     I --> K
     J --> K
 
-    style C fill:#90EE90
-    style E fill:#90EE90
-    style G fill:#90EE90
-    style I fill:#FFD700
-    style J fill:#FF6347
-    style K fill:#87CEEB
+    style C fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style E fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style G fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style I fill:#fff9c4,stroke:#333,stroke-width:2px
+    style J fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style K fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Exception Filters (C# 6.0+)
@@ -294,9 +294,9 @@ graph TD
     D --> I[Finally Block]
     H --> I
 
-    style D fill:#90EE90
-    style H fill:#FF6347
-    style I fill:#87CEEB
+    style D fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style H fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style I fill:#bbdefb,stroke:#333,stroke-width:2px
 ```
 
 ### Finally Block Behavior
@@ -398,11 +398,11 @@ graph TD
     I -->|No| J[Continue Execution]
     I -->|Yes| K[Propagate Exception]
 
-    style A fill:#87CEEB
-    style F fill:#90EE90
-    style H fill:#FFD700
-    style J fill:#90EE90
-    style K fill:#FF6347
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style F fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style H fill:#fff9c4,stroke:#333,stroke-width:2px
+    style J fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style K fill:#ef9a9a,stroke:#333,stroke-width:2px
 ```
 
 {
@@ -639,13 +639,13 @@ graph TD
     E --> E1[Custom NotFoundException]
     F --> F1[NotSupportedException]
 
-    style B2 fill:#FF6347
-    style B3 fill:#FFD700
-    style B4 fill:#FFA500
-    style C1 fill:#FFB6C1
-    style D1 fill:#87CEEB
-    style E1 fill:#90EE90
-    style F1 fill:#DDA0DD
+    style B2 fill:#ef9a9a,stroke:#333,stroke-width:2px
+    style B3 fill:#fff9c4,stroke:#333,stroke-width:2px
+    style B4 fill:#ffcc80,stroke:#333,stroke-width:2px
+    style C1 fill:#ffccbc,stroke:#333,stroke-width:2px
+    style D1 fill:#bbdefb,stroke:#333,stroke-width:2px
+    style E1 fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style F1 fill:#e1bee7,stroke:#333,stroke-width:2px
 ```
 
 ### Throwing Best Practices

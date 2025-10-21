@@ -28,12 +28,12 @@ graph TB
     E --> E1[Many small interfaces]
     F --> F1[Depend on abstractions]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFD700
-    style D fill:#FFB6C1
-    style E fill:#DDA0DD
-    style F fill:#87CEFA
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#fff9c4,stroke:#333,stroke-width:2px
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style E fill:#e1bee7,stroke:#333,stroke-width:2px
+    style F fill:#b3e5fc,stroke:#333,stroke-width:2px
 ```
 
 ### Design Pattern Categories
@@ -56,10 +56,10 @@ graph TB
     D --> D2[Observer]
     D --> D3[Command]
 
-    style A fill:#87CEEB
-    style B fill:#90EE90
-    style C fill:#FFD700
-    style D fill:#FFB6C1
+    style A fill:#bbdefb,stroke:#333,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
+    style C fill:#fff9c4,stroke:#333,stroke-width:2px
+    style D fill:#ffccbc,stroke:#333,stroke-width:2px
 ```
 
 ### Single Responsibility Principle (SRP)
