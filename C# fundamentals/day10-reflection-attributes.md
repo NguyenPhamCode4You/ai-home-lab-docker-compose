@@ -12,9 +12,46 @@
 
 ## 1. Reflection Basics
 
+### Reflection Process Flow
+
+```mermaid
+graph TB
+    A[Source Code] --> B[Compile to Assembly]
+    B --> C[Load Assembly]
+    C --> D[Get Type Information]
+    D --> E[Inspect Members]
+    E --> F[Create Instances]
+    E --> G[Invoke Methods]
+    E --> H[Access Properties]
+
+    style D fill:#87CEEB
+    style F fill:#90EE90
+    style G fill:#FFB6C1
+    style H fill:#FFD700
+```
+
+### Type Hierarchy
+
+```mermaid
+graph TB
+    A[Assembly] --> B[Type/Module]
+    B --> C[MemberInfo]
+    C --> D[MethodInfo]
+    C --> E[PropertyInfo]
+    C --> F[FieldInfo]
+    C --> G[ConstructorInfo]
+    C --> H[EventInfo]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+```
+
 ### Type Information
 
 ```csharp
+// 🔰 BEGINNER: Get Type object
+
 // Get Type object
 Type type1 = typeof(string);
 Type type2 = "hello".GetType();

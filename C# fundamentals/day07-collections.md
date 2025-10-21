@@ -14,29 +14,77 @@
 
 ### Core Interfaces Hierarchy
 
+```mermaid
+graph TB
+    A[IEnumerable&lt;T&gt;<br/>Basic iteration] --> B[ICollection&lt;T&gt;<br/>Add, Remove, Count]
+    B --> C[IList&lt;T&gt;<br/>Index access]
+    B --> D[ISet&lt;T&gt;<br/>Unique items]
+    B --> E[IDictionary&lt;TKey,TValue&gt;<br/>Key-value pairs]
+
+    C --> C1[List&lt;T&gt;]
+    C --> C2[Array]
+
+    D --> D1[HashSet&lt;T&gt;]
+    D --> D2[SortedSet&lt;T&gt;]
+
+    E --> E1[Dictionary&lt;TKey,TValue&gt;]
+    E --> E2[SortedDictionary&lt;TKey,TValue&gt;]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+    style D fill:#FFB6C1
+    style E fill:#DDA0DD
 ```
-IEnumerable<T>
-  └── ICollection<T>
-        ├── IList<T>
-        │     └── List<T>, Array
-        ├── ISet<T>
-        │     └── HashSet<T>, SortedSet<T>
-        └── IDictionary<TKey, TValue>
-              └── Dictionary<TKey, TValue>
+
+### Collection Selection Guide
+
+```mermaid
+graph TD
+    A[Need Collection?] --> B{Access Pattern?}
+
+    B -->|Sequential| C{Duplicates?}
+    B -->|By Index| D[Use List&lt;T&gt;]
+    B -->|By Key| E[Use Dictionary&lt;TKey,TValue&gt;]
+    B -->|Unique Items| F[Use HashSet&lt;T&gt;]
+
+    C -->|Allowed| G[Use List&lt;T&gt;]
+    C -->|Not Allowed| H[Use HashSet&lt;T&gt;]
+
+    D --> D1[✅ O1 access by index<br/>Fast iteration]
+    E --> E1[✅ O1 lookup by key<br/>Fast retrieval]
+    F --> F1[✅ O1 lookup<br/>No duplicates]
+    G --> G1[✅ O1 add at end<br/>On insertion order]
+    H --> H1[✅ O1 add/contains<br/>Unordered]
+
+    style D fill:#90EE90
+    style E fill:#FFB6C1
+    style F fill:#FFD700
+    style G fill:#90EE90
+    style H fill:#FFD700
 ```
 
 ### IEnumerable<T>
 
+**Simple Analogy:** IEnumerable<T> is like a **playlist** - you can only go through items one by one, but can't jump to specific songs or add/remove them.
+
 ```csharp
+// 🔰 BEGINNER: Basic IEnumerable
+
 public interface IEnumerable<out T> : IEnumerable
 {
     IEnumerator<T> GetEnumerator();
 }
 
-// Implementation
+// Simple implementation
 public class CustomCollection<T> : IEnumerable<T>
 {
     private T[] items;
+
+    public CustomCollection(params T[] items)
+    {
+        this.items = items;
+    }
 
     public IEnumerator<T> GetEnumerator()
     {
@@ -48,11 +96,82 @@ public class CustomCollection<T> : IEnumerable<T>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+
+// Usage
+var collection = new CustomCollection<int>(1, 2, 3, 4, 5);
+foreach (var item in collection)
+{
+    Console.WriteLine(item);
+}
+
+// 🎯 INTERMEDIATE: Custom enumerator with state
+public class RangeEnumerable : IEnumerable<int>
+{
+    private readonly int start;
+    private readonly int count;
+
+    public RangeEnumerable(int start, int count)
+    {
+        this.start = start;
+        this.count = count;
+    }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            yield return start + i;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+// Usage
+var range = new RangeEnumerable(10, 5); // 10, 11, 12, 13, 14
+foreach (var num in range)
+{
+    Console.WriteLine(num);
+}
+
+// 🚀 ADVANCED: Lazy evaluation with yield
+public class FibonacciSequence : IEnumerable<int>
+{
+    private readonly int maxCount;
+
+    public FibonacciSequence(int maxCount)
+    {
+        this.maxCount = maxCount;
+    }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        int a = 0, b = 1;
+        for (int i = 0; i < maxCount; i++)
+        {
+            yield return a;
+            int temp = a;
+            a = b;
+            b = temp + b;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+// Usage - generates numbers on-demand
+var fibonacci = new FibonacciSequence(10);
+foreach (var num in fibonacci)
+{
+    Console.WriteLine(num); // 0, 1, 1, 2, 3, 5, 8, 13, 21, 34
+}
 ```
 
 ### ICollection<T>
 
 ```csharp
+// 🔰 BEGINNER: ICollection adds modification capabilities
+
 public interface ICollection<T> : IEnumerable<T>
 {
     int Count { get; }
@@ -63,11 +182,21 @@ public interface ICollection<T> : IEnumerable<T>
     void CopyTo(T[] array, int arrayIndex);
     bool Remove(T item);
 }
+
+// Usage
+ICollection<string> collection = new List<string>();
+collection.Add("Apple");
+collection.Add("Banana");
+Console.WriteLine($"Count: {collection.Count}"); // 2
+Console.WriteLine($"Contains Banana: {collection.Contains("Banana")}"); // True
+collection.Remove("Apple");
 ```
 
 ### IList<T>
 
 ```csharp
+// 🎯 INTERMEDIATE: IList adds index-based access
+
 public interface IList<T> : ICollection<T>
 {
     T this[int index] { get; set; } // Indexer
@@ -75,11 +204,41 @@ public interface IList<T> : ICollection<T>
     void Insert(int index, T item);
     void RemoveAt(int index);
 }
+
+// Usage
+IList<string> list = new List<string> { "A", "B", "C" };
+Console.WriteLine(list[1]); // "B"
+list[1] = "Modified"; // Direct index access
+list.Insert(1, "Inserted"); // Insert at position
+Console.WriteLine(list.IndexOf("C")); // Find index
 ```
+
+````
 
 ---
 
 ## 2. List<T> - Dynamic Array
+
+### List<T> Internal Structure
+
+```mermaid
+graph TB
+    subgraph "List<T> Initial State"
+        A[Capacity: 4<br/>Count: 0] --> B[Empty Array]
+    end
+
+    subgraph "After Adding 4 Items"
+        C[Capacity: 4<br/>Count: 4] --> D[Full Array]
+    end
+
+    subgraph "Adding 5th Item - Resize!"
+        E[Capacity: 8<br/>Count: 5] --> F[New Array 2x size]
+        D -.Copy all items.-> F
+    end
+
+    style E fill:#FFD700
+    style F fill:#90EE90
+```
 
 ### Internals
 
@@ -134,7 +293,7 @@ public class MyList<T>
         items[--size] = default(T);
     }
 }
-```
+````
 
 ### Complexity
 
@@ -176,16 +335,52 @@ for (int i = numbers.Count - 1; i >= 0; i--)
 
 ## 3. Dictionary<TKey, TValue> - Hash Table
 
+### Dictionary Internal Structure
+
+```mermaid
+graph TB
+    subgraph "Hash Table Structure"
+        A[Key: Apple] -->|GetHashCode| B[Hash: 12345]
+        B -->|Modulo| C[Bucket: 5]
+        C --> D[Entry Chain]
+        D --> E[Apple: Red]
+        D --> F[Apricot: Orange]
+    end
+
+    style B fill:#FFD700
+    style C fill:#90EE90
+    style E fill:#87CEEB
+```
+
+### Hash Collision Handling
+
+```mermaid
+graph LR
+    subgraph "Buckets Array"
+        B0[Bucket 0] --> N1[null]
+        B1[Bucket 1] --> E1[Entry A]
+        B2[Bucket 2] --> E2[Entry B]
+        E2 -->|next| E3[Entry C]
+        E3 -->|next| E4[Entry D]
+        B3[Bucket 3] --> N2[null]
+    end
+
+    style E2 fill:#FFD700
+    style E3 fill:#FFA500
+    style E4 fill:#FF6347
+```
+
 ### Internals
 
 ```csharp
-// Simplified implementation concept
+// 🔰 BEGINNER: Simplified Dictionary implementation concept
+
 public class MyDictionary<TKey, TValue>
 {
     private struct Entry
     {
         public int hashCode;
-        public int next; // Next entry in bucket
+        public int next; // Next entry in bucket (for collisions)
         public TKey key;
         public TValue value;
     }

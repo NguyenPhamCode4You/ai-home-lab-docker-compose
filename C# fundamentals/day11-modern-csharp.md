@@ -12,9 +12,53 @@
 
 ## 1. Pattern Matching (C# 7.0+)
 
+### Pattern Matching Evolution
+
+```mermaid
+graph TB
+    A[C# 7.0<br/>Type Patterns] --> B[C# 8.0<br/>Switch Expressions]
+    B --> C[C# 9.0<br/>Relational Patterns]
+    C --> D[C# 10.0<br/>Extended Property Patterns]
+    D --> E[C# 11.0<br/>List Patterns]
+
+    A --> A1[is string s]
+    B --> B1[obj switch { }]
+    C --> C1[x is > 0 and < 10]
+    D --> D1[{ Prop.Nested: value }]
+    E --> E1[[1, 2, .., 9]]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+    style D fill:#FFB6C1
+    style E fill:#DDA0DD
+```
+
+### Pattern Matching Decision Tree
+
+```mermaid
+graph TD
+    A[Value] --> B{Type Match?}
+    B -->|Yes| C{Property Match?}
+    B -->|No| D[Default/Discard]
+
+    C -->|Yes| E{Guard Condition?}
+    C -->|No| F[Try Next Pattern]
+
+    E -->|True| G[Execute Branch]
+    E -->|False| F
+
+    F --> B
+
+    style G fill:#90EE90
+    style D fill:#FFD700
+```
+
 ### Type Pattern (C# 7.0)
 
 ```csharp
+// 🔰 BEGINNER: Basic pattern matching
+
 object obj = "hello";
 
 // Old way

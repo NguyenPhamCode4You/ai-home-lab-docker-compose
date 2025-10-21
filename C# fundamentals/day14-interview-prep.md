@@ -12,11 +12,88 @@
 
 ## 1. Core C# Interview Questions
 
+### Interview Question Categories
+
+```mermaid
+graph TB
+    A[C# Interview Topics] --> B[Language Fundamentals]
+    A --> C[OOP & Design Patterns]
+    A --> D[Async & Threading]
+    A --> E[Performance & Memory]
+    A --> F[System Design]
+
+    B --> B1[Value vs Reference<br/>Boxing/Unboxing<br/>Generics]
+    C --> C1[SOLID<br/>Patterns<br/>Inheritance]
+    D --> D1[async/await<br/>Task<br/>Deadlocks]
+    E --> E1[GC<br/>Memory Leaks<br/>Optimization]
+    F --> F1[Microservices<br/>CQRS<br/>Event Driven]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+    style D fill:#FFB6C1
+    style E fill:#DDA0DD
+    style F fill:#87CEFA
+```
+
+### System Architecture Patterns
+
+```mermaid
+graph TB
+    subgraph "Monolithic"
+        A1[UI] --> B1[Business Logic]
+        B1 --> C1[Data Access]
+        C1 --> D1[Database]
+    end
+
+    subgraph "Microservices"
+        A2[API Gateway] --> B2[Service 1]
+        A2 --> C2[Service 2]
+        A2 --> D2[Service 3]
+        B2 --> E2[DB 1]
+        C2 --> F2[DB 2]
+        D2 --> G2[DB 3]
+    end
+
+    subgraph "Event-Driven"
+        A3[Producer] --> B3[Message Bus]
+        B3 --> C3[Consumer 1]
+        B3 --> D3[Consumer 2]
+        B3 --> E3[Consumer 3]
+    end
+
+    style A1 fill:#FFD700
+    style A2 fill:#90EE90
+    style B3 fill:#87CEEB
+```
+
+### CQRS Pattern
+
+```mermaid
+graph LR
+    A[Client] --> B{CQRS}
+
+    B -->|Commands| C[Command Handler]
+    B -->|Queries| D[Query Handler]
+
+    C --> E[Write Database]
+    D --> F[Read Database]
+
+    E -.Sync.-> F
+
+    style C fill:#FFB6C1
+    style D fill:#90EE90
+    style E fill:#FFD700
+    style F fill:#87CEEB
+```
+
 ### Language Fundamentals
 
 **Q: Explain value types vs reference types**
 
 ```csharp
+// 🔰 BEGINNER: Understanding the difference
+
 // Value type - stored on stack (usually), copied by value
 int x = 10;
 int y = x; // Copy of value
@@ -37,6 +114,8 @@ Console.WriteLine(list1.Count); // 4 (same object!)
 **Q: What is boxing and unboxing?**
 
 ```csharp
+// 🎯 INTERMEDIATE: Performance implications
+
 // Boxing - value type to reference type
 int value = 42;
 object boxed = value; // Boxing - allocates on heap
@@ -55,6 +134,8 @@ List<int> list = new List<int>(); // No boxing
 **Q: Explain async/await**
 
 ```csharp
+// 🚀 ADVANCED: State machine understanding
+
 // async/await is compiler-generated state machine
 public async Task<string> GetDataAsync()
 {
@@ -75,8 +156,6 @@ public async Task<string> GetDataAsync()
 // - Better scalability
 // - Clean asynchronous code
 ```
-
----
 
 ## 2. Advanced Concepts
 

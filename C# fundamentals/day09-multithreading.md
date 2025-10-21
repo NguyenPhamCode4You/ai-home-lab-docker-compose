@@ -12,9 +12,52 @@
 
 ## 1. Thread Fundamentals
 
+### Thread Execution Model
+
+```mermaid
+graph TB
+    A[Main Thread] -->|Creates| B[Thread 1]
+    A -->|Creates| C[Thread 2]
+    A -->|Creates| D[Thread 3]
+
+    B --> E[CPU Core 1]
+    C --> F[CPU Core 2]
+    D --> G[CPU Core 3/4]
+
+    A --> H[Continues Execution]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFB6C1
+    style D fill:#FFD700
+```
+
+### Thread Pool vs Manual Threads
+
+```mermaid
+graph LR
+    subgraph "Manual Thread"
+        A1[Create Thread] --> B1[Allocate Resources<br/>1MB+ stack]
+        B1 --> C1[Start Thread]
+        C1 --> D1[Execute]
+        D1 --> E1[Destroy Thread]
+    end
+
+    subgraph "Thread Pool"
+        A2[Request Work] --> B2[Reuse Existing Thread]
+        B2 --> C2[Execute]
+        C2 --> D2[Return to Pool]
+    end
+
+    style E1 fill:#FF6347
+    style D2 fill:#90EE90
+```
+
 ### Creating Threads
 
 ```csharp
+// 🔰 BEGINNER: Basic thread creation
+
 // Basic thread creation
 Thread thread = new Thread(() =>
 {
@@ -42,7 +85,8 @@ thread.Priority = ThreadPriority.Normal;
 ### Thread Pool
 
 ```csharp
-// Use thread pool (preferred over manual threads)
+// 🎯 INTERMEDIATE: Use thread pool (preferred over manual threads)
+
 ThreadPool.QueueUserWorkItem(state =>
 {
     Console.WriteLine("Thread pool work");
@@ -64,9 +108,49 @@ ThreadPool.GetMinThreads(out int minWorker, out int minCompletion);
 
 ## 2. Synchronization Primitives
 
+### Race Condition Visualization
+
+```mermaid
+sequenceDiagram
+    participant T1 as Thread 1
+    participant Counter
+    participant T2 as Thread 2
+
+    Note over Counter: Initial value: 0
+
+    T1->>Counter: Read 0
+    T2->>Counter: Read 0
+    T1->>T1: Increment to 1
+    T2->>T2: Increment to 1
+    T1->>Counter: Write 1
+    T2->>Counter: Write 1
+
+    Note over Counter: Final value: 1 ❌<br/>Expected: 2
+```
+
+### Deadlock Scenario
+
+```mermaid
+sequenceDiagram
+    participant T1 as Thread 1
+    participant L1 as Lock A
+    participant L2 as Lock B
+    participant T2 as Thread 2
+
+    T1->>L1: Acquire Lock A ✅
+    T2->>L2: Acquire Lock B ✅
+
+    T1->>L2: Try Lock B ⏳
+    T2->>L1: Try Lock A ⏳
+
+    Note over T1,T2: ❌ DEADLOCK!<br/>Both threads wait forever
+```
+
 ### lock (Monitor)
 
 ```csharp
+// 🔰 BEGINNER: Basic lock usage
+
 private readonly object lockObject = new object();
 private int counter = 0;
 
@@ -89,15 +173,18 @@ finally
     Monitor.Exit(lockObject);
 }
 
-// lock rules:
+// 🎯 INTERMEDIATE: lock rules
+
 // ✅ Lock on private object
-// ❌ Don't lock on this, typeof, or string
-private readonly object myLock = new object(); // ✅
+private readonly object myLock = new object(); // ✅ GOOD
 
 public void Method()
 {
-    lock (this) { } // ❌ Bad!
-    lock (typeof(MyClass)) { } // ❌ Bad!
+    // ❌ Don't lock on these:
+    lock (this) { } // ❌ Bad! External code can lock on your instance
+    lock (typeof(MyClass)) { } // ❌ Bad! Can cause cross-app domain deadlocks
+    lock ("string") { } // ❌ Bad! String interning causes issues
+}
     lock ("string") { } // ❌ Bad!
 }
 ```

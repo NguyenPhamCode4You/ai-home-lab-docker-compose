@@ -12,9 +12,56 @@
 
 ## 1. Benchmarking with BenchmarkDotNet
 
+### Performance Optimization Flow
+
+```mermaid
+graph TB
+    A[Identify Bottleneck] --> B[Measure with Benchmarks]
+    B --> C[Optimize Code]
+    C --> D[Measure Again]
+    D --> E{Improved?}
+
+    E -->|Yes| F[Document & Deploy]
+    E -->|No| G[Try Different Approach]
+    G --> C
+
+    F --> H{More Bottlenecks?}
+    H -->|Yes| A
+    H -->|No| I[Done]
+
+    style A fill:#FFD700
+    style B fill:#87CEEB
+    style C fill:#90EE90
+    style F fill:#90EE90
+    style I fill:#90EE90
+```
+
+### Memory Allocation Comparison
+
+```mermaid
+graph LR
+    subgraph "String Concatenation (N=1000)"
+        A1[String +] --> B1[1000 allocations<br/>~500KB<br/>❌ O n²]
+    end
+
+    subgraph "StringBuilder"
+        A2[StringBuilder] --> B2[~5 allocations<br/>~10KB<br/>✅ On]
+    end
+
+    subgraph "Span<T>"
+        A3[Span&lt;T&gt;] --> B3[0 allocations<br/>Stack only<br/>✅✅ On]
+    end
+
+    style B1 fill:#FF6347
+    style B2 fill:#FFD700
+    style B3 fill:#90EE90
+```
+
 ### Setup
 
 ```csharp
+// 🔰 BEGINNER: Basic benchmarking
+
 // Install: dotnet add package BenchmarkDotNet
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
@@ -72,6 +119,8 @@ public class Program
 }
 ```
 
+````
+
 ### Benchmark Attributes
 
 ```csharp
@@ -113,7 +162,7 @@ public class MyBenchmarks
         // Final cleanup
     }
 }
-```
+````
 
 ---
 

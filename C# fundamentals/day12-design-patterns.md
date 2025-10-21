@@ -12,11 +12,63 @@
 
 ## 1. SOLID Principles
 
+### SOLID Overview
+
+```mermaid
+graph TB
+    A[SOLID Principles] --> B[Single Responsibility<br/>SRP]
+    A --> C[Open/Closed<br/>OCP]
+    A --> D[Liskov Substitution<br/>LSP]
+    A --> E[Interface Segregation<br/>ISP]
+    A --> F[Dependency Inversion<br/>DIP]
+
+    B --> B1[One reason to change]
+    C --> C1[Open for extension<br/>Closed for modification]
+    D --> D1[Subtypes must be substitutable]
+    E --> E1[Many small interfaces]
+    F --> F1[Depend on abstractions]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+    style D fill:#FFB6C1
+    style E fill:#DDA0DD
+    style F fill:#87CEFA
+```
+
+### Design Pattern Categories
+
+```mermaid
+graph TB
+    A[Design Patterns] --> B[Creational<br/>Object Creation]
+    A --> C[Structural<br/>Object Composition]
+    A --> D[Behavioral<br/>Object Interaction]
+
+    B --> B1[Singleton]
+    B --> B2[Factory]
+    B --> B3[Builder]
+
+    C --> C1[Adapter]
+    C --> C2[Decorator]
+    C --> C3[Proxy]
+
+    D --> D1[Strategy]
+    D --> D2[Observer]
+    D --> D3[Command]
+
+    style A fill:#87CEEB
+    style B fill:#90EE90
+    style C fill:#FFD700
+    style D fill:#FFB6C1
+```
+
 ### Single Responsibility Principle (SRP)
 
-A class should have only one reason to change.
+**Principle:** A class should have only one reason to change.
 
 ```csharp
+// 🔰 BEGINNER: Understanding SRP
+
 // ❌ BAD - Multiple responsibilities
 public class User
 {

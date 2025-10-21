@@ -12,9 +12,53 @@
 
 ## 1. Async/Await Fundamentals
 
+### Async State Machine Flow
+
+```mermaid
+sequenceDiagram
+    participant Caller
+    participant Method
+    participant StateMachine
+    participant Task
+
+    Caller->>Method: Call async method
+    Method->>StateMachine: Create state machine
+    StateMachine->>Task: Start Task
+    Method-->>Caller: Return Task immediately
+
+    StateMachine->>StateMachine: Execute until await
+    StateMachine->>Task: Await operation
+    Task->>StateMachine: Operation complete
+    StateMachine->>StateMachine: Continue execution
+    StateMachine->>Task: Set result
+    Task-->>Caller: Return result
+```
+
+### Task Lifecycle
+
+```mermaid
+graph TB
+    A[Created] --> B[WaitingForActivation]
+    B --> C[Running]
+
+    C -->|Success| D[RanToCompletion]
+    C -->|Error| E[Faulted]
+    C -->|Cancelled| F[Canceled]
+
+    D --> G[Result Available]
+    E --> H[Exception Stored]
+    F --> I[OperationCanceledException]
+
+    style D fill:#90EE90
+    style E fill:#FF6347
+    style F fill:#FFD700
+```
+
 ### Basic Async Method
 
 ```csharp
+// 🔰 BEGINNER: Basic async method
+
 public async Task<string> DownloadDataAsync(string url)
 {
     using HttpClient client = new HttpClient();
