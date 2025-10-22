@@ -305,28 +305,14 @@ graph TD
 
 #### Key Characteristics
 
-| Aspect                | Details                                                   |
-| --------------------- | --------------------------------------------------------- |
-| **Time Lock**         | Arrival time becomes **immutable** after approval         |
-| **ETA Closure**       | Final ETA from noon reports is compared to actual arrival |
-| **Bunker Snapshot**   | Records final fuel state at destination                   |
-| **Variance Analysis** | Enables estimated vs. actual comparison                   |
-
-#### Workflow
-
-```mermaid
-graph LR
-    A[Last Noon Report<br/>ETA: Oct 23, 06:00] --> B[Ship Arrives<br/>Actual: Oct 23, 01:00]
-    B --> C[Captain Submits<br/>Arrival Report]
-    C --> D[Operator Approves]
-    D --> E[Lock Arrival Time]
-    E --> F[Block ETA Editing]
-    E --> G[Finalize Bunker Status]
-    E --> H[Start Next Itinerary]
-
-    style E fill:#FFD700
-    style H fill:#90EE90
-```
+| Field              | Type           | Required | Editable After Approval | Description                      |
+| ------------------ | -------------- | -------- | ----------------------- | -------------------------------- |
+| Arrival Time       | DateTime       | ✓ Yes    | ❌ No                   | **Moment of truth** - locks ETA  |
+| From Port          | Port ID        | ✓ Yes    | ❌ No                   | Origin port                      |
+| To Port            | Port ID        | ✓ Yes    | ✓ Yes (until arrival)   | Destination port - Arriving port |
+| Distance Traveled  | Nautical Miles | ✓ Yes    | Daily                   | Last 24-hour progress            |
+| Speed (Past)       | Knots          | ✓ Yes    | Daily                   | Actual speed last 24h            |
+| Bunker Consumption | Per Tank       | ✓ Yes    | Daily                   | Fuel used last 24h               |
 
 ---
 
@@ -342,13 +328,14 @@ gantt
     Ship Arrival (Outside)     :a1, 08:00, 2h
     Idle Time (Waiting)       :a2, after a1, 4h
     section Moving to Berth
-    Intra (Moving to Berth)   :a3, after a2, 1h
+    Intra In (Moving to Berth)   :a3, after a2, 1h
     section Cargo Operations
     Berth Time (Start)        :milestone, after a3, 0h
     Cargo Loading/Unloading   :a4, after a3, 12h
     Unberth Time (End)        :milestone, after a4, 0h
     section Departure
     Departure                 :a5, after a4, 1h
+    Intra Out (Moving from Berth)   :a3, after a2, 1h
 ```
 
 #### Port Phase Definitions
