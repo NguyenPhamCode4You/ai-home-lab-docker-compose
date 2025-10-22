@@ -324,18 +324,23 @@ graph TD
 gantt
     title Complete Port Operation Timeline
     dateFormat HH:mm
+
     section Arrival
     Ship Arrival (Outside)     :a1, 08:00, 2h
-    Idle Time (Waiting)       :a2, after a1, 4h
+    Idle Time (Waiting)        :a2, after a1, 3h
+
     section Moving to Berth
-    Intra In (Moving to Berth)   :a3, after a2, 1h
+    Intra In (Moving to Berth) :a3, after a2, 1h
+
     section Cargo Operations
-    Berth Time (Start)        :milestone, after a3, 0h
-    Cargo Loading/Unloading   :a4, after a3, 12h
-    Unberth Time (End)        :milestone, after a4, 0h
+    Berth Time (Start)         :milestone, after a3, 0h
+    Cargo Loading/Unloading    :a4, after a3, 6h
+    Unberth Time (End)         :milestone, after a4, 0h
+
     section Departure
-    Departure                 :a5, after a4, 1h
-    Intra Out (Moving from Berth)   :a3, after a2, 1h
+    Intra Out (Moving from Berth) :a5, after a4, 1h
+    Departure                    :a6, after a5, 1h
+
 ```
 
 #### Port Phase Definitions
@@ -344,7 +349,7 @@ gantt
 | -------------- | --------- | ------------------ | ------- | --------- | ------------------------------------- |
 | **Idle Time**  | Variable  | Low (auxiliary)    | 0 kts   | ❌ None   | Waiting outside port to minimize fees |
 | **Intra Time** | 0.5-2 hrs | High (maneuvering) | 5-6 kts | ✓ Starts  | Moving from anchorage to berth        |
-| **Cargo Time** | 8-24 hrs  | Very Low           | 0 kts   | ✓ Active  | Loading/unloading at berth            |
+| **Cargo Time** | Variable  | Medium             | 0 kts   | ✓ Active  | Loading/unloading at berth            |
 
 #### Why Idle Time Matters
 
@@ -373,10 +378,6 @@ graph TD
     F --> G[Minimize Port Fees]
 
     D --> H[Pay Full Port Fees]
-
-    style C fill:#90EE90
-    style G fill:#90EE90
-    style H fill:#FFB6C1
 ```
 
 ---
