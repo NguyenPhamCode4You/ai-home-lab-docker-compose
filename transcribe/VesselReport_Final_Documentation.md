@@ -59,7 +59,7 @@ graph TB
 
     subgraph "BVMS System"
         C[Vessel Reports]
-        D[Processing report & voyage]
+        D[Current voyage]
         E[Consecutive voyages]
     end
 
@@ -74,7 +74,7 @@ graph TB
     F -->|Manual Entry| C
 
     C -->|Display| F
-    F -->|Approve| D
+    F -->|Approve & Process| D
 
     D -->|Propagate changes| E
 
