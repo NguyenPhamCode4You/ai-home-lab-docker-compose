@@ -49,34 +49,35 @@ VOYAGE START                    VOYAGE PROGRESS                      VOYAGE END
 
 ```mermaid
 graph TB
-    subgraph "External Systems"
-        A[WFOS System<br/>3rd Party]
-        B[Ship Captain<br/>Via WhatsApp]
+    subgraph "Vessel"
+        A[Ship Captain]
     end
 
-    subgraph "BVMS Core"
-        C[Import Module<br/>Cron: 2hrs]
-        D[Vessel Report UI]
-        E[Approval Engine]
-        F[Calculation Engine]
+    subgraph "WFOS System"
+        B[SmartLog Desktop]
     end
 
-    subgraph "Data Outputs"
-        G[Transaction Update]
-        H[Bunker Planning]
-        I[Consecutive Voyages]
-        J[Financial Reports]
+    subgraph "BVMS System"
+        C[Vessel Reports]
+        D[Processing report & voyage]
+        E[Consecutive voyages]
     end
 
-    A -->|Auto Import<br/>~10 Vessels| C
-    B -->|Manual Entry<br/>~90 Vessels| D
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    F --> H
-    F --> I
-    F --> J
+    subgraph "BBC Orginization"
+        F[Operators]
+    end
+
+    A -->|Submit Reports| B
+    A <-.->|WhatsApp| F
+
+    B -->|Import| C
+    F -->|Manual Entry| C
+
+    C -->|Display| F
+    F -->|Approve| D
+
+    D -->|Propagate changes| E
+
 ```
 
 ### 2.3 Operational Team Structure
