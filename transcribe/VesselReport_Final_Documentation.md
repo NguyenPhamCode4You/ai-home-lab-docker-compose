@@ -110,51 +110,15 @@ graph TD
 
 ## 3. Report Types Quick Reference
 
-### 3.1 Report Type Comparison
-
-| Report Type     | Timing           | Purpose           | Locks Data       | Frequency        | Critical Fields                   |
-| --------------- | ---------------- | ----------------- | ---------------- | ---------------- | --------------------------------- |
-| **Departure**   | Leaving port     | Voyage start      | ✓ Departure Time | Once per port    | Time, Position, Initial Bunker    |
-| **Noon (Null)** | Daily at sea     | Progress tracking | Updates ETA      | Daily            | Distance, Speed, Consumption, ETA |
-| **Arrival**     | Reaching port    | Voyage end        | ✓ Arrival Time   | Once per port    | Arrival Time, Final Position      |
-| **In Port**     | Waiting to berth | Port planning     | -                | Multiple         | Berth/Unberth estimates           |
-| **Berth**       | Entering berth   | Cargo start       | ✓ Berth Time     | Once             | Actual Berth Time                 |
-| **Unberth**     | Leaving berth    | Cargo end         | ✓ Unberth Time   | Once             | Actual Unberth Time               |
-| **Receival**    | Fuel loading     | Bunkering         | -                | Per bunker event | Fuel Type, Quantity, Lot          |
-
-### 3.2 Report Submission Flow
-
-```mermaid
-sequenceDiagram
-    participant Cap as Ship Captain
-    participant VF as WFOS System
-    participant BV as BVMS
-    participant Op as Operator
-    participant Txn as Transaction
-
-    Note over Cap: Every 24 Hours
-    Cap->>VF: Submit Report<br/>(Position, Fuel, Distance)
-
-    alt Auto-Import (Contracted Vessels)
-        VF->>BV: Sync via Cron Job<br/>(Every 2 hours)
-    else Manual Entry
-        Cap->>Op: WhatsApp/Email
-        Op->>BV: Manual Input
-    end
-
-    BV->>Op: Display Report<br/>(Pending Approval)
-    Op->>Op: Validate Data
-
-    alt Data Correct
-        Op->>BV: Approve Report
-        BV->>Txn: Delete Future Estimates
-        BV->>Txn: Insert Real Data
-        BV->>Txn: Recalculate Future
-    else Data Incorrect
-        Op->>Cap: Request Correction
-        Cap->>VF: Fix & Resubmit
-    end
-```
+| Report Type   | When Submitted       | Key Data Points                                             | Time Lock                  |
+| ------------- | -------------------- | ----------------------------------------------------------- | -------------------------- |
+| **Departure** | Leaving port         | Departure time (actual), from-to ports, initial bunker      | Locks **Departure Time**   |
+| **Noon**      | Daily at sea         | Distance traveled (24h), distance to go, bunker consumption | Updates **ETA**            |
+| **Arrival**   | Reaching destination | Arrival time (actual), final position                       | Locks **Arrival Time**     |
+| **In Port**   | While docked         | Time of berth, time of unberth                              | Reports **berth schedule** |
+| **Berth**     | Actual berthing      | Berth time (moment of truth)                                | Locks **Berth Time**       |
+| **Unberth**   | Leaving berth        | Unberth time (moment of truth)                              | Locks **Unberth Time**     |
+| **Receival**  | Receiving fuel       | Bunker lot received, quantity, specs                        | Adds bunker to **onboard** |
 
 ---
 
@@ -163,13 +127,13 @@ sequenceDiagram
 ### 4.1 Bunker Structure Hierarchy
 
 ```
-BUNKER TOWER (Summary View)
-├── Total VLSFO: 186 tons    ◄── Display in Itinerary
-├── Total LSMGO: 76 tons     ◄── Sum of all lots
+BUNKER TAB (Summary View)
+├── Total VLSFO: 186 tons               ◄── Display in each Itinerary row
+├── Total LSMGO: 76 tons                ◄── Sum of all lots of this type
 └── Total MDO: 40 tons
 
 BUNKER LOT (Detailed Breakdown)
-├── VLSFO Lot #1: 186 tons @ $489/ton  ◄── Tank-specific tracking
+├── VLSFO Lot #1: 186 tons @ $489/ton   ◄── Lot-specific tracking
 │   ├── Initial: 186
 │   ├── Onboard: 186
 │   ├── Consumption: 34
@@ -179,29 +143,13 @@ BUNKER LOT (Detailed Breakdown)
 └── LSMGO Lot #2: 20 tons @ $682/ton
 ```
 
-**Key Validation Rule:**
+### 4.2 Critical Bunker Metrics
 
-```
-Bunker Tower Amount = Sum of All Lot Amounts
-Example: 76 LSMGO = 55 (Lot #1) + 20 (Lot #2) + 1 (Lot #3)
-```
-
-### 4.2 Consumption Scenarios
-
-| Scenario               | Operator Plan          | Captain Reality                  | Reason                                    | System Response                      |
-| ---------------------- | ---------------------- | -------------------------------- | ----------------------------------------- | ------------------------------------ |
-| **ECA Zone Override**  | Use Lot #1 (55t) first | Uses Lot #2 (20t) first          | Ship in ECA, needs clean fuel immediately | Updates lot order, recalculates      |
-| **Fuel Shortage Risk** | Expect 2t remaining    | Reports 0.5t remaining           | Storm delays increased consumption        | Alerts operator for emergency refuel |
-| **Multiple Lot Usage** | Sequential consumption | Parallel consumption from 2 lots | Operational efficiency                    | Tracks both lots simultaneously      |
-
-### 4.3 Critical Bunker Metrics
-
-| Metric               | Definition                          | Why It Matters             | Monitoring Frequency |
-| -------------------- | ----------------------------------- | -------------------------- | -------------------- |
-| **Onboard Amount**   | Fuel confirmed on vessel via report | Validates actual inventory | Daily                |
-| **Consumption Rate** | Tons used per 24 hours              | Predicts future needs      | Daily                |
-| **Ending Lot**       | Remaining fuel at voyage end        | Feeds next voyage initial  | End of voyage        |
-| **ECA Compliance**   | Clean fuel in emission zones        | Environmental regulations  | Per report           |
+| Metric                 | Definition                          | Why It Matters                 |
+| ---------------------- | ----------------------------------- | ------------------------------ |
+| **Onboard Amount**     | Fuel confirmed on vessel via report | Validates actual inventory     |
+| **Consumption Amount** | Tons used per 24 hours              | Actual usage metrics by engine |
+| **Receival Amount**    | Tons bunkered at port               | Updates inventory levels       |
 
 ---
 
@@ -211,7 +159,7 @@ Example: 76 LSMGO = 55 (Lot #1) + 20 (Lot #2) + 1 (Lot #3)
 
 ```mermaid
 graph LR
-    A[Voyage 1: End] --> B{Two Data Points}
+    A[Voyage 1: End] --> B{Get current voyage's}
     B --> C[Ending Time]
     B --> D[Ending Bunker Lots]
     C --> E[Voyage 2: Start Time]
@@ -220,9 +168,6 @@ graph LR
     F --> G
     G --> H[Voyage 2: End]
     H --> I[Voyage 3: Start]
-
-    style B fill:#FFE4B5
-    style G fill:#90EE90
 ```
 
 ### 5.2 Cascade Effect Example
@@ -241,71 +186,30 @@ graph LR
 
 ### 6.1 Common Errors & Solutions
 
-| Error Type               | Example                        | Detection             | Impact Severity       | Correction Method                | Time to Fix |
-| ------------------------ | ------------------------------ | --------------------- | --------------------- | -------------------------------- | ----------- |
-| **Wrong Fuel Type**      | Dirty fuel in ECA              | Operator review       | 🔴 High (Compliance)  | Direct edit or Captain resubmit  | 15-30 min   |
-| **Consumption Mismatch** | Reports 2.1t used, actually 0t | System validation     | 🟡 Medium             | Edit + Re-approve                | 10 min      |
-| **Timing Paradox**       | Arrival before departure       | System validation     | 🔴 High (Logic break) | Correct sequence + Batch approve | 30-60 min   |
-| **Lot Tracking Error**   | Used wrong tank                | Bunker reconciliation | 🟡 Medium             | Adjust lot mapping               | 20 min      |
-| **Cascading Error**      | Day 1 wrong → Days 2-4 wrong   | Daily review          | 🔴 High (Accumulates) | Fix Day 1 + Batch re-approve     | 45 min      |
+| Error Type               | Example                               | Detection         | Impact Severity             |
+| ------------------------ | ------------------------------------- | ----------------- | --------------------------- |
+| **Wrong Fuel Type**      | Dirty fuel used in ECA                | Operator review   | 🟡 Medium (Compliance)      |
+| **Consumption Mismatch** | Reports 2.1 used, actually 0.0        | System validation | 🔴 High (Cascade effect)    |
+| **Report Types Paradox** | Departure submited without an arrival | System validation | 🔴 High (Wrong calculation) |
 
 ### 6.2 Correction Methods Comparison
 
-| Method                    | Use Case               | Steps                                           | Data Loss Risk | Operator Effort |
-| ------------------------- | ---------------------- | ----------------------------------------------- | -------------- | --------------- |
-| **1. Direct Edit**        | Minor single error     | Edit → Save → Re-approve                        | None           | Low             |
-| **2. Captain Resubmit**   | Source data wrong      | Request → WFOS fix → Sync → Override → Approve  | None           | Medium          |
-| **3. Batch Approval**     | Historical chain error | Fix first → Batch approve sequence              | None           | Medium          |
-| **4. Delete & Re-import** | Massive errors         | Delete all → Re-import → Map lots → Approve all | ⚠️ Loses edits | High            |
+| Method                    | Use Case                  | Steps                                          | Data Loss Risk | Operator Effort |
+| ------------------------- | ------------------------- | ---------------------------------------------- | -------------- | --------------- |
+| **1. Direct Edit**        | Minor single error        | Edit → Save → Re-approve                       | None           | Low             |
+| **2. Captain Resubmit**   | Wrong from WFOS submitted | Request → WFOS fix → Sync → Override → Approve | None           | Medium          |
+| **3. Batch Approval**     | Historical chain error    | Fix first → Batch approve sequence             | ⚠️             | High            |
+| **4. Delete & Re-import** | Massive errors            | Delete all → Re-import → Approve all           | ⚠️             | High            |
 
 ---
 
-## 7. Integration Requirements
+## 7. Prerequisites for Successful Import
 
-### 7.1 WFOS Contract Status
-
-| Category                   | Count | Import Method        | Update Frequency     |
-| -------------------------- | ----- | -------------------- | -------------------- |
-| **Contracted Vessels**     | ~10   | Automatic (WFOS API) | Every 2 hours (cron) |
-| **Non-contracted Vessels** | ~90   | Manual entry         | On-demand            |
-| **Total Fleet**            | ~100+ | Mixed                | Continuous           |
-
-### 7.2 Prerequisites for Successful Import
-
-| Requirement               | Description                | Failure Impact     | Validation               |
-| ------------------------- | -------------------------- | ------------------ | ------------------------ |
-| ✓ **Vessel in Contract**  | Ship in BBC-WFOS agreement | No auto-import     | Check vessel list        |
-| ✓ **Voyage Number Match** | WFOS #12345 = BVMS #12345  | Data misalignment  | Manual verification      |
-| ✓ **Route Consistency**   | Same ports/order           | Wrong calculations | Compare itineraries      |
-| ✓ **Captain Reporting**   | Active WFOS usage          | No data to import  | Monitor last report time |
-
----
-
-## 8. Key Takeaways by Role
-
-### For Operations Team ✅
-
-- Review reports **daily** (24-hour cycle)
-- **Validate before approving** (operator responsibility)
-- Monitor **bunker levels** to prevent shortages
-- Use **WhatsApp** for urgent captain communication
-- Understand **consecutive impact** of approvals
-
-### For System Developers 🔧
-
-- **Real data overrides** estimates (always)
-- Implement **multi-layer validation**
-- Track **lot-level** bunker details
-- Auto-calculate **cascade effects**
-- Provide **multiple correction paths**
-
-### For Data Integrity 📊
-
-- **High accuracy required** (drives financials)
-- Maintain **audit trail** of all changes
-- Lock **"moment of truth"** timestamps
-- Ensure **consecutive consistency**
-- WFOS = **source of truth** (for contracted vessels)
+| Requirement               | Description                   |
+| ------------------------- | ----------------------------- |
+| ✓ **Vessel in Contract**  | Vessels in contract agreement |
+| ✓ **Voyage Number Match** | WFOS Voy.No == BVMS Voy.No    |
+| ✓ **Routing Match**       | Same ports/order              |
 
 ---
 
@@ -346,26 +250,6 @@ sequenceDiagram
     BV->>Itin: Lock Departure Time (22:00)
     BV->>Itin: Block Time Field from Editing
     Note over Itin: Departure Time = Fixed
-```
-
-#### Example Report
-
-```json
-{
-  "reportType": "DEPARTURE",
-  "timestamp": "2024-10-17T22:00:00Z",
-  "vessel": "Cepasobo BBC",
-  "voyage": "V12345",
-  "fromPort": "New Orleans",
-  "toPort": "Albany",
-  "position": { "lat": 29.9511, "lon": -90.0715 },
-  "distanceToGo": 1800,
-  "bunker": {
-    "VLSFO_1": 186,
-    "LSMGO_1": 55,
-    "LSMGO_2": 20
-  }
-}
 ```
 
 ---
