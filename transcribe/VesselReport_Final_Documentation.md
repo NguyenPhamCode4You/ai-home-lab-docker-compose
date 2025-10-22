@@ -82,12 +82,29 @@ graph TB
 
 ### 2.3 Operational Team Structure
 
-| Role                   | Vessels Managed  | Primary Responsibility                   | Communication Tools     |
-| ---------------------- | ---------------- | ---------------------------------------- | ----------------------- |
-| **Operations Team**    | 3-4 vessels each | Daily report approval, bunker monitoring | BVMS, WhatsApp          |
-| **Ship Captain**       | Own vessel       | Submit reports every 24 hours            | WFOS, WhatsApp          |
-| **Charter Department** | N/A              | Initial transaction setup                | BVMS Transaction Module |
-| **System (Automated)** | All contracted   | Import, validate, calculate              | BVMS Backend + WFOS API |
+| Role                   | Vessels Managed  | Responsibility                           | Tools                 |
+| ---------------------- | ---------------- | ---------------------------------------- | --------------------- |
+| **BBC Charterer**      | N/A              | Voyage nomination with estimated figures | BVMS Estimate         |
+| **BBC Operator**       | 3-5 vessels each | Daily report approval, voyage monitoring | BVMS Voyage, WhatsApp |
+| **Ship Captain**       | Assigned vessel  | Submit reports every 24 hours            | WFOS, WhatsApp        |
+| **System (Automated)** | All contracted   | Import, validate, calculate logics       | BVMS API + WFOS API   |
+
+### 2.4 Workflow Summary Digram
+
+```mermaid
+graph TD
+    A[Charter Voyage Commenced] --> C[Ops Setup Bunker & Route]
+    C --> D[Captain Daily Reports]
+    D --> E[VFOS System]
+    E --> F[BVMS Import]
+    F --> G{Operator Review}
+    G -->|Approve| H[Recalculate Voyage]
+    G -->|Reject/Edit| I[Request Correction]
+    I --> E
+    H --> K{Voyage Complete?}
+    K -->|No| D
+    K -->|Yes| L[Final Reporting]
+```
 
 ---
 
