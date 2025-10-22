@@ -1,6 +1,6 @@
-# Vessel Report System in BBC BVMS
+# BBC BVMS Vessel Report System & Integration with WFOS
 
-## Complete Maritime Voyage Management Guide
+## A Comprehensive Document for Operations, Development, and Data Integrity Teams
 
 ---
 
@@ -10,15 +10,16 @@
 
 ### What is the Vessel Report System?
 
-The Vessel Report system in BBC BVMS (Bunker Voyage Management System) is the **bridge between estimated voyage planning and actual voyage execution**. It transforms future projections into real operational data through daily captain reports, enabling accurate cost analysis, fuel management, and voyage optimization.
+- BVMS Vessel Report system captures daily operational data from vessels during their voyages. When approved, these reports replace future/estimated values of the voyage with actual figures.
+- WFOS serves as the primary data source for contracted vessels, while BBC operators manually submit reports for non-contracted ones.
 
 ### Core Value Proposition
 
 | Business Need            | Solution                           | Impact                                                              |
 | ------------------------ | ---------------------------------- | ------------------------------------------------------------------- |
-| **Financial Accuracy**   | Replace estimates with actual data | Accurate P&L analysis (e.g., $100K projected vs $95K actual profit) |
 | **Fuel Management**      | Real-time bunker tracking          | Prevent fuel shortages mid-voyage                                   |
-| **Operational Control**  | Daily monitoring & adjustments     | Proactive decision-making on refueling, routing                     |
+| **Voyage Control**       | Daily monitoring & adjustments     | Proactive decision-making on refueling, routing changes,...         |
+| **Financial Accuracy**   | Replace estimates with actual data | Accurate P&L analysis (e.g., $100K projected vs $95K actual profit) |
 | **Compliance**           | ECA zone tracking                  | Environmental regulation adherence                                  |
 | **Consecutive Planning** | Data carryover between voyages     | Seamless multi-voyage operations                                    |
 
@@ -31,25 +32,25 @@ The Vessel Report system in BBC BVMS (Bunker Voyage Management System) is the **
 ```
 VOYAGE START                    VOYAGE PROGRESS                      VOYAGE END
 ┌─────────────┐                ┌─────────────┐                    ┌─────────────┐
-│ 30 Days     │    Day 1       │ 1 Real      │      Day 15        │ 30 Real     │
+│ 30 Days     │    Day 1       │ 1 Real      │      Day 30        │ 30 Real     │
 │ 100% Est.   │  ────────►     │ 29 Est.     │    ────────►       │ 0% Est.     │
 └─────────────┘                └─────────────┘                    └─────────────┘
    All Future                   Mixed Data                        All Historical
 ```
 
-**Critical Principle:** Each approved report:
+**Critical Principle:** Approving a vessel report will:
 
-1. **Deletes** remaining future estimates
-2. **Inserts** real data from the report
-3. **Recalculates** all future voyage segments
-4. **Propagates** changes to consecutive voyages
+1. **Deletes** all future data of voyage (itinerary times, bunkers & related costs)
+2. **Inserts** real reported data from the vessel report (time, current position & bunker levels)
+3. **Summarizes** current actual data & **Recalculates** future figures again
+4. **Propagates** ending figures (bunkers & times) toward the next voyage as initial data
 
 ### 2.2 System Integration Architecture
 
 ```mermaid
 graph TB
     subgraph "External Systems"
-        A[VFOS System<br/>3rd Party]
+        A[WFOS System<br/>3rd Party]
         B[Ship Captain<br/>Via WhatsApp]
     end
 
@@ -83,9 +84,9 @@ graph TB
 | Role                   | Vessels Managed  | Primary Responsibility                   | Communication Tools     |
 | ---------------------- | ---------------- | ---------------------------------------- | ----------------------- |
 | **Operations Team**    | 3-4 vessels each | Daily report approval, bunker monitoring | BVMS, WhatsApp          |
-| **Ship Captain**       | Own vessel       | Submit reports every 24 hours            | VFOS, WhatsApp          |
+| **Ship Captain**       | Own vessel       | Submit reports every 24 hours            | WFOS, WhatsApp          |
 | **Charter Department** | N/A              | Initial transaction setup                | BVMS Transaction Module |
-| **System (Automated)** | All contracted   | Import, validate, calculate              | BVMS Backend + VFOS API |
+| **System (Automated)** | All contracted   | Import, validate, calculate              | BVMS Backend + WFOS API |
 
 ---
 
@@ -108,7 +109,7 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant Cap as Ship Captain
-    participant VF as VFOS System
+    participant VF as WFOS System
     participant BV as BVMS
     participant Op as Operator
     participant Txn as Transaction
@@ -235,7 +236,7 @@ graph LR
 | Method                    | Use Case               | Steps                                           | Data Loss Risk | Operator Effort |
 | ------------------------- | ---------------------- | ----------------------------------------------- | -------------- | --------------- |
 | **1. Direct Edit**        | Minor single error     | Edit → Save → Re-approve                        | None           | Low             |
-| **2. Captain Resubmit**   | Source data wrong      | Request → VFOS fix → Sync → Override → Approve  | None           | Medium          |
+| **2. Captain Resubmit**   | Source data wrong      | Request → WFOS fix → Sync → Override → Approve  | None           | Medium          |
 | **3. Batch Approval**     | Historical chain error | Fix first → Batch approve sequence              | None           | Medium          |
 | **4. Delete & Re-import** | Massive errors         | Delete all → Re-import → Map lots → Approve all | ⚠️ Loses edits | High            |
 
@@ -243,11 +244,11 @@ graph LR
 
 ## 7. Integration Requirements
 
-### 7.1 VFOS Contract Status
+### 7.1 WFOS Contract Status
 
 | Category                   | Count | Import Method        | Update Frequency     |
 | -------------------------- | ----- | -------------------- | -------------------- |
-| **Contracted Vessels**     | ~10   | Automatic (VFOS API) | Every 2 hours (cron) |
+| **Contracted Vessels**     | ~10   | Automatic (WFOS API) | Every 2 hours (cron) |
 | **Non-contracted Vessels** | ~90   | Manual entry         | On-demand            |
 | **Total Fleet**            | ~100+ | Mixed                | Continuous           |
 
@@ -255,10 +256,10 @@ graph LR
 
 | Requirement               | Description                | Failure Impact     | Validation               |
 | ------------------------- | -------------------------- | ------------------ | ------------------------ |
-| ✓ **Vessel in Contract**  | Ship in BBC-VFOS agreement | No auto-import     | Check vessel list        |
-| ✓ **Voyage Number Match** | VFOS #12345 = BVMS #12345  | Data misalignment  | Manual verification      |
+| ✓ **Vessel in Contract**  | Ship in BBC-WFOS agreement | No auto-import     | Check vessel list        |
+| ✓ **Voyage Number Match** | WFOS #12345 = BVMS #12345  | Data misalignment  | Manual verification      |
 | ✓ **Route Consistency**   | Same ports/order           | Wrong calculations | Compare itineraries      |
-| ✓ **Captain Reporting**   | Active VFOS usage          | No data to import  | Monitor last report time |
+| ✓ **Captain Reporting**   | Active WFOS usage          | No data to import  | Monitor last report time |
 
 ---
 
@@ -286,7 +287,7 @@ graph LR
 - Maintain **audit trail** of all changes
 - Lock **"moment of truth"** timestamps
 - Ensure **consecutive consistency**
-- VFOS = **source of truth** (for contracted vessels)
+- WFOS = **source of truth** (for contracted vessels)
 
 ---
 
@@ -315,7 +316,7 @@ graph LR
 ```mermaid
 sequenceDiagram
     participant Cap as Captain
-    participant VF as VFOS
+    participant VF as WFOS
     participant BV as BVMS
     participant Itin as Itinerary
 
@@ -846,7 +847,7 @@ flowchart TD
     B --> C{Source Correct?}
 
     C -->|No<br/>Captain Wrong| D[Contact Captain<br/>via WhatsApp]
-    D --> E[Captain Fixes in VFOS]
+    D --> E[Captain Fixes in WFOS]
     E --> F[BVMS Sync Button]
     F --> G{New Version?}
 
@@ -868,7 +869,7 @@ flowchart TD
 **Example:**
 
 - Error: Used dirty fuel in ECA zone
-- Fix: Operator texts captain → Captain edits VFOS → Sync → Override changes → Re-approve
+- Fix: Operator texts captain → Captain edits WFOS → Sync → Override changes → Re-approve
 - Time: ~15-30 minutes
 
 #### Workflow 3: Cascading Historical Error
@@ -880,7 +881,7 @@ flowchart TD
 
     C --> D[Days 2-4 Derived Errors]
     D --> E[Contact Captain]
-    E --> F[Captain Fixes Day 1 in VFOS]
+    E --> F[Captain Fixes Day 1 in WFOS]
 
     F --> G[Sync All Updates<br/>Days 1-4]
     G --> H{All Reports Updated?}
@@ -911,8 +912,8 @@ flowchart TD
     A[Too Many Errors] --> B[Operator Decision]
     B --> C[Delete All Reports<br/>Report 1 → 79]
 
-    C --> D[Confirm VFOS Data Correct]
-    D --> E[Import Fresh from VFOS]
+    C --> D[Confirm WFOS Data Correct]
+    D --> E[Import Fresh from WFOS]
 
     E --> F[Map Bunker Lots]
     F --> G[Batch Approve All]
@@ -984,7 +985,7 @@ VOYAGE (Root Entity)
     ├── report_id: String
     ├── report_type: Enum [Departure, Noon, Arrival, InPort, Berth, Unberth, Receival]
     ├── report_time: DateTime
-    ├── source: Enum [VFOS, Manual]
+    ├── source: Enum [WFOS, Manual]
     ├── status: Enum [Pending, Approved, Rejected]
     ├── approved_by: User (FK) [Nullable]
     ├── approved_at: DateTime [Nullable]
@@ -995,7 +996,7 @@ VOYAGE (Root Entity)
     ├── speed_future: Float [Nullable]
     ├── eta: DateTime [Nullable]
     ├── bunker_consumption: JSON [Array of {lot_id, consumption}]
-    ├── version: Integer (For VFOS updates)
+    ├── version: Integer (For WFOS updates)
     └── changes_log: JSON (Audit trail)
 ```
 
@@ -1093,13 +1094,13 @@ class VesselReportApprovalEngine:
             next_voyage = self.get_next_voyage(next_voyage.vessel_id, next_voyage.end_time)
 ```
 
-### 13.3 VFOS Integration Architecture
+### 13.3 WFOS Integration Architecture
 
 ```mermaid
 graph TB
-    subgraph "VFOS System (External)"
+    subgraph "WFOS System (External)"
         A[Captain Submits Report]
-        B[VFOS API]
+        B[WFOS API]
     end
 
     subgraph "BVMS Backend"
@@ -1142,18 +1143,18 @@ class VFOSImportService:
 
     def import_reports_for_vessel(self, vessel_id: str, voyage_id: str):
         """
-        Import reports from VFOS for a specific voyage
+        Import reports from WFOS for a specific voyage
         """
         # Step 1: Check if vessel is in contract
         if not self.is_contracted_vessel(vessel_id):
-            raise VesselNotContractedError(f"Vessel {vessel_id} not in VFOS contract")
+            raise VesselNotContractedError(f"Vessel {vessel_id} not in WFOS contract")
 
         # Step 2: Get voyage number mapping
         vfos_voyage_number = self.get_vfos_voyage_number(voyage_id)
         if not vfos_voyage_number:
-            raise VoyageNumberMismatchError(f"No VFOS voyage mapping for {voyage_id}")
+            raise VoyageNumberMismatchError(f"No WFOS voyage mapping for {voyage_id}")
 
-        # Step 3: Fetch reports from VFOS API
+        # Step 3: Fetch reports from WFOS API
         vfos_reports = self.vfos_api.get_reports(vessel_id, vfos_voyage_number)
 
         # Step 4: Check for existing reports
@@ -1163,7 +1164,7 @@ class VFOSImportService:
         updated_count = 0
 
         for vfos_report in vfos_reports:
-            # Step 5: Map VFOS data to BVMS structure
+            # Step 5: Map WFOS data to BVMS structure
             bvms_report = self.map_vfos_to_bvms(vfos_report)
 
             # Step 6: Check if report already exists
@@ -1186,7 +1187,7 @@ class VFOSImportService:
 
     def map_vfos_to_bvms(self, vfos_report: dict) -> VesselReport:
         """
-        Transform VFOS data structure to BVMS data structure
+        Transform WFOS data structure to BVMS data structure
         """
         return VesselReport(
             report_type=self.map_report_type(vfos_report['reportType']),
@@ -1201,7 +1202,7 @@ class VFOSImportService:
             speed_future=vfos_report.get('speedFuture'),
             eta=self.parse_datetime(vfos_report.get('eta')),
             bunker_consumption=self.map_bunker_consumption(vfos_report['bunker']),
-            source='VFOS',
+            source='WFOS',
             version=vfos_report.get('version', 1)
         )
 ```
@@ -1313,7 +1314,7 @@ sequenceDiagram
 | Term                   | Full Form                       | Definition                                    | Example                             |
 | ---------------------- | ------------------------------- | --------------------------------------------- | ----------------------------------- |
 | **BVMS**               | Bunker Voyage Management System | BBC's maritime operations management software | -                                   |
-| **VFOS**               | Vessel Fuel Oil System          | Third-party captain reporting system          | Approximately 10 BBC vessels use it |
+| **WFOS**               | Vessel Fuel Oil System          | Third-party captain reporting system          | Approximately 10 BBC vessels use it |
 | **ECA**                | Emission Control Area           | Zones requiring low-sulfur fuel (≤0.1%)       | Baltic Sea, North Sea, US coasts    |
 | **ETA**                | Estimated Time of Arrival       | Projected arrival time (updates daily)        | Oct 23, 06:00                       |
 | **Noon Report**        | Daily Report                    | Captain's daily progress report (~noon time)  | Position, fuel, distance            |
@@ -1373,7 +1374,7 @@ sequenceDiagram
 
 ✅ **DO:**
 
-- Run VFOS sync every 2 hours (cron job)
+- Run WFOS sync every 2 hours (cron job)
 - Monitor API failures and retry logic
 - Maintain vessel contract list
 - Backup before bulk operations
@@ -1427,7 +1428,7 @@ sequenceDiagram
 | ------------------------------- | ------------------- | --------------------------------------- | -------------------------------- |
 | Manual lot mapping on re-import | High effort         | Operator maps manually                  | Implement auto-mapping algorithm |
 | No time zone handling           | Potential confusion | Use UTC everywhere                      | Add timezone support             |
-| Limited VFOS contract coverage  | 90% manual entry    | Increase contracts or build captain app | Expand VFOS contracts            |
+| Limited WFOS contract coverage  | 90% manual entry    | Increase contracts or build captain app | Expand WFOS contracts            |
 | No offline mode                 | Requires internet   | Use WhatsApp backup                     | PWA with offline capability      |
 
 ---
@@ -1450,7 +1451,7 @@ sequenceDiagram
 ### Related Documents
 
 - BVMS User Manual
-- VFOS Integration Guide
+- WFOS Integration Guide
 - Bunker Planning Manual
 - Financial Reporting Procedures
 - ECA Compliance Guidelines
