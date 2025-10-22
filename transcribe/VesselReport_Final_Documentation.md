@@ -273,18 +273,6 @@ sequenceDiagram
 
 #### ETA Evolution Example
 
-```mermaid
-gantt
-    title Noon Report ETA Updates
-    dateFormat YYYY-MM-DD HH:mm
-    section Estimates
-    Initial ETA (Departure)    :milestone, 2024-10-23 02:00, 0h
-    Noon Day 1 ETA Update     :milestone, 2024-10-23 02:00, 0h
-    Noon Day 2 ETA Update     :milestone, 2024-10-23 06:00, 0h
-    Noon Day 3 ETA Update     :milestone, 2024-10-23 06:00, 0h
-    Actual Arrival            :milestone, 2024-10-23 01:00, 0h
-```
-
 | Day | Report Time   | Distance Traveled | Distance to Go | Speed    | ETA           | Change Reason         |
 | --- | ------------- | ----------------- | -------------- | -------- | ------------- | --------------------- |
 | 1   | Oct 18, 01:00 | 108 nm            | 1692 nm        | 14.5 kts | Oct 23, 02:00 | Initial estimate      |
@@ -652,28 +640,6 @@ graph LR
 | 1      | Ras Laffan           | Oct 20, 22:00 ✓ | -             | -10 hours  |
 | 2      | Ras Laffan → Esbjerg | Oct 20, 22:00 ✓ | Oct 30, 24:00 | -10 hours  |
 | 3      | Esbjerg → Lisbon     | Oct 30, 24:00 ✓ | Nov 5, 04:00  | -10 hours  |
-
-**Propagation Logic:**
-
-```python
-def update_consecutive_voyages(approved_report, current_voyage):
-    time_delta = approved_report.departure_time - current_voyage.estimated_departure
-    bunker_ending = approved_report.final_bunker_status
-
-    next_voyage = get_next_voyage(current_voyage.vessel)
-    while next_voyage:
-        # Update time
-        next_voyage.start_time += time_delta
-        next_voyage.recalculate_eta()
-
-        # Update bunker
-        next_voyage.initial_bunker = bunker_ending
-        next_voyage.recalculate_consumption()
-
-        # Get ending for further propagation
-        bunker_ending = next_voyage.ending_bunker
-        next_voyage = get_next_voyage(next_voyage.vessel)
-```
 
 ---
 
