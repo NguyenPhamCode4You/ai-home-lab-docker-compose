@@ -292,12 +292,9 @@ graph TD
     E --> F[Previous: 186t]
     F --> G[Current: 173t]
 
-    D --> H[Update LSMGO Lot #2]
+    D --> H[Update LSMGO Lot]
     H --> I[Previous: 20t]
     I --> J[Current: 18.1t]
-
-    style C fill:#D2691E
-    style D fill:#90EE90
 ```
 
 ---
