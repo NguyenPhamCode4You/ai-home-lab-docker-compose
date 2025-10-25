@@ -1,5 +1,586 @@
 # Payment Gateway System Design
 
+## Executive Summary
+
+### Overview
+
+This comprehensive guide presents a production-ready payment gateway system design based on 15+ years of combined experience in fintech, banking, securities, and telecommunications sectors. The document covers end-to-end implementation of both **QR code-based domestic payments** (NAPAS 247) and **international credit card transactions** (Visa/Mastercard networks).
+
+### Critical Success Factors
+
+```mermaid
+mindmap
+  root((Payment Gateway<br/>Success))
+    Database Mastery
+      80-90% of challenges
+      Data lifecycle management
+      Partitioning strategies
+      Performance optimization
+    Security First
+      PCI DSS compliance
+      Tokenization
+      Encryption at rest/transit
+      API authentication
+    Reliability
+      99.99% uptime target
+      Multi-region deployment
+      Message queue patterns
+      Idempotency design
+    Business Logic
+      Transaction lifecycle
+      Settlement & reconciliation
+      Refund handling
+      Webhook reliability
+```
+
+### The 80-90% Database Rule
+
+> **Key Insight**: "In payment systems, 80-90% of challenges are related to database knowledge. This was true 10 years ago, and it's still true today."
+
+**Why Database Expertise Matters:**
+
+- Payment volume grows exponentially with business success
+- Poor database design becomes a bottleneck at scale
+- Data lifecycle management is critical for performance
+- Companies will invest heavily in database optimization expertise
+
+### System Capabilities Comparison
+
+| Feature                    | QR Code Payment           | Credit Card Payment        | Implementation Complexity     |
+| -------------------------- | ------------------------- | -------------------------- | ----------------------------- |
+| **Setup Time**             | 2-3 months                | 4-6 months                 | QR: Medium, Card: High        |
+| **Transaction Fee**        | 0.5-1%                    | 2-3%                       | Depends on negotiation        |
+| **Settlement Time**        | Real-time to 1-2 days     | 2-3 business days          | Card requires reconciliation  |
+| **Compliance**             | Local banking regulations | PCI DSS Level 1 + Licenses | Card requires certification   |
+| **Refund Cost**            | No fee (pre-settlement)   | Always incurs fee          | Critical cost consideration   |
+| **Target Market**          | Domestic (Vietnam)        | International              | Different infrastructure      |
+| **Integration Complexity** | Low-Medium                | High                       | Card needs tokenization       |
+| **Dispute Handling**       | Simpler                   | Complex chargeback process | Card has extensive procedures |
+
+### Core Architecture Principles
+
+#### 1. **Three-Pillar Foundation**
+
+```mermaid
+graph TB
+    subgraph "Pillar 1: Payment Methods"
+        A1[Static QR Code]
+        A2[Dynamic QR Code]
+        A3[Credit Card]
+        A4[Digital Wallets]
+    end
+
+    subgraph "Pillar 2: Merchant Support"
+        B1[Onboarding & KYC]
+        B2[API & Credentials]
+        B3[Webhook Configuration]
+        B4[Test Environment]
+        B5[Sub-Account Management]
+    end
+
+    subgraph "Pillar 3: Security & Compliance"
+        C1[PCI DSS Standards]
+        C2[Tokenization]
+        C3[TLS Encryption]
+        C4[API Authentication]
+        C5[Rate Limiting]
+        C6[Audit Logging]
+    end
+
+    style A1 fill:#a8dadc
+    style A2 fill:#a8dadc
+    style A3 fill:#a8dadc
+    style B1 fill:#f1faee
+    style B2 fill:#f1faee
+    style B3 fill:#f1faee
+    style C1 fill:#ffd7ba
+    style C2 fill:#ffd7ba
+    style C3 fill:#ffd7ba
+```
+
+#### 2. **Master-SubAccount Architecture**
+
+**Purpose**: Enable transaction tracking and fund segregation per merchant
+
+| Account Type       | Purpose                  | Example             | Visibility                   |
+| ------------------ | ------------------------ | ------------------- | ---------------------------- |
+| **Master Account** | Central fund aggregation | `LONGCHAU_MASTER`   | Payment gateway only         |
+| **Sub-Account 1**  | Store location 1         | `LONGCHAU_STORE_01` | Individual merchant tracking |
+| **Sub-Account 2**  | Store location 2         | `LONGCHAU_STORE_02` | Individual merchant tracking |
+| **Sub-Account N**  | Store location N         | `LONGCHAU_STORE_N`  | Individual merchant tracking |
+
+**Key Benefits:**
+
+- ✅ Real-time transaction tracking per location
+- ✅ Prevents fund mixing between merchants
+- ✅ Enables accurate reconciliation
+- ✅ Supports multi-location businesses
+- ✅ Facilitates fraud detection
+
+### Payment Flow Comparison
+
+#### QR Code Payment Flow
+
+```mermaid
+sequenceDiagram
+    participant C as Customer
+    participant B as Banking App
+    participant PG as Payment Gateway
+    participant N as NAPAS 247
+    participant M as Merchant
+
+    C->>B: Scan QR Code
+    B->>C: Show Transfer Info
+    C->>B: Confirm Payment
+    B->>N: Transfer Money
+    N->>PG: Webhook: Success
+    PG->>PG: Update Transaction
+    PG->>M: Webhook Notification
+
+    Note over PG,M: Async processing<br/>with message queue<br/>Retry on failure
+
+    Note over C,M: Duration: 2-5 seconds
+```
+
+**Key Characteristics:**
+
+- ⚡ **Speed**: Near real-time (2-5 seconds)
+- 💰 **Cost**: Low transaction fees (0.5-1%)
+- 🔄 **Settlement**: 1-2 days (with pre-check period)
+- 🛡️ **Security**: Bank-to-bank transfer via NAPAS
+- 📱 **User Experience**: Simple scan-and-pay
+
+#### Credit Card Payment Flow
+
+```mermaid
+sequenceDiagram
+    participant C as Customer
+    participant M as Merchant
+    participant PG as Payment Gateway
+    participant T as Tokenization
+    participant 3DS as 3DS Server
+    participant CN as Card Network
+    participant IB as Issuing Bank
+
+    C->>M: Enter Card Info
+    M->>PG: Payment Request
+    PG->>T: Tokenize Card
+    T->>PG: Return Token
+
+    alt 3DS Enabled
+        PG->>3DS: Authenticate
+        3DS->>C: OTP Challenge
+        C->>3DS: Enter OTP
+        3DS->>PG: Auth Success
+    end
+
+    PG->>CN: Authorize
+    CN->>IB: Check & Hold
+    IB->>CN: Approved
+    CN->>PG: Authorized
+
+    M->>PG: Capture
+    PG->>CN: Execute Payment
+
+    Note over CN,IB: Settlement: 2-3 days
+
+    Note over C,M: Duration: 5-15 seconds
+```
+
+**Key Characteristics:**
+
+- ⏱️ **Speed**: 5-15 seconds (with 3DS)
+- 💰 **Cost**: Higher fees (2-3%)
+- 🔄 **Settlement**: 2-3 business days
+- 🛡️ **Security**: PCI DSS + Tokenization + 3DS
+- 🌍 **Coverage**: International transactions
+
+### Transaction Lifecycle Management
+
+#### Transaction States & Transitions
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: Create
+    Pending --> Processing: Initiate
+    Processing --> Authorized: Approve
+    Processing --> Failed: Decline/Timeout
+    Authorized --> Captured: Capture
+    Authorized --> Void: Cancel (No Fee)
+    Captured --> Settling: End of Day
+    Settling --> Settled: Bank Settlement
+    Settled --> Refunding: Refund Request
+    Refunding --> Refunded: Complete
+
+    Failed --> [*]
+    Void --> [*]
+    Refunded --> [*]
+    Settled --> [*]
+
+    note right of Authorized
+        Funds held on card
+        Merchant can void
+        No fees if voided
+    end note
+
+    note right of Settled
+        Money in merchant account
+        Refund incurs fees
+        Reconciliation complete
+    end note
+```
+
+#### Status Management Table
+
+| Status         | Description              | Actions Available | Reversible          | Business Impact   |
+| -------------- | ------------------------ | ----------------- | ------------------- | ----------------- |
+| **Pending**    | Transaction created      | Cancel            | Yes (free)          | No funds movement |
+| **Processing** | Payment initiated        | Wait/Timeout      | Yes (automatic)     | Temporary state   |
+| **Authorized** | Funds held               | Capture, Void     | Yes (void - no fee) | Funds reserved    |
+| **Captured**   | Payment executed         | Refund            | Yes (fee applies)   | Funds transferred |
+| **Settling**   | EOD reconciliation       | Wait              | Via refund only     | In settlement     |
+| **Settled**    | Complete                 | Refund            | Yes (fee applies)   | Final state       |
+| **Failed**     | Declined/Error           | Retry             | N/A                 | No charge         |
+| **Void**       | Cancelled pre-settlement | None              | No                  | No fee charged    |
+| **Refunded**   | Money returned           | None              | No                  | Fee not recovered |
+
+### Security Framework
+
+#### PCI DSS Compliance Levels
+
+| Level       | Annual Transactions | Requirements    | Audit Type            | Target Merchants       |
+| ----------- | ------------------- | --------------- | --------------------- | ---------------------- |
+| **Level 1** | > 6 million         | Full compliance | Annual on-site by QSA | Large payment gateways |
+| **Level 2** | 1-6 million         | Self-assessment | Quarterly scans       | Medium processors      |
+| **Level 3** | 20K-1 million       | Self-assessment | Quarterly scans       | Small gateways         |
+| **Level 4** | < 20,000            | Self-assessment | Annual review         | Micro merchants        |
+
+#### Security Layers Implementation
+
+```mermaid
+graph TB
+    subgraph "Layer 1: Network Security"
+        L1A[HTTPS/TLS 1.3]
+        L1B[API Gateway with WAF]
+        L1C[IP Whitelisting]
+        L1D[DDoS Protection]
+    end
+
+    subgraph "Layer 2: Authentication"
+        L2A[API Key/Secret]
+        L2B[Request Signing HMAC-SHA256]
+        L2C[JWT Tokens]
+        L2D[OAuth 2.0]
+    end
+
+    subgraph "Layer 3: Data Protection"
+        L3A[Tokenization]
+        L3B[Encryption at Rest AES-256]
+        L3C[Field-Level Encryption]
+        L3D[Key Management Service]
+    end
+
+    subgraph "Layer 4: Access Control"
+        L4A[Role-Based Access]
+        L4B[Least Privilege]
+        L4C[Audit Logging]
+        L4D[Multi-Factor Auth]
+    end
+
+    subgraph "Layer 5: Monitoring"
+        L5A[Real-time Alerts]
+        L5B[Anomaly Detection]
+        L5C[Fraud Detection]
+        L5D[Compliance Reporting]
+    end
+
+    L1A --> L2A
+    L2A --> L3A
+    L3A --> L4A
+    L4A --> L5A
+```
+
+### Database Design Best Practices
+
+#### Data Lifecycle: End of Day (EOD) Pattern
+
+**The Critical Pattern for Payment Systems:**
+
+```mermaid
+graph LR
+    subgraph "00:00 - 23:59 Daily Operations"
+        A[Daily Transaction Table<br/>Size: 10K-100K records<br/>Status: Active]
+    end
+
+    subgraph "00:00 - 02:00 EOD Process"
+        B[Validation]
+        C[Reconciliation]
+        D[Archive to History]
+        E[Clear Daily Table]
+    end
+
+    subgraph "Permanent Storage"
+        F[History Table<br/>Size: 100M+ records<br/>Status: Read-only]
+    end
+
+    A -->|End of Day| B
+    B --> C
+    C --> D
+    D --> F
+    D --> E
+    E -->|Next Day| A
+
+    style A fill:#ff6b6b
+    style F fill:#51cf66
+    style E fill:#ffd43b
+```
+
+**Performance Impact:**
+
+| Metric                 | Without EOD | With EOD      | Improvement       |
+| ---------------------- | ----------- | ------------- | ----------------- |
+| **Daily Table Size**   | 10M+ rows   | 10K-100K rows | 99% reduction     |
+| **Query Speed**        | 2-5 seconds | 10-50ms       | 40-500x faster    |
+| **Index Efficiency**   | Degraded    | Optimal       | Consistently fast |
+| **Insert Performance** | Declining   | Stable        | Predictable       |
+| **Backup Time**        | Hours       | Minutes       | Much faster       |
+
+#### Partitioning Strategies
+
+```mermaid
+graph TB
+    subgraph "Range Partitioning by Date"
+        R1[Jan 2025<br/>10M records]
+        R2[Feb 2025<br/>12M records]
+        R3[Mar 2025<br/>11M records]
+        R4[Apr 2025<br/>13M records]
+    end
+
+    subgraph "Hash Partitioning by Merchant"
+        H1[Partition 1<br/>2.5M records]
+        H2[Partition 2<br/>2.5M records]
+        H3[Partition 3<br/>2.5M records]
+        H4[Partition 4<br/>2.5M records]
+    end
+
+    Q1[Query: March 2025] -->|Scan only 1 partition| R3
+    Q2[Query: All Dates] -->|Scan all partitions| R1
+    Q2 --> R2
+    Q2 --> R3
+    Q2 --> R4
+
+    Q3[Query: Merchant A] -->|Consistent hash| H2
+    Q4[Load Balancing] -->|Even distribution| H1
+    Q4 --> H2
+    Q4 --> H3
+    Q4 --> H4
+```
+
+**When to Use Each Strategy:**
+
+| Strategy      | Best For          | Partition Key        | Query Benefit           | Use Case                     |
+| ------------- | ----------------- | -------------------- | ----------------------- | ---------------------------- |
+| **Range**     | Time-series data  | `business_date`      | Date-range queries      | Historical reports, archival |
+| **Hash**      | Even distribution | `merchant_id`        | Single-merchant queries | Load balancing, scalability  |
+| **List**      | Known categories  | `status`, `region`   | Category filtering      | Status-based processing      |
+| **Composite** | Complex scenarios | `merchant_id + date` | Multiple dimensions     | Enterprise requirements      |
+
+### Settlement & Reconciliation
+
+#### Daily Reconciliation Process
+
+```mermaid
+sequenceDiagram
+    participant PS as Payment System
+    participant PP as Payment Processor
+    participant DB as Database
+    participant Ops as Operations Team
+
+    Note over PS,Ops: Daily at 01:00 AM
+
+    PS->>PP: Request Settlement File
+    PP->>PS: Return CSV/XML Report
+    PS->>DB: Load Settlement Data
+    PS->>DB: Load Transaction Data
+
+    PS->>PS: Reconciliation Logic
+
+    alt All Matched
+        PS->>DB: Update Status: Settled
+        PS->>Ops: Success Report
+    else Discrepancies Found
+        PS->>DB: Flag Transactions
+        PS->>Ops: Alert with Details
+        Ops->>PS: Investigate & Resolve
+    end
+
+    PS->>PS: Generate Daily Report
+```
+
+#### Reconciliation Outcomes
+
+| Outcome                   | Frequency | Action Required            | Impact                | Resolution Time |
+| ------------------------- | --------- | -------------------------- | --------------------- | --------------- |
+| **Perfect Match**         | 99.9%     | None                       | No impact             | N/A             |
+| **Missing in Settlement** | 0.05%     | Investigate with processor | Delayed settlement    | 1-2 days        |
+| **Missing in Database**   | 0.02%     | Check webhook failures     | Potential fraud       | Immediate       |
+| **Amount Mismatch**       | 0.03%     | Review transaction details | Financial discrepancy | 2-4 hours       |
+| **Duplicate Entry**       | <0.01%    | Idempotency check          | Potential overcharge  | Immediate       |
+
+### System Architecture Evolution
+
+#### Phase 1: MVP (QR Code Only)
+
+**Timeline**: Months 1-3  
+**Features**: Static/Dynamic QR, Basic webhooks, Single database
+
+```mermaid
+graph LR
+    A[Merchants] --> B[API Gateway]
+    B --> C[Payment Service]
+    C --> D[(Database)]
+    C --> E[NAPAS 247]
+```
+
+#### Phase 2: Production Ready
+
+**Timeline**: Months 4-6  
+**Features**: Message queue, Refunds, Monitoring, HA setup
+
+```mermaid
+graph LR
+    A[Merchants] --> B[Load Balancer]
+    B --> C[API Gateway]
+    C --> D[Payment Service]
+    D --> E[Message Queue]
+    E --> F[Workers]
+    D --> G[(Primary DB)]
+    G --> H[(Replica DB)]
+    F --> I[NAPAS 247]
+```
+
+#### Phase 3: Enterprise Scale
+
+**Timeline**: Months 7-12  
+**Features**: Credit card, Multi-region, Settlement, PCI DSS
+
+```mermaid
+graph TB
+    subgraph "Region 1: Primary"
+        A1[API Services]
+        A2[Payment Services]
+        A3[(DB Cluster)]
+    end
+
+    subgraph "Region 2: DR"
+        B1[API Services]
+        B2[Payment Services]
+        B3[(DB Replica)]
+    end
+
+    LB[Global Load Balancer] --> A1
+    LB -.Failover.-> B1
+    A3 -.Replication.-> B3
+
+    A2 --> C[Message Queue]
+    A2 --> D[Tokenization]
+    A2 --> E[Settlement]
+```
+
+### Key Performance Metrics
+
+#### Golden Signals for Payment Systems
+
+| Metric                  | Target  | Alert Threshold | Critical Threshold | Business Impact     |
+| ----------------------- | ------- | --------------- | ------------------ | ------------------- |
+| **API Latency (P99)**   | < 500ms | > 1s            | > 2s               | User experience     |
+| **Success Rate**        | > 99.9% | < 99.5%         | < 99%              | Revenue loss        |
+| **Database Response**   | < 100ms | > 200ms         | > 500ms            | System bottleneck   |
+| **Queue Depth**         | < 100   | > 1,000         | > 10,000           | Processing backlog  |
+| **Settlement Accuracy** | 100%    | < 100%          | < 99.9%            | Financial loss      |
+| **Webhook Delivery**    | > 99.5% | < 99%           | < 98%              | Merchant complaints |
+| **Uptime**              | 99.99%  | < 99.95%        | < 99.9%            | SLA violation       |
+
+### Cost Structure Analysis
+
+#### Transaction Fee Breakdown
+
+```mermaid
+pie title Transaction Fee Distribution
+    "Card Network (Visa/MC)" : 1.5
+    "Issuing Bank" : 0.8
+    "Acquiring Bank" : 0.5
+    "Payment Gateway" : 0.7
+    "VAT/Taxes" : 0.3
+```
+
+**Typical Fee Structure:**
+
+| Payment Method                  | Customer Fee | Merchant Fee    | Settlement Time | Gateway Revenue |
+| ------------------------------- | ------------ | --------------- | --------------- | --------------- |
+| **QR Code**                     | Free         | 0.5-1.0%        | 1-2 days        | 0.3-0.5%        |
+| **Credit Card (Domestic)**      | Free         | 2.0-2.5%        | 2-3 days        | 0.5-0.8%        |
+| **Credit Card (International)** | Free         | 2.5-3.5%        | 3-5 days        | 0.7-1.0%        |
+| **Bank Transfer**               | Free         | Flat fee $0.5-1 | 1-2 days        | 100% of fee     |
+
+### Implementation Roadmap
+
+```mermaid
+gantt
+    title Payment Gateway Implementation Timeline
+    dateFormat YYYY-MM-DD
+    section Phase 1: Foundation
+    Database Setup           :done, 2025-01-01, 30d
+    Merchant Onboarding      :done, 2025-01-15, 30d
+    Static QR Payment        :done, 2025-02-01, 30d
+
+    section Phase 2: Core
+    Dynamic QR Payment       :active, 2025-03-01, 30d
+    Webhook System           :active, 2025-03-01, 30d
+    Refund Processing        :2025-03-15, 20d
+    Message Queue            :2025-04-01, 20d
+
+    section Phase 3: Credit Card
+    Tokenization Service     :2025-04-15, 30d
+    Provider Integration     :2025-05-01, 45d
+    3DS Implementation       :2025-05-15, 30d
+
+    section Phase 4: Enterprise
+    Settlement System        :2025-06-15, 30d
+    Reconciliation           :2025-07-01, 30d
+    Multi-Region HA          :2025-07-15, 45d
+    PCI DSS Certification    :2025-09-01, 90d
+```
+
+### Critical Success Factors
+
+#### Top 10 Lessons from Production Systems
+
+1. **Database is King**: 80-90% of challenges relate to database design and optimization
+2. **Idempotency is Non-Negotiable**: Prevent duplicate payments at all costs
+3. **Message Queue Everything**: Decouple services for reliability
+4. **Monitor Relentlessly**: Know about issues before customers do
+5. **Security by Design**: Retrofit is exponentially harder
+6. **Data Lifecycle Management**: EOD process is critical for performance
+7. **Webhook Reliability**: Retry with exponential backoff
+8. **Reconciliation Daily**: Catch discrepancies early
+9. **Multi-Region from Day 1**: Disasters happen (floods, AWS outages)
+10. **Document Everything**: Compliance audits will thank you
+
+### Risk Mitigation Matrix
+
+| Risk                     | Probability | Impact       | Mitigation Strategy                 | Cost      |
+| ------------------------ | ----------- | ------------ | ----------------------------------- | --------- |
+| **Database Bottleneck**  | High        | Critical     | EOD + Partitioning + Replication    | Medium    |
+| **Payment Fraud**        | Medium      | High         | Real-time monitoring + ML models    | High      |
+| **System Outage**        | Medium      | Critical     | Multi-region HA + Load balancing    | High      |
+| **Data Breach**          | Low         | Catastrophic | PCI DSS + Tokenization + Encryption | Very High |
+| **Webhook Failures**     | High        | Medium       | Message queue + Retry logic         | Low       |
+| **Settlement Errors**    | Low         | High         | Daily reconciliation + Audit logs   | Medium    |
+| **Compliance Violation** | Medium      | High         | Regular audits + Automated checks   | Medium    |
+
+---
+
 ## Table of Contents
 
 1. [Introduction](#introduction)
