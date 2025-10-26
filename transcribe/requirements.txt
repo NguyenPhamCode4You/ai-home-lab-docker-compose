@@ -20,3 +20,5 @@ tqdm>=4.65.0
 
 # Optional but recommended for better performance
 datasets>=2.14.0
+
+docling
