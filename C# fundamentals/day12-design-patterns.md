@@ -2,11 +2,12 @@
 
 ## 🎯 Learning Objectives
 
-- Master SOLID principles with practical examples
-- Understand creational patterns (Factory, Builder, Singleton)
+- Master SOLID principles with real-world examples
+- Understand when and how to apply design patterns
+- Implement creational patterns (Factory, Builder, Singleton)
 - Learn structural patterns (Adapter, Decorator, Proxy)
 - Apply behavioral patterns (Strategy, Observer, Command)
-- Implement Dependency Injection properly
+- Understand Dependency Injection and IoC containers
 
 ---
 
@@ -15,51 +16,52 @@
 ### SOLID Overview
 
 ```mermaid
-graph TB
-    A[SOLID Principles] --> B[Single Responsibility<br/>SRP]
-    A --> C[Open/Closed<br/>OCP]
-    A --> D[Liskov Substitution<br/>LSP]
-    A --> E[Interface Segregation<br/>ISP]
-    A --> F[Dependency Inversion<br/>DIP]
+flowchart TB
+    A[SOLID<br/>Principles] --> B["S - Single Responsibility<br/><i>One reason to change</i>"]
+    A --> C["O - Open/Closed<br/><i>Open for extension,<br/>closed for modification</i>"]
+    A --> D["L - Liskov Substitution<br/><i>Subtypes must be<br/>substitutable</i>"]
+    A --> E["I - Interface Segregation<br/><i>Many specific interfaces<br/>better than one general</i>"]
+    A --> F["D - Dependency Inversion<br/><i>Depend on abstractions<br/>not concretions</i>"]
 
-    B --> B1[One reason to change]
-    C --> C1[Open for extension<br/>Closed for modification]
-    D --> D1[Subtypes must be substitutable]
-    E --> E1[Many small interfaces]
-    F --> F1[Depend on abstractions]
-
-    style A fill:#bbdefb,stroke:#333,stroke-width:2px
-    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style C fill:#fff9c4,stroke:#333,stroke-width:2px
-    style D fill:#ffccbc,stroke:#333,stroke-width:2px
-    style E fill:#e1bee7,stroke:#333,stroke-width:2px
-    style F fill:#b3e5fc,stroke:#333,stroke-width:2px
+    style A fill:#87CEEB,stroke:#333,stroke-width:3px
+    style B fill:#90EE90,stroke:#333,stroke-width:2px
+    style C fill:#FFD700,stroke:#333,stroke-width:2px
+    style D fill:#FFB6C1,stroke:#333,stroke-width:2px
+    style E fill:#DDA0DD,stroke:#333,stroke-width:2px
+    style F fill:#87CEFA,stroke:#333,stroke-width:2px
 ```
 
 ### Design Pattern Categories
 
 ```mermaid
-graph TB
-    A[Design Patterns] --> B[Creational<br/>Object Creation]
-    A --> C[Structural<br/>Object Composition]
-    A --> D[Behavioral<br/>Object Interaction]
+flowchart TB
+    subgraph Creational["🏗️ Creational Patterns<br/>(Object Creation)"]
+        C1[Singleton]
+        C2[Factory Method]
+        C3[Abstract Factory]
+        C4[Builder]
+        C5[Prototype]
+    end
 
-    B --> B1[Singleton]
-    B --> B2[Factory]
-    B --> B3[Builder]
+    subgraph Structural["🔗 Structural Patterns<br/>(Object Composition)"]
+        S1[Adapter]
+        S2[Decorator]
+        S3[Proxy]
+        S4[Facade]
+        S5[Composite]
+    end
 
-    C --> C1[Adapter]
-    C --> C2[Decorator]
-    C --> C3[Proxy]
+    subgraph Behavioral["🎭 Behavioral Patterns<br/>(Object Interaction)"]
+        B1[Strategy]
+        B2[Observer]
+        B3[Command]
+        B4[State]
+        B5[Template Method]
+    end
 
-    D --> D1[Strategy]
-    D --> D2[Observer]
-    D --> D3[Command]
-
-    style A fill:#bbdefb,stroke:#333,stroke-width:2px
-    style B fill:#c8e6c9,stroke:#333,stroke-width:2px
-    style C fill:#fff9c4,stroke:#333,stroke-width:2px
-    style D fill:#ffccbc,stroke:#333,stroke-width:2px
+    style Creational fill:#E8F5E9,stroke:#4CAF50,stroke-width:2px
+    style Structural fill:#FFF3E0,stroke:#FF9800,stroke-width:2px
+    style Behavioral fill:#E3F2FD,stroke:#2196F3,stroke-width:2px
 ```
 
 ### Single Responsibility Principle (SRP)
