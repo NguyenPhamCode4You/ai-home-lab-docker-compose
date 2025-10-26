@@ -35,7 +35,7 @@ bvms-cleaned
 
 bvms-learned
 
-*.mp4
+transcribe/videos/*.mp4
 
 *.mp3
 code-server/config
