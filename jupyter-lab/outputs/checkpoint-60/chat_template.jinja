@@ -1,0 +1,9 @@
+{{ bos_token }}{{ 'Below describes some details about some passengers who went on the Titanic.
+Predict whether they survived or perished based on their characteristics.
+Output 1 if they survived, and 0 if they died.' }}{% for message in messages %}{% if message['role'] == 'user' %}{{ '
+>>> Passenger Details:
+' + message['content'] }}{% elif message['role'] == 'assistant' %}{{ '
+>>> Did they survive?
+' + message['content'] + '<|end_of_text|>' }}{% else %}{{ raise_exception('Only user and assistant roles are supported!') }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '
+>>> Did they survive?
+' }}{% endif %}
