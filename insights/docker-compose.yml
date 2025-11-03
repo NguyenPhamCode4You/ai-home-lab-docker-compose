@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  insights-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: insights-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_LOGGER_LEVEL=info
+    volumes:
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    networks:
+      - insights-network
+
+networks:
+  insights-network:
+    driver: bridge
