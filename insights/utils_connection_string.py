@@ -1,11 +1,12 @@
 """
-Utility functions for Azure Application Insights connection using Connection String
-Connection String is the simplest and most reliable way to connect
+Utility functions for Azure Application Insights connection
+Uses Client ID, Client Secret, App ID, and Tenant ID for authentication
 """
 
 import pandas as pd
 import os
 from datetime import datetime, timedelta
+from azure.identity import ClientSecretCredential, DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus
 import logging
 
@@ -16,60 +17,74 @@ logger = logging.getLogger(__name__)
 class AzureInsightsConnector:
     """
     Connector for Azure Application Insights using KQL queries
-    Simplified to use Connection String for authentication
+    Uses Client ID, Client Secret, App ID (workspace ID), and Tenant ID
     """
     
-    def __init__(self, connection_string: str):
+    def __init__(self, client_id: str = None, client_secret: str = None, 
+                 app_id: str = None, tenant_id: str = None):
         """
-        Initialize the Azure Insights Connector with Connection String
+        Initialize the Azure Insights Connector
         
         Args:
-            connection_string: Application Insights Connection String
-            Example: InstrumentationKey=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx;IngestionEndpoint=https://xxx.applicationinsights.azure.com/
-        """
-        if not connection_string or not connection_string.strip():
-            raise ValueError("Connection string cannot be empty")
+            client_id: Azure AD Application (Client) ID
+            client_secret: Azure AD Client Secret
+            app_id: Application Insights Workspace ID (resource ID)
+            tenant_id: Azure AD Tenant ID
         
-        self.connection_string = connection_string.strip()
+        If not provided, will try to load from environment variables:
+            AZURE_CLIENT_ID
+            AZURE_CLIENT_SECRET
+            AZURE_APP_ID
+            AZURE_TENANT_ID
+        """
+        # Load from environment if not provided
+        self.client_id = client_id or os.getenv("AZURE_CLIENT_ID")
+        self.client_secret = client_secret or os.getenv("AZURE_CLIENT_SECRET")
+        self.app_id = app_id or os.getenv("AZURE_APP_ID")
+        self.tenant_id = tenant_id or os.getenv("AZURE_TENANT_ID")
+        
+        # Validate all required credentials
+        if not self.client_id:
+            raise ValueError("client_id is required (AZURE_CLIENT_ID)")
+        if not self.client_secret:
+            raise ValueError("client_secret is required (AZURE_CLIENT_SECRET)")
+        if not self.app_id:
+            raise ValueError("app_id is required (AZURE_APP_ID)")
+        if not self.tenant_id:
+            raise ValueError("tenant_id is required (AZURE_TENANT_ID)")
+        
         self.last_error = None
+        self.client = None
         
-        # Extract instrumentation key from connection string
-        self.instrumentation_key = self._extract_key_from_connection_string(self.connection_string)
+        logger.info(f"✅ Azure Insights Connector initialized")
+        logger.info(f"   Client ID: {self.client_id[:20]}...")
+        logger.info(f"   App ID (Workspace): {self.app_id[:20]}...")
+        logger.info(f"   Tenant ID: {self.tenant_id[:20]}...")
         
-        if not self.instrumentation_key:
-            raise ValueError("Invalid connection string - could not extract instrumentation key")
-        
-        logger.info(f"✅ Azure Insights Connector initialized with Connection String")
-        logger.info(f"   Instrumentation Key: {self.instrumentation_key[:20]}...")
+        # Initialize the Azure SDK client with proper authentication
+        self._initialize_client()
     
-    def _extract_key_from_connection_string(self, conn_str: str) -> str:
-        """Extract Instrumentation Key from connection string"""
+    def _initialize_client(self):
+        """Initialize Azure Logs Query Client with Client Secret credentials"""
         try:
-            # Parse connection string: InstrumentationKey=xxx;IngestionEndpoint=yyy
-            parts = conn_str.split(';')
-            for part in parts:
-                if part.startswith('InstrumentationKey='):
-                    return part.split('=', 1)[1]
-            return None
-        except Exception as e:
-            logger.error(f"❌ Failed to parse connection string: {str(e)}")
-            return None
-    
-    def _get_query_client(self) -> LogsQueryClient:
-        """
-        Get or create LogsQueryClient
-        Note: Connection string alone is not enough for LogsQueryClient
-        We need to use a different approach with workspace/resource querying
-        """
-        try:
-            # For direct Application Insights querying, we'll use the instrumentation key
-            logger.info("🔐 Using Application Insights Instrumentation Key for authentication")
+            logger.info("🔐 Using Client Secret authentication")
             
-            # Create a simple client using the instrumentation key
-            # The client will be configured in execute_kql method
-            return None  # We'll handle this differently
+            # Create credentials with provided values
+            credential = ClientSecretCredential(
+                tenant_id=self.tenant_id,
+                client_id=self.client_id,
+                client_secret=self.client_secret
+            )
+            
+            # Create the Logs Query Client
+            self.client = LogsQueryClient(credential)
+            logger.info("✅ Azure Logs Query Client initialized successfully")
+            self.last_error = None
+            
         except Exception as e:
-            logger.error(f"❌ Failed to create query client: {str(e)}")
+            error_msg = f"Failed to initialize Azure client: {str(e)}"
+            self.last_error = error_msg
+            logger.error(f"❌ {error_msg}")
             raise
     
     def execute_kql(self, query: str, time_range: str = "ago(1h)") -> pd.DataFrame:
@@ -78,75 +93,71 @@ class AzureInsightsConnector:
         
         Args:
             query: KQL query string
-            time_range: Time range string (e.g., "ago(1h)", "ago(24h)")
+            time_range: Time range string (e.g., "ago(1h)", "ago(24h)") or tuple of (start, end) datetimes
         
         Returns:
             pandas.DataFrame with query results
         """
         try:
-            import requests
-            import json
+            if not self.client:
+                raise ValueError("Client not initialized. Call _initialize_client first.")
             
             # Clean up query
             query = query.strip()
-            
-            # Extract instrumentation key and endpoint from connection string
-            instrumentation_key = self.instrumentation_key
-            
-            # Construct API endpoint
-            # Note: This is a simplified approach using REST API
-            # For production, consider using Azure SDK with proper authentication
-            endpoint = "https://api.applicationinsights.io/v1/apps/{}/query"
-            
-            # Build headers
-            headers = {
-                'Content-Type': 'application/json',
-                'x-api-key': instrumentation_key
-            }
-            
-            # Convert time range to timespan parameter
-            timespan = self._convert_time_range(time_range)
-            timespan_str = f"{timespan[0].isoformat()}Z/{timespan[1].isoformat()}Z"
-            
-            # Make API request
-            params = {
-                'query': query,
-                'timespan': timespan_str
-            }
-            
             logger.info(f"📊 Executing KQL query...")
-            response = requests.get(
-                endpoint.format(instrumentation_key),
-                headers=headers,
-                params=params
+            
+            # Convert time_range string to datetime tuple if needed
+            timespan = self._convert_time_range(time_range)
+            
+            # Execute the query using Azure SDK
+            # app_id is the workspace ID
+            response = self.client.query_workspace(
+                workspace_id=self.app_id,
+                query=query,
+                timespan=timespan
             )
             
-            if response.status_code == 200:
-                result = response.json()
+            # Check if query was successful
+            if response.status == LogsQueryStatus.SUCCESS:
+                # Convert to pandas DataFrame
+                table = response.tables[0] if response.tables else None
                 
-                if 'tables' in result and len(result['tables']) > 0:
-                    table = result['tables'][0]
+                if table:
+                    # Create DataFrame from query results
+                    data = []
+                    for row in table.rows:
+                        row_dict = {}
+                        for col_idx, col in enumerate(table.columns):
+                            row_dict[col.name] = row[col_idx]
+                        data.append(row_dict)
                     
-                    # Convert to DataFrame
-                    if 'rows' in table and len(table['rows']) > 0:
-                        columns = [col['name'] for col in table['columns']]
-                        data = [dict(zip(columns, row)) for row in table['rows']]
-                        df = pd.DataFrame(data)
-                        
-                        logger.info(f"✅ Query executed successfully. Rows: {len(df)}")
-                        self.last_error = None
-                        return df
-                    else:
-                        logger.warning("⚠️ Query returned no rows")
-                        return pd.DataFrame()
+                    df = pd.DataFrame(data)
+                    self.last_error = None
+                    logger.info(f"✅ Query executed successfully. Rows: {len(df)}")
+                    return df
                 else:
                     logger.warning("⚠️ Query returned no tables")
                     return pd.DataFrame()
             
+            elif response.status == LogsQueryStatus.PARTIAL:
+                logger.warning("⚠️ Query returned partial results")
+                table = response.tables[0] if response.tables else None
+                
+                if table:
+                    data = []
+                    for row in table.rows:
+                        row_dict = {}
+                        for col_idx, col in enumerate(table.columns):
+                            row_dict[col.name] = row[col_idx]
+                        data.append(row_dict)
+                    return pd.DataFrame(data)
+                else:
+                    return pd.DataFrame()
+            
             else:
-                error_msg = f"API request failed with status {response.status_code}: {response.text}"
-                logger.error(f"❌ {error_msg}")
+                error_msg = f"Query failed with status: {response.status}"
                 self.last_error = error_msg
+                logger.error(f"❌ {error_msg}")
                 return pd.DataFrame()
         
         except Exception as e:

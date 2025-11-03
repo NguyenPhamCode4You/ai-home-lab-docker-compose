@@ -44,33 +44,46 @@ if 'last_refresh' not in st.session_state:
 if 'connector' not in st.session_state:
     st.session_state.connector = None
 
-# Load connection string from environment
-CONNECTION_STRING = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+# Load credentials from environment
+AZURE_CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
+AZURE_CLIENT_SECRET = os.getenv("AZURE_CLIENT_SECRET")
+AZURE_APP_ID = os.getenv("AZURE_APP_ID")
+AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
+
+# Check if all credentials are loaded
+credentials_loaded = all([AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_APP_ID, AZURE_TENANT_ID])
 
 # Sidebar Configuration
 st.sidebar.title("⚙️ Configuration")
 st.sidebar.markdown("---")
 
-# Azure Connection Details - Simplified with Connection String
+# Azure Connection Details
 with st.sidebar.expander("🔐 Azure Connection", expanded=False):
-    if CONNECTION_STRING:
-        st.info("✅ Connection String loaded from .env file")
-        # Display masked connection string
-        masked_conn_str = CONNECTION_STRING[:50] + "..." if len(CONNECTION_STRING) > 50 else CONNECTION_STRING
-        st.text(f"Connection: {masked_conn_str}")
+    if credentials_loaded:
+        st.info("✅ Credentials loaded from .env file")
+        st.text_input("Client ID", value=AZURE_CLIENT_ID[:20] + "...", disabled=True, key="display_client_id")
+        st.text_input("Client Secret", value="•" * 20, disabled=True, key="display_secret")
+        st.text_input("App ID", value=AZURE_APP_ID, disabled=True, key="display_app_id")
+        st.text_input("Tenant ID", value=AZURE_TENANT_ID[:20] + "...", disabled=True, key="display_tenant_id")
     else:
-        st.error("❌ Missing CONNECTION_STRING in .env file!")
-        st.warning("Please add APPLICATIONINSIGHTS_CONNECTION_STRING to .env")
-        CONNECTION_STRING = st.text_area("Paste your Connection String:", placeholder="InstrumentationKey=xxx;IngestionEndpoint=https://...")
+        st.error("❌ Missing credentials in .env file!")
+        st.warning("Please add: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_APP_ID, AZURE_TENANT_ID")
+        AZURE_CLIENT_ID = st.text_input("Client ID", key="manual_client_id")
+        AZURE_CLIENT_SECRET = st.text_input("Client Secret", type="password", key="manual_secret")
+        AZURE_APP_ID = st.text_input("App ID", key="manual_app_id")
+        AZURE_TENANT_ID = st.text_input("Tenant ID", key="manual_tenant_id")
     
     if st.button("🔗 Connect to Azure Application Insights"):
-        if not CONNECTION_STRING:
-            st.error("❌ Please provide a connection string")
+        if not all([AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_APP_ID, AZURE_TENANT_ID]):
+            st.error("❌ Please provide all 4 credentials")
         else:
             with st.spinner("Connecting to Application Insights..."):
                 try:
                     st.session_state.connector = AzureInsightsConnector(
-                        connection_string=CONNECTION_STRING
+                        client_id=AZURE_CLIENT_ID,
+                        client_secret=AZURE_CLIENT_SECRET,
+                        app_id=AZURE_APP_ID,
+                        tenant_id=AZURE_TENANT_ID
                     )
                     # Test connection
                     if st.session_state.connector.test_connection():
