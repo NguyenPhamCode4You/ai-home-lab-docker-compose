@@ -5,7 +5,8 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import time
 from config import KQL_QUERIES, REFRESH_INTERVAL
-from utils import AzureInsightsConnector
+# from utils import AzureInsightsConnector
+from utils_managed_identity import AzureInsightsConnector
 
 # Page config
 st.set_page_config(
