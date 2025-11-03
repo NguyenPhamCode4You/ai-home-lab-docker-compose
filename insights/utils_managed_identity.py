@@ -5,6 +5,7 @@ Supports both Client Secret and Managed Identity authentication
 
 import pandas as pd
 import os
+from datetime import datetime, timedelta
 from azure.identity import ClientSecretCredential, ManagedIdentityCredential, DefaultAzureCredential
 from azure.monitor.query import LogsQueryClient, LogsQueryStatus
 import logging
@@ -71,6 +72,57 @@ class AzureInsightsConnector:
         ]
         return any(indicator in os.environ for indicator in azure_indicators)
     
+    def _convert_time_range(self, time_range):
+        """
+        Convert time_range string to Azure SDK compatible format
+        
+        Args:
+            time_range: String like "ago(1h)", "ago(24h)" or tuple of (start_datetime, end_datetime)
+        
+        Returns:
+            Tuple of (start_datetime, end_datetime)
+        """
+        # If already a tuple, return as-is
+        if isinstance(time_range, tuple):
+            return time_range
+        
+        # Parse time range string
+        time_range = time_range.strip()
+        
+        # Default to 1 hour if empty
+        if not time_range:
+            time_range = "ago(1h)"
+        
+        # Parse "ago(Xh|d|m|s)" format
+        if time_range.lower().startswith("ago(") and time_range.endswith(")"):
+            duration_str = time_range[4:-1].lower()  # Extract "1h" from "ago(1h)"
+            
+            # Parse duration
+            end_time = datetime.utcnow()
+            
+            if duration_str.endswith("h"):
+                hours = int(duration_str[:-1])
+                start_time = end_time - timedelta(hours=hours)
+            elif duration_str.endswith("d"):
+                days = int(duration_str[:-1])
+                start_time = end_time - timedelta(days=days)
+            elif duration_str.endswith("m"):
+                minutes = int(duration_str[:-1])
+                start_time = end_time - timedelta(minutes=minutes)
+            elif duration_str.endswith("s"):
+                seconds = int(duration_str[:-1])
+                start_time = end_time - timedelta(seconds=seconds)
+            else:
+                # Default to 1 hour
+                start_time = end_time - timedelta(hours=1)
+            
+            return (start_time, end_time)
+        
+        # Fallback to 1 hour
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=1)
+        return (start_time, end_time)
+    
     def _initialize_client(self):
         """Initialize Azure Logs Query Client with appropriate credentials"""
         try:
@@ -112,7 +164,7 @@ class AzureInsightsConnector:
         
         Args:
             query: KQL query string
-            time_range: Time range string (e.g., "ago(1h)", "ago(24h)")
+            time_range: Time range string (e.g., "ago(1h)", "ago(24h)") or tuple of (start, end) datetimes
         
         Returns:
             pandas.DataFrame with query results
@@ -121,11 +173,14 @@ class AzureInsightsConnector:
             # Clean up query - remove extra whitespace
             query = query.strip()
             
+            # Convert time_range string to datetime tuple if needed
+            timespan = self._convert_time_range(time_range)
+            
             # Execute the query
             response = self.client.query_workspace(
                 workspace_id=self.app_id,
                 query=query,
-                timespan=time_range
+                timespan=timespan
             )
             
             # Check if query was successful
