@@ -4,9 +4,13 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime, timedelta
 import time
+import os
+from dotenv import load_dotenv
 from config import KQL_QUERIES, REFRESH_INTERVAL
-# from utils import AzureInsightsConnector
-from utils_managed_identity import AzureInsightsConnector
+from utils_connection_string import AzureInsightsConnector
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Page config
 st.set_page_config(
@@ -40,26 +44,42 @@ if 'last_refresh' not in st.session_state:
 if 'connector' not in st.session_state:
     st.session_state.connector = None
 
+# Load connection string from environment
+CONNECTION_STRING = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+
 # Sidebar Configuration
 st.sidebar.title("⚙️ Configuration")
 st.sidebar.markdown("---")
 
-# Azure Connection Details
-with st.sidebar.expander("Azure Connection", expanded=False):
-    app_id = st.text_input("Application Insights ID", type="password", key="app_id")
-    client_id = st.text_input("Client ID", type="password", key="client_id")
-    client_secret = st.text_input("Client Secret", type="password", key="client_secret")
-    tenant_id = st.text_input("Tenant ID", type="password", key="tenant_id")
+# Azure Connection Details - Simplified with Connection String
+with st.sidebar.expander("🔐 Azure Connection", expanded=False):
+    if CONNECTION_STRING:
+        st.info("✅ Connection String loaded from .env file")
+        # Display masked connection string
+        masked_conn_str = CONNECTION_STRING[:50] + "..." if len(CONNECTION_STRING) > 50 else CONNECTION_STRING
+        st.text(f"Connection: {masked_conn_str}")
+    else:
+        st.error("❌ Missing CONNECTION_STRING in .env file!")
+        st.warning("Please add APPLICATIONINSIGHTS_CONNECTION_STRING to .env")
+        CONNECTION_STRING = st.text_area("Paste your Connection String:", placeholder="InstrumentationKey=xxx;IngestionEndpoint=https://...")
     
-    if st.button("Connect to Azure"):
-        with st.spinner("Connecting to Azure..."):
-            st.session_state.connector = AzureInsightsConnector(
-                app_id=app_id,
-                client_id=client_id,
-                client_secret=client_secret,
-                tenant_id=tenant_id
-            )
-            st.success("✅ Connected successfully!")
+    if st.button("🔗 Connect to Azure Application Insights"):
+        if not CONNECTION_STRING:
+            st.error("❌ Please provide a connection string")
+        else:
+            with st.spinner("Connecting to Application Insights..."):
+                try:
+                    st.session_state.connector = AzureInsightsConnector(
+                        connection_string=CONNECTION_STRING
+                    )
+                    # Test connection
+                    if st.session_state.connector.test_connection():
+                        st.session_state.last_refresh = datetime.now()
+                        st.success(f"✅ Connected successfully!")
+                    else:
+                        st.error(f"❌ Connection test failed: {st.session_state.connector.get_last_error()}")
+                except Exception as e:
+                    st.error(f"❌ Connection failed: {str(e)}")
 
 # Time range selection
 with st.sidebar.expander("Time Range", expanded=True):
