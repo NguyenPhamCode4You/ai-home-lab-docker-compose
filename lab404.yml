@@ -8,15 +8,15 @@ sections: # An array of sections
       - title: n8n
         description: AI Workflow Builder
         icon: fas code-branch
-        url: http://localhost:5678/home/workflows
+        url: http://10.13.13.7:5678/home/workflows
       - title: ollama be
         description: AI Language Models
         icon: fas fa-brain
-        url: http://localhost:11434
+        url: http://10.13.13.7:11434
       - title: Open Web UI
         description: AI Web Interface
         icon: fas fa-globe
-        url: http://localhost:11435
+        url: http://10.13.13.7:11435
 
   - name: Development
     icon: fas fa-code
@@ -24,12 +24,12 @@ sections: # An array of sections
       - title: Code Server
         description: VS Code in the browser
         icon: fas fa-code
-        url: http://localhost:8441
+        url: http://10.13.13.7:8441
 
       - title: Jupyter Lab
         description: Jupyter Notebook in the browser
         icon: fab fa-python
-        url: http://localhost:8883
+        url: http://10.13.13.7:8883
 
   - name: Hosting
     icon: fas fa-cloud
@@ -37,8 +37,8 @@ sections: # An array of sections
       - title: Nextcloud
         description: Nextcloud Database
         icon: fas fa-download
-        url: http://localhost:8081/apps/files/files
+        url: http://10.13.13.7:8081/apps/files/files
       - title: Supabase
         description: Supabase Cloud
         icon: fas fa-cloud
-        url: http://localhost:8000
+        url: http://10.13.13.7:8000

@@ -24,33 +24,33 @@ services:
       - ./lab404.yml:/app/user-data/conf.yml
     restart: always
 
-  # code-server:
-  #   image: lscr.io/linuxserver/code-server:latest
-  #   container_name: code-server
-  #   networks:
-  #     - homelab
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Etc/UTC
-  #     - PASSWORD=123456 #optional
-  #     - SUDO_PASSWORD=123456 #optional
-  #     - SUDO_PASSWORD_HASH= #optional
-  #     - DEFAULT_WORKSPACE=/config/workspace #optional
-  #     - PWA_APPNAME=code-server #optional
-  #   volumes:
-  #     - ./code-server/config:/config
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
-  #   ports:
-  #     - 8441:8443
-  #     - 8001:8001
-  #   restart: unless-stopped
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    networks:
+      - homelab
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PASSWORD=123456 #optional
+      - SUDO_PASSWORD=123456 #optional
+      - SUDO_PASSWORD_HASH= #optional
+      - DEFAULT_WORKSPACE=/config/workspace #optional
+      - PWA_APPNAME=code-server #optional
+    volumes:
+      - ./code-server/config:/config
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - 8441:8443
+      - 8001:8001
+    restart: unless-stopped
 
   # next-cloud:
   #   image: nextcloud
@@ -100,18 +100,18 @@ services:
       - open-webui:/app/backend/data
     restart: always
 
-  # n8n:
-  #   image: docker.n8n.io/n8nio/n8n
-  #   container_name: n8n
-  #   networks:
-  #     - homelab
-  #   ports:
-  #     - "5678:5678"
-  #   volumes:
-  #     - n8n_storage:/home/node/.n8n
-  #   environment:
-  #     - N8N_SECURE_COOKIE=false
-  #   restart: always
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    networks:
+      - homelab
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    environment:
+      - N8N_SECURE_COOKIE=false
+    restart: always
 
   qlserver:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -153,30 +153,30 @@ services:
   #   volumes:
   #     - qdrant_storage:/qdrant/storage
 
-  # jupyter-lab:
-  #   build:
-  #     context: .
-  #     dockerfile: jupyter.Dockerfile
-  #   container_name: jupyter-lab
-  #   user: root
-  #   networks:
-  #     - homelab
-  #   ports:
-  #     - "8883:8888"
-  #   volumes:
-  #     - ./jupyter-lab:/home/jovyan/work
-  #     - jupyter_lab_storage:/home/jovyan
-  #   environment:
-  #     - JUPYTER_ENABLE_LAB=yes
-  #     - JUPYTER_TOKEN=123456
-  #     - SUDO_PASSWORD=123456
-  #     - GRANT_SUDO=yes
-  #   command: start-notebook.py --NotebookApp.token='123456'
-  #   restart: always
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
+  jupyter-lab:
+    build:
+      context: .
+      dockerfile: jupyter.Dockerfile
+    container_name: jupyter-lab
+    user: root
+    networks:
+      - homelab
+    ports:
+      - "8883:8888"
+    volumes:
+      - ./jupyter-lab:/home/jovyan/work
+      - jupyter_lab_storage:/home/jovyan
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=123456
+      - SUDO_PASSWORD=123456
+      - GRANT_SUDO=yes
+    command: start-notebook.py --NotebookApp.token='123456'
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
