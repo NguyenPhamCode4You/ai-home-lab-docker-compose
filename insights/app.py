@@ -43,6 +43,8 @@ if 'last_refresh' not in st.session_state:
     st.session_state.last_refresh = datetime.now()
 if 'connector' not in st.session_state:
     st.session_state.connector = None
+if 'refresh_interval' not in st.session_state:
+    st.session_state.refresh_interval = 10  # Default 10 seconds
 
 # Load credentials from environment
 AZURE_CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
@@ -95,9 +97,27 @@ with st.sidebar.expander("🔐 Azure Connection", expanded=False):
                     st.error(f"❌ Connection failed: {str(e)}")
 
 # Time range selection
-with st.sidebar.expander("Time Range", expanded=True):
+with st.sidebar.expander("⏱️ Time Range", expanded=True):
     hours = st.slider("Select hours to look back:", 1, 24, 1)
     st.session_state.hours_lookback = hours
+
+# Refresh rate selection
+with st.sidebar.expander("🔄 Auto-Refresh Settings", expanded=True):
+    refresh_options = {
+        "5 seconds": 5,
+        "10 seconds": 10,
+        "30 seconds": 30,
+        "60 seconds": 60,
+        "5 minutes": 300
+    }
+    
+    selected_refresh = st.selectbox(
+        "Refresh Rate:",
+        options=list(refresh_options.keys()),
+        index=1  # Default to 10 seconds
+    )
+    
+    st.session_state.refresh_interval = refresh_options[selected_refresh]
 
 # Auto-refresh indicator
 st.sidebar.markdown("---")
@@ -105,7 +125,7 @@ col1, col2 = st.sidebar.columns(2)
 with col1:
     st.metric("Last Refresh", st.session_state.last_refresh.strftime("%H:%M:%S"))
 with col2:
-    st.metric("Refresh Rate", f"{REFRESH_INTERVAL}s")
+    st.metric("Refresh Rate", selected_refresh)
 
 # Main Dashboard
 st.markdown('<div class="header-title">📊 Application Insights Dashboard</div>', unsafe_allow_html=True)
@@ -303,9 +323,17 @@ else:
         # Auto-refresh mechanism
         placeholder = st.empty()
         
+        # Get refresh interval from session state
+        refresh_interval = st.session_state.refresh_interval
+        
         # Placeholder for refresh countdown
-        with st.spinner(f"⏳ Next refresh in {REFRESH_INTERVAL} seconds..."):
-            time.sleep(REFRESH_INTERVAL)
+        if refresh_interval >= 60:
+            refresh_display = f"{refresh_interval // 60} minute(s)"
+        else:
+            refresh_display = f"{refresh_interval} seconds"
+        
+        with st.spinner(f"⏳ Next refresh in {refresh_display}..."):
+            time.sleep(refresh_interval)
         
         st.session_state.last_refresh = datetime.now()
         st.rerun()
