@@ -159,8 +159,20 @@ else:
                 st.metric("📊 Requests", f"{int(total_reqs_result.iloc[0]['total_requests']):,}", label_visibility="visible")
             else:
                 st.metric("📊 Requests", "N/A")
-        
+
         with col2:
+            if avg_time_result is not None and len(avg_time_result) > 0:
+                st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
+            else:
+                st.metric("⚡ Avg Time", "N/A")
+
+        with col3:
+            if availability_result is not None and len(availability_result) > 0:
+                st.metric("✅ Availability", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
+            else:
+                st.metric("✅ Availability", "N/A")
+        
+        with col4:
             if memory_result is not None and len(memory_result) > 0:
                 memory_mb = memory_result.iloc[0]['avg_memory_mb']
                 if memory_mb >= 1024:
@@ -170,23 +182,11 @@ else:
             else:
                 st.metric("💾 Memory", "N/A")
         
-        with col3:
+        with col5:
             if cpu_result is not None and len(cpu_result) > 0:
                 st.metric("⚙️ CPU", f"{cpu_result.iloc[0]['avg_cpu']:.1f}%", label_visibility="visible")
             else:
                 st.metric("⚙️ CPU", "N/A")
-        
-        with col4:
-            if avg_time_result is not None and len(avg_time_result) > 0:
-                st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
-            else:
-                st.metric("⚡ Avg Time", "N/A")
-        
-        with col5:
-            if availability_result is not None and len(availability_result) > 0:
-                st.metric("✅ Availability", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
-            else:
-                st.metric("✅ Availability", "N/A")
         
         st.markdown("---")
         
@@ -196,46 +196,48 @@ else:
         response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
         
         if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
-            # Create figure with secondary y-axis
+            # Limit to exactly 30 bars by sampling evenly
+            total_bars = 30
+            
+            if len(request_timeline) > total_bars:
+                # Take every Nth row to get exactly 30 bars
+                step = len(request_timeline) // total_bars
+                request_timeline = request_timeline.iloc[::step][:total_bars]
+                response_time_trend = response_time_trend.iloc[::step][:total_bars]
+            
+            # Create stacked bar chart without scaling
             fig = go.Figure()
             
-            # Add request count as bar chart (blue)
+            # Add request count bar chart (blue) - base layer
             fig.add_trace(go.Bar(
                 x=request_timeline['timestamp'],
                 y=request_timeline['request_count'],
                 name='Request Count',
-                marker=dict(color='#636EFA', opacity=0.7),
-                yaxis='y'
+                marker=dict(color='#636EFA', opacity=0.8),
+                hovertemplate='<b>Request Count</b><br>%{y:,.0f}<extra></extra>'
             ))
             
-            # Add response time as bar chart on secondary y-axis (red)
+            # Add response time bar chart (red) - stacked on top with actual values
             fig.add_trace(go.Bar(
                 x=response_time_trend['timestamp'],
                 y=response_time_trend['avg_duration'],
                 name='Avg Response Time (ms)',
-                marker=dict(color='#EF553B', opacity=0.7),
-                yaxis='y2'
+                marker=dict(color='#EF553B', opacity=0.8),
+                hovertemplate='<b>Avg Response Time</b><br>%{y:.0f} ms<extra></extra>'
             ))
             
-            # Update layout with dual y-axes
+            # Update layout for stacked bars
             fig.update_layout(
+                barmode='stack',
                 xaxis=dict(title='Time', showgrid=False),
                 yaxis=dict(
-                    title='Request Count', 
-                    side='left', 
+                    title='Request Count + Response Time (ms)', 
                     showgrid=True,
                     gridcolor='rgba(128, 128, 128, 0.2)'
-                ),
-                yaxis2=dict(
-                    title='Response Time (ms)', 
-                    side='right', 
-                    overlaying='y', 
-                    showgrid=False
                 ),
                 hovermode='x unified',
                 height=350,
                 margin=dict(l=50, r=50, t=30, b=40),
-                barmode='overlay',  # Overlay bars for better visibility
                 legend=dict(
                     orientation='h', 
                     yanchor='bottom', 
