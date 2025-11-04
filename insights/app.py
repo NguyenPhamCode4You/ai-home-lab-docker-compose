@@ -299,19 +299,41 @@ else:
                     size='request_count',
                     hover_name='client_CountryOrRegion',
                     hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
-                    size_max=50,
+                    size_max=60,
                     color='request_count',
-                    color_continuous_scale='Viridis',
+                    color_continuous_scale='Plasma',  # More vivid color scale
                     labels={'request_count': 'Requests'}
                 )
                 fig.update_layout(
                     height=350,
                     margin=dict(l=0, r=0, t=0, b=0),
+                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
+                    plot_bgcolor='rgba(14,17,23,1)',
+                    font=dict(color='white'),
                     geo=dict(
+                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
                         showland=True,
-                        landcolor='rgb(243, 243, 243)',
-                        coastlinecolor='rgb(204, 204, 204)',
-                        projection_type='natural earth'
+                        landcolor='rgb(30, 35, 45)',  # Dark land
+                        showocean=True,
+                        oceancolor='rgb(20, 23, 30)',  # Darker ocean
+                        showcountries=True,
+                        countrycolor='rgb(80, 80, 80)',  # Gray borders
+                        coastlinecolor='rgb(60, 60, 60)',
+                        showlakes=True,
+                        lakecolor='rgb(20, 23, 30)',
+                        projection_type='natural earth',
+                        showframe=False
+                    ),
+                    coloraxis_colorbar=dict(
+                        title=dict(text='Requests', font=dict(color='white')),
+                        tickfont=dict(color='white')
+                    )
+                )
+                # Make markers glow effect
+                fig.update_traces(
+                    marker=dict(
+                        line=dict(width=1, color='rgba(255, 255, 255, 0.3)'),
+                        opacity=0.9
                     )
                 )
                 st.plotly_chart(fig, use_container_width=True)
