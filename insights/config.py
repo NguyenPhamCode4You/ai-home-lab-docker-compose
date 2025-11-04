@@ -42,6 +42,20 @@ KQL_QUERIES = {
         | project availability = (successful * 100.0 / total)
     """,
     
+    # Average memory usage
+    'memory_usage': """
+        performanceCounters
+        | where name == "Available Bytes" or name == "Private Bytes"
+        | summarize avg_memory_mb = avg(value) / 1024 / 1024
+    """,
+    
+    # Average CPU percentage
+    'cpu_percentage': """
+        performanceCounters
+        | where name == "% Processor Time" or name == "Processor Time"
+        | summarize avg_cpu = avg(value)
+    """,
+    
     # Request timeline (by minute)
     'request_timeline': """
         requests

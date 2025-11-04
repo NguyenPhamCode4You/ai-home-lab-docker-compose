@@ -149,10 +149,10 @@ else:
         
         # Fetch all metrics
         total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
-        failed_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['failed_requests'], time_range)
         avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
-        error_rate_result = st.session_state.connector.execute_kql(KQL_QUERIES['error_rate'], time_range)
         availability_result = st.session_state.connector.execute_kql(KQL_QUERIES['availability'], time_range)
+        memory_result = st.session_state.connector.execute_kql(KQL_QUERIES['memory_usage'], time_range)
+        cpu_result = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_percentage'], time_range)
         
         with col1:
             if total_reqs_result is not None and len(total_reqs_result) > 0:
@@ -161,22 +161,26 @@ else:
                 st.metric("📊 Requests", "N/A")
         
         with col2:
-            if failed_reqs_result is not None and len(failed_reqs_result) > 0:
-                st.metric("❌ Failed", f"{int(failed_reqs_result.iloc[0]['failed_requests']):,}", label_visibility="visible")
+            if memory_result is not None and len(memory_result) > 0:
+                memory_mb = memory_result.iloc[0]['avg_memory_mb']
+                if memory_mb >= 1024:
+                    st.metric("💾 Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
+                else:
+                    st.metric("💾 Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
             else:
-                st.metric("❌ Failed", "N/A")
+                st.metric("💾 Memory", "N/A")
         
         with col3:
+            if cpu_result is not None and len(cpu_result) > 0:
+                st.metric("⚙️ CPU", f"{cpu_result.iloc[0]['avg_cpu']:.1f}%", label_visibility="visible")
+            else:
+                st.metric("⚙️ CPU", "N/A")
+        
+        with col4:
             if avg_time_result is not None and len(avg_time_result) > 0:
                 st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
             else:
                 st.metric("⚡ Avg Time", "N/A")
-        
-        with col4:
-            if error_rate_result is not None and len(error_rate_result) > 0:
-                st.metric("⚠️ Error Rate", f"{error_rate_result.iloc[0]['error_rate']:.2f}%", label_visibility="visible")
-            else:
-                st.metric("⚠️ Error Rate", "N/A")
         
         with col5:
             if availability_result is not None and len(availability_result) > 0:
@@ -195,23 +199,21 @@ else:
             # Create figure with secondary y-axis
             fig = go.Figure()
             
-            # Add request count as bar chart
+            # Add request count as bar chart (blue)
             fig.add_trace(go.Bar(
                 x=request_timeline['timestamp'],
                 y=request_timeline['request_count'],
                 name='Request Count',
-                marker=dict(color='#636EFA', opacity=0.6),
+                marker=dict(color='#636EFA', opacity=0.7),
                 yaxis='y'
             ))
             
-            # Add response time as line chart on secondary y-axis
-            fig.add_trace(go.Scatter(
+            # Add response time as bar chart on secondary y-axis (red)
+            fig.add_trace(go.Bar(
                 x=response_time_trend['timestamp'],
                 y=response_time_trend['avg_duration'],
                 name='Avg Response Time (ms)',
-                line=dict(color='#EF553B', width=3),
-                mode='lines+markers',
-                marker=dict(size=4, color='#EF553B'),
+                marker=dict(color='#EF553B', opacity=0.7),
                 yaxis='y2'
             ))
             
@@ -233,6 +235,7 @@ else:
                 hovermode='x unified',
                 height=350,
                 margin=dict(l=50, r=50, t=30, b=40),
+                barmode='overlay',  # Overlay bars for better visibility
                 legend=dict(
                     orientation='h', 
                     yanchor='bottom', 
