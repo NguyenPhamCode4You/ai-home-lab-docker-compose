@@ -479,7 +479,28 @@ else:
         st.subheader("🔍 Top Exceptions")
         result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
         if result is not None and len(result) > 0:
-            st.dataframe(result, use_container_width=True, height=250)
+            # Format the dataframe for better display
+            display_df = result.copy()
+            
+            # Rename columns for better readability
+            column_config = {
+                'type': st.column_config.TextColumn('Exception Type', width='medium'),
+                'outerMessage': st.column_config.TextColumn('Message', width='large'),
+                'method': st.column_config.TextColumn('Method', width='small'),
+                'exception_count': st.column_config.NumberColumn('Count', format='%d'),
+                'affected_operations': st.column_config.NumberColumn('Affected APIs', format='%d'),
+                'first_seen': st.column_config.DatetimeColumn('First Seen', format='DD/MM/YY HH:mm'),
+                'last_seen': st.column_config.DatetimeColumn('Last Seen', format='DD/MM/YY HH:mm'),
+                'problemId': st.column_config.TextColumn('Problem ID', width='small')
+            }
+            
+            st.dataframe(
+                display_df, 
+                use_container_width=True, 
+                height=300,
+                column_config=column_config,
+                hide_index=True
+            )
         else:
             st.info("No exceptions found")
         

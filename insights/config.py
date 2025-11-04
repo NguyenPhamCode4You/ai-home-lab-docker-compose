@@ -127,9 +127,15 @@ KQL_QUERIES = {
     # Top exceptions
     'top_exceptions': """
         exceptions
-        | summarize exception_count = count() by type, outerMessage
+        | summarize 
+            exception_count = count(),
+            first_seen = min(timestamp),
+            last_seen = max(timestamp),
+            affected_operations = dcount(operation_Name)
+        by type, outerMessage, method, problemId
         | top 10 by exception_count
         | order by exception_count desc
+        | project type, outerMessage, method, exception_count, affected_operations, first_seen, last_seen, problemId
     """,
     
     # Requests by location (country/region)
