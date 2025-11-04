@@ -44,7 +44,13 @@ if 'last_refresh' not in st.session_state:
 if 'connector' not in st.session_state:
     st.session_state.connector = None
 if 'refresh_interval' not in st.session_state:
-    st.session_state.refresh_interval = 10  # Default 10 seconds
+    st.session_state.refresh_interval = 15  # Default 15 seconds
+if 'time_range_value' not in st.session_state:
+    st.session_state.time_range_value = "1h"  # Default 1 hour
+if 'bars_count' not in st.session_state:
+    st.session_state.bars_count = 30  # Default 30 bars
+if 'top_k' not in st.session_state:
+    st.session_state.top_k = 8  # Default top 8
 
 # Load credentials from environment
 AZURE_CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
@@ -97,27 +103,70 @@ with st.sidebar.expander("🔐 Azure Connection", expanded=False):
                     st.error(f"❌ Connection failed: {str(e)}")
 
 # Time range selection
-with st.sidebar.expander("⏱️ Time Range", expanded=True):
-    hours = st.slider("Select hours to look back:", 1, 24, 1)
-    st.session_state.hours_lookback = hours
-
-# Refresh rate selection
-with st.sidebar.expander("🔄 Auto-Refresh Settings", expanded=True):
+# Dashboard Settings
+with st.sidebar.expander("⚙️ Dashboard Settings", expanded=True):
+    # Time Range selection
+    st.markdown("**⏱️ Time Range**")
+    time_range_options = {
+        "30 minutes": "30m",
+        "1 hour": "1h",
+        "2 hours": "2h",
+        "4 hours": "4h",
+        "8 hours": "8h",
+        "12 hours": "12h",
+        "24 hours": "24h"
+    }
+    
+    selected_time_range = st.selectbox(
+        "Look back period:",
+        options=list(time_range_options.keys()),
+        index=1,  # Default to 1 hour
+        label_visibility="collapsed"
+    )
+    st.session_state.time_range_value = time_range_options[selected_time_range]
+    
+    st.markdown("---")
+    
+    # Refresh Rate selection
+    st.markdown("**🔄 Refresh Rate**")
     refresh_options = {
-        "5 seconds": 5,
-        "10 seconds": 10,
+        "15 seconds": 15,
         "30 seconds": 30,
-        "60 seconds": 60,
+        "1 minute": 60,
         "5 minutes": 300
     }
     
     selected_refresh = st.selectbox(
-        "Refresh Rate:",
+        "Auto-refresh interval:",
         options=list(refresh_options.keys()),
-        index=1  # Default to 10 seconds
+        index=0,  # Default to 15 seconds
+        label_visibility="collapsed"
     )
-    
     st.session_state.refresh_interval = refresh_options[selected_refresh]
+    
+    st.markdown("---")
+    
+    # Bars Count selection
+    st.markdown("**📊 Bars Count**")
+    bars_count = st.selectbox(
+        "Timeline chart bars:",
+        options=[20, 30, 40, 50, 100],
+        index=1,  # Default to 30
+        label_visibility="collapsed"
+    )
+    st.session_state.bars_count = bars_count
+    
+    st.markdown("---")
+    
+    # Top K selection
+    st.markdown("**🔝 Top K Results**")
+    top_k = st.selectbox(
+        "Number of top results:",
+        options=[5, 8, 10, 25],
+        index=1,  # Default to 8
+        label_visibility="collapsed"
+    )
+    st.session_state.top_k = top_k
 
 # Auto-refresh indicator
 st.sidebar.markdown("---")
@@ -141,8 +190,8 @@ if st.session_state.connector is None:
     """)
 else:
     try:
-        # Get time range
-        time_range = f"ago({st.session_state.hours_lookback}h)"
+        # Get time range from settings
+        time_range = f"ago({st.session_state.time_range_value})"
         
         # Compact metrics in one row with 5 columns
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -199,11 +248,11 @@ else:
             response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
             
             if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
-                # Limit to exactly 30 bars by sampling evenly
-                total_bars = 30
+                # Use bars count from settings
+                total_bars = st.session_state.bars_count
                 
                 if len(request_timeline) > total_bars:
-                    # Take every Nth row to get exactly 30 bars
+                    # Take every Nth row to get exactly the configured number of bars
                     step = len(request_timeline) // total_bars
                     request_timeline = request_timeline.iloc[::step][:total_bars]
                     response_time_trend = response_time_trend.iloc[::step][:total_bars]
@@ -331,7 +380,9 @@ else:
         
         with col1:
             st.subheader("🎯 Top Most-Called APIs")
-            result = st.session_state.connector.execute_kql(KQL_QUERIES['top_operations'], time_range)
+            # Use dynamic top K value
+            top_ops_query = KQL_QUERIES['top_operations'].replace('top 8', f'top {st.session_state.top_k}')
+            result = st.session_state.connector.execute_kql(top_ops_query, time_range)
             if result is not None and len(result) > 0:
                 fig = go.Figure()
                 
@@ -365,7 +416,9 @@ else:
         
         with col2:
             st.subheader("🐌 Top Slowest APIs")
-            result = st.session_state.connector.execute_kql(KQL_QUERIES['slowest_operations'], time_range)
+            # Use dynamic top K value
+            slowest_ops_query = KQL_QUERIES['slowest_operations'].replace('top 8', f'top {st.session_state.top_k}')
+            result = st.session_state.connector.execute_kql(slowest_ops_query, time_range)
             if result is not None and len(result) > 0:
                 fig = go.Figure()
                 
@@ -477,7 +530,9 @@ else:
         
         # Exceptions section
         st.subheader("🔍 Top Exceptions")
-        result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
+        # Use dynamic top K value
+        exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 20', f'top {st.session_state.top_k * 2}')  # Show 2x for exceptions
+        result = st.session_state.connector.execute_kql(exceptions_query, time_range)
         if result is not None and len(result) > 0:
             # Format the dataframe for better display
             display_df = result.copy()
