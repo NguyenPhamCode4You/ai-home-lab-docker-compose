@@ -73,8 +73,10 @@ KQL_QUERIES = {
     # Top operations by request count
     'top_operations': """
         requests
+        | where url !has "healthz"
+        | where (url has "bvms-voyage") or (url has "bvms-master")
         | summarize count = count() by operation_Name
-        | top 10 by count
+        | top 8 by count
         | order by count desc
     """,
     
