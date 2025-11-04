@@ -50,16 +50,16 @@ KQL_QUERIES = {
     # Top operations by request count
     'top_operations': """
         requests
-        | summarize count() by operation_name
-        | top 10 by count_
-        | order by count_ desc
+        | summarize count = count() by operation_Name
+        | top 10 by count
+        | order by count desc
     """,
     
     # Errors by status code
     'errors_by_status': """
         requests
         | where success == false
-        | summarize error_count = count() by result_code
+        | summarize error_count = count() by resultCode
         | order by error_count desc
     """,
     

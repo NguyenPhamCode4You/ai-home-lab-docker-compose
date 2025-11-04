@@ -232,10 +232,10 @@ else:
             if result is not None and len(result) > 0:
                 fig = px.bar(
                     result,
-                    x='operation_name',
+                    x='operation_Name',
                     y='count',
                     title="Top Operations",
-                    labels={'count': 'Request Count', 'operation_name': 'Operation'},
+                    labels={'count': 'Request Count', 'operation_Name': 'Operation'},
                     color='count',
                     color_continuous_scale='Viridis'
                 )
@@ -254,9 +254,9 @@ else:
                 fig = px.pie(
                     result,
                     values='error_count',
-                    names='result_code',
+                    names='resultCode',
                     title="Errors by Status Code",
-                    labels={'error_count': 'Error Count', 'result_code': 'Status Code'}
+                    labels={'error_count': 'Error Count', 'resultCode': 'Status Code'}
                 )
                 fig.update_layout(height=400)
                 st.plotly_chart(fig, use_container_width=True)
