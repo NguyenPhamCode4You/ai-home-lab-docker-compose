@@ -283,7 +283,7 @@ else:
                     size='request_count',
                     hover_name='client_CountryOrRegion',
                     hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
-                    size_max=60,
+                    size_max=30,  # Smaller bubble size
                     color='request_count',
                     color_continuous_scale=['#FFA500', '#FFA500', '#FF4500', '#DC143C'],  # Blue -> Orange -> OrangeRed -> Crimson
                     labels={'request_count': 'Requests'}
@@ -313,10 +313,10 @@ else:
                         tickfont=dict(color='white')
                     )
                 )
-                # Make markers glow effect with gradient color
+                # Remove border and adjust opacity
                 fig.update_traces(
                     marker=dict(
-                        line=dict(width=1, color='rgba(255, 255, 255, 0.5)'),  # Orange glow
+                        line=dict(width=0),  # No border
                         opacity=0.9
                     )
                 )
