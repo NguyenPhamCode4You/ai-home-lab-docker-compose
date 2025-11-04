@@ -254,11 +254,29 @@ else:
             st.subheader("⚠️ Error Status")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['errors_by_status'], time_range)
             if result is not None and len(result) > 0:
+                # Define color mapping based on error severity
+                def get_error_color(code):
+                    code_str = str(code)
+                    if code_str.startswith('5'):  # 5xx - Server errors (most severe)
+                        return '#DC143C'  # Crimson red
+                    elif code_str in ['400', '401', '403']:  # Auth/Permission errors
+                        return '#FF4500'  # Orange red
+                    elif code_str == '404':  # Not found (less severe)
+                        return '#4169E1'  # Royal blue
+                    elif code_str.startswith('4'):  # Other 4xx client errors
+                        return '#FFA500'  # Orange
+                    else:
+                        return '#808080'  # Gray for unknown
+                
+                # Create color list for each status code
+                colors = [get_error_color(code) for code in result['resultCode']]
+                
                 fig = px.pie(
                     result,
                     values='error_count',
                     names='resultCode',
-                    labels={'error_count': 'Count', 'resultCode': 'Code'}
+                    labels={'error_count': 'Count', 'resultCode': 'Code'},
+                    color_discrete_sequence=colors
                 )
                 fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
