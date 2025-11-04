@@ -528,69 +528,73 @@ else:
         
         st.markdown("---")
         
-        # Exceptions section
-        st.subheader("🔍 Top Exceptions")
-        # Use dynamic top K value
-        exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 20', f'top {st.session_state.top_k * 2}')  # Show 2x for exceptions
-        result = st.session_state.connector.execute_kql(exceptions_query, time_range)
-        if result is not None and len(result) > 0:
-            # Format the dataframe for better display
-            display_df = result.copy()
-            
-            # Rename columns for better readability
-            column_config = {
-                'type': st.column_config.TextColumn('Exception Type', width='medium'),
-                'outerMessage': st.column_config.TextColumn('Message', width='large'),
-                'method': st.column_config.TextColumn('Method', width='small'),
-                'exception_count': st.column_config.NumberColumn('Count', format='%d'),
-                'affected_operations': st.column_config.NumberColumn('Affected APIs', format='%d'),
-                'first_seen': st.column_config.DatetimeColumn('First Seen', format='DD/MM/YY HH:mm'),
-                'last_seen': st.column_config.DatetimeColumn('Last Seen', format='DD/MM/YY HH:mm'),
-                'problemId': st.column_config.TextColumn('Problem ID', width='small')
-            }
-            
-            st.dataframe(
-                display_df, 
-                use_container_width=True, 
-                height=450,
-                column_config=column_config,
-                hide_index=True
-            )
-        else:
-            st.info("No exceptions found")
+        # Exceptions and Recent Requests in one row (4:6 ratio)
+        col_exceptions, col_requests = st.columns([4, 6])
         
-        st.markdown("---")
+        with col_exceptions:
+            st.subheader("🔍 Top Exceptions")
+            # Use dynamic top K value
+            exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 20', f'top {st.session_state.top_k * 2}')  # Show 2x for exceptions
+            result = st.session_state.connector.execute_kql(exceptions_query, time_range)
+            if result is not None and len(result) > 0:
+                # Format the dataframe for better display
+                display_df = result.copy()
+                
+                # Drop unwanted columns
+                columns_to_drop = ['first_seen', 'last_seen', 'problemId']
+                display_df = display_df.drop(columns=[col for col in columns_to_drop if col in display_df.columns])
+                
+                # Rename columns for better readability
+                column_config = {
+                    'type': st.column_config.TextColumn('Exception Type', width='medium'),
+                    'outerMessage': st.column_config.TextColumn('Message', width='large'),
+                    'method': st.column_config.TextColumn('Method', width='small'),
+                    'sample_url': st.column_config.TextColumn('URL', width='large'),
+                    'service_name': st.column_config.TextColumn('Service', width='medium'),
+                    'exception_count': st.column_config.NumberColumn('Count', format='%d'),
+                    'affected_operations': st.column_config.NumberColumn('Affected APIs', format='%d')
+                }
+                
+                st.dataframe(
+                    display_df, 
+                    use_container_width=True, 
+                    height=450,
+                    column_config=column_config,
+                    hide_index=True
+                )
+            else:
+                st.info("No exceptions found")
         
-        # Recent Requests Details
-        st.subheader("📋 Recent Requests (Last 15 Minutes)")
-        recent_requests = st.session_state.connector.execute_kql(KQL_QUERIES['recent_requests'], time_range)
-        if recent_requests is not None and len(recent_requests) > 0:
-            # Format the dataframe for better display
-            display_df = recent_requests.copy()
-            
-            # Column configuration for better readability
-            column_config = {
-                'timestamp': st.column_config.DatetimeColumn('Timestamp', format='DD/MM/YY HH:mm:ss', width='medium'),
-                'name': st.column_config.TextColumn('Operation Name', width='large'),
-                'url': st.column_config.TextColumn('URL', width='large'),
-                'success': st.column_config.CheckboxColumn('Success', width='small'),
-                'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
-                'duration': st.column_config.NumberColumn('Duration (ms)', format='%.0f', width='small'),
-                'performanceBucket': st.column_config.TextColumn('Perf Bucket', width='small'),
-                'client_City': st.column_config.TextColumn('City', width='medium'),
-                'cloud_RoleInstance': st.column_config.TextColumn('Instance', width='medium'),
-                'cloud_RoleName': st.column_config.TextColumn('Service', width='medium')
-            }
-            
-            st.dataframe(
-                display_df,
-                use_container_width=True,
-                height=400,
-                column_config=column_config,
-                hide_index=True
-            )
-        else:
-            st.info("No recent requests found")
+        with col_requests:
+            st.subheader("📋 Recent Requests (Last 15 Minutes)")
+            recent_requests = st.session_state.connector.execute_kql(KQL_QUERIES['recent_requests'], time_range)
+            if recent_requests is not None and len(recent_requests) > 0:
+                # Format the dataframe for better display
+                display_df = recent_requests.copy()
+                
+                # Column configuration for better readability
+                column_config = {
+                    'timestamp': st.column_config.DatetimeColumn('Timestamp', format='DD/MM/YY HH:mm:ss', width='medium'),
+                    'name': st.column_config.TextColumn('Operation Name', width='large'),
+                    'url': st.column_config.TextColumn('URL', width='large'),
+                    'success': st.column_config.CheckboxColumn('Success', width='small'),
+                    'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
+                    'duration': st.column_config.NumberColumn('Duration (ms)', format='%.0f', width='small'),
+                    'performanceBucket': st.column_config.TextColumn('Perf Bucket', width='small'),
+                    'client_City': st.column_config.TextColumn('City', width='medium'),
+                    'cloud_RoleInstance': st.column_config.TextColumn('Instance', width='medium'),
+                    'cloud_RoleName': st.column_config.TextColumn('Service', width='medium')
+                }
+                
+                st.dataframe(
+                    display_df,
+                    use_container_width=True,
+                    height=450,
+                    column_config=column_config,
+                    hide_index=True
+                )
+            else:
+                st.info("No recent requests found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
