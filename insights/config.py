@@ -146,6 +146,17 @@ KQL_QUERIES = {
         | order by request_count desc
     """,
     
+    # Recent requests detail (last 15 minutes)
+    'recent_requests': """
+        requests
+        | where timestamp >= ago(15m)
+        | where url !has "healthz"
+        | where (url has "bvms-voyage") or (url has "bvms-master")
+        | project timestamp, name, url, success, resultCode, duration, performanceBucket, client_City, cloud_RoleInstance, cloud_RoleName
+        | order by timestamp desc
+        | take 100
+    """,
+    
     # Request duration distribution
     'duration_distribution': """
         requests

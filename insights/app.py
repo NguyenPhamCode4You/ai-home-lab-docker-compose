@@ -552,12 +552,45 @@ else:
             st.dataframe(
                 display_df, 
                 use_container_width=True, 
-                height=300,
+                height=450,
                 column_config=column_config,
                 hide_index=True
             )
         else:
             st.info("No exceptions found")
+        
+        st.markdown("---")
+        
+        # Recent Requests Details
+        st.subheader("📋 Recent Requests (Last 15 Minutes)")
+        recent_requests = st.session_state.connector.execute_kql(KQL_QUERIES['recent_requests'], time_range)
+        if recent_requests is not None and len(recent_requests) > 0:
+            # Format the dataframe for better display
+            display_df = recent_requests.copy()
+            
+            # Column configuration for better readability
+            column_config = {
+                'timestamp': st.column_config.DatetimeColumn('Timestamp', format='DD/MM/YY HH:mm:ss', width='medium'),
+                'name': st.column_config.TextColumn('Operation Name', width='large'),
+                'url': st.column_config.TextColumn('URL', width='large'),
+                'success': st.column_config.CheckboxColumn('Success', width='small'),
+                'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
+                'duration': st.column_config.NumberColumn('Duration (ms)', format='%.0f', width='small'),
+                'performanceBucket': st.column_config.TextColumn('Perf Bucket', width='small'),
+                'client_City': st.column_config.TextColumn('City', width='medium'),
+                'cloud_RoleInstance': st.column_config.TextColumn('Instance', width='medium'),
+                'cloud_RoleName': st.column_config.TextColumn('Service', width='medium')
+            }
+            
+            st.dataframe(
+                display_df,
+                use_container_width=True,
+                height=400,
+                column_config=column_config,
+                hide_index=True
+            )
+        else:
+            st.info("No recent requests found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
