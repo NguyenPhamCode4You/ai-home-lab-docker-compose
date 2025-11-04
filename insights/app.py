@@ -144,14 +144,15 @@ else:
         # Get time range
         time_range = f"ago({st.session_state.hours_lookback}h)"
         
-        # Compact metrics in one row with 4 columns
-        col1, col2, col3, col4 = st.columns(4)
+        # Compact metrics in one row with 5 columns
+        col1, col2, col3, col4, col5 = st.columns(5)
         
         # Fetch all metrics
         total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
         failed_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['failed_requests'], time_range)
         avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
         error_rate_result = st.session_state.connector.execute_kql(KQL_QUERIES['error_rate'], time_range)
+        availability_result = st.session_state.connector.execute_kql(KQL_QUERIES['availability'], time_range)
         
         with col1:
             if total_reqs_result is not None and len(total_reqs_result) > 0:
@@ -176,6 +177,12 @@ else:
                 st.metric("⚠️ Error Rate", f"{error_rate_result.iloc[0]['error_rate']:.2f}%", label_visibility="visible")
             else:
                 st.metric("⚠️ Error Rate", "N/A")
+        
+        with col5:
+            if availability_result is not None and len(availability_result) > 0:
+                st.metric("✅ Availability", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
+            else:
+                st.metric("✅ Availability", "N/A")
         
         st.markdown("---")
         

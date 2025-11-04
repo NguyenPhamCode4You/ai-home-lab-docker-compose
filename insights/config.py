@@ -33,6 +33,15 @@ KQL_QUERIES = {
         | project error_rate = (failed * 100.0 / total)
     """,
     
+    # Availability percentage
+    'availability': """
+        requests
+        | summarize 
+            total = count(),
+            successful = sum(iff(success == true, 1, 0))
+        | project availability = (successful * 100.0 / total)
+    """,
+    
     # Request timeline (by minute)
     'request_timeline': """
         requests
