@@ -44,7 +44,7 @@ if 'last_refresh' not in st.session_state:
 if 'connector' not in st.session_state:
     st.session_state.connector = None
 if 'refresh_interval' not in st.session_state:
-    st.session_state.refresh_interval = 15  # Default 15 seconds
+    st.session_state.refresh_interval = 60  # Default 15 seconds
 if 'time_range_value' not in st.session_state:
     st.session_state.time_range_value = "1h"  # Default 1 hour
 if 'bars_count' not in st.session_state:
@@ -139,7 +139,7 @@ with st.sidebar.expander("⚙️ Dashboard Settings", expanded=True):
     selected_refresh = st.selectbox(
         "Auto-refresh interval:",
         options=list(refresh_options.keys()),
-        index=0,  # Default to 15 seconds
+        index=2,  # Default to 1 minute (60 seconds)
         label_visibility="collapsed"
     )
     st.session_state.refresh_interval = refresh_options[selected_refresh]
