@@ -193,49 +193,57 @@ else:
         # Get time range from settings
         time_range = f"ago({st.session_state.time_range_value})"
         
-        # Compact metrics in one row with 5 columns
+        # Compact metrics in one row with 5 columns - each loads independently
         col1, col2, col3, col4, col5 = st.columns(5)
         
-        # Fetch all metrics
-        total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
-        avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
-        availability_result = st.session_state.connector.execute_kql(KQL_QUERIES['availability'], time_range)
-        memory_result = st.session_state.connector.execute_kql(KQL_QUERIES['memory_usage'], time_range)
-        cpu_result = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_percentage'], time_range)
-        
+        # Metric 1: Total Requests - loads immediately
         with col1:
-            if total_reqs_result is not None and len(total_reqs_result) > 0:
-                st.metric("📊 Requests", f"{int(total_reqs_result.iloc[0]['total_requests']):,}", label_visibility="visible")
-            else:
-                st.metric("📊 Requests", "N/A")
-
-        with col2:
-            if avg_time_result is not None and len(avg_time_result) > 0:
-                st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
-            else:
-                st.metric("⚡ Avg Time", "N/A")
-
-        with col3:
-            if availability_result is not None and len(availability_result) > 0:
-                st.metric("✅ Success Rate", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
-            else:
-                st.metric("✅ Success Rate", "N/A")
-        
-        with col4:
-            if memory_result is not None and len(memory_result) > 0:
-                memory_mb = memory_result.iloc[0]['avg_memory_mb']
-                if memory_mb >= 1024:
-                    st.metric("💾 Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
+            with st.spinner(""):
+                total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
+                if total_reqs_result is not None and len(total_reqs_result) > 0:
+                    st.metric("📊 Requests", f"{int(total_reqs_result.iloc[0]['total_requests']):,}", label_visibility="visible")
                 else:
-                    st.metric("💾 Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
-            else:
-                st.metric("💾 Memory", "N/A")
+                    st.metric("📊 Requests", "N/A")
+
+        # Metric 2: Average Response Time - loads independently
+        with col2:
+            with st.spinner(""):
+                avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
+                if avg_time_result is not None and len(avg_time_result) > 0:
+                    st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
+                else:
+                    st.metric("⚡ Avg Time", "N/A")
+
+        # Metric 3: Success Rate - loads independently
+        with col3:
+            with st.spinner(""):
+                availability_result = st.session_state.connector.execute_kql(KQL_QUERIES['availability'], time_range)
+                if availability_result is not None and len(availability_result) > 0:
+                    st.metric("✅ Success Rate", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
+                else:
+                    st.metric("✅ Success Rate", "N/A")
         
+        # Metric 4: Memory Usage - loads independently
+        with col4:
+            with st.spinner(""):
+                memory_result = st.session_state.connector.execute_kql(KQL_QUERIES['memory_usage'], time_range)
+                if memory_result is not None and len(memory_result) > 0:
+                    memory_mb = memory_result.iloc[0]['avg_memory_mb']
+                    if memory_mb >= 1024:
+                        st.metric("💾 Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
+                    else:
+                        st.metric("💾 Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
+                else:
+                    st.metric("💾 Memory", "N/A")
+        
+        # Metric 5: CPU Percentage - loads independently
         with col5:
-            if cpu_result is not None and len(cpu_result) > 0:
-                st.metric("⚙️ CPU", f"{cpu_result.iloc[0]['avg_cpu']:.1f}%", label_visibility="visible")
-            else:
-                st.metric("⚙️ CPU", "N/A")
+            with st.spinner(""):
+                cpu_result = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_percentage'], time_range)
+                if cpu_result is not None and len(cpu_result) > 0:
+                    st.metric("⚙️ CPU", f"{cpu_result.iloc[0]['avg_cpu']:.1f}%", label_visibility="visible")
+                else:
+                    st.metric("⚙️ CPU", "N/A")
         
         st.markdown("---")
         
