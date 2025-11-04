@@ -106,6 +106,14 @@ KQL_QUERIES = {
         | order by exception_count desc
     """,
     
+    # Requests by location (country/region)
+    'requests_by_location': """
+        requests
+        | summarize request_count = count() by client_CountryOrRegion
+        | where isnotempty(client_CountryOrRegion)
+        | order by request_count desc
+    """,
+    
     # Request duration distribution
     'duration_distribution': """
         requests

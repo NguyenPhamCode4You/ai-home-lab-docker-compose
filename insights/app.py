@@ -284,13 +284,47 @@ else:
         
         st.markdown("---")
         
-        # Exception Details at bottom
-        st.subheader("🔍 Exception Details")
-        result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
-        if result is not None and len(result) > 0:
-            st.dataframe(result, use_container_width=True, height=250)
-        else:
-            st.info("No exceptions found")
+        # World Map and Exception Details
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            st.subheader("🌍 Requests by Location")
+            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
+            if location_result is not None and len(location_result) > 0:
+                # Create world map with bubble markers
+                fig = px.scatter_geo(
+                    location_result,
+                    locations='client_CountryOrRegion',
+                    locationmode='country names',
+                    size='request_count',
+                    hover_name='client_CountryOrRegion',
+                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
+                    size_max=50,
+                    color='request_count',
+                    color_continuous_scale='Viridis',
+                    labels={'request_count': 'Requests'}
+                )
+                fig.update_layout(
+                    height=350,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    geo=dict(
+                        showland=True,
+                        landcolor='rgb(243, 243, 243)',
+                        coastlinecolor='rgb(204, 204, 204)',
+                        projection_type='natural earth'
+                    )
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No location data available")
+        
+        with col2:
+            st.subheader("🔍 Exceptions")
+            result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
+            if result is not None and len(result) > 0:
+                st.dataframe(result, use_container_width=True, height=350)
+            else:
+                st.info("No exceptions found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
