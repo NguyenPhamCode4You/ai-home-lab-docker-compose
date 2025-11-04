@@ -168,9 +168,9 @@ else:
 
         with col3:
             if availability_result is not None and len(availability_result) > 0:
-                st.metric("✅ Availability", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
+                st.metric("✅ Success Rate", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
             else:
-                st.metric("✅ Availability", "N/A")
+                st.metric("✅ Success Rate", "N/A")
         
         with col4:
             if memory_result is not None and len(memory_result) > 0:
@@ -209,20 +209,34 @@ else:
             fig = go.Figure()
             
             # Add request count bar chart (blue) - base layer
+            # Only show text for values >= 100
+            request_text = [f"{val:,.0f}" if val >= 100 else "" for val in request_timeline['request_count']]
+            
             fig.add_trace(go.Bar(
                 x=request_timeline['timestamp'],
                 y=request_timeline['request_count'],
                 name='Request Count',
                 marker=dict(color='#636EFA', opacity=0.8),
+                text=request_text,
+                textposition='inside',
+                insidetextanchor='middle',
+                textfont=dict(size=12, color='white'),
                 hovertemplate='<b>Request Count</b><br>%{y:,.0f}<extra></extra>'
             ))
             
             # Add response time bar chart (red) - stacked on top with actual values
+            # Only show text for values >= 100
+            response_text = [f"{val:.0f}" if val >= 100 else "" for val in response_time_trend['avg_duration']]
+            
             fig.add_trace(go.Bar(
                 x=response_time_trend['timestamp'],
                 y=response_time_trend['avg_duration'],
-                name='Avg Response Time (ms)',
+                name='Avg Response Time',
                 marker=dict(color='#EF553B', opacity=0.8),
+                text=response_text,
+                textposition='inside',
+                insidetextanchor='middle',
+                textfont=dict(size=12, color='white'),
                 hovertemplate='<b>Avg Response Time</b><br>%{y:.0f} ms<extra></extra>'
             ))
             
@@ -313,15 +327,39 @@ else:
             st.subheader("📊 Percentiles")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['percentile_response_time'], time_range)
             if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='percentile',
-                    y='duration_ms',
-                    labels={'duration_ms': 'ms', 'percentile': 'P'},
-                    color='percentile',
-                    color_discrete_sequence=['#636EFA', '#EF553B', '#00CC96']
+                # Apply gradient colors for percentiles (P50, P95, P99)
+                percentile_colors = ['#4169E1', '#FFA500', '#DC143C']  # Blue -> Orange -> Red
+                
+                fig = go.Figure()
+                
+                # Add bars with values displayed (only if >= 100)
+                for idx, row in result.iterrows():
+                    # Convert to float to handle numeric comparison
+                    duration_value = float(row['duration_ms']) if pd.notna(row['duration_ms']) else 0
+                    text_value = f"{duration_value:.0f}" if duration_value >= 100 else ""
+                    
+                    fig.add_trace(go.Bar(
+                        x=[row['percentile']],
+                        y=[duration_value],
+                        name=row['percentile'],
+                        marker=dict(color=percentile_colors[idx % len(percentile_colors)]),
+                        text=[text_value],
+                        textposition='inside',
+                        insidetextanchor='middle',
+                        textfont=dict(size=14, color='white'),
+                        hovertemplate=f"<b>{row['percentile']}</b><br>%{{y:.0f}} ms<extra></extra>",
+                        showlegend=False
+                    ))
+                
+                fig.update_layout(
+                    height=300, 
+                    showlegend=False, 
+                    margin=dict(l=10, r=10, t=30, b=10),
+                    xaxis=dict(title='Percentile'),
+                    yaxis=dict(title='Response Time (ms)', showgrid=True, gridcolor='rgba(128, 128, 128, 0.2)'),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
                 )
-                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")

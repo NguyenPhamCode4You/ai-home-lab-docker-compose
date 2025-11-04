@@ -93,9 +93,8 @@ KQL_QUERIES = {
             p50 = percentile(duration, 50),
             p95 = percentile(duration, 95),
             p99 = percentile(duration, 99)
-        | project 
-            percentile = pack_all(),
-            duration_ms = pack_all()
+        | project p50, p95, p99
+        | project percentile = pack_array('P50', 'P95', 'P99'), duration_ms = pack_array(p50, p95, p99)
         | mvexpand percentile, duration_ms
     """,
     
