@@ -14,7 +14,7 @@ load_dotenv()
 
 # Page config
 st.set_page_config(
-    page_title="Application Insights Dashboard",
+    page_title="BVMS Application Insights Dashboard",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -177,7 +177,7 @@ with col2:
     st.metric("Refresh Rate", selected_refresh)
 
 # Main Dashboard
-st.markdown('<div class="header-title">📊 Application Insights Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="header-title">📊 BVMS Application Insights Dashboard</div>', unsafe_allow_html=True)
 st.markdown(f"*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
 
 if st.session_state.connector is None:
