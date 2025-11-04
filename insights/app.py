@@ -195,33 +195,54 @@ else:
             # Create figure with secondary y-axis
             fig = go.Figure()
             
-            # Add request count trace
-            fig.add_trace(go.Scatter(
+            # Add request count as bar chart
+            fig.add_trace(go.Bar(
                 x=request_timeline['timestamp'],
                 y=request_timeline['request_count'],
                 name='Request Count',
-                line=dict(color='#636EFA', width=2),
+                marker=dict(color='#636EFA', opacity=0.6),
                 yaxis='y'
             ))
             
-            # Add response time trace on secondary y-axis
+            # Add response time as line chart on secondary y-axis
             fig.add_trace(go.Scatter(
                 x=response_time_trend['timestamp'],
                 y=response_time_trend['avg_duration'],
                 name='Avg Response Time (ms)',
-                line=dict(color='#EF553B', width=2),
+                line=dict(color='#EF553B', width=3),
+                mode='lines+markers',
+                marker=dict(size=4, color='#EF553B'),
                 yaxis='y2'
             ))
             
             # Update layout with dual y-axes
             fig.update_layout(
-                xaxis=dict(title='Time'),
-                yaxis=dict(title='Request Count', side='left', showgrid=False),
-                yaxis2=dict(title='Response Time (ms)', side='right', overlaying='y', showgrid=False),
+                xaxis=dict(title='Time', showgrid=False),
+                yaxis=dict(
+                    title='Request Count', 
+                    side='left', 
+                    showgrid=True,
+                    gridcolor='rgba(128, 128, 128, 0.2)'
+                ),
+                yaxis2=dict(
+                    title='Response Time (ms)', 
+                    side='right', 
+                    overlaying='y', 
+                    showgrid=False
+                ),
                 hovermode='x unified',
                 height=350,
                 margin=dict(l=50, r=50, t=30, b=40),
-                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+                legend=dict(
+                    orientation='h', 
+                    yanchor='bottom', 
+                    y=1.02, 
+                    xanchor='right', 
+                    x=1,
+                    bgcolor='rgba(0,0,0,0)'
+                ),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)'
             )
             
             st.plotly_chart(fig, use_container_width=True)
