@@ -333,15 +333,32 @@ else:
             st.subheader("🎯 Top Most-Called APIs")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['top_operations'], time_range)
             if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='operation_Name',
-                    y='count',
-                    labels={'count': 'Count', 'operation_Name': 'Operation'},
-                    color='count',
-                    color_continuous_scale='Viridis'
+                fig = go.Figure()
+                
+                # Add bars with text labels
+                fig.add_trace(go.Bar(
+                    x=result['operation_Name'],
+                    y=result['count'],
+                    marker=dict(
+                        color=result['count'],
+                        colorscale='Viridis',
+                        showscale=False
+                    ),
+                    text=[f"{val:,.0f}" for val in result['count']],
+                    textposition='inside',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>%{x}</b><br>Count: %{y:,.0f}<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    height=300,
+                    showlegend=False,
+                    margin=dict(l=10, r=10, t=30, b=10),
+                    xaxis=dict(title='Operation'),
+                    yaxis=dict(title='Count'),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
                 )
-                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")
@@ -350,15 +367,34 @@ else:
             st.subheader("🐌 Top Slowest APIs")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['slowest_operations'], time_range)
             if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='operation_Name',
-                    y='avg_duration',
-                    labels={'avg_duration': 'Avg Duration (ms)', 'operation_Name': 'Operation'},
-                    color='avg_duration',
-                    color_continuous_scale='Reds'
+                fig = go.Figure()
+                
+                # Add bars with conditional text labels (hide if < 100)
+                text_labels = [f"{val:.0f}" if val >= 100 else "" for val in result['avg_duration']]
+                
+                fig.add_trace(go.Bar(
+                    x=result['operation_Name'],
+                    y=result['avg_duration'],
+                    marker=dict(
+                        color=result['avg_duration'],
+                        colorscale='Reds',
+                        showscale=False
+                    ),
+                    text=text_labels,
+                    textposition='inside',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>%{x}</b><br>Avg Duration: %{y:.0f} ms<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    height=300,
+                    showlegend=False,
+                    margin=dict(l=10, r=10, t=30, b=10),
+                    xaxis=dict(title='Operation'),
+                    yaxis=dict(title='Avg Duration (ms)'),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
                 )
-                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")
