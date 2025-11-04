@@ -275,7 +275,7 @@ else:
             st.subheader("🌍 Requests by Location")
             location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
             if location_result is not None and len(location_result) > 0:
-                # Create world map with bubble markers using blue to orange gradient (similar to error status)
+                # Create world map with bubble markers using vibrant colors for better visibility
                 fig = px.scatter_geo(
                     location_result,
                     locations='client_CountryOrRegion',
@@ -283,9 +283,9 @@ else:
                     size='request_count',
                     hover_name='client_CountryOrRegion',
                     hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
-                    size_max=30,  # Smaller bubble size
+                    size_max=40,  # Slightly larger for better visibility
                     color='request_count',
-                    color_continuous_scale=['#FFA500', '#FFA500', '#FF4500', '#DC143C'],  # Blue -> Orange -> OrangeRed -> Crimson
+                    color_continuous_scale=['#4169E1', '#FFD700', '#FF6B35', '#FF0000'],  # Blue -> Gold -> Orange -> Red (more vibrant)
                     labels={'request_count': 'Requests'}
                 )
                 fig.update_layout(
@@ -297,14 +297,14 @@ else:
                     geo=dict(
                         bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
                         showland=True,
-                        landcolor='rgb(30, 35, 45)',  # Dark land
+                        landcolor='rgb(20, 25, 35)',  # Darker land for better contrast
                         showocean=True,
-                        oceancolor='rgb(20, 23, 30)',  # Darker ocean
+                        oceancolor='rgb(10, 13, 20)',  # Even darker ocean
                         showcountries=True,
-                        countrycolor='rgb(80, 80, 80)',  # Gray borders
-                        coastlinecolor='rgb(60, 60, 60)',
+                        countrycolor='rgb(60, 60, 60)',  # Darker borders
+                        coastlinecolor='rgb(40, 40, 40)',
                         showlakes=True,
-                        lakecolor='rgb(20, 23, 30)',
+                        lakecolor='rgb(10, 13, 20)',
                         projection_type='natural earth',
                         showframe=False
                     ),
@@ -313,11 +313,11 @@ else:
                         tickfont=dict(color='white')
                     )
                 )
-                # Remove border and adjust opacity
+                # Add glow effect with white outline for better visibility
                 fig.update_traces(
                     marker=dict(
-                        line=dict(width=0),  # No border
-                        opacity=0.9
+                        line=dict(width=2, color='rgba(255, 255, 255, 0.6)'),  # White glow
+                        opacity=1.0  # Full opacity
                     )
                 )
                 st.plotly_chart(fig, use_container_width=True)
