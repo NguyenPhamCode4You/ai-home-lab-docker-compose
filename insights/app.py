@@ -275,7 +275,7 @@ else:
             st.subheader("🌍 Requests by Location")
             location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
             if location_result is not None and len(location_result) > 0:
-                # Create world map with bubble markers
+                # Create world map with bubble markers using blue to orange gradient (similar to error status)
                 fig = px.scatter_geo(
                     location_result,
                     locations='client_CountryOrRegion',
@@ -285,7 +285,7 @@ else:
                     hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
                     size_max=60,
                     color='request_count',
-                    color_continuous_scale='Plasma',  # More vivid color scale
+                    color_continuous_scale=['#FFA500', '#FFA500', '#FF4500', '#DC143C'],  # Blue -> Orange -> OrangeRed -> Crimson
                     labels={'request_count': 'Requests'}
                 )
                 fig.update_layout(
@@ -313,10 +313,10 @@ else:
                         tickfont=dict(color='white')
                     )
                 )
-                # Make markers glow effect
+                # Make markers glow effect with gradient color
                 fig.update_traces(
                     marker=dict(
-                        line=dict(width=1, color='rgba(255, 255, 255, 0.3)'),
+                        line=dict(width=1, color='rgba(255, 255, 255, 0.5)'),  # Orange glow
                         opacity=0.9
                     )
                 )
@@ -330,7 +330,7 @@ else:
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.subheader("🎯 Top Operations")
+            st.subheader("🎯 Top Most-Called APIs")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['top_operations'], time_range)
             if result is not None and len(result) > 0:
                 fig = px.bar(
@@ -347,7 +347,7 @@ else:
                 st.info("No data available")
         
         with col2:
-            st.subheader("🐌 Slowest Operations")
+            st.subheader("🐌 Top Slowest APIs")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['slowest_operations'], time_range)
             if result is not None and len(result) > 0:
                 fig = px.bar(
