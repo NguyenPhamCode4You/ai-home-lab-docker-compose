@@ -80,6 +80,17 @@ KQL_QUERIES = {
         | order by count desc
     """,
     
+    # Top slowest operations by average duration
+    'slowest_operations': """
+        requests
+        | where url !has "healthz"
+        | where (url has "bvms-voyage") or (url has "bvms-master")
+        | summarize avg_duration = avg(duration), count = count() by operation_Name
+        | where count > 5
+        | top 8 by avg_duration
+        | order by avg_duration desc
+    """,
+    
     # Errors by status code
     'errors_by_status': """
         requests

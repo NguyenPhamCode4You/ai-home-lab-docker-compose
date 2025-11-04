@@ -270,8 +270,8 @@ else:
         
         st.markdown("---")
         
-        # Compact 3-column layout for remaining charts
-        col1, col2, col3 = st.columns(3)
+        # Compact 4-column layout for remaining charts
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
             st.subheader("🎯 Top Operations")
@@ -291,6 +291,23 @@ else:
                 st.info("No data available")
         
         with col2:
+            st.subheader("🐌 Slowest Operations")
+            result = st.session_state.connector.execute_kql(KQL_QUERIES['slowest_operations'], time_range)
+            if result is not None and len(result) > 0:
+                fig = px.bar(
+                    result,
+                    x='operation_Name',
+                    y='avg_duration',
+                    labels={'avg_duration': 'Avg Duration (ms)', 'operation_Name': 'Operation'},
+                    color='avg_duration',
+                    color_continuous_scale='Reds'
+                )
+                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No data available")
+        
+        with col3:
             st.subheader("⚠️ Error Status")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['errors_by_status'], time_range)
             if result is not None and len(result) > 0:
@@ -323,7 +340,7 @@ else:
             else:
                 st.info("No data available")
         
-        with col3:
+        with col4:
             st.subheader("📊 Percentiles")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['percentile_response_time'], time_range)
             if result is not None and len(result) > 0:
