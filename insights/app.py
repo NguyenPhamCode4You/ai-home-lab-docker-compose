@@ -190,83 +190,139 @@ else:
         
         st.markdown("---")
         
-        # Combined Request Timeline & Response Time Trend
-        st.subheader("📈 Request & Response Time Trends")
-        request_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['request_timeline'], time_range)
-        response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
+        # Combined Request Timeline & World Map in same row (2:1 ratio)
+        col_timeline, col_map = st.columns([2, 1])
         
-        if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
-            # Limit to exactly 30 bars by sampling evenly
-            total_bars = 30
+        with col_timeline:
+            st.subheader("📈 Request & Response Time Trends")
+            request_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['request_timeline'], time_range)
+            response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
             
-            if len(request_timeline) > total_bars:
-                # Take every Nth row to get exactly 30 bars
-                step = len(request_timeline) // total_bars
-                request_timeline = request_timeline.iloc[::step][:total_bars]
-                response_time_trend = response_time_trend.iloc[::step][:total_bars]
-            
-            # Create stacked bar chart without scaling
-            fig = go.Figure()
-            
-            # Add request count bar chart (blue) - base layer
-            # Only show text for values >= 100
-            request_text = [f"{val:,.0f}" if val >= 100 else "" for val in request_timeline['request_count']]
-            
-            fig.add_trace(go.Bar(
-                x=request_timeline['timestamp'],
-                y=request_timeline['request_count'],
-                name='Request Count',
-                marker=dict(color='#636EFA', opacity=0.8),
-                text=request_text,
-                textposition='inside',
-                insidetextanchor='middle',
-                textfont=dict(size=12, color='white'),
-                hovertemplate='<b>Request Count</b><br>%{y:,.0f}<extra></extra>'
-            ))
-            
-            # Add response time bar chart (red) - stacked on top with actual values
-            # Only show text for values >= 100
-            response_text = [f"{val:.0f}" if val >= 100 else "" for val in response_time_trend['avg_duration']]
-            
-            fig.add_trace(go.Bar(
-                x=response_time_trend['timestamp'],
-                y=response_time_trend['avg_duration'],
-                name='Avg Response Time',
-                marker=dict(color='#EF553B', opacity=0.8),
-                text=response_text,
-                textposition='inside',
-                insidetextanchor='middle',
-                textfont=dict(size=12, color='white'),
-                hovertemplate='<b>Avg Response Time</b><br>%{y:.0f} ms<extra></extra>'
-            ))
-            
-            # Update layout for stacked bars
-            fig.update_layout(
-                barmode='stack',
-                xaxis=dict(title='Time', showgrid=False),
-                yaxis=dict(
-                    title='Request Count + Response Time (ms)', 
-                    showgrid=True,
-                    gridcolor='rgba(128, 128, 128, 0.2)'
-                ),
-                hovermode='x unified',
-                height=350,
-                margin=dict(l=50, r=50, t=30, b=40),
-                legend=dict(
-                    orientation='h', 
-                    yanchor='bottom', 
-                    y=1.02, 
-                    xanchor='right', 
-                    x=1,
-                    bgcolor='rgba(0,0,0,0)'
-                ),
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)'
-            )
-            
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.info("No data available")
+            if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
+                # Limit to exactly 30 bars by sampling evenly
+                total_bars = 30
+                
+                if len(request_timeline) > total_bars:
+                    # Take every Nth row to get exactly 30 bars
+                    step = len(request_timeline) // total_bars
+                    request_timeline = request_timeline.iloc[::step][:total_bars]
+                    response_time_trend = response_time_trend.iloc[::step][:total_bars]
+                
+                # Create stacked bar chart without scaling
+                fig = go.Figure()
+                
+                # Add request count bar chart (blue) - base layer
+                # Only show text for values >= 100
+                request_text = [f"{val:,.0f}" if val >= 100 else "" for val in request_timeline['request_count']]
+                
+                fig.add_trace(go.Bar(
+                    x=request_timeline['timestamp'],
+                    y=request_timeline['request_count'],
+                    name='Request Count',
+                    marker=dict(color='#636EFA', opacity=0.8),
+                    text=request_text,
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>Request Count</b><br>%{y:,.0f}<extra></extra>'
+                ))
+                
+                # Add response time bar chart (red) - stacked on top with actual values
+                # Only show text for values >= 100
+                response_text = [f"{val:.0f}" if val >= 100 else "" for val in response_time_trend['avg_duration']]
+                
+                fig.add_trace(go.Bar(
+                    x=response_time_trend['timestamp'],
+                    y=response_time_trend['avg_duration'],
+                    name='Avg Response Time',
+                    marker=dict(color='#EF553B', opacity=0.8),
+                    text=response_text,
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>Avg Response Time</b><br>%{y:.0f} ms<extra></extra>'
+                ))
+                
+                # Update layout for stacked bars
+                fig.update_layout(
+                    barmode='stack',
+                    xaxis=dict(title='Time', showgrid=False),
+                    yaxis=dict(
+                        title='Request Count + Response Time (ms)', 
+                        showgrid=True,
+                        gridcolor='rgba(128, 128, 128, 0.2)'
+                    ),
+                    hovermode='x unified',
+                    height=350,
+                    margin=dict(l=50, r=50, t=30, b=40),
+                    legend=dict(
+                        orientation='h', 
+                        yanchor='bottom', 
+                        y=1.02, 
+                        xanchor='right', 
+                        x=1,
+                        bgcolor='rgba(0,0,0,0)'
+                    ),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No data available")
+        
+        with col_map:
+            st.subheader("🌍 Requests by Location")
+            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
+            if location_result is not None and len(location_result) > 0:
+                # Create world map with bubble markers
+                fig = px.scatter_geo(
+                    location_result,
+                    locations='client_CountryOrRegion',
+                    locationmode='country names',
+                    size='request_count',
+                    hover_name='client_CountryOrRegion',
+                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
+                    size_max=60,
+                    color='request_count',
+                    color_continuous_scale='Plasma',  # More vivid color scale
+                    labels={'request_count': 'Requests'}
+                )
+                fig.update_layout(
+                    height=350,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
+                    plot_bgcolor='rgba(14,17,23,1)',
+                    font=dict(color='white'),
+                    geo=dict(
+                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
+                        showland=True,
+                        landcolor='rgb(30, 35, 45)',  # Dark land
+                        showocean=True,
+                        oceancolor='rgb(20, 23, 30)',  # Darker ocean
+                        showcountries=True,
+                        countrycolor='rgb(80, 80, 80)',  # Gray borders
+                        coastlinecolor='rgb(60, 60, 60)',
+                        showlakes=True,
+                        lakecolor='rgb(20, 23, 30)',
+                        projection_type='natural earth',
+                        showframe=False
+                    ),
+                    coloraxis_colorbar=dict(
+                        title=dict(text='Requests', font=dict(color='white')),
+                        tickfont=dict(color='white')
+                    )
+                )
+                # Make markers glow effect
+                fig.update_traces(
+                    marker=dict(
+                        line=dict(width=1, color='rgba(255, 255, 255, 0.3)'),
+                        opacity=0.9
+                    )
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No location data available")
         
         st.markdown("---")
         
@@ -383,69 +439,13 @@ else:
         
         st.markdown("---")
         
-        # World Map and Exception Details
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            st.subheader("🌍 Requests by Location")
-            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
-            if location_result is not None and len(location_result) > 0:
-                # Create world map with bubble markers
-                fig = px.scatter_geo(
-                    location_result,
-                    locations='client_CountryOrRegion',
-                    locationmode='country names',
-                    size='request_count',
-                    hover_name='client_CountryOrRegion',
-                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
-                    size_max=60,
-                    color='request_count',
-                    color_continuous_scale='Plasma',  # More vivid color scale
-                    labels={'request_count': 'Requests'}
-                )
-                fig.update_layout(
-                    height=350,
-                    margin=dict(l=0, r=0, t=0, b=0),
-                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
-                    plot_bgcolor='rgba(14,17,23,1)',
-                    font=dict(color='white'),
-                    geo=dict(
-                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
-                        showland=True,
-                        landcolor='rgb(30, 35, 45)',  # Dark land
-                        showocean=True,
-                        oceancolor='rgb(20, 23, 30)',  # Darker ocean
-                        showcountries=True,
-                        countrycolor='rgb(80, 80, 80)',  # Gray borders
-                        coastlinecolor='rgb(60, 60, 60)',
-                        showlakes=True,
-                        lakecolor='rgb(20, 23, 30)',
-                        projection_type='natural earth',
-                        showframe=False
-                    ),
-                    coloraxis_colorbar=dict(
-                        title=dict(text='Requests', font=dict(color='white')),
-                        tickfont=dict(color='white')
-                    )
-                )
-                # Make markers glow effect
-                fig.update_traces(
-                    marker=dict(
-                        line=dict(width=1, color='rgba(255, 255, 255, 0.3)'),
-                        opacity=0.9
-                    )
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No location data available")
-        
-        with col2:
-            st.subheader("🔍 Exceptions")
-            result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
-            if result is not None and len(result) > 0:
-                st.dataframe(result, use_container_width=True, height=350)
-            else:
-                st.info("No exceptions found")
+        # Exceptions section
+        st.subheader("🔍 Top Exceptions")
+        result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
+        if result is not None and len(result) > 0:
+            st.dataframe(result, use_container_width=True, height=250)
+        else:
+            st.info("No exceptions found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
