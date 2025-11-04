@@ -144,181 +144,146 @@ else:
         # Get time range
         time_range = f"ago({st.session_state.hours_lookback}h)"
         
-        # Create columns for main metrics
+        # Compact metrics in one row with 4 columns
         col1, col2, col3, col4 = st.columns(4)
         
+        # Fetch all metrics
+        total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
+        failed_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['failed_requests'], time_range)
+        avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
+        error_rate_result = st.session_state.connector.execute_kql(KQL_QUERIES['error_rate'], time_range)
+        
         with col1:
-            # Total Requests
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['total_requests'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                total_reqs = result.iloc[0]['total_requests']
-                st.metric("Total Requests", f"{int(total_reqs):,}")
+            if total_reqs_result is not None and len(total_reqs_result) > 0:
+                st.metric("📊 Requests", f"{int(total_reqs_result.iloc[0]['total_requests']):,}", label_visibility="visible")
             else:
-                st.metric("Total Requests", "N/A")
+                st.metric("📊 Requests", "N/A")
         
         with col2:
-            # Failed Requests
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['failed_requests'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                failed_reqs = result.iloc[0]['failed_requests']
-                st.metric("Failed Requests", f"{int(failed_reqs):,}")
+            if failed_reqs_result is not None and len(failed_reqs_result) > 0:
+                st.metric("❌ Failed", f"{int(failed_reqs_result.iloc[0]['failed_requests']):,}", label_visibility="visible")
             else:
-                st.metric("Failed Requests", "N/A")
+                st.metric("❌ Failed", "N/A")
         
         with col3:
-            # Average Response Time
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['avg_response_time'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                avg_time = result.iloc[0]['avg_response_time']
-                st.metric("Avg Response Time", f"{avg_time:.0f}ms")
+            if avg_time_result is not None and len(avg_time_result) > 0:
+                st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
             else:
-                st.metric("Avg Response Time", "N/A")
+                st.metric("⚡ Avg Time", "N/A")
         
         with col4:
-            # Error Rate
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['error_rate'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                error_rate = result.iloc[0]['error_rate']
-                st.metric("Error Rate", f"{error_rate:.2f}%")
+            if error_rate_result is not None and len(error_rate_result) > 0:
+                st.metric("⚠️ Error Rate", f"{error_rate_result.iloc[0]['error_rate']:.2f}%", label_visibility="visible")
             else:
-                st.metric("Error Rate", "N/A")
+                st.metric("⚠️ Error Rate", "N/A")
         
         st.markdown("---")
         
-        # Charts Row 1
-        col1, col2 = st.columns(2)
+        # Combined Request Timeline & Response Time Trend
+        st.subheader("📈 Request & Response Time Trends")
+        request_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['request_timeline'], time_range)
+        response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
         
-        with col1:
-            st.subheader("📈 Request Timeline")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['request_timeline'],
-                time_range
+        if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
+            # Create figure with secondary y-axis
+            fig = go.Figure()
+            
+            # Add request count trace
+            fig.add_trace(go.Scatter(
+                x=request_timeline['timestamp'],
+                y=request_timeline['request_count'],
+                name='Request Count',
+                line=dict(color='#636EFA', width=2),
+                yaxis='y'
+            ))
+            
+            # Add response time trace on secondary y-axis
+            fig.add_trace(go.Scatter(
+                x=response_time_trend['timestamp'],
+                y=response_time_trend['avg_duration'],
+                name='Avg Response Time (ms)',
+                line=dict(color='#EF553B', width=2),
+                yaxis='y2'
+            ))
+            
+            # Update layout with dual y-axes
+            fig.update_layout(
+                xaxis=dict(title='Time'),
+                yaxis=dict(title='Request Count', side='left', showgrid=False),
+                yaxis2=dict(title='Response Time (ms)', side='right', overlaying='y', showgrid=False),
+                hovermode='x unified',
+                height=350,
+                margin=dict(l=50, r=50, t=30, b=40),
+                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
             )
-            if result is not None and len(result) > 0:
-                fig = px.line(
-                    result,
-                    x='timestamp',
-                    y='request_count',
-                    title="Requests Over Time",
-                    labels={'request_count': 'Request Count', 'timestamp': 'Time'}
-                )
-                fig.update_layout(hovermode='x unified', height=400)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        with col2:
-            st.subheader("📉 Response Time Trend")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['response_time_trend'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.line(
-                    result,
-                    x='timestamp',
-                    y='avg_duration',
-                    title="Average Response Time Over Time",
-                    labels={'avg_duration': 'Avg Duration (ms)', 'timestamp': 'Time'}
-                )
-                fig.update_layout(hovermode='x unified', height=400)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
+            
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No data available")
         
         st.markdown("---")
         
-        # Charts Row 2
-        col1, col2 = st.columns(2)
+        # Compact 3-column layout for remaining charts
+        col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.subheader("🎯 Request Distribution by Operation")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['top_operations'],
-                time_range
-            )
+            st.subheader("🎯 Top Operations")
+            result = st.session_state.connector.execute_kql(KQL_QUERIES['top_operations'], time_range)
             if result is not None and len(result) > 0:
                 fig = px.bar(
                     result,
                     x='operation_Name',
                     y='count',
-                    title="Top Operations",
-                    labels={'count': 'Request Count', 'operation_Name': 'Operation'},
+                    labels={'count': 'Count', 'operation_Name': 'Operation'},
                     color='count',
                     color_continuous_scale='Viridis'
                 )
-                fig.update_layout(height=400, showlegend=False)
+                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")
         
         with col2:
-            st.subheader("⚠️ Error Distribution by Status")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['errors_by_status'],
-                time_range
-            )
+            st.subheader("⚠️ Error Status")
+            result = st.session_state.connector.execute_kql(KQL_QUERIES['errors_by_status'], time_range)
             if result is not None and len(result) > 0:
                 fig = px.pie(
                     result,
                     values='error_count',
                     names='resultCode',
-                    title="Errors by Status Code",
-                    labels={'error_count': 'Error Count', 'resultCode': 'Status Code'}
+                    labels={'error_count': 'Count', 'resultCode': 'Code'}
                 )
-                fig.update_layout(height=400)
+                fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10))
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No data available")
+        
+        with col3:
+            st.subheader("📊 Percentiles")
+            result = st.session_state.connector.execute_kql(KQL_QUERIES['percentile_response_time'], time_range)
+            if result is not None and len(result) > 0:
+                fig = px.bar(
+                    result,
+                    x='percentile',
+                    y='duration_ms',
+                    labels={'duration_ms': 'ms', 'percentile': 'P'},
+                    color='percentile',
+                    color_discrete_sequence=['#636EFA', '#EF553B', '#00CC96']
+                )
+                fig.update_layout(height=300, showlegend=False, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")
         
         st.markdown("---")
         
-        # Charts Row 3
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("📊 P95/P99 Response Times")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['percentile_response_time'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='percentile',
-                    y='duration_ms',
-                    title="Response Time Percentiles",
-                    labels={'duration_ms': 'Duration (ms)', 'percentile': 'Percentile'},
-                    color='percentile',
-                    color_discrete_sequence=['#636EFA', '#EF553B', '#00CC96']
-                )
-                fig.update_layout(height=400, showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        with col1:
-            st.subheader("🔍 Exception Details")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['top_exceptions'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                st.dataframe(result, use_container_width=True, height=300)
-            else:
-                st.info("No exceptions found")
+        # Exception Details at bottom
+        st.subheader("🔍 Exception Details")
+        result = st.session_state.connector.execute_kql(KQL_QUERIES['top_exceptions'], time_range)
+        if result is not None and len(result) > 0:
+            st.dataframe(result, use_container_width=True, height=250)
+        else:
+            st.info("No exceptions found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
