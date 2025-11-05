@@ -44,11 +44,10 @@ if 'last_refresh' not in st.session_state:
 if 'connector' not in st.session_state:
     st.session_state.connector = None
 if 'refresh_interval' not in st.session_state:
-    st.session_state.refresh_interval = 60  # Default 15 seconds
+    st.session_state.refresh_interval = 120  # Default 120 seconds
 if 'time_range_value' not in st.session_state:
     st.session_state.time_range_value = "1h"  # Default 1 hour
-if 'bars_count' not in st.session_state:
-    st.session_state.bars_count = 30  # Default 30 bars
+
 if 'top_k' not in st.session_state:
     st.session_state.top_k = 8  # Default top 8
 
@@ -130,31 +129,21 @@ with st.sidebar.expander("⚙️ Dashboard Settings", expanded=True):
     # Refresh Rate selection
     st.markdown("**🔄 Refresh Rate**")
     refresh_options = {
-        "15 seconds": 15,
+        "10 seconds": 10,
+        "20 seconds": 20,
         "30 seconds": 30,
         "1 minute": 60,
+        "2 minutes": 120,
         "5 minutes": 300
     }
     
     selected_refresh = st.selectbox(
         "Auto-refresh interval:",
         options=list(refresh_options.keys()),
-        index=2,  # Default to 1 minute (60 seconds)
+        index=4,  # Default to 2 minutes (120 seconds)
         label_visibility="collapsed"
     )
     st.session_state.refresh_interval = refresh_options[selected_refresh]
-    
-    st.markdown("---")
-    
-    # Bars Count selection
-    st.markdown("**📊 Bars Count**")
-    bars_count = st.selectbox(
-        "Timeline chart bars:",
-        options=[20, 30, 40, 50, 100],
-        index=1,  # Default to 30
-        label_visibility="collapsed"
-    )
-    st.session_state.bars_count = bars_count
     
     st.markdown("---")
     
@@ -256,11 +245,21 @@ else:
             response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
             
             if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
-                # Use bars count from settings
-                total_bars = st.session_state.bars_count
+                # Calculate bars dynamically: Time Range / Refresh Rate
+                # Convert time range to seconds
+                time_value = st.session_state.time_range_value
+                if 'm' in time_value:
+                    time_seconds = int(time_value.replace('m', '')) * 60
+                elif 'h' in time_value:
+                    time_seconds = int(time_value.replace('h', '')) * 3600
+                else:
+                    time_seconds = 3600  # Default 1 hour
+                
+                # Calculate number of bars: time range / refresh interval
+                total_bars = max(10, min(100, time_seconds // st.session_state.refresh_interval))
                 
                 if len(request_timeline) > total_bars:
-                    # Take every Nth row to get exactly the configured number of bars
+                    # Take every Nth row to get exactly the calculated number of bars
                     step = len(request_timeline) // total_bars
                     request_timeline = request_timeline.iloc[::step][:total_bars]
                     response_time_trend = response_time_trend.iloc[::step][:total_bars]
