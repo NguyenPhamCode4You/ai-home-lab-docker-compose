@@ -157,6 +157,7 @@ KQL_QUERIES = {
         requests
         | where timestamp >= ago(15m)
         | where url !has "healthz"
+        | where operation_Name != "GET /"
         | where (url has "orderrequest") or (url has "masterdata")
         | project timestamp, name, url, success, resultCode, duration, performanceBucket, client_City, cloud_RoleInstance, cloud_RoleName
         | order by timestamp desc
