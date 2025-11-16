@@ -90,6 +90,7 @@ KQL_QUERIES = {
     'top_operations': """
         requests
         | where url !has "healthz"
+        | where operation_Name != "GET /"
         | where (url has "orderrequest") or (url has "masterdata")
         | summarize count = count() by operation_Name
         | top 8 by count
@@ -121,11 +122,26 @@ KQL_QUERIES = {
             exception_count = count(),
             first_seen = min(timestamp),
             last_seen = max(timestamp),
-            affected_operations = dcount(operation_Name)
+            affected_operations = dcount(operation_Name),
+            sample_url = take_any(url)
         by type, outerMessage, method, problemId
         | top 10 by exception_count
         | order by exception_count desc
-        | project type, outerMessage, method, exception_count, affected_operations, first_seen, last_seen, problemId
+        | project type, outerMessage, method, exception_count, affected_operations, sample_url, first_seen, last_seen, problemId
+    """,
+    
+    # Failed requests (for when no exceptions are thrown)
+    'failed_requests_detail': """
+        requests
+        | where success == false
+        | summarize 
+            error_count = count(),
+            avg_duration = avg(duration),
+            sample_url = take_any(url)
+        by operation_Name, resultCode, problemId
+        | top 20 by error_count
+        | order by error_count desc
+        | project operation_Name, resultCode, error_count, avg_duration, sample_url, problemId
     """,
     
     # Requests by location (country/region)

@@ -568,13 +568,20 @@ else:
         col_exceptions, col_requests = st.columns([4, 6])
         
         with col_exceptions:
-            st.subheader("🔍 Top Exceptions")
-            # Use dynamic top K value
-            exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 20', f'top {st.session_state.top_k * 2}')  # Show 2x for exceptions
-            result = st.session_state.connector.execute_kql(exceptions_query, time_range)
-            if result is not None and len(result) > 0:
-                # Format the dataframe for better display
-                display_df = result.copy()
+            st.subheader("🔍 Top Exceptions & Failed Requests")
+            
+            # Try to get exceptions first
+            exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 10', f'top {st.session_state.top_k}')
+            exceptions_result = st.session_state.connector.execute_kql(exceptions_query, time_range)
+            
+            # Also get failed requests
+            failed_requests_query = KQL_QUERIES['failed_requests_detail'].replace('top 20', f'top {st.session_state.top_k}')
+            failed_requests_result = st.session_state.connector.execute_kql(failed_requests_query, time_range)
+            
+            # Show exceptions if available
+            if exceptions_result is not None and len(exceptions_result) > 0:
+                st.markdown("**⚠️ Exceptions**")
+                display_df = exceptions_result.copy()
                 
                 # Drop unwanted columns
                 columns_to_drop = ['first_seen', 'last_seen', 'problemId']
@@ -585,8 +592,7 @@ else:
                     'type': st.column_config.TextColumn('Exception Type', width='medium'),
                     'outerMessage': st.column_config.TextColumn('Message', width='large'),
                     'method': st.column_config.TextColumn('Method', width='small'),
-                    'sample_url': st.column_config.TextColumn('URL', width='large'),
-                    'service_name': st.column_config.TextColumn('Service', width='medium'),
+                    'sample_url': st.column_config.TextColumn('Sample URL', width='large'),
                     'exception_count': st.column_config.NumberColumn('Count', format='%d'),
                     'affected_operations': st.column_config.NumberColumn('Affected APIs', format='%d')
                 }
@@ -594,12 +600,41 @@ else:
                 st.dataframe(
                     display_df, 
                     use_container_width=True, 
-                    height=450,
+                    height=200,
                     column_config=column_config,
                     hide_index=True
                 )
-            else:
-                st.info("No exceptions found")
+            
+            # Show failed requests
+            if failed_requests_result is not None and len(failed_requests_result) > 0:
+                st.markdown("**❌ Failed Requests by Status Code**")
+                display_df = failed_requests_result.copy()
+                
+                # Drop unwanted columns
+                columns_to_drop = ['problemId']
+                display_df = display_df.drop(columns=[col for col in columns_to_drop if col in display_df.columns])
+                
+                # Rename columns for better readability
+                column_config = {
+                    'operation_Name': st.column_config.TextColumn('Operation', width='large'),
+                    'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
+                    'error_count': st.column_config.NumberColumn('Count', format='%d', width='small'),
+                    'avg_duration': st.column_config.NumberColumn('Avg Duration (ms)', format='%.0f', width='small'),
+                    'sample_url': st.column_config.TextColumn('Sample URL', width='large')
+                }
+                
+                st.dataframe(
+                    display_df, 
+                    use_container_width=True, 
+                    height=200,
+                    column_config=column_config,
+                    hide_index=True
+                )
+            
+            # Show message if neither has data
+            if (exceptions_result is None or len(exceptions_result) == 0) and \
+               (failed_requests_result is None or len(failed_requests_result) == 0):
+                st.info("No exceptions or failed requests found")
         
         with col_requests:
             st.subheader("📋 Recent Requests (Last 15 Minutes)")
