@@ -217,29 +217,29 @@ else:
             with st.spinner(""):
                 memory_result = st.session_state.connector.execute_kql(KQL_QUERIES['memory_usage'], time_range)
                 if memory_result is not None and len(memory_result) > 0:
-                    memory_mb = memory_result.iloc[0]['avg_memory_mb']
+                    memory_mb = memory_result.iloc[0]['max_memory_mb']
                     if memory_mb >= 1024:
-                        st.metric("💾 Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
+                        st.metric("💾 Max Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
                     else:
-                        st.metric("💾 Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
+                        st.metric("💾 Max Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
                 else:
-                    st.metric("💾 Memory", "N/A")
+                    st.metric("💾 Max Memory", "N/A")
         
         # Metric 5: CPU Percentage - loads independently
         with col5:
             with st.spinner(""):
                 cpu_result = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_percentage'], time_range)
                 if cpu_result is not None and len(cpu_result) > 0:
-                    st.metric("⚙️ CPU", f"{cpu_result.iloc[0]['avg_cpu']:.1f}%", label_visibility="visible")
+                    st.metric("⚙️ Max CPU", f"{cpu_result.iloc[0]['max_cpu']:.1f}%", label_visibility="visible")
                 else:
-                    st.metric("⚙️ CPU", "N/A")
+                    st.metric("⚙️ Max CPU", "N/A")
         
         st.markdown("---")
         
-        # Combined Request Timeline & World Map in same row (2:1 ratio)
-        col_timeline, col_map = st.columns([2, 1])
+        # Combined Request Timeline & CPU/Memory Timeline in same row (1:1 ratio)
+        col_request_timeline, col_resource_timeline = st.columns([1, 1])
         
-        with col_timeline:
+        with col_request_timeline:
             st.subheader("📈 Request & Response Time Trends")
             request_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['request_timeline'], time_range)
             response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
@@ -327,58 +327,92 @@ else:
             else:
                 st.info("No data available")
         
-        with col_map:
-            st.subheader("🌍 Requests by Location")
-            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
-            if location_result is not None and len(location_result) > 0:
-                # Create world map with bubble markers using vibrant colors for better visibility
-                fig = px.scatter_geo(
-                    location_result,
-                    locations='client_CountryOrRegion',
-                    locationmode='country names',
-                    size='request_count',
-                    hover_name='client_CountryOrRegion',
-                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
-                    size_max=40,  # Slightly larger for better visibility
-                    color='request_count',
-                    color_continuous_scale=['#4169E1', '#FFD700', '#FF6B35', '#FF0000'],  # Blue -> Gold -> Orange -> Red (more vibrant)
-                    labels={'request_count': 'Requests'}
-                )
+        with col_resource_timeline:
+            st.subheader("💻 CPU & Memory Usage Trends")
+            cpu_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_timeline'], time_range)
+            memory_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['memory_timeline'], time_range)
+            
+            if cpu_timeline is not None and len(cpu_timeline) > 0 and memory_timeline is not None and len(memory_timeline) > 0:
+                # Calculate bars dynamically: Time Range / Refresh Rate
+                # Convert time range to seconds
+                time_value = st.session_state.time_range_value
+                if 'm' in time_value:
+                    time_seconds = int(time_value.replace('m', '')) * 60
+                elif 'h' in time_value:
+                    time_seconds = int(time_value.replace('h', '')) * 3600
+                else:
+                    time_seconds = 3600  # Default 1 hour
+                
+                # Calculate number of bars: time range / refresh interval
+                total_bars = max(10, min(100, time_seconds // st.session_state.refresh_interval))
+                
+                if len(cpu_timeline) > total_bars:
+                    # Take every Nth row to get exactly the calculated number of bars
+                    step = len(cpu_timeline) // total_bars
+                    cpu_timeline = cpu_timeline.iloc[::step][:total_bars]
+                    memory_timeline = memory_timeline.iloc[::step][:total_bars]
+                
+                # Create dual-axis chart
+                fig = go.Figure()
+                
+                # Add CPU percentage line (left y-axis)
+                fig.add_trace(go.Scatter(
+                    x=cpu_timeline['timestamp'],
+                    y=cpu_timeline['cpu_percentage'],
+                    name='CPU %',
+                    mode='lines+markers',
+                    line=dict(color='#EF553B', width=2),
+                    marker=dict(size=6),
+                    yaxis='y1',
+                    hovertemplate='<b>CPU</b><br>%{y:.1f}%<extra></extra>'
+                ))
+                
+                # Add Memory usage line (right y-axis)
+                fig.add_trace(go.Scatter(
+                    x=memory_timeline['timestamp'],
+                    y=memory_timeline['memory_mb'],
+                    name='Memory (MB)',
+                    mode='lines+markers',
+                    line=dict(color='#636EFA', width=2),
+                    marker=dict(size=6),
+                    yaxis='y2',
+                    hovertemplate='<b>Memory</b><br>%{y:.0f} MB<extra></extra>'
+                ))
+                
+                # Update layout with dual y-axes
                 fig.update_layout(
-                    height=350,
-                    margin=dict(l=0, r=0, t=0, b=0),
-                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
-                    plot_bgcolor='rgba(14,17,23,1)',
-                    font=dict(color='white'),
-                    geo=dict(
-                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
-                        showland=True,
-                        landcolor='rgb(20, 25, 35)',  # Darker land for better contrast
-                        showocean=True,
-                        oceancolor='rgb(10, 13, 20)',  # Even darker ocean
-                        showcountries=True,
-                        countrycolor='rgb(60, 60, 60)',  # Darker borders
-                        coastlinecolor='rgb(40, 40, 40)',
-                        showlakes=True,
-                        lakecolor='rgb(10, 13, 20)',
-                        projection_type='natural earth',
-                        showframe=False
+                    xaxis=dict(title='Time', showgrid=False),
+                    yaxis=dict(
+                        title=dict(text='CPU %', font=dict(color='#EF553B')),
+                        tickfont=dict(color='#EF553B'),
+                        showgrid=True,
+                        gridcolor='rgba(128, 128, 128, 0.2)'
                     ),
-                    coloraxis_colorbar=dict(
-                        title=dict(text='Requests', font=dict(color='white')),
-                        tickfont=dict(color='white')
-                    )
+                    yaxis2=dict(
+                        title=dict(text='Memory (MB)', font=dict(color='#636EFA')),
+                        tickfont=dict(color='#636EFA'),
+                        overlaying='y',
+                        side='right',
+                        showgrid=False
+                    ),
+                    hovermode='x unified',
+                    height=350,
+                    margin=dict(l=50, r=50, t=30, b=40),
+                    legend=dict(
+                        orientation='h',
+                        yanchor='bottom',
+                        y=1.02,
+                        xanchor='right',
+                        x=1,
+                        bgcolor='rgba(0,0,0,0)'
+                    ),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
                 )
-                # Add glow effect with white outline for better visibility
-                fig.update_traces(
-                    marker=dict(
-                        line=dict(width=2, color='rgba(255, 255, 255, 0.6)'),  # White glow
-                        opacity=1.0  # Full opacity
-                    )
-                )
+                
                 st.plotly_chart(fig, use_container_width=True)
             else:
-                st.info("No location data available")
+                st.info("No data available")
         
         st.markdown("---")
         
@@ -460,6 +494,59 @@ else:
                 st.info("No data available")
         
         with col3:
+            st.subheader("🌍 Requests by Location")
+            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
+            if location_result is not None and len(location_result) > 0:
+                # Create world map with bubble markers using vibrant colors for better visibility
+                fig = px.scatter_geo(
+                    location_result,
+                    locations='client_CountryOrRegion',
+                    locationmode='country names',
+                    size='request_count',
+                    hover_name='client_CountryOrRegion',
+                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
+                    size_max=40,  # Slightly larger for better visibility
+                    color='request_count',
+                    color_continuous_scale=['#4169E1', '#FFD700', '#FF6B35', '#FF0000'],  # Blue -> Gold -> Orange -> Red (more vibrant)
+                    labels={'request_count': 'Requests'}
+                )
+                fig.update_layout(
+                    height=300,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
+                    plot_bgcolor='rgba(14,17,23,1)',
+                    font=dict(color='white'),
+                    geo=dict(
+                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
+                        showland=True,
+                        landcolor='rgb(20, 25, 35)',  # Darker land for better contrast
+                        showocean=True,
+                        oceancolor='rgb(10, 13, 20)',  # Even darker ocean
+                        showcountries=True,
+                        countrycolor='rgb(60, 60, 60)',  # Darker borders
+                        coastlinecolor='rgb(40, 40, 40)',
+                        showlakes=True,
+                        lakecolor='rgb(10, 13, 20)',
+                        projection_type='natural earth',
+                        showframe=False
+                    ),
+                    coloraxis_colorbar=dict(
+                        title=dict(text='Requests', font=dict(color='white')),
+                        tickfont=dict(color='white')
+                    )
+                )
+                # Add glow effect with white outline for better visibility
+                fig.update_traces(
+                    marker=dict(
+                        line=dict(width=2, color='rgba(255, 255, 255, 0.6)'),  # White glow
+                        opacity=1.0  # Full opacity
+                    )
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No location data available")
+        
+        with col4:
             st.subheader("⚠️ Error Status")
             result = st.session_state.connector.execute_kql(KQL_QUERIES['errors_by_status'], time_range)
             if result is not None and len(result) > 0:
@@ -488,47 +575,6 @@ else:
                     color_discrete_sequence=colors
                 )
                 fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10))
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        with col4:
-            st.subheader("📊 Percentiles")
-            result = st.session_state.connector.execute_kql(KQL_QUERIES['percentile_response_time'], time_range)
-            if result is not None and len(result) > 0:
-                # Apply gradient colors for percentiles (P50, P95, P99)
-                percentile_colors = ['#4169E1', '#FFA500', '#DC143C']  # Blue -> Orange -> Red
-                
-                fig = go.Figure()
-                
-                # Add bars with values displayed (only if >= 100)
-                for idx, row in result.iterrows():
-                    # Convert to float to handle numeric comparison
-                    duration_value = float(row['duration_ms']) if pd.notna(row['duration_ms']) else 0
-                    text_value = f"{duration_value:.0f}" if duration_value >= 100 else ""
-                    
-                    fig.add_trace(go.Bar(
-                        x=[row['percentile']],
-                        y=[duration_value],
-                        name=row['percentile'],
-                        marker=dict(color=percentile_colors[idx % len(percentile_colors)]),
-                        text=[text_value],
-                        textposition='inside',
-                        insidetextanchor='middle',
-                        textfont=dict(size=14, color='white'),
-                        hovertemplate=f"<b>{row['percentile']}</b><br>%{{y:.0f}} ms<extra></extra>",
-                        showlegend=False
-                    ))
-                
-                fig.update_layout(
-                    height=300, 
-                    showlegend=False, 
-                    margin=dict(l=10, r=10, t=30, b=10),
-                    xaxis=dict(title='Percentile'),
-                    yaxis=dict(title='Response Time (ms)', showgrid=True, gridcolor='rgba(128, 128, 128, 0.2)'),
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)'
-                )
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No data available")
