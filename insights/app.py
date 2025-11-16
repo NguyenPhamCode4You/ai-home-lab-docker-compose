@@ -166,9 +166,6 @@ with col2:
     st.metric("Refresh Rate", selected_refresh)
 
 # Main Dashboard
-st.markdown('<div class="header-title">📊 BVMS Application Insights Dashboard</div>', unsafe_allow_html=True)
-st.markdown(f"*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
-
 if st.session_state.connector is None:
     st.warning("⚠️ Please configure Azure connection in the sidebar first.")
     st.info("""
@@ -237,7 +234,7 @@ else:
         st.markdown("---")
         
         # Combined Request Timeline & CPU/Memory Timeline in same row (1:1 ratio)
-        col_request_timeline, col_resource_timeline = st.columns([1, 1])
+        col_request_timeline, col_resource_timeline = st.columns([1.5, 1])
         
         with col_request_timeline:
             st.subheader("📈 Request & Response Time Trends")
@@ -416,8 +413,8 @@ else:
         
         st.markdown("---")
         
-        # Compact 4-column layout for remaining charts
-        col1, col2, col3, col4 = st.columns(4)
+        # 3-column layout: API charts (2 small) + World Map (1 larger)
+        col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
             st.subheader("🎯 Top Most-Called APIs")
@@ -545,39 +542,6 @@ else:
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("No location data available")
-        
-        with col4:
-            st.subheader("⚠️ Error Status")
-            result = st.session_state.connector.execute_kql(KQL_QUERIES['errors_by_status'], time_range)
-            if result is not None and len(result) > 0:
-                # Define color mapping based on error severity
-                def get_error_color(code):
-                    code_str = str(code)
-                    if code_str.startswith('5'):  # 5xx - Server errors (most severe)
-                        return '#DC143C'  # Crimson red
-                    elif code_str in ['400', '401', '403']:  # Auth/Permission errors
-                        return '#FF4500'  # Orange red
-                    elif code_str == '404':  # Not found (less severe)
-                        return '#4169E1'  # Royal blue
-                    elif code_str.startswith('4'):  # Other 4xx client errors
-                        return '#FFA500'  # Orange
-                    else:
-                        return '#808080'  # Gray for unknown
-                
-                # Create color list for each status code
-                colors = [get_error_color(code) for code in result['resultCode']]
-                
-                fig = px.pie(
-                    result,
-                    values='error_count',
-                    names='resultCode',
-                    labels={'error_count': 'Count', 'resultCode': 'Code'},
-                    color_discrete_sequence=colors
-                )
-                fig.update_layout(height=300, margin=dict(l=10, r=10, t=30, b=10))
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
         
         st.markdown("---")
         
