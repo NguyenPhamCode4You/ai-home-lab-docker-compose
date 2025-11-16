@@ -45,14 +45,14 @@ KQL_QUERIES = {
     # Max memory usage
     'memory_usage': """
         performanceCounters
-        | where name == "Available Bytes" or name == "Private Bytes"
+        | where name == "Private Bytes"
         | summarize max_memory_mb = max(value) / 1024 / 1024
     """,
     
     # Memory usage timeline (by minute)
     'memory_timeline': """
         performanceCounters
-        | where name == "Available Bytes" or name == "Private Bytes"
+        | where name == "Private Bytes"
         | summarize memory_mb = max(value) / 1024 / 1024 by timestamp = bin(timestamp, 1m)
         | order by timestamp asc
     """,

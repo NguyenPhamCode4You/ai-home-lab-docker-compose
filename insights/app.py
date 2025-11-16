@@ -349,31 +349,48 @@ else:
                     cpu_timeline = cpu_timeline.iloc[::step][:total_bars]
                     memory_timeline = memory_timeline.iloc[::step][:total_bars]
                 
+                # Convert memory from MB to GB
+                memory_timeline['memory_gb'] = memory_timeline['memory_mb'] / 1024
+                
                 # Create dual-axis chart
                 fig = go.Figure()
+                
+                # Determine which CPU points to show (CPU > 25%)
+                cpu_text = [f"{val:.1f}%" if val > 25 else "" for val in cpu_timeline['cpu_percentage']]
+                cpu_marker_sizes = [8 if val > 25 else 4 for val in cpu_timeline['cpu_percentage']]
                 
                 # Add CPU percentage line (left y-axis)
                 fig.add_trace(go.Scatter(
                     x=cpu_timeline['timestamp'],
                     y=cpu_timeline['cpu_percentage'],
                     name='CPU %',
-                    mode='lines+markers',
-                    line=dict(color='#EF553B', width=2),
-                    marker=dict(size=6),
+                    mode='lines+markers+text',
+                    line=dict(color='#EF553B', width=2, shape='spline', smoothing=1.3),
+                    marker=dict(size=cpu_marker_sizes, color='#EF553B'),
+                    text=cpu_text,
+                    textposition='top center',
+                    textfont=dict(size=10, color='#EF553B'),
                     yaxis='y1',
                     hovertemplate='<b>CPU</b><br>%{y:.1f}%<extra></extra>'
                 ))
                 
+                # Determine which Memory points to show (Memory > 3GB)
+                memory_text = [f"{val:.1f}GB" if val > 3 else "" for val in memory_timeline['memory_gb']]
+                memory_marker_sizes = [8 if val > 3 else 4 for val in memory_timeline['memory_gb']]
+                
                 # Add Memory usage line (right y-axis)
                 fig.add_trace(go.Scatter(
                     x=memory_timeline['timestamp'],
-                    y=memory_timeline['memory_mb'],
-                    name='Memory (MB)',
-                    mode='lines+markers',
-                    line=dict(color='#636EFA', width=2),
-                    marker=dict(size=6),
+                    y=memory_timeline['memory_gb'],
+                    name='Memory (GB)',
+                    mode='lines+markers+text',
+                    line=dict(color='#636EFA', width=2, shape='spline', smoothing=1.3),
+                    marker=dict(size=memory_marker_sizes, color='#636EFA'),
+                    text=memory_text,
+                    textposition='top center',
+                    textfont=dict(size=10, color='#636EFA'),
                     yaxis='y2',
-                    hovertemplate='<b>Memory</b><br>%{y:.0f} MB<extra></extra>'
+                    hovertemplate='<b>Memory</b><br>%{y:.2f} GB<extra></extra>'
                 ))
                 
                 # Update layout with dual y-axes
@@ -383,14 +400,16 @@ else:
                         title=dict(text='CPU %', font=dict(color='#EF553B')),
                         tickfont=dict(color='#EF553B'),
                         showgrid=True,
-                        gridcolor='rgba(128, 128, 128, 0.2)'
+                        gridcolor='rgba(128, 128, 128, 0.2)',
+                        range=[0, 100]  # Fixed range 0-100%
                     ),
                     yaxis2=dict(
-                        title=dict(text='Memory (MB)', font=dict(color='#636EFA')),
+                        title=dict(text='Memory (GB)', font=dict(color='#636EFA')),
                         tickfont=dict(color='#636EFA'),
                         overlaying='y',
                         side='right',
-                        showgrid=False
+                        showgrid=False,
+                        range=[0, 6]  # Fixed range 0-6GB
                     ),
                     hovermode='x unified',
                     height=350,
