@@ -90,7 +90,7 @@ KQL_QUERIES = {
     'top_operations': """
         requests
         | where url !has "healthz"
-        | where (url has "bvms-voyage") or (url has "bvms-master")
+        | where (url has "orderrequest") or (url has "masterdata")
         | summarize count = count() by operation_Name
         | top 8 by count
         | order by count desc
@@ -100,9 +100,8 @@ KQL_QUERIES = {
     'slowest_operations': """
         requests
         | where url !has "healthz"
-        | where (url has "bvms-voyage") or (url has "bvms-master")
+        | where (url has "orderrequest") or (url has "masterdata")
         | summarize avg_duration = avg(duration), count = count() by operation_Name
-        | where count > 5
         | top 8 by avg_duration
         | order by avg_duration desc
     """,
@@ -113,31 +112,6 @@ KQL_QUERIES = {
         | where success == false
         | summarize error_count = count() by resultCode
         | order by error_count desc
-    """,
-    
-    # Response time percentiles (P50, P95, P99)
-    'percentile_response_time': """
-        requests
-        | summarize 
-            p50 = percentile(duration, 50),
-            p95 = percentile(duration, 95),
-            p99 = percentile(duration, 99)
-        | project p50, p95, p99
-        | project percentile = pack_array('P50', 'P95', 'P99'), duration_ms = pack_array(p50, p95, p99)
-        | mvexpand percentile, duration_ms
-    """,
-    
-    # Alternative percentile query (simpler)
-    'percentile_response_time_alt': """
-        requests
-        | extend percentile = case(
-            1 == 1, 'P50',
-            1 == 0, 'P95',
-            'P99'
-        )
-        | summarize percentile = 'P50', duration_ms = percentile(duration, 50)
-        | union (requests | summarize percentile = 'P95', duration_ms = percentile(duration, 95))
-        | union (requests | summarize percentile = 'P99', duration_ms = percentile(duration, 99))
     """,
     
     # Top exceptions
@@ -167,10 +141,10 @@ KQL_QUERIES = {
         requests
         | where timestamp >= ago(15m)
         | where url !has "healthz"
-        | where (url has "bvms-voyage") or (url has "bvms-master")
+        | where (url has "orderrequest") or (url has "masterdata")
         | project timestamp, name, url, success, resultCode, duration, performanceBucket, client_City, cloud_RoleInstance, cloud_RoleName
         | order by timestamp desc
-        | take 100
+        | take 200
     """,
     
     # Request duration distribution
