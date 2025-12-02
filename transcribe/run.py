@@ -46,13 +46,37 @@ from tqdm import tqdm
 class VideoTranscriber:
     """Transcribes video files using Whisper large v3 and formats with Ollama."""
    
+    # ==================== CONFIGURATION PARAMETERS ====================
+    # Audio Processing Configuration
+    CHUNK_DURATION_SECONDS = 20      # Duration of each audio chunk for transcription
+    CHUNK_OVERLAP_SECONDS = 1        # Overlap between chunks to avoid missing words at boundaries
+    SAMPLE_RATE = 16000              # Audio sample rate (required by Whisper)
+    
+    # Whisper Model Configuration
+    WHISPER_MODEL_ID = "openai/whisper-large-v3"
+    MAX_NEW_TOKENS = 444             # Max tokens per chunk (must be < 448 to account for 3-4 token overhead)
+    BATCH_SIZE = 4                   # Batch size for processing (reduce if OOM errors)
+    LANGUAGE = "en"                  # Target language for transcription
+    
+    # Ollama Configuration
+    OLLAMA_URL = "http://localhost:11434/api/generate"
+    OLLAMA_CHAT_URL = "http://localhost:11434/api/chat"
+    OLLAMA_MODEL = "gemma3:12b"      # Primary model for chat API
+    OLLAMA_MODEL_FALLBACK = "gemma2:2b"  # Fallback model for generate API
+    OLLAMA_TIMEOUT_SECONDS = 300     # Timeout for Ollama API requests
+    
+    # File Processing Configuration
+    FFMPEG_TIMEOUT_SECONDS = 300     # Timeout for FFmpeg audio extraction
+    LARGE_FILE_THRESHOLD_MB = 100    # Threshold for chunked audio loading (in MB)
+    # ==================================================================
+   
     def __init__(self):
         """Initialize the transcriber with GPU acceleration if available."""
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
         self.whisper_pipeline = None
-        self.ollama_url = "http://localhost:11434/api/generate"
-        self.ollama_chat_url = "http://localhost:11434/api/chat"
+        self.ollama_url = self.OLLAMA_URL
+        self.ollama_chat_url = self.OLLAMA_CHAT_URL
        
         print(f"Using device: {self.device}")
         if self.device == "cpu":
@@ -62,7 +86,7 @@ class VideoTranscriber:
         """Load the Whisper large v3 model for transcription."""
         print("Loading Whisper large v3 model...")
        
-        model_id = "openai/whisper-large-v3"
+        model_id = self.WHISPER_MODEL_ID
        
         try:
             # Load model and processor
@@ -82,15 +106,15 @@ class VideoTranscriber:
                 model=model,
                 tokenizer=processor.tokenizer,
                 feature_extractor=processor.feature_extractor,
-                max_new_tokens=200,  # Reduced to avoid token limit issues
-                chunk_length_s=15,   # Reduced to avoid timeout
-                batch_size=4,        # Further reduced for stability
+                max_new_tokens=self.MAX_NEW_TOKENS,
+                chunk_length_s=self.CHUNK_DURATION_SECONDS,
+                batch_size=self.BATCH_SIZE,
                 return_timestamps="word",  # Word-level timestamps
                 torch_dtype=self.torch_dtype,
                 device=self.device,
                 # Language and task settings to avoid warnings
                 generate_kwargs={
-                    "language": "en",  # Force English to avoid auto-detection
+                    "language": self.LANGUAGE,
                     "task": "transcribe",  # Transcribe instead of translate
                     "forced_decoder_ids": None,  # Let model handle this
                 }
@@ -134,9 +158,9 @@ class VideoTranscriber:
             # Run FFmpeg with timeout
             import subprocess
             try:
-                result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=300)  # 5 minute timeout
+                result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True, timeout=self.FFMPEG_TIMEOUT_SECONDS)
             except subprocess.TimeoutExpired:
-                print("FFmpeg process timed out after 5 minutes")
+                print(f"FFmpeg process timed out after {self.FFMPEG_TIMEOUT_SECONDS} seconds")
                 raise Exception("FFmpeg extraction timed out")
            
             if result.returncode != 0:
@@ -172,9 +196,9 @@ class VideoTranscriber:
                 print(f"Sample rate: {sample_rate} Hz")
                 print(f"Channels: {channels}")
                
-                # For very large files (> 100MB), consider chunked loading
-                if file_size > 100 * 1024 * 1024:  # 100MB
-                    print("Large file detected, using chunked loading...")
+                # For very large files, consider chunked loading
+                if file_size > self.LARGE_FILE_THRESHOLD_MB * 1024 * 1024:
+                    print(f"Large file detected (>{self.LARGE_FILE_THRESHOLD_MB}MB), using chunked loading...")
                     # Load in chunks to manage memory
                     chunk_size = sample_rate * 60  # 1 minute chunks
                     audio_chunks = []
@@ -201,14 +225,14 @@ class VideoTranscriber:
                     print("Converting stereo to mono...")
                     audio_array = np.mean(audio_array, axis=1)
                
-                # Resample to 16kHz if needed using librosa (with progress)
-                if sample_rate != 16000:
-                    print(f"Resampling from {sample_rate}Hz to 16kHz...")
+                # Resample if needed using librosa (with progress)
+                if sample_rate != self.SAMPLE_RATE:
+                    print(f"Resampling from {sample_rate}Hz to {self.SAMPLE_RATE}Hz...")
                     with tqdm(desc="Resampling", unit="samples") as pbar:
                         audio_array = librosa.resample(
                             audio_array, 
                             orig_sr=sample_rate, 
-                            target_sr=16000,
+                            target_sr=self.SAMPLE_RATE,
                             res_type='kaiser_best'  # High quality resampling
                         )
                         pbar.update(len(audio_array))
@@ -216,16 +240,16 @@ class VideoTranscriber:
             except Exception as e:
                 print(f"Error loading with soundfile: {e}")
                 print("Falling back to librosa loading...")
-                audio_array, sample_rate = librosa.load(temp_audio_path, sr=16000)
+                audio_array, sample_rate = librosa.load(temp_audio_path, sr=self.SAMPLE_RATE)
            
             # Clean up
             if os.path.exists(temp_audio_path):
                 os.remove(temp_audio_path)
                 print("Temporary audio file cleaned up")
            
-            print(f"Audio extracted successfully! Duration: {len(audio_array)/16000:.2f} seconds")
+            print(f"Audio extracted successfully! Duration: {len(audio_array)/self.SAMPLE_RATE:.2f} seconds")
             print(f"Audio array shape: {audio_array.shape}")
-            print(f"Audio sample rate: 16000 Hz")
+            print(f"Audio sample rate: {self.SAMPLE_RATE} Hz")
             print(f"Audio min/max values: {audio_array.min():.3f}/{audio_array.max():.3f}")
             
             # Check if audio has actual content (not just silence)
@@ -244,21 +268,46 @@ class VideoTranscriber:
                 os.remove(temp_audio_path)
             sys.exit(1)
    
-    def split_audio_into_chunks(self, audio_array: np.ndarray, chunk_duration: int = 15, sample_rate: int = 16000) -> List[Tuple[np.ndarray, float, float]]:
-        """Split audio array into chunks of specified duration.
+    def split_audio_into_chunks(self, audio_array: np.ndarray, chunk_duration: int = None, overlap: int = None, sample_rate: int = None) -> List[Tuple[np.ndarray, float, float]]:
+        """Split audio array into chunks of specified duration with overlap.
+        
+        Args:
+            audio_array: Input audio array
+            chunk_duration: Duration of each chunk in seconds (default: uses CHUNK_DURATION_SECONDS)
+            overlap: Overlap duration between chunks in seconds (default: uses CHUNK_OVERLAP_SECONDS)
+            sample_rate: Audio sample rate (default: uses SAMPLE_RATE)
         
         Returns:
             List of tuples containing (audio_chunk, start_time, end_time)
         """
+        # Use class configuration if not specified
+        if chunk_duration is None:
+            chunk_duration = self.CHUNK_DURATION_SECONDS
+        if overlap is None:
+            overlap = self.CHUNK_OVERLAP_SECONDS
+        if sample_rate is None:
+            sample_rate = self.SAMPLE_RATE
+            
         chunk_samples = chunk_duration * sample_rate
+        overlap_samples = overlap * sample_rate
+        step_samples = chunk_samples - overlap_samples  # Move forward by this amount
         total_samples = len(audio_array)
         chunks = []
         
-        for i in range(0, total_samples, chunk_samples):
-            chunk = audio_array[i:i + chunk_samples]
+        i = 0
+        while i < total_samples:
+            chunk_end = min(i + chunk_samples, total_samples)
+            chunk = audio_array[i:chunk_end]
             start_time = i / sample_rate
-            end_time = min((i + chunk_samples) / sample_rate, total_samples / sample_rate)
+            end_time = chunk_end / sample_rate
             chunks.append((chunk, start_time, end_time))
+            
+            # Move to next chunk position
+            i += step_samples
+            
+            # Break if we've covered all audio
+            if chunk_end >= total_samples:
+                break
         
         return chunks
     
@@ -270,19 +319,19 @@ class VideoTranscriber:
                 return {"text": "", "chunks": []}
             
             # For very long chunks, trim to avoid token limit issues
-            max_chunk_length = 15 * 16000  # 15 seconds at 16kHz
+            max_chunk_length = self.CHUNK_DURATION_SECONDS * self.SAMPLE_RATE
             if len(audio_chunk) > max_chunk_length:
-                print(f"Warning: Trimming chunk from {len(audio_chunk)/16000:.1f}s to 15s")
+                print(f"Warning: Trimming chunk from {len(audio_chunk)/self.SAMPLE_RATE:.1f}s to {self.CHUNK_DURATION_SECONDS}s")
                 audio_chunk = audio_chunk[:max_chunk_length]
-                end_time = start_time + 15
+                end_time = start_time + self.CHUNK_DURATION_SECONDS
             
             # Transcribe chunk with explicit parameters to avoid configuration issues
             result = self.whisper_pipeline(
                 audio_chunk,
                 generate_kwargs={
-                    "language": "en",
+                    "language": self.LANGUAGE,
                     "task": "transcribe",
-                    "max_new_tokens": 200
+                    "max_new_tokens": self.MAX_NEW_TOKENS
                 }
             )
             
@@ -305,16 +354,16 @@ class VideoTranscriber:
     
     def transcribe_audio(self, audio_array: np.ndarray, progress_file: str = None, raw_output_path: str = None) -> Dict[str, Any]:
         """Transcribe audio using Whisper large v3 with chunked processing and incremental saving."""
-        total_duration = len(audio_array) / 16000
+        total_duration = len(audio_array) / self.SAMPLE_RATE
         print(f"Transcribing audio (duration: {total_duration:.1f}s)...")
         
         if self.whisper_pipeline is None:
             self.load_whisper_model()
         
         try:
-            # Split audio into chunks
-            chunks = self.split_audio_into_chunks(audio_array, chunk_duration=15)
-            print(f"Processing {len(chunks)} chunks of ~15 seconds each...")
+            # Split audio into chunks with overlap
+            chunks = self.split_audio_into_chunks(audio_array)
+            print(f"Processing {len(chunks)} chunks of ~{self.CHUNK_DURATION_SECONDS} seconds each (with {self.CHUNK_OVERLAP_SECONDS}s overlap)...")
             
             # Load existing progress if available
             progress_data = self._load_existing_progress(progress_file) if progress_file else {
@@ -333,7 +382,13 @@ class VideoTranscriber:
             start_index = len(completed_chunk_indices)
             
             if start_index > 0:
-                print(f"Resuming from chunk {start_index + 1} (already completed: {start_index}/{len(chunks)})")
+                print(f"\n{'='*60}")
+                print(f"📂 RESUMING FROM EXISTING PROGRESS")
+                print(f"{'='*60}")
+                print(f"Already completed: {start_index}/{len(chunks)} chunks")
+                print(f"Starting from chunk: {start_index + 1}")
+                print(f"Remaining chunks: {len(chunks) - start_index}")
+                print(f"{'='*60}\n")
             
             # Initialize results from existing progress
             all_text = progress_data.get('all_text', [])
@@ -456,7 +511,7 @@ class VideoTranscriber:
         structured_text = "Transcription with Segment Timestamps:\n" + text + "\n\n"
        
         # Prepare prompt for Ollama
-        prompt = f"""Please create a comprehensive, fact-based educational document from the following video transcription. Transform this raw transcript into a well-structured knowledge resource.
+        prompt = f"""Please create a comprehensive, fact-based educational document in the form of markdown from the following video transcription. Transform this raw transcript into a well-structured knowledge resource.
 
 Requirements:
 1. Write a concise, factual document covering all content discussed in the recording
@@ -481,7 +536,7 @@ Please provide a well-organized, educational markdown document:"""
         try:
             # First try the chat API (newer format)
             chat_payload = {
-                "model": "gemma3:12b",
+                "model": self.OLLAMA_MODEL,
                 "messages": [
                     {
                         "role": "user",
@@ -492,7 +547,7 @@ Please provide a well-organized, educational markdown document:"""
             }
            
             print(f"Trying Ollama chat API...")
-            response = requests.post(self.ollama_chat_url, json=chat_payload, timeout=300)
+            response = requests.post(self.ollama_chat_url, json=chat_payload, timeout=self.OLLAMA_TIMEOUT_SECONDS)
            
             if response.status_code == 200:
                 result = response.json()
@@ -504,12 +559,12 @@ Please provide a well-organized, educational markdown document:"""
             # Fallback to generate API
             print(f"Chat API failed ({response.status_code}), trying generate API...")
             generate_payload = {
-                "model": "gemma2:2b",
+                "model": self.OLLAMA_MODEL_FALLBACK,
                 "prompt": prompt,
                 "stream": False
             }
            
-            response = requests.post(self.ollama_url, json=generate_payload, timeout=300)
+            response = requests.post(self.ollama_url, json=generate_payload, timeout=self.OLLAMA_TIMEOUT_SECONDS)
            
             if response.status_code == 200:
                 result = response.json()
@@ -659,8 +714,15 @@ This document contains the transcription of the provided video file.
         print(f"Ollama-formatted transcript saved to: {output_path}")
         return formatted_text
 
-    def transcribe_video(self, video_path: str, output_path: Optional[str] = None, use_ollama: bool = True) -> str:
-        """Main function to transcribe video and format output."""
+    def transcribe_video(self, video_path: str, output_path: Optional[str] = None, use_ollama: bool = True, continue_from_progress: bool = False) -> str:
+        """Main function to transcribe video and format output.
+        
+        Args:
+            video_path: Path to the video file
+            output_path: Optional custom output path
+            use_ollama: Whether to use Ollama for formatting
+            continue_from_progress: If True, resume from existing progress; if False (default), start fresh
+        """
         overall_start_time = time.time()
         
         # Validate input
@@ -686,6 +748,17 @@ This document contains the transcription of the provided video file.
        
         # Set up incremental saving
         progress_file = self._create_incremental_save_file(video_path)
+        
+        # Default behavior: start fresh (delete existing progress)
+        if not continue_from_progress and os.path.exists(progress_file):
+            print(f"\n🔄 Starting fresh transcription (existing progress will be ignored)...")
+            try:
+                os.remove(progress_file)
+                print("✓ Starting transcription from the beginning\n")
+            except Exception as e:
+                print(f"Warning: Could not remove progress file: {e}")
+        elif continue_from_progress and os.path.exists(progress_file):
+            print(f"\n📂 Continuing from existing progress...\n")
         
         # Determine raw output path early
         if output_path is None:
@@ -743,7 +816,7 @@ This document contains the transcription of the provided video file.
        
         # Final summary
         total_duration = time.time() - overall_start_time
-        audio_duration = len(audio_array) / 16000
+        audio_duration = len(audio_array) / self.SAMPLE_RATE
         
         print("=" * 50)
         print("=== Transcription Complete ===")
@@ -789,6 +862,12 @@ def main():
         action="store_true",
         help="Skip Ollama formatting and use basic markdown format instead (ignored when using --ollama-only)"
     )
+    parser.add_argument(
+        "--continue",
+        dest="continue_transcription",
+        action="store_true",
+        help="Continue from existing progress file instead of starting fresh (default: start fresh)"
+    )
    
     args = parser.parse_args()
    
@@ -811,7 +890,8 @@ def main():
             result = transcriber.transcribe_video(
                 args.video_path,
                 args.output,
-                use_ollama=not args.no_ollama
+                use_ollama=not args.no_ollama,
+                continue_from_progress=args.continue_transcription
             )
             print("\nTranscription completed successfully!")
        

@@ -7,3 +7,9 @@
 ```
 python run-youtube-stream.py "https://www.youtube.com/watch?v=sSso2J0lWAk" --cookies cookies.txt
 ```
+
+```
+python run.py "videos/sample-mp4-file.mp4"
+
+python run.py "videos/sample-mp4-file.mp4" --continue
+```
