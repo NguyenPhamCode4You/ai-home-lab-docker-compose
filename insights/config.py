@@ -33,6 +33,45 @@ KQL_QUERIES = {
         | project error_rate = (failed * 100.0 / total)
     """,
     
+    # Availability percentage
+    'availability': """
+        requests
+        | summarize 
+            total = count(),
+            successful = sum(iff(success == true, 1, 0))
+        | project availability = (successful * 100.0 / total)
+    """,
+    
+    # Max memory usage
+    'memory_usage': """
+        performanceCounters
+        | where name == "Private Bytes"
+        | summarize max_memory_mb = max(value) / 1024 / 1024
+    """,
+    
+    # Memory usage timeline (by minute)
+    'memory_timeline': """
+        performanceCounters
+        | where name == "Private Bytes"
+        | summarize memory_mb = max(value) / 1024 / 1024 by timestamp = bin(timestamp, 1m)
+        | order by timestamp asc
+    """,
+    
+    # Max CPU percentage
+    'cpu_percentage': """
+        performanceCounters
+        | where name == "% Processor Time" or name == "Processor Time"
+        | summarize max_cpu = max(value)
+    """,
+    
+    # CPU usage timeline (by minute)
+    'cpu_timeline': """
+        performanceCounters
+        | where name == "% Processor Time" or name == "Processor Time"
+        | summarize cpu_percentage = max(value) by timestamp = bin(timestamp, 1m)
+        | order by timestamp asc
+    """,
+    
     # Request timeline (by minute)
     'request_timeline': """
         requests
@@ -50,51 +89,79 @@ KQL_QUERIES = {
     # Top operations by request count
     'top_operations': """
         requests
-        | summarize count() by operation_name
-        | top 10 by count_
-        | order by count_ desc
+        | where url !has "healthz"
+        | where operation_Name != "GET /"
+        | where (url has "orderrequest") or (url has "masterdata")
+        | summarize count = count() by operation_Name
+        | top 8 by count
+        | order by count desc
+    """,
+    
+    # Top slowest operations by average duration
+    'slowest_operations': """
+        requests
+        | where url !has "healthz"
+        | where (url has "orderrequest") or (url has "masterdata")
+        | summarize avg_duration = avg(duration), count = count() by operation_Name
+        | top 8 by avg_duration
+        | order by avg_duration desc
     """,
     
     # Errors by status code
     'errors_by_status': """
         requests
         | where success == false
-        | summarize error_count = count() by result_code
+        | summarize error_count = count() by resultCode
         | order by error_count desc
-    """,
-    
-    # Response time percentiles (P50, P95, P99)
-    'percentile_response_time': """
-        requests
-        | summarize 
-            p50 = percentile(duration, 50),
-            p95 = percentile(duration, 95),
-            p99 = percentile(duration, 99)
-        | project 
-            percentile = pack_all(),
-            duration_ms = pack_all()
-        | mvexpand percentile, duration_ms
-    """,
-    
-    # Alternative percentile query (simpler)
-    'percentile_response_time_alt': """
-        requests
-        | extend percentile = case(
-            1 == 1, 'P50',
-            1 == 0, 'P95',
-            'P99'
-        )
-        | summarize percentile = 'P50', duration_ms = percentile(duration, 50)
-        | union (requests | summarize percentile = 'P95', duration_ms = percentile(duration, 95))
-        | union (requests | summarize percentile = 'P99', duration_ms = percentile(duration, 99))
     """,
     
     # Top exceptions
     'top_exceptions': """
         exceptions
-        | summarize exception_count = count() by type, outerMessage
+        | summarize 
+            exception_count = count(),
+            first_seen = min(timestamp),
+            last_seen = max(timestamp),
+            affected_operations = dcount(operation_Name),
+            sample_url = take_any(url)
+        by type, outerMessage, method, problemId
         | top 10 by exception_count
         | order by exception_count desc
+        | project type, outerMessage, method, exception_count, affected_operations, sample_url, first_seen, last_seen, problemId
+    """,
+    
+    # Failed requests (for when no exceptions are thrown)
+    'failed_requests_detail': """
+        requests
+        | where success == false
+        | summarize 
+            error_count = count(),
+            avg_duration = avg(duration),
+            sample_url = take_any(url)
+        by operation_Name, resultCode, problemId
+        | top 20 by error_count
+        | order by error_count desc
+        | project operation_Name, resultCode, error_count, avg_duration, sample_url, problemId
+    """,
+    
+    # Requests by location (country/region)
+    'requests_by_location': """
+        requests
+        | summarize request_count = count() by client_CountryOrRegion
+        | where isnotempty(client_CountryOrRegion)
+        | order by request_count desc
+    """,
+    
+    # Recent requests detail (last 15 minutes)
+    'recent_requests': """
+        requests
+        | where timestamp >= ago(15m)
+        | where url !has "healthz"
+        | where operation_Name != "GET /"
+        | where (url has "orderrequest") or (url has "masterdata")
+        | project timestamp, name, url, success, resultCode, duration, performanceBucket, client_City, cloud_RoleInstance, cloud_RoleName
+        | order by timestamp desc
+        | take 200
     """,
     
     # Request duration distribution

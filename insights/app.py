@@ -14,7 +14,7 @@ load_dotenv()
 
 # Page config
 st.set_page_config(
-    page_title="Application Insights Dashboard",
+    page_title="BVMS Application Insights Dashboard",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -43,6 +43,13 @@ if 'last_refresh' not in st.session_state:
     st.session_state.last_refresh = datetime.now()
 if 'connector' not in st.session_state:
     st.session_state.connector = None
+if 'refresh_interval' not in st.session_state:
+    st.session_state.refresh_interval = 120  # Default 120 seconds
+if 'time_range_value' not in st.session_state:
+    st.session_state.time_range_value = "1h"  # Default 1 hour
+
+if 'top_k' not in st.session_state:
+    st.session_state.top_k = 8  # Default top 8
 
 # Load credentials from environment
 AZURE_CLIENT_ID = os.getenv("AZURE_CLIENT_ID")
@@ -95,9 +102,60 @@ with st.sidebar.expander("🔐 Azure Connection", expanded=False):
                     st.error(f"❌ Connection failed: {str(e)}")
 
 # Time range selection
-with st.sidebar.expander("Time Range", expanded=True):
-    hours = st.slider("Select hours to look back:", 1, 24, 1)
-    st.session_state.hours_lookback = hours
+# Dashboard Settings
+with st.sidebar.expander("⚙️ Dashboard Settings", expanded=True):
+    # Time Range selection
+    st.markdown("**⏱️ Time Range**")
+    time_range_options = {
+        "30 minutes": "30m",
+        "1 hour": "1h",
+        "2 hours": "2h",
+        "4 hours": "4h",
+        "8 hours": "8h",
+        "12 hours": "12h",
+        "24 hours": "24h"
+    }
+    
+    selected_time_range = st.selectbox(
+        "Look back period:",
+        options=list(time_range_options.keys()),
+        index=1,  # Default to 1 hour
+        label_visibility="collapsed"
+    )
+    st.session_state.time_range_value = time_range_options[selected_time_range]
+    
+    st.markdown("---")
+    
+    # Refresh Rate selection
+    st.markdown("**🔄 Refresh Rate**")
+    refresh_options = {
+        "10 seconds": 10,
+        "20 seconds": 20,
+        "30 seconds": 30,
+        "1 minute": 60,
+        "2 minutes": 120,
+        "5 minutes": 300
+    }
+    
+    selected_refresh = st.selectbox(
+        "Auto-refresh interval:",
+        options=list(refresh_options.keys()),
+        index=4,  # Default to 2 minutes (120 seconds)
+        label_visibility="collapsed"
+    )
+    st.session_state.refresh_interval = refresh_options[selected_refresh]
+    
+    st.markdown("---")
+    
+    # Top K selection
+    st.markdown("**🔝 Top K Results**")
+    top_k = st.selectbox(
+        "Number of top results:",
+        options=[5, 8, 10, 25],
+        index=1,  # Default to 8
+        label_visibility="collapsed"
+    )
+    st.session_state.top_k = top_k
 
 # Auto-refresh indicator
 st.sidebar.markdown("---")
@@ -105,12 +163,9 @@ col1, col2 = st.sidebar.columns(2)
 with col1:
     st.metric("Last Refresh", st.session_state.last_refresh.strftime("%H:%M:%S"))
 with col2:
-    st.metric("Refresh Rate", f"{REFRESH_INTERVAL}s")
+    st.metric("Refresh Rate", selected_refresh)
 
 # Main Dashboard
-st.markdown('<div class="header-title">📊 Application Insights Dashboard</div>', unsafe_allow_html=True)
-st.markdown(f"*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
-
 if st.session_state.connector is None:
     st.warning("⚠️ Please configure Azure connection in the sidebar first.")
     st.info("""
@@ -121,191 +176,513 @@ if st.session_state.connector is None:
     """)
 else:
     try:
-        # Get time range
-        time_range = f"ago({st.session_state.hours_lookback}h)"
+        # Get time range from settings
+        time_range = f"ago({st.session_state.time_range_value})"
         
-        # Create columns for main metrics
-        col1, col2, col3, col4 = st.columns(4)
+        # Compact metrics in one row with 5 columns - each loads independently
+        col1, col2, col3, col4, col5 = st.columns(5)
+        
+        # Metric 1: Total Requests - loads immediately
+        with col1:
+            with st.spinner(""):
+                total_reqs_result = st.session_state.connector.execute_kql(KQL_QUERIES['total_requests'], time_range)
+                if total_reqs_result is not None and len(total_reqs_result) > 0:
+                    st.metric("📊 Requests", f"{int(total_reqs_result.iloc[0]['total_requests']):,}", label_visibility="visible")
+                else:
+                    st.metric("📊 Requests", "N/A")
+
+        # Metric 2: Average Response Time - loads independently
+        with col2:
+            with st.spinner(""):
+                avg_time_result = st.session_state.connector.execute_kql(KQL_QUERIES['avg_response_time'], time_range)
+                if avg_time_result is not None and len(avg_time_result) > 0:
+                    st.metric("⚡ Avg Time", f"{avg_time_result.iloc[0]['avg_response_time']:.0f}ms", label_visibility="visible")
+                else:
+                    st.metric("⚡ Avg Time", "N/A")
+
+        # Metric 3: Success Rate - loads independently
+        with col3:
+            with st.spinner(""):
+                availability_result = st.session_state.connector.execute_kql(KQL_QUERIES['availability'], time_range)
+                if availability_result is not None and len(availability_result) > 0:
+                    st.metric("✅ Success Rate", f"{availability_result.iloc[0]['availability']:.2f}%", label_visibility="visible")
+                else:
+                    st.metric("✅ Success Rate", "N/A")
+        
+        # Metric 4: Memory Usage - loads independently
+        with col4:
+            with st.spinner(""):
+                memory_result = st.session_state.connector.execute_kql(KQL_QUERIES['memory_usage'], time_range)
+                if memory_result is not None and len(memory_result) > 0:
+                    memory_mb = memory_result.iloc[0]['max_memory_mb']
+                    if memory_mb >= 1024:
+                        st.metric("💾 Max Memory", f"{memory_mb/1024:.1f} GB", label_visibility="visible")
+                    else:
+                        st.metric("💾 Max Memory", f"{memory_mb:.0f} MB", label_visibility="visible")
+                else:
+                    st.metric("💾 Max Memory", "N/A")
+        
+        # Metric 5: CPU Percentage - loads independently
+        with col5:
+            with st.spinner(""):
+                cpu_result = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_percentage'], time_range)
+                if cpu_result is not None and len(cpu_result) > 0:
+                    st.metric("⚙️ Max CPU", f"{cpu_result.iloc[0]['max_cpu']:.1f}%", label_visibility="visible")
+                else:
+                    st.metric("⚙️ Max CPU", "N/A")
+        
+        st.markdown("---")
+        
+        # Combined Request Timeline & CPU/Memory Timeline in same row (1:1 ratio)
+        col_request_timeline, col_resource_timeline = st.columns([4, 3])
+        
+        with col_request_timeline:
+            st.subheader("📈 Request & Response Time Trends")
+            request_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['request_timeline'], time_range)
+            response_time_trend = st.session_state.connector.execute_kql(KQL_QUERIES['response_time_trend'], time_range)
+            
+            if request_timeline is not None and len(request_timeline) > 0 and response_time_trend is not None and len(response_time_trend) > 0:
+                # Calculate bars dynamically: Time Range / Refresh Rate
+                # Convert time range to seconds
+                time_value = st.session_state.time_range_value
+                if 'm' in time_value:
+                    time_seconds = int(time_value.replace('m', '')) * 60
+                elif 'h' in time_value:
+                    time_seconds = int(time_value.replace('h', '')) * 3600
+                else:
+                    time_seconds = 3600  # Default 1 hour
+                
+                # Calculate number of bars: time range / refresh interval
+                total_bars = max(10, min(100, time_seconds // st.session_state.refresh_interval))
+                
+                if len(request_timeline) > total_bars:
+                    # Take every Nth row to get exactly the calculated number of bars
+                    step = len(request_timeline) // total_bars
+                    request_timeline = request_timeline.iloc[::step][:total_bars]
+                    response_time_trend = response_time_trend.iloc[::step][:total_bars]
+                
+                # Create stacked bar chart without scaling
+                fig = go.Figure()
+                
+                # Add request count bar chart (blue) - base layer
+                # Only show text for values >= 100
+                request_text = [f"{val:,.0f}" if val >= 100 else "" for val in request_timeline['request_count']]
+                
+                fig.add_trace(go.Bar(
+                    x=request_timeline['timestamp'],
+                    y=request_timeline['request_count'],
+                    name='Request Count',
+                    marker=dict(color='#636EFA', opacity=0.8),
+                    text=request_text,
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>Request Count</b><br>%{y:,.0f}<extra></extra>'
+                ))
+                
+                # Add response time bar chart (red) - stacked on top with actual values
+                # Only show text for values >= 100
+                response_text = [f"{val:.0f}" if val >= 100 else "" for val in response_time_trend['avg_duration']]
+                
+                fig.add_trace(go.Bar(
+                    x=response_time_trend['timestamp'],
+                    y=response_time_trend['avg_duration'],
+                    name='Avg Response Time',
+                    marker=dict(color='#EF553B', opacity=0.8),
+                    text=response_text,
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>Avg Response Time</b><br>%{y:.0f} ms<extra></extra>'
+                ))
+                
+                # Update layout for stacked bars
+                fig.update_layout(
+                    barmode='stack',
+                    xaxis=dict(title='Time', showgrid=False),
+                    yaxis=dict(
+                        title='Request Count + Response Time (ms)', 
+                        showgrid=True,
+                        gridcolor='rgba(128, 128, 128, 0.2)'
+                    ),
+                    hovermode='x unified',
+                    height=350,
+                    margin=dict(l=50, r=50, t=30, b=40),
+                    legend=dict(
+                        orientation='h', 
+                        yanchor='bottom', 
+                        y=1.02, 
+                        xanchor='right', 
+                        x=1,
+                        bgcolor='rgba(0,0,0,0)'
+                    ),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No data available")
+        
+        with col_resource_timeline:
+            st.subheader("🌍 Requests by Location")
+            location_result = st.session_state.connector.execute_kql(KQL_QUERIES['requests_by_location'], time_range)
+            if location_result is not None and len(location_result) > 0:
+                # Create world map with bubble markers using vibrant colors for better visibility
+                fig = px.scatter_geo(
+                    location_result,
+                    locations='client_CountryOrRegion',
+                    locationmode='country names',
+                    size='request_count',
+                    hover_name='client_CountryOrRegion',
+                    hover_data={'request_count': ':,', 'client_CountryOrRegion': False},
+                    size_max=40,  # Slightly larger for better visibility
+                    color='request_count',
+                    color_continuous_scale=['#4169E1', '#FFD700', '#FF6B35', '#FF0000'],  # Blue -> Gold -> Orange -> Red (more vibrant)
+                    labels={'request_count': 'Requests'}
+                )
+                fig.update_layout(
+                    height=300,
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    paper_bgcolor='rgba(14,17,23,1)',  # Dark background
+                    plot_bgcolor='rgba(14,17,23,1)',
+                    font=dict(color='white'),
+                    geo=dict(
+                        bgcolor='rgba(14,17,23,1)',  # Match Streamlit dark theme
+                        showland=True,
+                        landcolor='rgb(20, 25, 35)',  # Darker land for better contrast
+                        showocean=True,
+                        oceancolor='rgb(10, 13, 20)',  # Even darker ocean
+                        showcountries=True,
+                        countrycolor='rgb(60, 60, 60)',  # Darker borders
+                        coastlinecolor='rgb(40, 40, 40)',
+                        showlakes=True,
+                        lakecolor='rgb(10, 13, 20)',
+                        projection_type='natural earth',
+                        showframe=False
+                    ),
+                    coloraxis_colorbar=dict(
+                        title=dict(text='Requests', font=dict(color='white')),
+                        tickfont=dict(color='white')
+                    )
+                )
+                # Add glow effect with white outline for better visibility
+                fig.update_traces(
+                    marker=dict(
+                        line=dict(width=2, color='rgba(255, 255, 255, 0.6)'),  # White glow
+                        opacity=1.0  # Full opacity
+                    )
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No location data available")
+        
+        st.markdown("---")
+        
+        # 3-column layout: API charts (2 small) + World Map (1 larger)
+        col1, col2, col3 = st.columns([2, 2, 3])
         
         with col1:
-            # Total Requests
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['total_requests'],
-                time_range
-            )
+            st.subheader("🎯 Top Most-Called APIs")
+            # Use dynamic top K value
+            top_ops_query = KQL_QUERIES['top_operations'].replace('top 8', f'top {st.session_state.top_k}')
+            result = st.session_state.connector.execute_kql(top_ops_query, time_range)
             if result is not None and len(result) > 0:
-                total_reqs = result.iloc[0]['total_requests']
-                st.metric("Total Requests", f"{int(total_reqs):,}")
+                fig = go.Figure()
+                
+                # Add bars with text labels
+                fig.add_trace(go.Bar(
+                    x=result['operation_Name'],
+                    y=result['count'],
+                    marker=dict(
+                        color=result['count'],
+                        colorscale='Viridis',
+                        showscale=False
+                    ),
+                    text=[f"{val:,.0f}" for val in result['count']],
+                    textposition='inside',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>%{x}</b><br>Count: %{y:,.0f}<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    height=300,
+                    showlegend=False,
+                    margin=dict(l=10, r=10, t=30, b=10),
+                    xaxis=dict(title='Operation'),
+                    yaxis=dict(title='Count'),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                st.plotly_chart(fig, use_container_width=True)
             else:
-                st.metric("Total Requests", "N/A")
+                st.info("No data available")
         
         with col2:
-            # Failed Requests
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['failed_requests'],
-                time_range
-            )
+            st.subheader("🐌 Top Slowest APIs")
+            # Use dynamic top K value
+            slowest_ops_query = KQL_QUERIES['slowest_operations'].replace('top 8', f'top {st.session_state.top_k}')
+            result = st.session_state.connector.execute_kql(slowest_ops_query, time_range)
             if result is not None and len(result) > 0:
-                failed_reqs = result.iloc[0]['failed_requests']
-                st.metric("Failed Requests", f"{int(failed_reqs):,}")
+                fig = go.Figure()
+                
+                # Add bars with conditional text labels (hide if < 100)
+                text_labels = [f"{val:.0f}" if val >= 100 else "" for val in result['avg_duration']]
+                
+                fig.add_trace(go.Bar(
+                    x=result['operation_Name'],
+                    y=result['avg_duration'],
+                    marker=dict(
+                        color=result['avg_duration'],
+                        colorscale='Reds',
+                        showscale=False
+                    ),
+                    text=text_labels,
+                    textposition='inside',
+                    textfont=dict(size=12, color='white'),
+                    hovertemplate='<b>%{x}</b><br>Avg Duration: %{y:.0f} ms<extra></extra>'
+                ))
+                
+                fig.update_layout(
+                    height=300,
+                    showlegend=False,
+                    margin=dict(l=10, r=10, t=30, b=10),
+                    xaxis=dict(title='Operation'),
+                    yaxis=dict(title='Avg Duration (ms)'),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                st.plotly_chart(fig, use_container_width=True)
             else:
-                st.metric("Failed Requests", "N/A")
+                st.info("No data available")
         
         with col3:
-            # Average Response Time
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['avg_response_time'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                avg_time = result.iloc[0]['avg_response_time']
-                st.metric("Avg Response Time", f"{avg_time:.0f}ms")
+            st.subheader("💻 CPU & Memory Usage Trends")
+            cpu_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['cpu_timeline'], time_range)
+            memory_timeline = st.session_state.connector.execute_kql(KQL_QUERIES['memory_timeline'], time_range)
+            
+            if cpu_timeline is not None and len(cpu_timeline) > 0 and memory_timeline is not None and len(memory_timeline) > 0:
+                # Calculate bars dynamically: Time Range / Refresh Rate
+                # Convert time range to seconds
+                time_value = st.session_state.time_range_value
+                if 'm' in time_value:
+                    time_seconds = int(time_value.replace('m', '')) * 60
+                elif 'h' in time_value:
+                    time_seconds = int(time_value.replace('h', '')) * 3600
+                else:
+                    time_seconds = 3600  # Default 1 hour
+                
+                # Calculate number of bars: time range / refresh interval
+                total_bars = max(10, min(100, time_seconds // st.session_state.refresh_interval))
+                
+                if len(cpu_timeline) > total_bars:
+                    # Take every Nth row to get exactly the calculated number of bars
+                    step = len(cpu_timeline) // total_bars
+                    cpu_timeline = cpu_timeline.iloc[::step][:total_bars]
+                    memory_timeline = memory_timeline.iloc[::step][:total_bars]
+                
+                # Convert memory from MB to GB
+                memory_timeline['memory_gb'] = memory_timeline['memory_mb'] / 1024
+                
+                # Create dual-axis chart
+                fig = go.Figure()
+                
+                # Determine which CPU points to show (CPU > 25%)
+                cpu_text = [f"{val:.1f}%" if val > 25 else "" for val in cpu_timeline['cpu_percentage']]
+                cpu_marker_sizes = [8 if val > 25 else 4 for val in cpu_timeline['cpu_percentage']]
+                
+                # Add CPU percentage line (left y-axis)
+                fig.add_trace(go.Scatter(
+                    x=cpu_timeline['timestamp'],
+                    y=cpu_timeline['cpu_percentage'],
+                    name='CPU %',
+                    mode='lines+markers+text',
+                    line=dict(color='#EF553B', width=2, shape='spline', smoothing=1.3),
+                    marker=dict(size=cpu_marker_sizes, color='#EF553B'),
+                    text=cpu_text,
+                    textposition='top center',
+                    textfont=dict(size=10, color='#EF553B'),
+                    yaxis='y1',
+                    hovertemplate='<b>CPU</b><br>%{y:.1f}%<extra></extra>'
+                ))
+                
+                # Determine which Memory points to show (Memory > 3GB)
+                memory_text = [f"{val:.1f}GB" if val > 3 else "" for val in memory_timeline['memory_gb']]
+                memory_marker_sizes = [8 if val > 3 else 4 for val in memory_timeline['memory_gb']]
+                
+                # Add Memory usage line (right y-axis)
+                fig.add_trace(go.Scatter(
+                    x=memory_timeline['timestamp'],
+                    y=memory_timeline['memory_gb'],
+                    name='Memory (GB)',
+                    mode='lines+markers+text',
+                    line=dict(color='#636EFA', width=2, shape='spline', smoothing=1.3),
+                    marker=dict(size=memory_marker_sizes, color='#636EFA'),
+                    text=memory_text,
+                    textposition='top center',
+                    textfont=dict(size=10, color='#636EFA'),
+                    yaxis='y2',
+                    hovertemplate='<b>Memory</b><br>%{y:.2f} GB<extra></extra>'
+                ))
+                
+                # Update layout with dual y-axes
+                fig.update_layout(
+                    xaxis=dict(title='Time', showgrid=False),
+                    yaxis=dict(
+                        title=dict(text='CPU %', font=dict(color='#EF553B')),
+                        tickfont=dict(color='#EF553B'),
+                        showgrid=True,
+                        gridcolor='rgba(128, 128, 128, 0.2)',
+                        range=[0, 85]  # Fixed range 0-85%
+                    ),
+                    yaxis2=dict(
+                        title=dict(text='Memory (GB)', font=dict(color='#636EFA')),
+                        tickfont=dict(color='#636EFA'),
+                        overlaying='y',
+                        side='right',
+                        showgrid=False,
+                        range=[0, 6]  # Fixed range 0-6GB
+                    ),
+                    hovermode='x unified',
+                    height=350,
+                    margin=dict(l=50, r=50, t=30, b=40),
+                    legend=dict(
+                        orientation='h',
+                        yanchor='bottom',
+                        y=1.02,
+                        xanchor='right',
+                        x=1,
+                        bgcolor='rgba(0,0,0,0)'
+                    ),
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)'
+                )
+                
+                st.plotly_chart(fig, use_container_width=True)
             else:
-                st.metric("Avg Response Time", "N/A")
-        
-        with col4:
-            # Error Rate
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['error_rate'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                error_rate = result.iloc[0]['error_rate']
-                st.metric("Error Rate", f"{error_rate:.2f}%")
-            else:
-                st.metric("Error Rate", "N/A")
+                st.info("No data available")
+
+            
         
         st.markdown("---")
         
-        # Charts Row 1
-        col1, col2 = st.columns(2)
+        # Exceptions and Recent Requests in one row (4:6 ratio)
+        col_exceptions, col_requests = st.columns([4, 6])
         
-        with col1:
-            st.subheader("📈 Request Timeline")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['request_timeline'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.line(
-                    result,
-                    x='timestamp',
-                    y='request_count',
-                    title="Requests Over Time",
-                    labels={'request_count': 'Request Count', 'timestamp': 'Time'}
+        with col_exceptions:
+            st.subheader("🔍 Top Exceptions & Failed Requests")
+            
+            # Try to get exceptions first
+            exceptions_query = KQL_QUERIES['top_exceptions'].replace('top 10', f'top {st.session_state.top_k}')
+            exceptions_result = st.session_state.connector.execute_kql(exceptions_query, time_range)
+            
+            # Also get failed requests
+            failed_requests_query = KQL_QUERIES['failed_requests_detail'].replace('top 20', f'top {st.session_state.top_k}')
+            failed_requests_result = st.session_state.connector.execute_kql(failed_requests_query, time_range)
+            
+            # Show exceptions if available
+            if exceptions_result is not None and len(exceptions_result) > 0:
+                st.markdown("**⚠️ Exceptions**")
+                display_df = exceptions_result.copy()
+                
+                # Drop unwanted columns
+                columns_to_drop = ['first_seen', 'last_seen', 'problemId']
+                display_df = display_df.drop(columns=[col for col in columns_to_drop if col in display_df.columns])
+                
+                # Rename columns for better readability
+                column_config = {
+                    'type': st.column_config.TextColumn('Exception Type', width='medium'),
+                    'outerMessage': st.column_config.TextColumn('Message', width='large'),
+                    'method': st.column_config.TextColumn('Method', width='small'),
+                    'sample_url': st.column_config.TextColumn('Sample URL', width='large'),
+                    'exception_count': st.column_config.NumberColumn('Count', format='%d'),
+                    'affected_operations': st.column_config.NumberColumn('Affected APIs', format='%d')
+                }
+                
+                st.dataframe(
+                    display_df, 
+                    use_container_width=True, 
+                    height=200,
+                    column_config=column_config,
+                    hide_index=True
                 )
-                fig.update_layout(hovermode='x unified', height=400)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        with col2:
-            st.subheader("📉 Response Time Trend")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['response_time_trend'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.line(
-                    result,
-                    x='timestamp',
-                    y='avg_duration',
-                    title="Average Response Time Over Time",
-                    labels={'avg_duration': 'Avg Duration (ms)', 'timestamp': 'Time'}
+            
+            # Show failed requests
+            if failed_requests_result is not None and len(failed_requests_result) > 0:
+                st.markdown("**❌ Failed Requests by Status Code**")
+                display_df = failed_requests_result.copy()
+                
+                # Drop unwanted columns
+                columns_to_drop = ['problemId']
+                display_df = display_df.drop(columns=[col for col in columns_to_drop if col in display_df.columns])
+                
+                # Rename columns for better readability
+                column_config = {
+                    'operation_Name': st.column_config.TextColumn('Operation', width='large'),
+                    'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
+                    'error_count': st.column_config.NumberColumn('Count', format='%d', width='small'),
+                    'avg_duration': st.column_config.NumberColumn('Avg Duration (ms)', format='%.0f', width='small'),
+                    'sample_url': st.column_config.TextColumn('Sample URL', width='large')
+                }
+                
+                st.dataframe(
+                    display_df, 
+                    use_container_width=True, 
+                    height=200,
+                    column_config=column_config,
+                    hide_index=True
                 )
-                fig.update_layout(hovermode='x unified', height=400)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
+            
+            # Show message if neither has data
+            if (exceptions_result is None or len(exceptions_result) == 0) and \
+               (failed_requests_result is None or len(failed_requests_result) == 0):
+                st.info("No exceptions or failed requests found")
         
-        st.markdown("---")
-        
-        # Charts Row 2
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("🎯 Request Distribution by Operation")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['top_operations'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='operation_name',
-                    y='count',
-                    title="Top Operations",
-                    labels={'count': 'Request Count', 'operation_name': 'Operation'},
-                    color='count',
-                    color_continuous_scale='Viridis'
+        with col_requests:
+            st.subheader("📋 Recent Requests (Last 15 Minutes)")
+            recent_requests = st.session_state.connector.execute_kql(KQL_QUERIES['recent_requests'], time_range)
+            if recent_requests is not None and len(recent_requests) > 0:
+                # Format the dataframe for better display
+                display_df = recent_requests.copy()
+                
+                # Column configuration for better readability
+                column_config = {
+                    'timestamp': st.column_config.DatetimeColumn('Timestamp', format='DD/MM/YY HH:mm:ss', width='medium'),
+                    'name': st.column_config.TextColumn('Operation Name', width='large'),
+                    'url': st.column_config.TextColumn('URL', width='large'),
+                    'success': st.column_config.CheckboxColumn('Success', width='small'),
+                    'resultCode': st.column_config.NumberColumn('Status Code', format='%d', width='small'),
+                    'duration': st.column_config.NumberColumn('Duration (ms)', format='%.0f', width='small'),
+                    'performanceBucket': st.column_config.TextColumn('Perf Bucket', width='small'),
+                    'client_City': st.column_config.TextColumn('City', width='medium'),
+                    'cloud_RoleInstance': st.column_config.TextColumn('Instance', width='medium'),
+                    'cloud_RoleName': st.column_config.TextColumn('Service', width='medium')
+                }
+                
+                st.dataframe(
+                    display_df,
+                    use_container_width=True,
+                    height=450,
+                    column_config=column_config,
+                    hide_index=True
                 )
-                fig.update_layout(height=400, showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
             else:
-                st.info("No data available")
-        
-        with col2:
-            st.subheader("⚠️ Error Distribution by Status")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['errors_by_status'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.pie(
-                    result,
-                    values='error_count',
-                    names='result_code',
-                    title="Errors by Status Code",
-                    labels={'error_count': 'Error Count', 'result_code': 'Status Code'}
-                )
-                fig.update_layout(height=400)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        st.markdown("---")
-        
-        # Charts Row 3
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("📊 P95/P99 Response Times")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['percentile_response_time'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                fig = px.bar(
-                    result,
-                    x='percentile',
-                    y='duration_ms',
-                    title="Response Time Percentiles",
-                    labels={'duration_ms': 'Duration (ms)', 'percentile': 'Percentile'},
-                    color='percentile',
-                    color_discrete_sequence=['#636EFA', '#EF553B', '#00CC96']
-                )
-                fig.update_layout(height=400, showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.info("No data available")
-        
-        with col1:
-            st.subheader("🔍 Exception Details")
-            result = st.session_state.connector.execute_kql(
-                KQL_QUERIES['top_exceptions'],
-                time_range
-            )
-            if result is not None and len(result) > 0:
-                st.dataframe(result, use_container_width=True, height=300)
-            else:
-                st.info("No exceptions found")
+                st.info("No recent requests found")
         
         # Auto-refresh mechanism
         placeholder = st.empty()
         
+        # Get refresh interval from session state
+        refresh_interval = st.session_state.refresh_interval
+        
         # Placeholder for refresh countdown
-        with st.spinner(f"⏳ Next refresh in {REFRESH_INTERVAL} seconds..."):
-            time.sleep(REFRESH_INTERVAL)
+        if refresh_interval >= 60:
+            refresh_display = f"{refresh_interval // 60} minute(s)"
+        else:
+            refresh_display = f"{refresh_interval} seconds"
+        
+        with st.spinner(f"⏳ Next refresh in {refresh_display}..."):
+            time.sleep(refresh_interval)
         
         st.session_state.last_refresh = datetime.now()
         st.rerun()

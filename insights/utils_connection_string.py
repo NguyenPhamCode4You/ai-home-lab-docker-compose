@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class AzureInsightsConnector:
     """
     Connector for Azure Application Insights using KQL queries
-    Uses Client ID, Client Secret, App ID (workspace ID), and Tenant ID
+    Uses Client ID, Client Secret, Application Insights Resource ID, and Tenant ID
     """
     
     def __init__(self, client_id: str = None, client_secret: str = None, 
@@ -28,7 +28,7 @@ class AzureInsightsConnector:
         Args:
             client_id: Azure AD Application (Client) ID
             client_secret: Azure AD Client Secret
-            app_id: Application Insights Workspace ID (resource ID)
+            app_id: Application Insights Resource ID (ApplicationId from connection string)
             tenant_id: Azure AD Tenant ID
         
         If not provided, will try to load from environment variables:
@@ -42,6 +42,7 @@ class AzureInsightsConnector:
         self.client_secret = client_secret or os.getenv("AZURE_CLIENT_SECRET")
         self.app_id = app_id or os.getenv("AZURE_APP_ID")
         self.tenant_id = tenant_id or os.getenv("AZURE_TENANT_ID")
+        self.resource_id = None  # Will be constructed if needed
         
         # Validate all required credentials
         if not self.client_id:
@@ -58,7 +59,7 @@ class AzureInsightsConnector:
         
         logger.info(f"✅ Azure Insights Connector initialized")
         logger.info(f"   Client ID: {self.client_id[:20]}...")
-        logger.info(f"   App ID (Workspace): {self.app_id[:20]}...")
+        logger.info(f"   App ID (Application Insights): {self.app_id[:20]}...")
         logger.info(f"   Tenant ID: {self.tenant_id[:20]}...")
         
         # Initialize the Azure SDK client with proper authentication
@@ -109,55 +110,55 @@ class AzureInsightsConnector:
             # Convert time_range string to datetime tuple if needed
             timespan = self._convert_time_range(time_range)
             
-            # Execute the query using Azure SDK
-            # app_id is the workspace ID
-            response = self.client.query_workspace(
-                workspace_id=self.app_id,
-                query=query,
-                timespan=timespan
+            # Use the Application Insights API endpoint directly
+            # Query using the ai.applications endpoint with ApplicationId
+            import requests
+            from azure.core.credentials import AccessToken
+            
+            # Get access token from credential
+            credential = ClientSecretCredential(
+                tenant_id=self.tenant_id,
+                client_id=self.client_id,
+                client_secret=self.client_secret
             )
+            token = credential.get_token("https://api.applicationinsights.io/.default")
             
-            # Check if query was successful
-            if response.status == LogsQueryStatus.SUCCESS:
-                # Convert to pandas DataFrame
-                table = response.tables[0] if response.tables else None
+            # Build the API URL
+            url = f"https://api.applicationinsights.io/v1/apps/{self.app_id}/query"
+            
+            # Format timespan for the API
+            start_time, end_time = timespan
+            timespan_str = f"{start_time.isoformat()}Z/{end_time.isoformat()}Z"
+            
+            # Make the request
+            headers = {
+                "Authorization": f"Bearer {token.token}",
+                "Content-Type": "application/json"
+            }
+            
+            payload = {
+                "query": query,
+                "timespan": timespan_str
+            }
+            
+            logger.info(f"🔗 Querying Application Insights API...")
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            
+            # Parse the response
+            result_json = response.json()
+            
+            if "tables" in result_json and len(result_json["tables"]) > 0:
+                table = result_json["tables"][0]
+                columns = [col["name"] for col in table["columns"]]
+                rows = table["rows"]
                 
-                if table:
-                    # Create DataFrame from query results
-                    data = []
-                    for row in table.rows:
-                        row_dict = {}
-                        for col_idx, col in enumerate(table.columns):
-                            row_dict[col.name] = row[col_idx]
-                        data.append(row_dict)
-                    
-                    df = pd.DataFrame(data)
-                    self.last_error = None
-                    logger.info(f"✅ Query executed successfully. Rows: {len(df)}")
-                    return df
-                else:
-                    logger.warning("⚠️ Query returned no tables")
-                    return pd.DataFrame()
-            
-            elif response.status == LogsQueryStatus.PARTIAL:
-                logger.warning("⚠️ Query returned partial results")
-                table = response.tables[0] if response.tables else None
-                
-                if table:
-                    data = []
-                    for row in table.rows:
-                        row_dict = {}
-                        for col_idx, col in enumerate(table.columns):
-                            row_dict[col.name] = row[col_idx]
-                        data.append(row_dict)
-                    return pd.DataFrame(data)
-                else:
-                    return pd.DataFrame()
-            
+                df = pd.DataFrame(rows, columns=columns)
+                self.last_error = None
+                logger.info(f"✅ Query executed successfully. Rows: {len(df)}")
+                return df
             else:
-                error_msg = f"Query failed with status: {response.status}"
-                self.last_error = error_msg
-                logger.error(f"❌ {error_msg}")
+                logger.warning("⚠️ Query returned no tables")
                 return pd.DataFrame()
         
         except Exception as e:
