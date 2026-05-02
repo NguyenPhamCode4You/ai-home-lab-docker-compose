@@ -46,7 +46,7 @@ services:
   #         devices:
   #           - driver: nvidia
   #             count: 1
-  #             capabilities: [gpu]
+  #             capabilities: [ gpu ]
   #   ports:
   #     - 8441:8443
   #     - 8001:8001
@@ -69,50 +69,49 @@ services:
   #     - OVERWRITEHOST=172.20.37.3:8081
   #   restart: always
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    ports:
-      - "11434:11434"
-    networks:
-      - homelab
-    volumes:
-      - ollama_storage:/root/.ollama
-    restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama
+  #   ports:
+  #     - "11434:11434"
+  #   networks:
+  #     - homelab
+  #   volumes:
+  #     - ollama_storage:/root/.ollama
+  #   restart: always
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [ gpu ]
 
-  open-web-ui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-web-ui
-    networks:
-      - homelab
-    ports:
-      - "11435:8080"
-    environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
-    volumes:
-      - open-webui:/app/backend/data
-    restart: always
-
-  # n8n:
-  #   image: docker.n8n.io/n8nio/n8n
-  #   container_name: n8n
+  # open-web-ui:
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   container_name: open-web-ui
   #   networks:
   #     - homelab
   #   ports:
-  #     - "5678:5678"
-  #   volumes:
-  #     - n8n_storage:/home/node/.n8n
+  #     - "11435:8080"
   #   environment:
-  #     - N8N_SECURE_COOKIE=false
+  #     - OLLAMA_BASE_URL=http://ollama:11434
+  #   volumes:
+  #     - open-webui:/app/backend/data
   #   restart: always
 
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    networks:
+      - homelab
+    ports:
+      - "5678:5678"
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    environment:
+      - N8N_SECURE_COOKIE=false
+    restart: always
   # qlserver:
   #   image: mcr.microsoft.com/mssql/server:2019-latest
   #   container_name: sqlserver
@@ -179,4 +178,4 @@ services:
   #         devices:
   #           - driver: nvidia
   #             count: 1
-  #             capabilities: [gpu]
+  #             capabilities: [ gpu ]
