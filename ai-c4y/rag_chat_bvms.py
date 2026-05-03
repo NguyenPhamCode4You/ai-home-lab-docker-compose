@@ -7,16 +7,18 @@ from src.agents.DocumentRanking import DocumentRanking
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_document_ranking=DocumentRanking(
-        llm_model=Ollama(),
+        llm_model=Ollama(model="gemma3:4b", num_ctx=15000),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(num_ctx=28000),
-        max_context_tokens=32000,
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=20000),
+        max_context_tokens=36000,
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
         {context}
         Here is the user question: {question}
+        Only focus on the relevant information related to the user question from the knowledge base to provide a detailed answer. 
+        If the question is not related to the knowledge base, you can say "I don't know" or "The question is not related to the knowledge base".
         Try your best to assist the user with their question. Be as detailed and accurate as possible.
         """
     ))

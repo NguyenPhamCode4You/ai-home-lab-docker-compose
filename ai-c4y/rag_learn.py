@@ -18,7 +18,7 @@ async def insert():
     print("Insert done")
 
 async def main():
-    # await clean()
+    await clean()
     await insert()
 
 if __name__ == "__main__":
