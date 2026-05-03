@@ -12,6 +12,7 @@ async def clean():
 async def insert():
     await insert_sentences(
         src_folder_path='bvms-0305-cleaned',
+        done_folder_path='bvms-0305-done',
         table_name="n8n_documents_bvms_neo",
         summary_max_char=600, keyword_count=20)
     print("Insert done")

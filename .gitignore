@@ -13,6 +13,7 @@ bvms-knowledge-base
 
 temp
 
+bvms-*
 bvms
 
 .env

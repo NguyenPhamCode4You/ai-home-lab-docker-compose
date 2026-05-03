@@ -5,17 +5,17 @@ networks:
     driver: bridge
 
 services:
-  orchestra-chat:
-    ports:
-      - 9000:8001
-    build:
-      context: .
-      dockerfile: Dockerfile.orchestra
-    env_file:
-      - .env
-    networks:
-      - ai-agentic-chat
-    restart: unless-stopped
+  # orchestra-chat:
+  #   ports:
+  #     - 9000:8001
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.orchestra
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - ai-agentic-chat
+  #   restart: unless-stopped
 
   bvms-rag-chat:
     ports:
@@ -28,15 +28,14 @@ services:
     networks:
       - ai-agentic-chat
     restart: unless-stopped
-
-  imos-rag-chat:
-    ports:
-      - 9002:8001
-    build:
-      context: .
-      dockerfile: Dockerfile.imos
-    env_file:
-      - .env
-    networks:
-      - ai-agentic-chat
-    restart: unless-stopped
+  # imos-rag-chat:
+  #   ports:
+  #     - 9002:8001
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.imos
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - ai-agentic-chat
+  #   restart: unless-stopped
