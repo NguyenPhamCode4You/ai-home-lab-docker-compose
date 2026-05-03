@@ -76,7 +76,7 @@ def find_and_delete_blank_files(docs_folder):
 
 def main():
     """Main function to run the blank file cleanup."""
-    docs_folder = "./docs"
+    docs_folder = "./bvms-0305-cleaned"  # Change this to your target docs folder
     
     print("Clean Blank Files Script")
     print("=" * 30)

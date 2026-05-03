@@ -3,21 +3,21 @@ from src.agents.MarkdownContextCleaner import MarkdownContextCleaner
 
 async def clean():
     await clean_src_folder(
-        src_folder_path='imos',
-        target_folder_path='imos-cleaned', 
+        src_folder_path='bvms-0305',
+        target_folder_path='bvms-0305-cleaned', 
         llm_context_cleaner=MarkdownContextCleaner(),
         context_chunk_size=600)
     print("Clean done")
 
 async def insert():
     await insert_sentences(
-        src_folder_path='imos-cleaned',
-        table_name="n8n_documents_imos_neo",
+        src_folder_path='bvms-0305-cleaned',
+        table_name="n8n_documents_bvms_neo",
         summary_max_char=600, keyword_count=20)
     print("Insert done")
 
 async def main():
-    await clean()
+    # await clean()
     await insert()
 
 if __name__ == "__main__":

@@ -11,6 +11,7 @@ from .agents.Task import Task
 async def insert_sentences(
         src_folder_path: str,
         table_name: str,
+        done_folder_path: str = None,
         llm_vector_store: SupabaseVectorStore = None,
         llm_keyword_extractor: Task = None,
         llm_knowledge_compressor: Task = None,
@@ -18,6 +19,12 @@ async def insert_sentences(
         keyword_count: int = 10):
     async def handle_insert_file(file_content: str, folder_path: str, file_name: str) -> None:
         print(f"Inserting file {file_name} at {folder_path} ooooooooooooooooo")
+        if done_folder_path:
+            import glob
+            already_done = glob.glob(os.path.join(done_folder_path, file_name + ".*"))
+            if already_done:
+                print(f"Skipping {file_name} - already in done folder")
+                return
         keyword_extractor = llm_keyword_extractor or KeywordExtractor(count=keyword_count)
         knowledge_compressor = llm_knowledge_compressor or KnowledgeCompression(max_char=summary_max_char)
         vector_store = llm_vector_store or SupabaseVectorStore(embedding=Embedding())
@@ -40,6 +47,13 @@ async def insert_sentences(
                 print(f"ooooooooooooooooo Sentence inserted success ooooooooooooooooo")
             except Exception as e:
                 print(f"Failed to insert sentence: {sentence}, error: {e}")
+        if done_folder_path:
+            matched = glob.glob(os.path.join(folder_path, file_name + ".*"))
+            if matched:
+                os.makedirs(done_folder_path, exist_ok=True)
+                dest = os.path.join(done_folder_path, os.path.basename(matched[0]))
+                os.rename(matched[0], dest)
+                print(f"Moved {file_name} to {done_folder_path}")
     await for_each_file_in_folder(src_folder_path, handle_insert_file)
 
 async def clean_src_folder(
@@ -68,6 +82,9 @@ async def clean_src_folder(
         os.makedirs(adjusted_folder_path, exist_ok=True)
         target_file_name = file_name + ".md"
         target_file_path = os.path.join(adjusted_folder_path, target_file_name)
+        if os.path.exists(target_file_path):
+            print(f"Skipping {file_name} - already exists in target folder")
+            return
         with open(target_file_path, "w", encoding="utf-8") as file:
             sections = split_markdown_header_and_content(file_content)
             for header, content in sections:
