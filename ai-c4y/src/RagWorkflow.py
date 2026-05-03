@@ -48,12 +48,10 @@ async def insert_sentences(
             except Exception as e:
                 print(f"Failed to insert sentence: {sentence}, error: {e}")
         if done_folder_path:
-            matched = glob.glob(os.path.join(folder_path, file_name + ".*"))
-            if matched:
-                os.makedirs(done_folder_path, exist_ok=True)
-                dest = os.path.join(done_folder_path, os.path.basename(matched[0]))
-                os.rename(matched[0], dest)
-                print(f"Moved {file_name} to {done_folder_path}")
+            os.makedirs(done_folder_path, exist_ok=True)
+            marker_path = os.path.join(done_folder_path, file_name + ".done")
+            open(marker_path, "w").close()
+            print(f"Marked {file_name} as done in {done_folder_path}")
     await for_each_file_in_folder(src_folder_path, handle_insert_file)
 
 async def clean_src_folder(
@@ -105,7 +103,7 @@ async def clean_src_folder(
         # Check content length after processing and remove if too small
         with open(target_file_path, "r", encoding="utf-8") as check_file:
             content_length = len(check_file.read())
-        min_content_threshold = context_chunk_size * 1.5
+        min_content_threshold = context_chunk_size * 1.2
         if content_length < min_content_threshold:
             os.remove(target_file_path)
             print(f"File {target_file_name} removed - content length {content_length} chars is below threshold {min_content_threshold} chars")

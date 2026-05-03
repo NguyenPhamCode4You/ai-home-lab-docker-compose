@@ -30,20 +30,18 @@ class LlamaServer:
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", f"{self.url}/completion", json=payload) as response:
-                async for chunk in response.aiter_bytes():
-                    if len(chunk) <= 1:
+                async for line in response.aiter_lines():
+                    line = line.strip()
+                    if not line or not line.startswith('data: '):
                         continue
                     try:
-                        # Parse the SSE data format used by llama-server
-                        chunk_str = chunk.decode('utf-8').strip()
-                        if chunk_str.startswith('data: '):
-                            json_str = chunk_str[6:]  # Remove 'data: ' prefix
-                            if json_str == '[DONE]':
-                                break
-                            data = json.loads(json_str)
-                            content = data.get("content", "")
-                            if content:
-                                yield content
+                        json_str = line[6:]
+                        if json_str == '[DONE]':
+                            return
+                        data = json.loads(json_str)
+                        content = data.get("content", "")
+                        if content:
+                            yield content
                     except Exception as e:
                         print(f"Error decoding chunk: {e}")
                         continue
@@ -64,21 +62,20 @@ class LlamaServer:
         
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", f"{self.url}/v1/chat/completions", json=payload) as response:
-                async for chunk in response.aiter_bytes():
-                    if len(chunk) <= 1:
+                async for line in response.aiter_lines():
+                    line = line.strip()
+                    if not line or not line.startswith('data: '):
                         continue
                     try:
-                        chunk_str = chunk.decode('utf-8').strip()
-                        if chunk_str.startswith('data: '):
-                            json_str = chunk_str[6:]
-                            if json_str == '[DONE]':
-                                break
-                            data = json.loads(json_str)
-                            choices = data.get("choices", [])
-                            if choices and "delta" in choices[0]:
-                                content = choices[0]["delta"].get("content", "")
-                                if content:
-                                    yield content
+                        json_str = line[6:]
+                        if json_str == '[DONE]':
+                            return
+                        data = json.loads(json_str)
+                        choices = data.get("choices", [])
+                        if choices and "delta" in choices[0]:
+                            content = choices[0]["delta"].get("content", "")
+                            if content:
+                                yield content
                     except Exception as e:
                         print(f"Error decoding chunk: {e}")
                         continue

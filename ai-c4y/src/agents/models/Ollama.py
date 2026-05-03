@@ -16,12 +16,12 @@ class Ollama:
             raise ValueError("URL and model must be set before using the assistant.")
         async with httpx.AsyncClient(timeout=httpx.Timeout(80.0)) as client:
             async with client.stream("POST", f"{self.url}/api/generate", json={"model": self.model, "prompt": prompt, "options": {"num_ctx": self.num_ctx}}) as response:
-                async for chunk in response.aiter_bytes():
-                    if (len(chunk) > 1000):
+                async for line in response.aiter_lines():
+                    line = line.strip()
+                    if not line:
                         continue
                     try:
-                        response = json.loads(chunk).get("response", "")
-                        yield response
+                        yield json.loads(line).get("response", "")
                     except Exception as e:
                         print(f"Error decoding chunk: {e}")
                         continue
