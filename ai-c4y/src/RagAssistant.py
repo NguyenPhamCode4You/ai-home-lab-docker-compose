@@ -48,8 +48,15 @@ class RagAssistant():
 
             # Rank all documents in parallel
             async def rank_doc(idx, doc):
-                score = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
-                return idx, float(score)
+                raw = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
+                try:
+                    # Extract the first numeric token in case the LLM adds explanation text
+                    import re as _re
+                    match = _re.search(r'\d+(\.\d+)?', str(raw))
+                    score = float(match.group()) if match else 0.0
+                except Exception:
+                    score = 0.0
+                return idx, score
 
             tasks = [rank_doc(i, doc) for i, doc in enumerate(docs_to_rank)]
             scores = [0.0] * len(docs_to_rank)

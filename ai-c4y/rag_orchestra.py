@@ -53,7 +53,7 @@ assistant = AssistantOrchestra(
      max_iterations=3,
 )
 assistant.agents = {
-    "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
+    # "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
     "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
     "BVMS-Code Assistant": {"agent": bvms_code_assistant, "context_awareness": True, "description": "This agent can provide code snippet and code explaination for a software named BVMS (BBC Voyager Management System)"},
 }
