@@ -80,8 +80,9 @@ async def clean_src_folder(
         os.makedirs(adjusted_folder_path, exist_ok=True)
         target_file_name = file_name + ".md"
         target_file_path = os.path.join(adjusted_folder_path, target_file_name)
-        if os.path.exists(target_file_path):
-            print(f"Skipping {file_name} - already exists in target folder")
+        skip_file_path = target_file_path + ".skip"
+        if os.path.exists(target_file_path) or os.path.exists(skip_file_path):
+            print(f"Skipping {file_name} - already processed in target folder")
             return
         with open(target_file_path, "w", encoding="utf-8") as file:
             sections = split_markdown_header_and_content(file_content)
@@ -105,8 +106,8 @@ async def clean_src_folder(
             content_length = len(check_file.read())
         min_content_threshold = context_chunk_size * 1.2
         if content_length < min_content_threshold:
-            os.remove(target_file_path)
-            print(f"File {target_file_name} removed - content length {content_length} chars is below threshold {min_content_threshold} chars")
+            os.rename(target_file_path, skip_file_path)
+            print(f"File {target_file_name} marked as .skip - content length {content_length} chars is below threshold {min_content_threshold} chars")
         else:
             print(f"File {file_name} cleaned and saved to {target_file_path} ooooooooooooooooo")
     await for_each_file_in_folder(src_folder_path, handle_clean_file, allowed_file_extensions, ignored_file_pattern)
