@@ -8,14 +8,16 @@ from rag_chat_bvms import bvms_rag_assistant
 from src.RagAssistant import RagAssistant
 from src.agents.DocumentRanking import DocumentRanking
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
+from src.agents.QuestionForwarder import QuestionForwarder
+from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 
 from dotenv import load_dotenv
 load_dotenv()
 
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        llm_model=Ollama(num_ctx=28000),
-        max_context_tokens=28000,
+        llm_model=Ollama(num_ctx=32000),
+        max_context_tokens=32000,
     )
 )
 
@@ -37,11 +39,18 @@ bvms_code_assistant = RagAssistant(
         """
     ))
 
-assistant = AssistantOrchestra()
+assistant = AssistantOrchestra(
+    llm_question_forwarder=QuestionForwarder(
+        llm_model=Ollama(model="gemma3:12b"),
+     ),
+     llm_final_thought_summarizer=FinalThoughtSummarizer(
+        llm_model=Ollama(model="gemma3:12b"),
+     )
+)
 assistant.agents = {
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
-    "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": False, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
-    "BVMS-Code Assistant": {"agent": bvms_code_assistant, "context_awareness": False, "description": "This agent can provide code snippet and code explaination for a software named BVMS (BBC Voyager Management System)"},
+    "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
+    "BVMS-Code Assistant": {"agent": bvms_code_assistant, "context_awareness": True, "description": "This agent can provide code snippet and code explaination for a software named BVMS (BBC Voyager Management System)"},
 }
 
 if __name__ == "__main__":

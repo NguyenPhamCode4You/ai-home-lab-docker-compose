@@ -1,3 +1,4 @@
+import asyncio
 from .agents.tools import SupabaseVectorStore
 from .agents.tools.SupabaseVectorStore import SupabaseVectorStore
 from .agents.tools.Embedding import Embedding
@@ -33,21 +34,38 @@ class RagAssistant():
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
-            yield f"📌 Re-ranking documents: "
-            documents = []
+            yield f"📌 Retrieving documents: "
+
+            # Collect documents up to the token limit first
+            docs_to_rank = []
             documents_context_length = 0
             for header, content in split_markdown_header_and_content(knowledge_context):
                 document = f"# {header}\n\n{content}"
-                score = await self.document_ranking.run(context=document, question=question, conversation_history=conversation_history)
-                score = float(score)
-                documents.append((document, score))
+                docs_to_rank.append(document)
                 documents_context_length += len(document)
-                percentage = int(documents_context_length / max_ranking_context_tokens * 100)
-                if percentage > 100:
-                    percentage = 100
-                yield f" ➜ {str(percentage)}%"
                 if documents_context_length > max_ranking_context_tokens:
                     break
+
+            # Rank all documents in parallel
+            async def rank_doc(idx, doc):
+                score = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
+                return idx, float(score)
+
+            tasks = [rank_doc(i, doc) for i, doc in enumerate(docs_to_rank)]
+            scores = [0.0] * len(docs_to_rank)
+            completed = 0
+            last_emitted = -1
+            for coro in asyncio.as_completed(tasks):
+                idx, score = await coro
+                scores[idx] = score
+                completed += 1
+                percentage = int(completed / len(docs_to_rank) * 100)
+                milestone = (percentage // 10) * 10
+                if milestone > last_emitted:
+                    yield f" ➜ {str(milestone)}%"
+                    last_emitted = milestone
+
+            documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
             knowledge_context = "\n\n".join([doc[0] for doc in documents])
         iterations_response = ""
