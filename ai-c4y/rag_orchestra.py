@@ -33,7 +33,6 @@ bvms_code_assistant = RagAssistant(
         {context}
         Here is the user question: {question}
         Only focus on the relevant information related to the user question from the knowledge base to provide a detailed answer. 
-        If the question is not related to the knowledge base, you can say "I don't know" or "The question is not related to the knowledge base".
         Try your best to assist the user with their question. Be as detailed and accurate as possible.
         """
     ))
