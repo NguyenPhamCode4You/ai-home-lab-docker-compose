@@ -10,6 +10,7 @@ from src.agents.DocumentRanking import DocumentRanking
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.QuestionForwarder import QuestionForwarder
 from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
+from src.agents.AnswerEvaluator import AnswerEvaluator
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -45,7 +46,11 @@ assistant = AssistantOrchestra(
      ),
      llm_final_thought_summarizer=FinalThoughtSummarizer(
         llm_model=Ollama(model="gemma3:12b"),
-     )
+     ),
+     llm_answer_evaluator=AnswerEvaluator(
+        llm_model=Ollama(model="gemma3:4b"),
+     ),
+     max_iterations=3,
 )
 assistant.agents = {
     "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
