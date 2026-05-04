@@ -7,10 +7,11 @@ from src.agents.DocumentRanking import DocumentRanking
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
     llm_document_ranking=DocumentRanking(
-        llm_model=Ollama(model="gemma3:4b", num_ctx=15000),
+        llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(model="gemma4:e4b", num_ctx=20000),
+        # llm_model=Ollama(model="gemma4:e4b", num_ctx=24000),
+        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
         max_context_tokens=36000,
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
