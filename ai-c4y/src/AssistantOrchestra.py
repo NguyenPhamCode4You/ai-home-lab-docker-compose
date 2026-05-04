@@ -19,11 +19,11 @@ class AssistantOrchestra:
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
     
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
-        is_verbose = "--verbose" in question
+        is_silent = "--silent" in question
         agent_self_questions  = ""
         async for question_chunk in self.question_forwarder.stream(context=self.get_agents_description(), question=question, conversation_history=conversation_history):
             agent_self_questions += question_chunk
-            if is_verbose:
+            if not is_silent:
                 yield question_chunk
         
         agent_questions = []
@@ -61,7 +61,7 @@ class AssistantOrchestra:
             if agent_details.get("context_awareness") == False:
                 additional_context = ""
                 
-            if is_verbose:
+            if not is_silent:
                 yield f"\n\n### 🤖 {agent_name} {agent_question} ...\n\n"
             else:
                 yield f"\n\n"
