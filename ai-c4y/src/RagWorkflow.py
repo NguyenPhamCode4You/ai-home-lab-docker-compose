@@ -52,7 +52,7 @@ async def insert_sentences(
             marker_path = os.path.join(done_folder_path, file_name + ".done")
             open(marker_path, "w").close()
             print(f"Marked {file_name} as done in {done_folder_path}")
-    await for_each_file_in_folder(src_folder_path, handle_insert_file)
+    await for_each_file_in_folder(src_folder_path, handle_insert_file, allowed_file_extensions=[".md"], ignored_file_pattern=[])
 
 async def clean_src_folder(
         src_folder_path: str, 
