@@ -45,7 +45,8 @@ assistant = AssistantOrchestra(
         llm_model=Ollama(model="gemma3:12b"),
      ),
      llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=Ollama(model="gemma3:12b"),
+        llm_model=Ollama(model="gemma3:12b", num_ctx=32000),
+        max_context_tokens=32000,
      ),
      llm_answer_evaluator=AnswerEvaluator(
         llm_model=Ollama(model="gemma3:4b"),
