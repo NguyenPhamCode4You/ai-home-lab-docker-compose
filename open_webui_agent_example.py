@@ -36,7 +36,6 @@ class Pipe:
             async with client.stream(
                 "POST", self.valves.bvms_rag_url, json={"messages": messages}
             ) as response:
-                response.raise_for_status()
-                async for line in response.aiter_lines():
-                    if line:
-                        yield line
+                response.raise_for_status()  # Raise exception for HTTP errors
+                async for chunk in response.aiter_bytes():
+                    yield chunk
