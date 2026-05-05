@@ -78,6 +78,7 @@ class AssistantOrchestra:
         llm_iteration_summarizer: Task = None,
         agents: dict = None,
         max_iterations: int = 3,
+        compact_threshold_tokens: int = 24000,
     ):
         self.agents = agents or {}
         self.question_forwarder = llm_question_forwarder or QuestionForwarder()
@@ -85,6 +86,7 @@ class AssistantOrchestra:
         self.answer_evaluator = llm_answer_evaluator or AnswerEvaluator()
         self.iteration_summarizer = llm_iteration_summarizer or IterationSummarizer()
         self.max_iterations = max_iterations
+        self.compact_threshold_tokens = compact_threshold_tokens
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         is_silent = "--silent" in question
@@ -102,6 +104,7 @@ class AssistantOrchestra:
 
             routing_output = ""
             in_json_block = False  # suppress the ```json ... ``` routing block from display
+            prev_safe_display = ""  # track what has already been yielded (after stripping model think)
             if not is_silent:
                 if iteration > 1:
                     yield f"<think>\n🔄 **Iteration {iteration}** — refining the answer...\n"
@@ -114,17 +117,24 @@ class AssistantOrchestra:
             ):
                 routing_output += chunk
                 if not is_silent and not in_json_block:
-                    marker = "```json"
-                    marker_pos = routing_output.find(marker)
-                    if marker_pos != -1:
-                        # Yield only the portion before the json block (not yet yielded = tail of chunk)
-                        already_yielded = len(routing_output) - len(chunk)
-                        safe_end = max(marker_pos - already_yielded, 0)
-                        if safe_end > 0:
-                            yield chunk[:safe_end]
+                    # Strip complete model <think>...</think> blocks, hold back incomplete ones
+                    safe = re.sub(r'<think>[\s\S]*?</think>\s*', '', routing_output)
+                    open_pos = safe.find('<think>')
+                    if open_pos != -1:
+                        safe = safe[:open_pos]  # suppress until think block closes
+
+                    # Stop displaying at the json routing block
+                    json_pos = safe.find('```json')
+                    if json_pos != -1:
+                        safe = safe[:json_pos]
                         in_json_block = True
-                    else:
-                        yield chunk
+
+                    # Yield only the new delta since last iteration
+                    if safe.startswith(prev_safe_display):
+                        new_part = safe[len(prev_safe_display):]
+                        if new_part:
+                            yield new_part
+                    prev_safe_display = safe
 
             agent_questions = _parse_agent_routing(routing_output, valid_agent_names)
 
@@ -183,7 +193,9 @@ class AssistantOrchestra:
                 break
 
             # Compact accumulated responses via summarization before next iteration
-            if self.iteration_summarizer is not None:
+            # Only compact when context exceeds the threshold (approx 4 chars per token)
+            context_too_long = len(all_agent_responses) > self.compact_threshold_tokens * 4
+            if self.iteration_summarizer is not None and context_too_long:
                 if not is_silent:
                     yield "<think>\n🗜️ Compacting previous answers...\n"
                 compacted = ""
@@ -197,8 +209,7 @@ class AssistantOrchestra:
                 if not is_silent:
                     yield "\n</think>\n\n"
                 all_agent_responses = f"## Summary of previous iterations:\n{compacted}"
-            else:
-                all_agent_responses = all_agent_responses[-3000:]
+            # else: keep all_agent_responses as-is for the next iteration
 
             current_question = follow_up or question
 
