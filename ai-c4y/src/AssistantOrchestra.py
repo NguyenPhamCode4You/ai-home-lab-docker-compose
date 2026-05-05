@@ -140,7 +140,8 @@ class AssistantOrchestra:
 
             # ---- Step 3: Execute each agent ----
             dispatched_agents = [name for name, _ in agent_questions]
-            for agent_name, agent_question in agent_questions:
+            total_agents = len(agent_questions)
+            for agent_idx, (agent_name, agent_question) in enumerate(agent_questions, start=1):
                 agent_details = self.agents.get(agent_name, {})
                 agent = agent_details.get("agent")
 
@@ -153,7 +154,7 @@ class AssistantOrchestra:
                     additional_context = all_agent_responses or routing_output
 
                 if not is_silent:
-                    yield f"\n\nHey {agent_name}, {agent_question.strip().rstrip('?')}?\n\n"
+                    yield f"\n\n### Hey 🤖 {agent_name} ({agent_idx}/{total_agents}), {agent_question.strip().rstrip('?')}?\n\n"
                 else:
                     yield "\n\n"
 
