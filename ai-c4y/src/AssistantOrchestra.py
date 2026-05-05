@@ -5,6 +5,7 @@ from .agents.Task import Task
 from .agents.QuestionForwarder import QuestionForwarder
 from .agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 from .agents.AnswerEvaluator import AnswerEvaluator
+from .agents.IterationSummarizer import IterationSummarizer
 
 
 def _parse_agent_routing(routing_text: str, valid_agent_names: list) -> list:
@@ -74,6 +75,7 @@ class AssistantOrchestra:
         llm_question_forwarder: Task = None,
         llm_final_thought_summarizer: Task = None,
         llm_answer_evaluator: Task = None,
+        llm_iteration_summarizer: Task = None,
         agents: dict = None,
         max_iterations: int = 3,
     ):
@@ -81,6 +83,7 @@ class AssistantOrchestra:
         self.question_forwarder = llm_question_forwarder or QuestionForwarder()
         self.final_thought_summarizer = llm_final_thought_summarizer or FinalThoughtSummarizer()
         self.answer_evaluator = llm_answer_evaluator or AnswerEvaluator()
+        self.iteration_summarizer = llm_iteration_summarizer or IterationSummarizer()
         self.max_iterations = max_iterations
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
@@ -157,6 +160,17 @@ class AssistantOrchestra:
             satisfied, follow_up = _parse_eval_result(eval_result)
             if satisfied:
                 break
+
+            # Compact accumulated responses via summarization before next iteration
+            if self.iteration_summarizer is not None:
+                compacted = await self.iteration_summarizer.run(
+                    context=all_agent_responses,
+                    question=question,
+                )
+                all_agent_responses = f"## Summary of previous iterations:\n{compacted}"
+            else:
+                all_agent_responses = all_agent_responses[-3000:]
+
             current_question = follow_up or question
 
         # ---- Step 5: Final summarizer if multiple agents responded ----

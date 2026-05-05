@@ -12,6 +12,7 @@ from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.QuestionForwarder import QuestionForwarder
 from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 from src.agents.AnswerEvaluator import AnswerEvaluator
+from src.agents.IterationSummarizer import IterationSummarizer
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -45,17 +46,21 @@ bvms_code_assistant = RagAssistant(
 
 assistant = AssistantOrchestra(
     llm_question_forwarder=QuestionForwarder(
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
-     ),
-     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
+        llm_model=Ollama(model="gemma3:12b"),
+    ),
+    llm_final_thought_summarizer=FinalThoughtSummarizer(
+        llm_model=Ollama(model="gemma3:12b"),
         max_context_tokens=32000,
-     ),
-     llm_answer_evaluator=AnswerEvaluator(
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
+    ),
+    llm_answer_evaluator=AnswerEvaluator(
+        llm_model=Ollama(model="gemma3:12b"),
         max_context_tokens=32000,
-     ),
-     max_iterations=3,
+    ),
+    llm_iteration_summarizer=IterationSummarizer(
+        llm_model=Ollama(model="gemma3:4b"),
+        max_context_tokens=32000,
+    ),
+    max_iterations=3,
 )
 assistant.agents = {
     # "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},

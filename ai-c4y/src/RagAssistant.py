@@ -50,7 +50,6 @@ class RagAssistant():
             async def rank_doc(idx, doc):
                 raw = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
                 try:
-                    # Extract the first numeric token in case the LLM adds explanation text
                     import re as _re
                     match = _re.search(r'\d+(\.\d+)?', str(raw))
                     score = float(match.group()) if match else 0.0
@@ -75,11 +74,19 @@ class RagAssistant():
             documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
             knowledge_context = "\n\n".join([doc[0] for doc in documents])
+
+        # ---- Single-shot answer ----
         iterations_response = ""
         yield "\n\n"
-        async for response_chunk in self.rag_answer.stream(context=knowledge_context, question=question, conversation_history=conversation_history):
+        async for response_chunk in self.rag_answer.stream(
+            context=knowledge_context,
+            question=question,
+            conversation_history=conversation_history,
+        ):
             yield response_chunk
             iterations_response += response_chunk
+
+        # ---- Optional enricher ----
         if self.context_enricher:
             enrichment_header = f"\n\n### 🌟 Let's enrich the context with more information...\n\n"
             yield enrichment_header
@@ -87,10 +94,11 @@ class RagAssistant():
             async for enricher_chunk in self.context_enricher.stream(question=question):
                 yield enricher_chunk
                 iterations_response += enricher_chunk
+
+        # ---- Optional final summarizer ----
         if self.final_summarizer:
             summarizer_header = f"\n\n### 🎯 Lets have one final revise on the question ...\n\n"
             yield summarizer_header
             iterations_response += summarizer_header
             async for summarizer_chunk in self.final_summarizer.stream(context=iterations_response, question=question):
                 yield summarizer_chunk
-        
