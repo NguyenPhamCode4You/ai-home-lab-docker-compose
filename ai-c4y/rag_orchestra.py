@@ -19,7 +19,7 @@ load_dotenv()
 
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=24000),
         max_context_tokens=32000,
         # llm_model=Gemini(model="gemini-2.5-flash"),
         # max_context_tokens=100000,
@@ -32,7 +32,7 @@ bvms_code_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=24000),
         max_context_tokens=36000,
         instruction_template="""
         You are an intelligient assistant that can provide code snippet and explaination for a software named BVMS (BBC Voyager Management System).
@@ -46,18 +46,18 @@ bvms_code_assistant = RagAssistant(
 
 assistant = AssistantOrchestra(
     llm_question_forwarder=QuestionForwarder(
-        llm_model=Ollama(model="gemma3:12b"),
+        llm_model=Ollama(model="gemma4:e4b"),
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=Ollama(model="gemma3:12b"),
+        llm_model=Ollama(model="gemma4:e4b"),
         max_context_tokens=32000,
     ),
     llm_answer_evaluator=AnswerEvaluator(
-        llm_model=Ollama(model="gemma3:12b"),
+        llm_model=Ollama(model="gemma4:e4b"),
         max_context_tokens=32000,
     ),
     llm_iteration_summarizer=IterationSummarizer(
-        llm_model=Ollama(model="gemma3:4b"),
+        llm_model=Ollama(model="gemma4:e4b"),
         max_context_tokens=32000,
     ),
     max_iterations=3,
