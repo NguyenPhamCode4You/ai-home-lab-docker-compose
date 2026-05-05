@@ -34,7 +34,7 @@ class RagAssistant():
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
-            yield f"📌 Retrieving documents: "
+            yield "<think>\n📌 Retrieving documents: "
 
             # Collect documents up to the token limit first
             docs_to_rank = []
@@ -74,10 +74,10 @@ class RagAssistant():
             documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
             knowledge_context = "\n\n".join([doc[0] for doc in documents])
+            yield "\n</think>\n\n"
 
         # ---- Single-shot answer ----
         iterations_response = ""
-        yield "\n\n"
         async for response_chunk in self.rag_answer.stream(
             context=knowledge_context,
             question=question,

@@ -94,29 +94,49 @@ class AssistantOrchestra:
         dispatched_agents = []
 
         for iteration in range(1, self.max_iterations + 1):
-            if not is_silent and iteration > 1:
-                yield f"\n\n🔄 **Iteration {iteration}** — refining the answer...\n\n"
 
-            # ---- Step 1: Route the question ----
+            # ---- Step 1: Route the question — stream reasoning live inside <think>, hide JSON block ----
             routing_context = self.get_agents_description()
             if iteration > 1 and all_agent_responses:
-                routing_context += f"\n\nPrevious answers so far:\n{all_agent_responses[-3000:]}"
+                routing_context += f"\n\nPrevious answers so far:\n{all_agent_responses}"
 
             routing_output = ""
+            in_json_block = False  # suppress the ```json ... ``` routing block from display
+            if not is_silent:
+                if iteration > 1:
+                    yield f"<think>\n🔄 **Iteration {iteration}** — refining the answer...\n"
+                else:
+                    yield "<think>\n"
             async for chunk in self.question_forwarder.stream(
                 context=routing_context,
                 question=current_question,
                 conversation_history=conversation_history,
             ):
                 routing_output += chunk
-                if not is_silent:
-                    yield chunk
+                if not is_silent and not in_json_block:
+                    marker = "```json"
+                    marker_pos = routing_output.find(marker)
+                    if marker_pos != -1:
+                        # Yield only the portion before the json block (not yet yielded = tail of chunk)
+                        already_yielded = len(routing_output) - len(chunk)
+                        safe_end = max(marker_pos - already_yielded, 0)
+                        if safe_end > 0:
+                            yield chunk[:safe_end]
+                        in_json_block = True
+                    else:
+                        yield chunk
 
             agent_questions = _parse_agent_routing(routing_output, valid_agent_names)
 
-            # ---- Step 2: No agents → forwarder answered directly, stop ----
+            # ---- Step 2: No agents → forwarder answered directly, close think and emit answer ----
             if not agent_questions:
+                if not is_silent:
+                    yield "\n</think>\n\n"
                 break
+
+            # ---- Agents found → close <think> block ----
+            if not is_silent:
+                yield "\n</think>\n\n"
 
             # ---- Step 3: Execute each agent ----
             dispatched_agents = [name for name, _ in agent_questions]
@@ -133,7 +153,7 @@ class AssistantOrchestra:
                     additional_context = all_agent_responses or routing_output
 
                 if not is_silent:
-                    yield f"\n\n### 🤖 {agent_name} — {agent_question.strip(': ')} ...\n\n"
+                    yield f"\n\nHey {agent_name}, {agent_question.strip().rstrip('?')}?\n\n"
                 else:
                     yield "\n\n"
 
@@ -163,10 +183,18 @@ class AssistantOrchestra:
 
             # Compact accumulated responses via summarization before next iteration
             if self.iteration_summarizer is not None:
-                compacted = await self.iteration_summarizer.run(
+                if not is_silent:
+                    yield "<think>\n🗜️ Compacting previous answers...\n"
+                compacted = ""
+                async for chunk in self.iteration_summarizer.stream(
                     context=all_agent_responses,
                     question=question,
-                )
+                ):
+                    compacted += chunk
+                    if not is_silent:
+                        yield chunk
+                if not is_silent:
+                    yield "\n</think>\n\n"
                 all_agent_responses = f"## Summary of previous iterations:\n{compacted}"
             else:
                 all_agent_responses = all_agent_responses[-3000:]
