@@ -1,11 +1,15 @@
-# Bunker Invoice Price Propagation — Investigation
+# Bunker Invoice Price Propagation — Root Cause Analysis & Fix History
 
-> **Bug Reference:** Consecutive voyage does not reflect the updated Price Per Ton after invoice approval on the previous voyage's bunker order.
+> **Bug Reference:** Consecutive voyage (V2) does not reflect the updated Price Per Ton after invoice
+> approval or reversal on the previous voyage's (V1) bunker order.
 >
 > **Repro voyages (QAQC):**
 >
 > - Voyage 1: `17c7ebef-3604-4b97-be59-120b1cc412a5` (1391001) — contains BNK-1394001-0001
 > - Voyage 2: `10397a6e-51f1-44a1-bfa4-aa9a3893d10e` (1391002) — consecutive to Voyage 1
+>
+> **Confirmed:** The repro voyages have **no `OwnershipChangeLogs`** on their bunker order items.
+> The root cause is NOT the TCO/TC ownership transition logic. See §7 for the correct analysis.
 
 ---
 
@@ -13,13 +17,15 @@
 
 1. [System Overview](#1-system-overview)
 2. [Key Entities & Fields](#2-key-entities--fields)
-3. [Full Approval Workflow](#3-full-approval-workflow)
-4. [Consecutive Voyage Bunker Lot Carry-Over](#4-consecutive-voyage-bunker-lot-carry-over)
-5. [Price Computation After Invoice Approval](#5-price-computation-after-invoice-approval)
-6. [Root Cause Analysis](#6-root-cause-analysis)
-7. [Guard Conditions That Can Block Recalculation](#7-guard-conditions-that-can-block-recalculation)
-8. [Fix Recommendations](#8-fix-recommendations)
-9. [Quick Reference: File Map](#9-quick-reference-file-map)
+3. [Price Lifecycle](#3-price-lifecycle)
+4. [Full Approval Workflow](#4-full-approval-workflow)
+5. [Full Reversal Workflow](#5-full-reversal-workflow)
+6. [Consecutive Voyage Bunker Lot Carry-Over](#6-consecutive-voyage-bunker-lot-carry-over)
+7. [Root Cause Analysis (Correct)](#7-root-cause-analysis-correct)
+8. [Guard Conditions That Block V2 Recalculation](#8-guard-conditions-that-block-v2-recalculation)
+9. [Applied Fixes](#9-applied-fixes)
+10. [Remaining Limitation](#10-remaining-limitation)
+11. [Quick Reference: File Map](#11-quick-reference-file-map)
 
 ---
 
@@ -27,227 +33,262 @@
 
 ### Actors in the Bunker Invoice Approval Chain
 
-| Actor                                                           | Role                                                                       |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Business Central (BC)                                           | External finance system — sends invoice import/reverse via REST API        |
-| `BcIntegrationController`                                       | API entry point — routes BC payloads to the sync queue                     |
-| `SynchronizationLoggingService`                                 | Persists sync job, dispatches to the correct business service              |
-| `InvoiceReverseBusinessService`                                 | Processes reverse-invoice BC payloads                                      |
-| `ApproveBunkerInvoices`                                         | Sets invoice-approved values on `BunkerOrderItem`                          |
-| `ReverseBunkerInvoiceApproval`                                  | Clears invoice-approved values from `BunkerOrderItem`                      |
-| `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents` | Propagates bunker order changes into voyage entities, triggers recalc      |
-| `ReCalculateAndSaveVoyageById`                                  | Loads, recalculates, and saves a single voyage                             |
-| `CalculateAndSaveConsecutiveVoyage`                             | Background recalculation of one consecutive voyage                         |
-| `VoyageBackgroundService`                                       | Manages fire-and-forget recalculation of all downstream voyages            |
-| `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders`          | During calculation, re-syncs bunker lot price from its source bunker order |
+| Actor                                                           | Role                                                                              |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| BVMS UI                                                         | Front-end — user clicks "Approve Invoices"                                        |
+| `VoyageController`                                              | API — `POST /Voyage/bunker-order/approve-invoices`                                |
+| Business Central (BC)                                           | External finance system — sends invoice import/reverse via REST                   |
+| `BcIntegrationController`                                       | API entry point for BC payloads                                                   |
+| `SynchronizationLoggingService`                                 | Persists sync job, dispatches to correct `ISynchronizationBusinessService`        |
+| `InvoiceReverseBusinessService`                                 | Processes `ImportReverseInvoice` BC payloads                                      |
+| `ApproveBunkerInvoices`                                         | Sets invoice-approved values on `BunkerOrderItem`; calls `SyncChanges...`         |
+| `ReverseBunkerInvoiceApproval`                                  | Clears invoice-approved values; calls `SyncChanges...` (created in Bug #2981 fix) |
+| `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents` | Propagates BO changes into voyage entities, triggers V1 recalc                    |
+| `ReCalculateAndSaveVoyageById`                                  | Loads, calculates, and saves a single voyage                                      |
+| `CalculateAndSaveConsecutiveVoyage`                             | Recalculates one downstream consecutive voyage (with guards)                      |
+| `VoyageBackgroundService`                                       | Fire-and-forget background runner for all consecutive voyages after V1            |
+| `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders`          | Within each voyage calc — re-syncs lot price from its source bunker order         |
 
 ---
 
 ## 2. Key Entities & Fields
 
-### `BunkerOrderItemEntity` — Fields Relevant to Pricing
+### `BunkerOrderItemEntity` — Pricing Fields
 
-| Field                                       | Storage                  | Set By                       | Notes                                                                              |
-| ------------------------------------------- | ------------------------ | ---------------------------- | ---------------------------------------------------------------------------------- |
-| `TotalCostPerMetricTonsInUSD`               | DB column                | Bunker order placement       | Base ordered price per MT                                                          |
-| `ActuallyReceivedQuantity`                  | DB column                | Receival report              | Physical delivery qty                                                              |
-| `ApprovedTotalCostInUSD`                    | DB column                | `ApproveBunkerInvoices`      | Set on approval; cleared on reversal                                               |
-| `BunkerDeliveryNoteQuantity`                | DB column                | `ApproveBunkerInvoices`      | BDN invoice quantity                                                               |
-| `TotalCostInUSDForCalculation`              | **NotMapped** (computed) | —                            | `ApprovedTotalCostInUSD ?? (received? qty×price : TotalCostInUSD)`                 |
-| `FuelQuantityForCalculation`                | **NotMapped** (computed) | —                            | `ActuallyReceivedQty ?? BDNQty ?? RequestedQty`                                    |
-| `TotalCostPerMetricTonsInUSDForCalculation` | **NotMapped** (computed) | —                            | **The price used for propagation** — see §5                                        |
-| `OwnershipChangeLogs`                       | NotMapped / JSON column  | TCO delivery/redelivery calc | Per-itinerary-item ownership price history — **NEVER updated by invoice approval** |
+| Field                                       | Storage           | Set By                                                                  | Notes                                                                            |
+| ------------------------------------------- | ----------------- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `TotalCostPerMetricTonsInUSD`               | DB column         | Order placement; also updated at approval (commit `bad4c6e0c`)          | Base ordered price per MT                                                        |
+| `ActuallyReceivedQuantity`                  | DB column         | Receival report                                                         | Physical delivery qty                                                            |
+| `ApprovedTotalCostInUSD`                    | DB column         | `ApproveBunkerInvoices` (set); `ReverseBunkerInvoiceApproval` (cleared) | Invoice total cost; `null` = not yet approved                                    |
+| `BunkerDeliveryNoteQuantity`                | DB column         | `ApproveBunkerInvoices` (set); `ReverseBunkerInvoiceApproval` (cleared) | BDN invoice quantity                                                             |
+| `TotalCostInUSDForCalculation`              | **`[NotMapped]`** | Computed                                                                | `ApprovedTotalCostInUSD ?? (received? qty×price : TotalCostInUSD)`               |
+| `FuelQuantityForCalculation`                | **`[NotMapped]`** | Computed                                                                | `ActuallyReceivedQty ?? BDNQty ?? RequestedQty`                                  |
+| `TotalCostPerMetricTonsInUSDForCalculation` | **`[NotMapped]`** | Computed                                                                | **The price propagated to voyage lots** — see §3                                 |
+| `OwnershipChangeLogs`                       | JSON column       | TCO deliver/redeliver workflow                                          | Per-itinerary ownership history — **never touched by invoice approval/reversal** |
 
-### `VoyageBunkerLotEntity` — Fields Relevant to Pricing
+### `VoyageBunkerLotEntity` — Pricing Fields
 
-| Field                         | Storage                   | Notes                                                                       |
-| ----------------------------- | ------------------------- | --------------------------------------------------------------------------- |
-| `PricePerMetricTonInUsds`     | DB column `decimal(18,5)` | Current lot price used in all calculations                                  |
-| `OwnershipChangeLogs`         | JSON column               | Mirrors the bunker order item's ownership transitions for this lot          |
-| `BunkerOrderId`               | DB column                 | References the originating bunker order (can be from a **previous** voyage) |
-| `BunkerOrderItemId`           | DB column                 | References the specific order item                                          |
-| `IsInitial`                   | DB column                 | `true` = lot was on board at voyage commencement                            |
-| `IsLifted`                    | DB column                 | `true` = at least one approved vessel report exists for this lot            |
-| `EndQuantityInMetricTons`     | DB column                 | Non-zero lots are carried to the next consecutive voyage                    |
-| `InitialQuantityInMetricTons` | DB column                 | Starting ROB for this lot in this voyage                                    |
+| Field                     | Storage            | Notes                                                                           |
+| ------------------------- | ------------------ | ------------------------------------------------------------------------------- |
+| `PricePerMetricTonInUsds` | DB `decimal(18,5)` | Current lot price used in all cost calculations                                 |
+| `BunkerOrderId`           | DB column          | References the originating bunker order — **can be from a previous voyage**     |
+| `BunkerOrderItemId`       | DB column          | References the specific order item                                              |
+| `IsInitial`               | DB column          | `true` = lot was on board at voyage commencement (carried from previous voyage) |
+| `IsLifted`                | DB column          | `true` = an approved vessel report has consumed from this lot                   |
+| `EndQuantityInMetricTons` | DB column          | Non-zero = will be carried as initial lot into the next consecutive voyage      |
+| `OwnershipChangeLogs`     | JSON column        | Mirrors the source BO item's ownership history (synced, not always current)     |
 
 ---
 
-## 3. Full Approval Workflow
+## 3. Price Lifecycle
 
-### 3.1 Invoice Approval (Happy Path)
+### 3.1 `TotalCostPerMetricTonsInUSDForCalculation` — The Authoritative Price Signal
+
+This `[NotMapped]` computed property drives what price is written to voyage lots:
+
+```
+BEFORE approval (ApprovedTotalCostInUSD is null):
+  TotalCostPerMetricTonsInUSD  (the originally ordered price per MT = P_ordered)
+
+AFTER approval (ApprovedTotalCostInUSD has a value):
+  TotalCostInUSDForCalculation / FuelQuantityForCalculation
+    = ApprovedTotalCostInUSD / (ActuallyReceivedQty ?? BDNQty ?? RequestedQty)
+    = P_invoice  (invoice total / invoice or received quantity)
+
+AFTER reversal (ApprovedTotalCostInUSD cleared back to null):
+  TotalCostPerMetricTonsInUSD  (= P_ordered again)
+```
+
+### 3.2 Price Flow Through the System
+
+```
+BunkerOrderItem.ApprovedTotalCostInUSD  (set on approval)
+          |
+          v  computed property
+TotalCostPerMetricTonsInUSDForCalculation  = P_invoice
+          |
+          v  SynchronizeBunkerOrderItemsWithReceivalEventsAsync
+VoyageBunkerEvent.PricePerMetricTonInUsds  (V1 receival event updated)
+          |
+          v  CalculateVoyage -> GeneratePreCalculatedEstimateBunkerEvents
+EstimateCrudDto.BunkerPrices[].PricePerMetricTonInUsds  (V1 in-memory price)
+          |
+          v  EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders
+EstimateCrudDto.BunkerPrices[].PricePerMetricTonInUsds  = P_invoice  (confirmed)
+          |
+          v  UpdateVoyageBunkerLots -> OverwriteChanges -> SaveChangesAsync
+VoyageBunkerLotEntity.PricePerMetricTonInUsds  (V1 persisted lot = P_invoice)  OK
+          |
+          v  GetEndingBunkerLotsFromVoyageId -> GenerateStartingLotsFromEndingLots
+V2 initial VoyageBunkerLotEntity.PricePerMetricTonInUsds = P_invoice  OK
+```
+
+---
+
+## 4. Full Approval Workflow
+
+### 4.1 Current State
 
 ```mermaid
 sequenceDiagram
-    participant BC as Business Central
-    participant API as BcIntegrationController
-    participant SLS as SynchronizationLoggingService
+    participant UI as BVMS UI
+    participant VC as VoyageController
     participant ABI as ApproveBunkerInvoices
     participant SYNC as SyncChangesOfBunkerOrder...
     participant RCALC as ReCalculateAndSaveVoyageById
-    participant BG as VoyageBackgroundService
+    participant UPD as UpdateVoyageById
+    participant BG as VoyageBackgroundService (Task.Run)
     participant CSV as CalculateAndSaveConsecutiveVoyage
 
-    BC->>API: POST /v1/Integration/BC/Invoices\n(ExternalInvoiceDto)
-    API->>SLS: Handle(SynchronizationType.ImportInvoice)
-    SLS->>ABI: ApproveBunkerInvoices.Handle()
+    UI->>VC: POST /Voyage/bunker-order/approve-invoices
+    VC->>ABI: ApproveBunkerInvoices.Handle()
 
-    Note over ABI: Sets on BunkerOrderItem:\n• ApprovedTotalCostInUSD\n• BunkerDeliveryNoteQuantity\n• Status = Invoiced
-    ABI->>ABI: SaveChangesAsync (BunkerOrderItem)
+    Note over ABI: For each BunkerOrderItem:<br/>BunkerDeliveryNoteQuantity = InvoiceQuantity<br/>ApprovedTotalCostInUSD = InvoiceTotalCostInUSD<br/>TotalCostPerMetricTonsInUSD = TotalCostPerMetricTonsInUSDForCalculation (added bad4c6e0c)<br/>Status = Invoiced
+    ABI->>ABI: SaveChangesAsync
 
-    ABI->>SYNC: SyncChangesOfBunkerOrder...(BunkerOrderId)
-    Note over SYNC: 1. Remove not-lifted receival lots\n2. Sync receival events with new price\n3. Sync OwnershipChangeLogs into lots\n4. SaveChangesAsync
+    ABI->>SYNC: await SyncChangesOfBunkerOrder...(BunkerOrderId)
+    Note over SYNC: 1. Remove not-lifted receival lots from V1<br/>2. Sync receival events with P_invoice<br/>3. Sync ownership fields into all lots linked to BO<br/>4. SaveChangesAsync
 
-    SYNC->>RCALC: ReCalculateAndSaveVoyageById\n(V1, CalculateAndSaveConsecutiveVoyages=true)
-    Note over RCALC: Awaited synchronously
-    RCALC->>RCALC: CalculateVoyage(V1)\n→ EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders\n→ V1 lot price = P_invoice ✓
-    RCALC->>RCALC: UpdateVoyageById(V1, CalculateAndSaveConsecutiveVoyages=true)\n→ SaveChangesAsync (V1 with P_invoice)
+    SYNC->>RCALC: await ReCalculateAndSaveVoyageById(V1, consecutive=true)
+    RCALC->>RCALC: GetVoyageById(V1) -> CalculateVoyage(V1)
+    Note over RCALC: EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders:<br/>loads BO item from DB (ApprovedTotalCostInUSD set)<br/>TotalCostPerMetricTonsInUSDForCalculation = P_invoice<br/>V1 lot price -> P_invoice OK
+    RCALC->>UPD: await UpdateVoyageById(V1, CalculateAndSaveConsecutiveVoyages=true)
+    UPD->>UPD: UpdateVoyageBunkerLots -> SaveChangesAsync (V1 lots = P_invoice OK)
+    UPD-->>BG: CalculateAndSaveConsecutiveVoyagesInBackground(V1.Id) [FIRE-AND-FORGET]
 
-    RCALC-->>BG: CalculateAndSaveConsecutiveVoyagesInBackground(V1.Id)\n[FIRE AND FORGET — Task.Run, NOT awaited]
-    Note over BG: 1500ms delay per voyage
-    BG->>CSV: CalculateAndSaveConsecutiveVoyage(V2)
-    Note over CSV: This is where the bug manifests
+    Note over BG: NEW DI scope (IServiceScopeFactory.CreateScope())<br/>Finds all next voyage IDs after V1 by VoyageNumber string comparison<br/>For each V2, V3 etc (1500ms delay each):
+    BG->>CSV: await CalculateAndSaveConsecutiveVoyage(V2)
+    Note over CSV: GUARD: if V2 has any approved vessel report -> return null (V2 SKIPPED)<br/>Otherwise: remove V2 old initial lots, seed from V1 ending lots (P_invoice),<br/>SaveChangesAsync, then RecalculateAndSaveVoyageByIdAsync(V2)
+
+    ABI-->>VC: return bunkerOrderDto  <- HTTP response returns BEFORE V2 finishes
 ```
 
-### 3.2 Invoice Reversal Path
+> **Note:** The HTTP response returns before the background service finishes V2 recalculation. The user
+> may briefly see the old price on V2 until the background task (≥1500 ms delay) completes.
+
+---
+
+## 5. Full Reversal Workflow
+
+### 5.1 Current State (After Bug #2981 Fix — commit `f04d07cdd`)
 
 ```mermaid
 sequenceDiagram
     participant BC as Business Central
-    participant API as BcIntegrationController
     participant IRS as InvoiceReverseBusinessService
     participant RBIA as ReverseBunkerInvoiceApproval
+    participant SYNC as SyncChangesOfBunkerOrder...
+    participant RCALC as ReCalculateAndSaveVoyageById
+    participant BG as VoyageBackgroundService
 
-    BC->>API: DELETE /v1/Integration/BC/Invoices/{transNo}
-    API->>IRS: InvoiceReverseBusinessService.BusinessProcess()
-    IRS->>IRS: ReverseInvoiceTransaction + ReverseInvoice\n(soft-deletes BC invoice records)
-    IRS->>RBIA: ReverseBunkerInvoiceApproval.Handle()
+    BC->>IRS: ImportReverseInvoice (BC webhook)
+    IRS->>IRS: ReverseInvoiceTransaction + ReverseInvoice (soft-delete BC records)
+    IRS->>RBIA: await ReverseBunkerInvoiceApproval(PurchaseOrderNo, ReversedInvoiceId)
 
-    Note over RBIA: Parses PLItemName to find BunkerTypeCodes\nClears on affected BunkerOrderItems:\n• ApprovedTotalCostInUSD = null\n• BunkerDeliveryNoteQuantity = null\n• Status → Received or Ordered
+    Note over RBIA: Parses PLItemName from reversed invoice items to find BunkerTypeCodes<br/>For each affected BunkerOrderItem:<br/>  ApprovedTotalCostInUSD = null  (price now = P_ordered)<br/>  BunkerDeliveryNoteQuantity = null<br/>  Status -> Received or Ordered
     RBIA->>RBIA: SaveChangesAsync
 
-    Note over RBIA: ⚠️ Does NOT call\nSyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents\nAfter reversal — V1 and V2 are NOT recalculated
+    RBIA->>SYNC: await SyncChangesOfBunkerOrder...(BunkerOrderId)
+    SYNC->>RCALC: await ReCalculateAndSaveVoyageById(V1, consecutive=true)
+    Note over RCALC: TotalCostPerMetricTonsInUSDForCalculation = P_ordered (ApprovedTotalCostInUSD is null)<br/>V1 lot price reverts to P_ordered OK
+    RCALC-->>BG: CalculateAndSaveConsecutiveVoyagesInBackground(V1.Id)
+    Note over BG: V2 background recalculation triggered<br/>V2 lot price reverts to P_ordered OK (if no approved reports guard)
 ```
 
-> **Note:** `ReverseBunkerInvoiceApproval` does **not** trigger voyage recalculation. Reversal only resets the `BunkerOrderItem` fields. The voyage's displayed price will remain stale until the next manual recalculation.
+### 5.2 State BEFORE Fix (Bug #2981) — The Primary Root Cause
+
+```mermaid
+sequenceDiagram
+    participant BC as Business Central
+    participant IRS as InvoiceReverseBusinessService
+
+    BC->>IRS: ImportReverseInvoice
+    IRS->>IRS: ReverseInvoiceTransaction + ReverseInvoice (soft-delete BC records only)
+    Note over IRS: BunkerOrderItem.ApprovedTotalCostInUSD NOT cleared<br/>SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents NOT called<br/>V1 NOT recalculated<br/>V2 background task NEVER triggered
+    IRS-->>BC: done  <- V1 and V2 still display P_invoice (stale)
+```
+
+> **This is the root cause the user identified:** _"it does not do any trigger to update voy 1 thus_
+> _never trigger to update vo2 consecutively"_ — `InvoiceReverseBusinessService` had no voyage
+> recalculation trigger after BC reversal.
 
 ---
 
-## 4. Consecutive Voyage Bunker Lot Carry-Over
+## 6. Consecutive Voyage Bunker Lot Carry-Over
 
-### 4.1 When Carry-Over Runs
+### 6.1 Two Code Paths That Carry Lots from V1 → V2
 
-`AutoCorrectConsecutiveBunkerLotsAndCommencePortForCurrentVoyage` (in `CalculateConsecutiveVoyageHelper.cs`) runs inside `CalculateVoyage` with these guards:
+| Path       | Where                                                                                                | When Triggered                                                    | Modifies DB directly?                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Path A** | `CalculateAndSaveConsecutiveVoyage.Handle()`                                                         | Background service after V1's `UpdateVoyageById`                  | **Yes** — removes old V2 lots from DB, inserts new lots, then calls `RecalculateAndSaveVoyageByIdAsync` |
+| **Path B** | `CalculateConsecutiveVoyageHelper.AutoCorrectConsecutiveBunkerLotsAndCommencePortForCurrentVoyage()` | Inside `CalculateVoyage(V2)` when V2 is calculated for any reason | **No** — modifies in-memory `VoyageCrudDto` only; persisted by subsequent `UpdateVoyageBunkerLots`      |
 
-| Guard Condition                          | Effect if True                                                          |
-| ---------------------------------------- | ----------------------------------------------------------------------- |
-| `voyageCrud.IsConsecutiveVoyage != true` | Skip entirely                                                           |
-| `FindPreviousVoyageId() == null`         | Skip entirely                                                           |
-| `VoyageHasAnyLiftedBunkerLot() == true`  | Skip entirely — voyage has approved vessel reports, do not re-seed lots |
-
-> **`IsLifted`** is set to `true` on a bunker lot when the voyage has at least one approved vessel report touching that lot. Once lifted, consecutive recalculations no longer overwrite the seeded lots.
-
-### 4.2 How Voyages Are Ordered (for "next voyage" lookup)
-
-`FindNextVoyageIds` queries `VoyageNumber` (string comparison) within the same `VesselId`. There is no explicit `PreviousVoyageId` foreign key — order is purely numeric-string comparison:
+### 6.2 `GetEndingBunkerLotsFromVoyageId` — Which V1 Lots Are Carried
 
 ```csharp
-context.Voyages
-    .Where(v => v.VesselId == currentVessel &&
-                string.Compare(v.VoyageNumber, currentVoyageNumber) > 0)
-    .OrderBy(v => v.VoyageNumber)
+return await context.VoyageBunkerLots
+    .Where(b => b.VoyageId == voyageId && b.EndQuantityInMetricTons != 0)
+    .Include(b => b.BunkerType)
+    .ToListAsync();
 ```
 
-### 4.3 `GenerateStartingLotsFromEndingLots` — Carry-Over Logic
+Only lots with a non-zero ending quantity are carried to V2. If V1 consumed all bunker of a given type, that lot is not carried.
 
-This is the critical method that seeds V2's initial bunker lots from V1's ending lots.
-
-```
-Source: V1's VoyageBunkerLots where EndQuantityInMetricTons != 0
-```
-
-**Step-by-step for each ending lot from V1:**
+### 6.3 `GenerateStartingLotsFromEndingLots` — Carry-Over Logic
 
 ```
-1. Deep-copy ALL fields via AutoMapper
-   → BunkerOrderId, BunkerOrderItemId, BunkerOrderCode, BunkerOrderVoyageId all carried over
+For each V1 ending lot:
 
-2. pricePerTonBringOver = lot.PricePerMetricTonInUsds   (fallback)
+  1. Deep-copy all fields via AutoMapper
+     (BunkerOrderId, BunkerOrderItemId, BunkerOrderCode, BunkerOrderVoyageId all retained — V1's order)
 
-3. lastOwnershipChangeLog = lot.OwnershipChangeLogs
-                               .OrderByDescending(log => log.IteneraryItemNumber)
-                               .FirstOrDefault()
+  2. pricePerTonBringOver = lot.PricePerMetricTonInUsds   <- the authoritative price from V1's lot
 
-4. IF lastOwnershipChangeLog != null:
+  3. lastOwnershipChangeLog = lot.OwnershipChangeLogs
+                                 .OrderByDescending(IteneraryItemNumber)
+                                 .FirstOrDefault()
+
+  4. IF lastOwnershipChangeLog != null:  <- only for TCO/TC voyages with ownership transitions
        pricePerTonBringOver = lastOwnershipChangeLog.PricePerMetricTonInUsdsAfterLeavingIteneraryItem
-                              ?? pricePerTonBringOver          ← OVERWRITES the lot price
+                              ?? pricePerTonBringOver          <- can overwrite with redelivery price
        ownedByBringOver     = lastOwnershipChangeLog.OwnedBy  ?? ownedByBringOver
        paidByBringOver      = lastOwnershipChangeLog.PaidBy   ?? paidByBringOver
 
-5. Override new lot fields:
-   Id                           = new Guid()
-   VoyageId                     = V2.Id
-   IsInitial                    = true
-   IsLifted                     = false
-   InitialQuantityInMetricTons  = V1 ending lot's EndQuantityInMetricTons
-   PricePerMetricTonInUsds      = pricePerTonBringOver   ← result of step 2/4
-   OwnedBy / PaidBy             = pricePerTonBringOver result
-   ConsumptionDetails           = []
-   OwnershipChangeLogs          = []   ← CLEARED for new voyage
+  5. Override new lot:
+     Id                          = new Guid()
+     VoyageId                    = V2.Id
+     IsInitial                   = true
+     IsLifted                    = false
+     InitialQuantityInMetricTons = V1 ending lot EndQuantityInMetricTons
+     PricePerMetricTonInUsds     = pricePerTonBringOver
+     OwnershipChangeLogs         = []   <- cleared for new voyage
 ```
 
-**Key fact:** `BunkerOrderId` and `BunkerOrderItemId` are **not explicitly cleared** — they are silently retained from the AutoMapper deep-copy. V2's initial lot therefore still references V1's bunker order.
+**For voyages with NO OwnershipChangeLogs** (the repro scenario): step 4 is skipped entirely.
+`pricePerTonBringOver = lot.PricePerMetricTonInUsds` (V1's current lot price = P_invoice after approval).
+V2 correctly gets P_invoice from the seeding step.
 
-### 4.4 What `AutoCorrectIsInitialStatus` Does with the Carried-Over Lot
+### 6.4 `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` — Price Re-Confirmation Step
 
-```
-IF bunkerPrice.BunkerOrderId != null:
-    IF the order belongs to the CURRENT voyage  → IsInitial = false  (receival)
-    ELSE (order is from a PREVIOUS voyage)      → IsInitial = true   (initial)
-```
-
-So V2's lot with a reference to V1's bunker order will always correctly be flagged as `IsInitial = true`.
-
----
-
-## 5. Price Computation After Invoice Approval
-
-### 5.1 `TotalCostPerMetricTonsInUSDForCalculation` Computed Property
-
-This **NotMapped** computed property on `BunkerOrderItemEntity` determines what price is propagated:
-
-```
-BEFORE approval (ActuallyReceivedQuantity set, ApprovedTotalCostInUSD null):
-  → TotalCostPerMetricTonsInUSD   (the originally ordered price per MT)
-
-AFTER approval (ApprovedTotalCostInUSD set):
-  → ApprovedTotalCostInUSD / FuelQuantityForCalculation
-    where FuelQuantityForCalculation = ActuallyReceivedQty ?? BDNQty ?? RequestedQty
-  = P_invoice  (invoice-approved cost ÷ BDN quantity)
-```
-
-### 5.2 How `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` Uses It
-
-Called as Step 3 inside `CalculateAllBunkersCostsAndFeesForEstimate` on every voyage/estimate calculation:
+Runs inside `CalculateAllBunkersCostsAndFeesForEstimate` on every voyage calculation.
+Loads the BO item fresh from DB and confirms/overwrites the lot's price:
 
 ```csharp
 foreach (var bunkerPrice in estimate.BunkerPrices)
 {
-    var bunkerOrder     = find by bunkerPrice.BunkerOrderId;     // can be V1's order
-    var bunkerOrderItem = find by bunkerPrice.BunkerOrderItemId;
+    var bunkerOrderItem = /* load from DB — has ApprovedTotalCostInUSD set (or cleared) */;
 
     var currentBunkerPricePerTon = bunkerPrice.PricePerMetricTonInUsds;
 
-    // Price of the last ownership change log on the BunkerOrderItem (NOT the VoyageBunkerLot)
     var lastPriceChangesFromChangeLog = bunkerOrderItem.OwnershipChangeLogs?
         .OrderByDescending(log => log.IteneraryItemNumber)
         .FirstOrDefault()?.PricePerMetricTonInUsdsAfterLeavingIteneraryItem;
 
-    // SKIP if already matches the ownership-log price
+    // Skip if current price already matches the ownership-log price
+    // (intent: already propagated correctly via TCO redelivery workflow)
     if (lastPriceChangesFromChangeLog == currentBunkerPricePerTon)
         continue;
 
-    // Otherwise update: prefer invoice-computed price
     var lotPricePerTon = bunkerOrderItem.TotalCostPerMetricTonsInUSD;
     if (bunkerOrderItem.TotalCostPerMetricTonsInUSDForCalculation > 0)
         lotPricePerTon = bunkerOrderItem.TotalCostPerMetricTonsInUSDForCalculation;  // P_invoice
@@ -256,248 +297,272 @@ foreach (var bunkerPrice in estimate.BunkerPrices)
 }
 ```
 
-**The skip condition intent:** "If the lot's current price already equals the last ownership-change-log price, it means the price was already correctly propagated via the TCO redelivery workflow — do not overwrite."
+**For voyages with NO OwnershipChangeLogs (the repro):**
+
+- `lastPriceChangesFromChangeLog = null`
+- `currentBunkerPricePerTon = P_invoice` (seeded in §6.3 — non-null)
+- Guard: `null == P_invoice` → **FALSE** → does NOT skip → updates to P_invoice OK
+
+The guard **does not** incorrectly fire for this scenario. The null==null skip only occurs if V2's
+initial lot somehow has a null price AND there are no OwnershipChangeLogs.
 
 ---
 
-## 6. Root Cause Analysis
+## 7. Root Cause Analysis (Correct)
 
-### 6.1 The Bug Scenario (TC/TCO Voyage with `OwnershipChangeLogs`)
+### 7.1 Primary Bug — Reversal Path Had No Trigger
 
-The bug only manifests when V1's ending bunker lot has at least one `OwnershipChangeLog` entry. This occurs on TCO/TC voyages that have a delivery or redelivery itinerary item.
+**Symptom:** After Business Central sent a reversal, V1 and V2 continued to display P_invoice (stale).
 
-Let these be:
+**Root Cause:** `InvoiceReverseBusinessService.BusinessProcess()` processed the BC reversal
+(soft-deleted invoice/transaction records) but:
 
-- **P_invoice** — the new price after invoice approval
-- **P_redelivery** — the price stored in `OwnershipChangeLog.PricePerMetricTonInUsdsAfterLeavingIteneraryItem` (set during TCO redelivery, **never updated by invoice approval**)
+1. Did NOT clear `BunkerOrderItem.ApprovedTotalCostInUSD` → item still computed P_invoice
+2. Did NOT call `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents`
+3. Therefore: no `ReCalculateAndSaveVoyageById(V1)` → no `CalculateAndSaveConsecutiveVoyagesInBackground(V1)` → V2 never updated
 
-Typically `P_redelivery ≈ P_ordered` (the pre-invoice price).
+**The user's description:** _"it does not do any trigger to update voy 1 thus never trigger to update vo2 consecutively"_
 
-### 6.2 Step-by-Step Bug Trace
+**Fix (commit `f04d07cdd`, Bug #2981):** Created `ReverseBunkerInvoiceApproval.cs` — a new command
+handler that:
 
-```
-INITIAL STATE (before approval):
-  V1 ending lot: PricePerMetricTonInUsds = P_ordered
-                 OwnershipChangeLogs     = [{...PriceAfterLeaving = P_redelivery}]
-  V2 initial lot: PricePerMetricTonInUsds = P_redelivery  (from last carry-over)
-                  BunkerOrderId           = BO1 (V1's bunker order)
-                  OwnershipChangeLogs     = []  (cleared at carry-over time)
-  BO1 item:       TotalCostPerMetricTonsInUSD            = P_ordered
-                  ApprovedTotalCostInUSD                 = null
-                  OwnershipChangeLogs                    = [{...PriceAfterLeaving = P_redelivery}]
-```
+1. Parses `PLItemName` from the reversed invoice items to find affected `BunkerTypeCodes`
+2. For each affected `BunkerOrderItem`: clears `ApprovedTotalCostInUSD`, `BunkerDeliveryNoteQuantity`, reverts `Status`
+3. `SaveChangesAsync`
+4. `await SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents` → triggers full recalc chain
 
-**Step 1 — `ApproveBunkerInvoices`:**
+`InvoiceReverseBusinessService` was updated (+17 lines) to call `ReverseBunkerInvoiceApproval`.
 
-```
-BO1 item:  ApprovedTotalCostInUSD = InvoiceTotalCostInUSD  (→ P_invoice becomes effective)
-           BunkerDeliveryNoteQuantity = InvoiceQuantity
-           Status = Invoiced
-           OwnershipChangeLogs = [{...PriceAfterLeaving = P_redelivery}]  ← UNCHANGED
-```
+### 7.2 Secondary Bug — Approval Stored Field Not Updated
 
-**Step 2 — `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents`:**
+**Symptom:** After approval, certain views reading `TotalCostPerMetricTonsInUSD` (the stored DB field)
+showed the old P_ordered price instead of P_invoice.
 
-```
-V1 receival event: PricePerMetricTonInUsds = TotalCostPerMetricTonsInUSDForCalculation = P_invoice ✓
-V1/V2 lots sharing BO1 item: OwnershipChangeLogs synced from BO1 item = [{P_redelivery}]
-→ SaveChangesAsync
-→ ReCalculateAndSaveVoyageById(V1, CalculateAndSaveConsecutiveVoyages=true)  [AWAITED]
-```
+**Root Cause:** `ApproveBunkerInvoices` set `ApprovedTotalCostInUSD` and called `SyncChanges...`,
+but did NOT update the stored `TotalCostPerMetricTonsInUSD` field on the entity. The computed
+property `TotalCostPerMetricTonsInUSDForCalculation` returned the correct P_invoice, but the raw
+stored column retained P_ordered.
 
-**Step 3 — V1 recalculation (`EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` for V1):**
+**Note:** `ApproveBunkerInvoices` has ALWAYS called `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents`
+(since the feature was first introduced in `b591a3486`). V1 was always recalculated on approval. This
+bug only affected the raw stored field value and views/queries that read it directly.
 
-```
-BO1 item.OwnershipChangeLogs.last.Price = P_redelivery
-V1 lot.PricePerMetricTonInUsds          = P_invoice   (from receival event sync in step 2)
-
-Guard: P_redelivery == P_invoice ?  → FALSE (they differ) → NOT skipped
-→ V1 lot price updated to P_invoice ✓
-→ V1 saved with P_invoice ✓
-```
-
-**Step 4 — Background: `CalculateAndSaveConsecutiveVoyage(V2)`:**
-
-```
-GetEndingBunkerLotsFromVoyageId(V1)
-  → V1 ending lot: PricePerMetricTonInUsds = P_invoice ✓
-                   OwnershipChangeLogs      = [{PriceAfterLeaving = P_redelivery}]  ← STALE
-
-GenerateStartingLotsFromEndingLots:
-  pricePerTonBringOver = P_invoice          (from lot.PricePerMetricTonInUsds)
-  lastOwnershipChangeLog != null            → TRUE
-  pricePerTonBringOver = P_redelivery       ← BUG 1: OVERWRITES correct P_invoice with stale P_redelivery ✗
-
-V2 new initial lot: PricePerMetricTonInUsds = P_redelivery  ✗
-                    BunkerOrderId            = BO1
-                    OwnershipChangeLogs      = []
-```
-
-**Step 5 — V2 recalculation (`EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` for V2):**
-
-```
-BO1 item.OwnershipChangeLogs.last.Price = P_redelivery
-V2 lot.PricePerMetricTonInUsds          = P_redelivery   (set by Bug 1 in step 4)
-
-Guard: P_redelivery == P_redelivery ?  → TRUE → SKIP ✗  ← BUG 2: Guard short-circuits the fix
-→ V2 lot price remains P_redelivery — P_invoice never reaches V2 ✗
-```
-
-### 6.3 Root Cause Summary Table
-
-| #         | Location                                               | File                                                      | Problem                                                                                                                                                                                                                                                                                  |
-| --------- | ------------------------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Bug 1** | `GenerateStartingLotsFromEndingLots`                   | `CalculateConsecutiveVoyageHelper.cs`                     | When `OwnershipChangeLogs` exist, the ending lot's `PricePerMetricTonInUsds` (which already reflects the invoice-updated price) is **overwritten** by the stale `PricePerMetricTonInUsdsAfterLeavingIteneraryItem` from the ownership log. The log is never updated on invoice approval. |
-| **Bug 2** | `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` | `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders.cs` | Skip condition `if (lastPriceChangesFromChangeLog == currentBunkerPricePerTon)` fires for consecutive voyages when Bug 1 has set V2's price to exactly the ownership-log price, preventing the invoice price from being applied. Also fires incorrectly when both are `null`.            |
-
-### 6.4 Why V1 Works But V2 Does Not
-
-```
-V1 receival lot:
-  Price comes directly from receival event (SyncChangesOfBunkerOrder... step 2)
-  → EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders sees P_invoice ≠ P_redelivery → updates → ✓
-
-V2 initial lot (consecutive carry-over):
-  Price comes from GenerateStartingLotsFromEndingLots (step 4)
-  → Bug 1 sets it to P_redelivery
-  → EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders sees P_redelivery == P_redelivery → skips → ✗
-```
-
-### 6.5 Additional Edge Case: `null == null`
-
-If a bunker lot has **no `OwnershipChangeLogs`** (non-TCO voyage) AND `PricePerMetricTonInUsds` is `null`:
-
-```
-lastPriceChangesFromChangeLog = null
-currentBunkerPricePerTon      = null
-
-Guard: null == null → TRUE → SKIP
-```
-
-This incorrectly skips updating a lot that has no price yet. The lot would fall back to the default price set in `EnsureLotCodesAndMetaDataExistForEstimateBunkerIntials` (`BunkerTypeConstants.DefaultNormalBunkerPrice`), rather than getting the actual bunker order price.
-
----
-
-## 7. Guard Conditions That Can Block Recalculation
-
-### 7.1 `CalculateAndSaveConsecutiveVoyage` — Full Guard List
-
-| Guard                | Condition                             | Implication                                                      |
-| -------------------- | ------------------------------------- | ---------------------------------------------------------------- |
-| Voyage not found     | entity is null                        | Logs warning, returns null                                       |
-| Not consecutive      | `IsConsecutiveVoyage != true`         | Returns null — skipped                                           |
-| Has approved reports | any `VesselReport.IsApproved == true` | Returns null — V2 is locked, lots are lifted, carry-over skipped |
-| No previous voyage   | `FindPreviousVoyageId() == null`      | Returns null — cannot seed initial lots                          |
-
-> Once V2 has **any approved vessel report** (`VesselReport.IsApproved = true`), the carry-over seeding step is permanently bypassed. Invoice approval changes on V1's bunker order will not automatically propagate to V2's lots. A manual workaround (admin recalculation) would be needed.
-
-### 7.2 Fire-and-Forget Background Execution
-
-```
-ApproveBunkerInvoices
-  └── SyncChangesOfBunkerOrder...
-        └── ReCalculateAndSaveVoyageById [AWAITED]
-              └── UpdateVoyageById [AWAITED]
-                    └── CalculateAndSaveConsecutiveVoyagesInBackground [FIRE-AND-FORGET]
-                          └── Task.Run(async () => {
-                                foreach (nextVoyageId) {
-                                  await Task.Delay(1500);  // throttle
-                                  await CalculateAndSaveConsecutiveVoyage(nextVoyageId);
-                                }
-                              })
-```
-
-**Implications:**
-
-- `ApproveBunkerInvoices` returns its DTO **before** V2 (and any further consecutive voyages) finish recalculating
-- If the server crashes or the background task fails, V2 will never be updated
-- The 1500ms delay means the API response is not correlated with V2's updated state
-
----
-
-## 8. Fix Recommendations
-
-### Fix 1 — `GenerateStartingLotsFromEndingLots` (Primary Fix)
-
-**File:** `Core/Business/VoyageManagement/Helpers/CalculateConsecutiveVoyageHelper.cs`
-
-**Problem:** The `OwnershipChangeLog` price unconditionally overwrites `lot.PricePerMetricTonInUsds`. After invoice approval, the lot's price field has already been updated to `P_invoice`, but the `OwnershipChangeLog` entry still holds `P_redelivery`.
-
-**Principle:** `OwnershipChangeLogs` record the price **at the time of TC delivery/redelivery**, not the invoice-approved price. The lot's `PricePerMetricTonInUsds` is the authoritative current price — it should always be the carry-over value.
+**Fix (commit `bad4c6e0c`, Bug #1994):** One line added after setting `ApprovedTotalCostInUSD`:
 
 ```csharp
-// BEFORE (buggy):
-var pricePerTonBringOver = bunkerLotPrevious.PricePerMetricTonInUsds;  // fallback
-if (lastOwnershipChangeLog != null)
-{
-    pricePerTonBringOver = lastOwnershipChangeLog.PricePerMetricTonInUsdsAfterLeavingIteneraryItem
-                           ?? pricePerTonBringOver;  // ← overwrites with stale value
-    ownedByBringOver = lastOwnershipChangeLog.OwenedBy ?? ownedByBringOver;
-    paidByBringOver  = lastOwnershipChangeLog.PaidBy   ?? paidByBringOver;
-}
-
-// AFTER (fixed):
-var pricePerTonBringOver = bunkerLotPrevious.PricePerMetricTonInUsds;  // always use the lot's actual price
-if (lastOwnershipChangeLog != null)
-{
-    // Only carry over OwnedBy / PaidBy from the ownership log, NOT the price
-    // The lot.PricePerMetricTonInUsds already reflects the latest invoice-approved price
-    ownedByBringOver = lastOwnershipChangeLog.OwenedBy ?? ownedByBringOver;
-    paidByBringOver  = lastOwnershipChangeLog.PaidBy   ?? paidByBringOver;
-}
+bunkerOrderItem.TotalCostPerMetricTonsInUSD = bunkerOrderItem.TotalCostPerMetricTonsInUSDForCalculation;
 ```
 
-> **Why is the price in the lot correct?** `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` runs on every V1 recalculation and updates `V1.lot.PricePerMetricTonInUsds` to the invoice-approved price. After V1 is saved, `GetEndingBunkerLotsFromVoyageId(V1)` reads these updated values. Therefore, `bunkerLotPrevious.PricePerMetricTonInUsds` is always the correct and most up-to-date price to carry forward.
+### 7.3 Why the OwnershipChangeLogs Analysis Was Wrong for the Repro Voyages
 
-### Fix 2 — `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` (Defensive Fix)
+A previous investigation identified two bugs related to `OwnershipChangeLogs` (TCO/TC voyages):
 
-**File:** `Core/Business/VoyageManagement/Estimate/EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders.cs`
+- **Bug A** — `GenerateStartingLotsFromEndingLots` overwrites P_invoice with a stale redelivery price from the changelog
+- **Bug B** — `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` null==null skip guard
 
-**Problem:** `null == null` and `P_redelivery == P_redelivery` both incorrectly trigger the skip, preventing the invoice-approved price from being applied.
+**These are irrelevant for the repro voyages** because the repro voyages have NO `OwnershipChangeLogs`:
 
-```csharp
-// BEFORE (buggy):
-if (lastPriceChangesFromChangeLog == currentBunkerPricePerTon)
-    continue;
+- Without an ownership log entry, step 4 in `GenerateStartingLotsFromEndingLots` is simply skipped — the price overwrite never happens
+- `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders`'s skip guard fires as `null == P_invoice` → **FALSE** → price IS updated
 
-// AFTER (fixed):
-// Only skip if there IS a change log price AND the current lot price already matches it.
-// This correctly identifies "already propagated via TCO redelivery workflow" without
-// incorrectly skipping lots that have no change log or where both happen to be equal by coincidence.
-if (lastPriceChangesFromChangeLog.HasValue && lastPriceChangesFromChangeLog == currentBunkerPricePerTon)
-    continue;
-```
+Both potential bugs only manifest on TCO/TC voyages that have actual ownership transitions. They are a
+separate concern and are not the cause of the symptom described in the bug report.
 
-> Fix 2 is a defensive measure. With Fix 1 applied, V2's initial lot price will be `P_invoice` (not `P_redelivery`), so the guard `P_redelivery == P_invoice` will be `false` regardless. However, Fix 2 independently closes the `null == null` edge case.
+### 7.4 Complete Bug → Fix Mapping
 
-### Impact Assessment
-
-| Fix   | Affects                                               | Risk                                                                        |
-| ----- | ----------------------------------------------------- | --------------------------------------------------------------------------- |
-| Fix 1 | All consecutive voyages with TCO/TC bunker lots       | Low — price was already correct before ownership change log overwrote it    |
-| Fix 2 | All voyages where `OwnershipChangeLogs` is null/empty | Low — makes skip condition explicit, non-breaking for the intended use case |
+| Bug                                                        | File                                   | Description                                                                           | Status                                   | Commit       |
+| ---------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- | ------------ |
+| Reversal path: no trigger to V1 or V2                      | `InvoiceReverseBusinessService.cs`     | BC reversal didn't clear BO item or trigger voyage recalc                             | **FIXED**                                | `f04d07cdd`  |
+| Approval: stored `TotalCostPerMetricTonsInUSD` not updated | `ApproveBunkerInvoices.cs`             | Stored field retained P_ordered after approval                                        | **FIXED**                                | `bad4c6e0c`  |
+| TCO: ownership log price overwrites invoice price          | `CalculateConsecutiveVoyageHelper.cs`  | `GenerateStartingLotsFromEndingLots` overwrites lot price with stale redelivery price | **Separate issue — affects TCO/TC only** | Not in scope |
+| V2 locked by approved vessel reports                       | `CalculateAndSaveConsecutiveVoyage.cs` | Guard blocks V2 auto-update when V2 has any approved vessel report                    | **Open limitation**                      | —            |
 
 ---
 
-## 9. Quick Reference: File Map
+## 8. Guard Conditions That Block V2 Recalculation
 
-| File                                                               | Path                                                                 | Purpose in this flow                               |
-| ------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------- |
-| `BcIntegrationController.cs`                                       | `APIs/MasterData/Integration/`                                       | REST entry point for BC invoice sync               |
-| `ApproveBunkerInvoices.cs`                                         | `Core/Business/BunkerOrder/`                                         | Sets invoice values on BunkerOrderItem             |
-| `ReverseBunkerInvoiceApproval.cs`                                  | `Core/Business/BunkerOrder/`                                         | Clears invoice values on BunkerOrderItem           |
-| `InvoiceReverseBusinessService.cs`                                 | `Core/Business/DataSynchronization/BusinessCentral/ImportBCInvoice/` | BC reverse invoice business service                |
-| `SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.cs` | `Core/Business/VoyageManagement/SyncBunker/`                         | Propagates BO changes into voyage, triggers recalc |
-| `ReCalculateAndSaveVoyageById.cs`                                  | `Core/Business/VoyageManagement/Voyage/`                             | Load-calculate-save a single voyage                |
-| `CalculateVoyage.cs`                                               | `Core/Business/VoyageManagement/Voyage/`                             | Full voyage recalculation logic                    |
-| `CalculateEstimate.cs`                                             | `Core/Business/VoyageManagement/Estimate/`                           | Full estimate recalculation logic                  |
-| **`CalculateConsecutiveVoyageHelper.cs`**                          | `Core/Business/VoyageManagement/Helpers/`                            | **Bug 1** — `GenerateStartingLotsFromEndingLots`   |
-| `CalculateAndSaveConsecutiveVoyage.cs`                             | `Core/Business/VoyageManagement/Voyage/`                             | Recalculate one consecutive voyage (with guards)   |
-| `VoyageBackgroundService.cs`                                       | `Core/Business/BackgroundServices/`                                  | Fire-and-forget recalc of all next voyages         |
-| `CalculateAllBunkersCostsAndFeesForEstimate.cs`                    | `Core/Business/VoyageManagement/Estimate/`                           | Orchestrates bunker cost calculation steps         |
-| **`EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders.cs`**      | `Core/Business/VoyageManagement/Estimate/`                           | **Bug 2** — skip condition guard                   |
-| `BunkerLotCodeHelper.cs`                                           | `Core/Business/VoyageManagement/BunkerLot/Helpers/`                  | Auto-correct IsInitial, FIFO dates, lot codes      |
-| `GeneratePreCalculatedEstimateBunkerEvents.cs`                     | `Core/Business/VoyageManagement/Estimate/`                           | Step 1 of bunker cost calculation pipeline         |
+### 8.1 Guards in `CalculateAndSaveConsecutiveVoyage` (Path A — Background Service)
+
+These block the **entire V2 recalculation**:
+
+| Guard                    | Condition                                       | Outcome                                  |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------- |
+| Voyage not found         | entity is null                                  | Logs warning, returns null               |
+| Not consecutive          | `IsConsecutiveVoyage != true`                   | Returns null                             |
+| **Has approved reports** | **any `VesselReport.IsApproved == true` in V2** | **Returns null — V2 completely skipped** |
+| No previous voyage       | `FindPreviousVoyageId() == null`                | Returns null                             |
+
+### 8.2 Guards in `AutoCorrectConsecutiveBunkerLotsAndCommencePortForCurrentVoyage` (Path B)
+
+These block **lot re-seeding only** (recalculation still runs, and `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` still updates prices):
+
+| Guard                  | Condition                               | Outcome                                                                                        |
+| ---------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Not consecutive        | `IsConsecutiveVoyage != true`           | Returns immediately                                                                            |
+| No previous voyage     | `FindPreviousVoyageId() == null`        | Returns immediately                                                                            |
+| Has lifted bunker lots | `VoyageHasAnyLiftedBunkerLot() == true` | Returns immediately — lot re-seeding skipped, prices still re-synced via `EnsureBunkerLots...` |
+
+### 8.3 Decision Flow: Will V2 Get Updated After V1's Invoice Approval?
+
+```
+V1 invoice approved or reversed
+        |
+        v  awaited
+SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents
+        |
+        v  awaited
+ReCalculateAndSaveVoyageById(V1, consecutive=true)
+        |
+        v  fire-and-forget (new DI scope via IServiceScopeFactory.CreateScope())
+CalculateAndSaveConsecutiveVoyagesInBackground(V1)
+        |
+        +-- 1500ms delay per voyage --+
+        |
+        v
+Does V2 have any approved VesselReport?
+    YES -> return null -----------------------------------------> V2 NOT updated (open limitation)
+    |
+    NO -> continue
+          |
+          v
+Does V1 have ending bunker lots (EndQuantityInMetricTons > 0)?
+    NO  -> lots not re-seeded (port/date still synced if applicable)
+    YES -> remove V2 old initial lots, seed from V1 ending lots
+          |
+          v
+RecalculateAndSaveVoyageByIdAsync(V2)
+    |
+    v
+Does V2 have lifted bunker lots?
+    YES -> lot re-seeding skipped inside CalculateVoyage
+           BUT EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders still runs -> prices updated OK
+    NO  -> full re-seeding + recalculation OK
+    |
+    v (both cases)
+EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders
+    Loads BO item fresh from DB
+    TotalCostPerMetricTonsInUSDForCalculation = P_invoice (or P_ordered after reversal)
+    V2 lot prices updated
+    |
+    v
+UpdateVoyageBunkerLots -> SaveChangesAsync
+V2 persisted with correct price OK
+```
+
+### 8.4 Fire-and-Forget Execution Risk
+
+```
+ApproveBunkerInvoices / ReverseBunkerInvoiceApproval
+  +-> SyncChangesOfBunkerOrder...  [awaited]
+        +-> ReCalculateAndSaveVoyageById(V1)  [awaited]
+              +-> UpdateVoyageById(V1)  [awaited]
+                    +-> CalculateAndSaveConsecutiveVoyagesInBackground  [FIRE-AND-FORGET]
+                          Task.Run(async () => {
+                            foreach nextVoyageId:
+                              await Task.Delay(1500)
+                              await CalculateAndSaveConsecutiveVoyage(nextVoyageId)
+                          })
+```
+
+The API response returns **before V2 finishes recalculating**. If the background task throws an
+exception for one voyage, it is caught and logged silently and the loop continues to the next voyage.
+
+---
+
+## 9. Applied Fixes
+
+### Fix A — Bug #2981: Reversal Has No Trigger (commit `f04d07cdd`, 13 Mar 2026)
+
+**Files changed:**
+
+- `Core/Business/BunkerOrder/ReverseBunkerInvoiceApproval.cs` — **new file** (106 lines)
+- `Core/Business/DataSynchronization/BusinessCentral/ImportBCInvoice/InvoiceReverseBusinessService.cs` — +17 lines
+
+**What changed in `InvoiceReverseBusinessService`:**
+
+```csharp
+// Added after reversing invoice records:
+await _mediator.Send(new ReverseBunkerInvoiceApproval.Request
+{
+    PurchaseOrderNo   = purchaseOrderNo,
+    ReversedInvoiceId = reversedInvoiceId
+}, cancellationToken);
+```
+
+**What `ReverseBunkerInvoiceApproval` does:**
+
+1. Finds `BunkerOrder` by `OrderCode == PurchaseOrderNo`
+2. Parses `PLItemName` from reversed invoice items (pattern `"Category - BunkerTypeCode"`) to identify affected `BunkerTypeCodes`
+3. For each affected `BunkerOrderItem`: clears `ApprovedTotalCostInUSD`, `BunkerDeliveryNoteQuantity`, reverts `Status`
+4. `SaveChangesAsync`
+5. `await SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents` → triggers full V1+V2 chain
+
+### Fix B — Bug #1994: Stored Price Not Updated at Approval (commit `bad4c6e0c`, 7 Jan 2026)
+
+**File:** `Core/Business/BunkerOrder/ApproveBunkerInvoices.cs`
+
+**One line added after setting `ApprovedTotalCostInUSD`:**
+
+```csharp
+bunkerOrderItem.BunkerDeliveryNoteQuantity = itemDto.InvoiceQuantity;
+bunkerOrderItem.ApprovedTotalCostInUSD = itemDto.InvoiceTotalCostInUSD;
++ bunkerOrderItem.TotalCostPerMetricTonsInUSD = bunkerOrderItem.TotalCostPerMetricTonsInUSDForCalculation;
+bunkerOrderItem.Status = BunkerOrderStatusEnum.Invoiced.ToString();
+```
+
+Ensures the stored DB column `TotalCostPerMetricTonsInUSD` equals P_invoice immediately after approval
+so that any view or query reading the stored field sees the correct value.
+
+---
+
+## 10. Remaining Limitation
+
+### V2 Is Not Auto-Updated When It Has Approved Vessel Reports
+
+Even with both fixes applied, the guard in `CalculateAndSaveConsecutiveVoyage` (§8.1) causes V2 to
+be **skipped entirely** when V1's invoice is approved or reversed, if V2 has any approved vessel report.
+
+**Scenario:**
+
+1. V1 has bunker order BNK-X. V2 is consecutive.
+2. V2 has been in progress — noon reports have been submitted and approved.
+3. User approves V1's invoice → V1 correctly updates to P_invoice.
+4. Background fires for V2 → `HasAnyApprovedReportsInVoyageAsync(V2)` = true → **V2 skipped**.
+5. V2 still shows old P_ordered.
+
+**Workaround:** An admin or user must trigger a manual recalculation of V2 (e.g., edit any voyage
+field and save). When V2 is recalculated, `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders` will
+correctly update V2's lot prices from the BO item's current `TotalCostPerMetricTonsInUSDForCalculation`.
+
+**Design rationale for the guard:** Prevent overwriting operational data (port, commence date, vessel
+report references) for voyages actively being managed. Side effect: also blocks price-only updates.
+
+**Potential future fix:** Separate the "port/date/structure sync" (which should respect approved reports)
+from the "price-only update" path. After `CalculateAndSaveConsecutiveVoyage` returns null, a lightweight
+sync could still update V2's lot prices without touching operational fields.
+
+---
+
+## 11. Quick Reference: File Map
+
+| File                                                                   | Path                                                                 | Role in This Flow                                                                                              |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `VoyageController.cs`                                                  | `APIs/OrderRequest/Controllers/`                                     | `POST /Voyage/bunker-order/approve-invoices` calls `ApproveBunkerInvoices`                                     |
+| `BcIntegrationController.cs`                                           | `APIs/MasterData/Integration/`                                       | REST entry for BC invoice/reversal sync                                                                        |
+| **`ApproveBunkerInvoices.cs`**                                         | `Core/Business/BunkerOrder/`                                         | Sets invoice values; calls `SyncChanges...` — always had this trigger                                          |
+| **`ReverseBunkerInvoiceApproval.cs`**                                  | `Core/Business/BunkerOrder/`                                         | Clears invoice values; calls `SyncChanges...` — **created in Bug #2981 fix**                                   |
+| **`InvoiceReverseBusinessService.cs`**                                 | `Core/Business/DataSynchronization/BusinessCentral/ImportBCInvoice/` | BC reverse path — **updated to call `ReverseBunkerInvoiceApproval`**                                           |
+| **`SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.cs`** | `Core/Business/VoyageManagement/SyncBunker/`                         | Central trigger: syncs BO -> receival events -> V1 recalc -> V2 background                                     |
+| `ReCalculateAndSaveVoyageById.cs`                                      | `Core/Business/VoyageManagement/Voyage/`                             | Load -> Calculate -> Save a single voyage                                                                      |
+| `UpdateVoyageById.cs`                                                  | `Core/Business/VoyageManagement/Voyage/`                             | Saves voyage; fires `CalculateAndSaveConsecutiveVoyagesInBackground` if flag set                               |
+| **`VoyageBackgroundService.cs`**                                       | `Core/Business/BackgroundServices/`                                  | Fire-and-forget, new DI scope per run, 1500ms delay, calls `CalculateAndSaveConsecutiveVoyage`                 |
+| **`CalculateAndSaveConsecutiveVoyage.cs`**                             | `Core/Business/VoyageManagement/Voyage/`                             | Recalculates V2; guarded by approved-reports check — open limitation lives here                                |
+| `CalculateConsecutiveVoyageHelper.cs`                                  | `Core/Business/VoyageManagement/Helpers/`                            | `GenerateStartingLotsFromEndingLots`, `AutoCorrectConsecutiveBunkerLots...`, `GetEndingBunkerLotsFromVoyageId` |
+| `CalculateVoyage.cs`                                                   | `Core/Business/VoyageManagement/Voyage/`                             | Full voyage recalculation; calls `AutoCorrectConsecutiveBunkerLots...`                                         |
+| `CalculateAllBunkersCostsAndFeesForEstimate.cs`                        | `Core/Business/VoyageManagement/Estimate/`                           | Bunker cost pipeline; calls `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders`                             |
+| `EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders.cs`              | `Core/Business/VoyageManagement/Estimate/`                           | Re-syncs lot price from BO item; loads fresh DB state; has skip guard                                          |
+| `UpdateVoyageBunkerLots.cs`                                            | `Core/Business/VoyageManagement/BunkerLot/`                          | Persists voyage bunker lots via `OverwriteChanges`                                                             |
+| `BunkerLotCodeHelper.cs`                                               | `Core/Business/VoyageManagement/BunkerLot/Helpers/`                  | Auto-correct `IsInitial`, FIFO date ordering, lot codes                                                        |
 
 ---
 
