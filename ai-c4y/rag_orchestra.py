@@ -3,6 +3,7 @@ from src.AssistantOrchestra import AssistantOrchestra
 from src.DiagramAssistant import DiagramAssistant
 from src.agents.MermaidCodeWriter import MermaidCodeWriter
 from src.agents.models.Ollama import Ollama
+from src.agents.models.Gemini import Gemini
 from rag_chat_bvms import bvms_rag_assistant
 # from rag_chat_imos import imos_rag_assistant
 from src.RagAssistant import RagAssistant
@@ -10,14 +11,21 @@ from src.agents.DocumentRanking import DocumentRanking
 from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.agents.QuestionForwarder import QuestionForwarder
 from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
+from src.agents.AnswerEvaluator import AnswerEvaluator
+from src.agents.IterationSummarizer import IterationSummarizer
 
 from dotenv import load_dotenv
+import os
 load_dotenv()
+
+TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
 
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
-        llm_model=Ollama(num_ctx=32000),
-        max_context_tokens=32000,
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
+        # llm_model=Gemini(model="gemini-2.5-flash"),
+        # max_context_tokens=100000,
     )
 )
 
@@ -27,8 +35,8 @@ bvms_code_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(model="qwen3.5:9b", num_ctx=24000),
-        max_context_tokens=36000,
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
         instruction_template="""
         You are an intelligient assistant that can provide code snippet and explaination for a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
@@ -41,14 +49,25 @@ bvms_code_assistant = RagAssistant(
 
 assistant = AssistantOrchestra(
     llm_question_forwarder=QuestionForwarder(
-        llm_model=Ollama(model="gemma3:12b"),
-     ),
-     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=Ollama(model="gemma3:12b"),
-     )
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+    ),
+    llm_final_thought_summarizer=FinalThoughtSummarizer(
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
+    ),
+    llm_answer_evaluator=AnswerEvaluator(
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
+    ),
+    llm_iteration_summarizer=IterationSummarizer(
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
+    ),
+    max_iterations=3,
+    compact_threshold_tokens=TOKENS_LENGTH,
 )
 assistant.agents = {
-    "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
+    # "Diagram Assistant": {"agent": diagram_assistant, "context_awareness": True, "description": "This agent can generate diagrams and workflows based on a given context"},
     "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},
     "BVMS-Code Assistant": {"agent": bvms_code_assistant, "context_awareness": True, "description": "This agent can provide code snippet and code explaination for a software named BVMS (BBC Voyager Management System)"},
 }

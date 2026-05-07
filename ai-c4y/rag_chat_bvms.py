@@ -3,6 +3,12 @@ from src.agents.GeneralRagAnswer import GeneralRagAnswer
 from src.RagAssistant import RagAssistant
 from src.ChatBackend import create_chat_backend
 from src.agents.DocumentRanking import DocumentRanking
+from src.agents.models.Gemini import Gemini
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -10,9 +16,10 @@ bvms_rag_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        # llm_model=Ollama(model="gemma4:e4b", num_ctx=24000),
-        llm_model=Ollama(model="gemma3:12b", num_ctx=24000),
-        max_context_tokens=36000,
+        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
+        max_context_tokens=TOKENS_LENGTH,
+        # llm_model=Gemini(model="gemini-2.5-flash"),
+        # max_context_tokens=100000,
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.

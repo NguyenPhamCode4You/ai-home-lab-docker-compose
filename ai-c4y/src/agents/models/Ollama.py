@@ -9,7 +9,7 @@ class Ollama:
     def __init__(self, url: str = None, model: str = None, num_ctx: int = None):
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_GENERAL_MODEL") or None
-        self.num_ctx = num_ctx or 2048
+        self.num_ctx = num_ctx or 24000
 
     async def stream(self, prompt: str):
         if not self.url or not self.model:

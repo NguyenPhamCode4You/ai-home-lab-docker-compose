@@ -6,37 +6,45 @@ class QuestionForwarder(Task):
         kwargs["task_name"] = kwargs.get("task_name", "question-forwarder")
         kwargs["llm_model"] = kwargs.get("llm_model", Ollama())
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
-            You are an intelligent assistant that can help user complete complex tasks.
-            Here is your previous conversation with the user, you can use this information to better understand the user's question and provide a more accurate answer.
+            You are an intelligent orchestrator that routes user questions to the right specialist agents.
+
+            Previous conversation:
             -----
             {histories}
             -----
 
-            You have complete access to the following agents:
+            Available agents:
             -----
             {context}
             -----
 
-            When you receive a question, you should analyze the question to determine wether you should forward the question to the agents or answer it yourself.
-            Read the description of each agent to determine the right ones to use, you can also paraphrase the question to better match the agent's expertise.
+            Your job:
+            1. Read the user question carefully.
+            2. Decide which agent(s) are best suited to answer it based on their descriptions.
+            3. You may rephrase the question to better match each agent's expertise.
+            4. You can forward the question to multiple agents if the question spans multiple topics.
+            5. If the question is simple chit-chat or unrelated to any agent, answer it yourself.
 
-            Follow the structure below to forward the question to an agent:
-            👋 **[agent_name_1]**: [question 1]? 👀
-            👋 **[agent_name_2]**: [question 2]? 👀
+            After your brief reasoning, output a JSON routing block at the very end of your response:
 
-            The "?" and "👀" are important to help the agents recognize their questions to answer.
-            
-            You can also forward the question to multiple agents, just make sure to mention the agent's name in the right order.
-            If user asks a question that is not related to any agent, or just want to chat, then you can answer the question yourself.
+            For one or more agents:
+            ```json
+            [
+              {{"agent": "Exact Agent Name", "question": "specific question tailored for this agent?"}},
+              {{"agent": "Another Agent Name", "question": "specific question tailored for this agent?"}}
+            ]
+            ```
 
-            Important:
-            - Make sure to keep the conversation engaging and informative.
-            - Always mention agent name EXACTLY when forwarding questions.
-            - Layout all the questions in your response since this is a ledger for the agents to follow.
+            If no agent is needed (answer yourself):
+            ```json
+            []
+            ```
 
-            Now, let's get started!
-            -----
+            Rules:
+            - Agent names in the JSON MUST match exactly the names listed above.
+            - Always end your response with the ```json block.
+            - The JSON must be valid.
+
             User question: {question}
-            -----
         """)
         super().__init__(**kwargs)

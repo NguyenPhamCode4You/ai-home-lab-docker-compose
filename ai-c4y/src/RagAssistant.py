@@ -34,7 +34,7 @@ class RagAssistant():
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
-            yield f"📌 Retrieving documents: "
+            yield "<think>\n📌 Retrieving documents: "
 
             # Collect documents up to the token limit first
             docs_to_rank = []
@@ -48,8 +48,14 @@ class RagAssistant():
 
             # Rank all documents in parallel
             async def rank_doc(idx, doc):
-                score = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
-                return idx, float(score)
+                raw = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
+                try:
+                    import re as _re
+                    match = _re.search(r'\d+(\.\d+)?', str(raw))
+                    score = float(match.group()) if match else 0.0
+                except Exception:
+                    score = 0.0
+                return idx, score
 
             tasks = [rank_doc(i, doc) for i, doc in enumerate(docs_to_rank)]
             scores = [0.0] * len(docs_to_rank)
@@ -68,11 +74,19 @@ class RagAssistant():
             documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
             knowledge_context = "\n\n".join([doc[0] for doc in documents])
+            yield "\n</think>\n\n"
+
+        # ---- Single-shot answer ----
         iterations_response = ""
-        yield "\n\n"
-        async for response_chunk in self.rag_answer.stream(context=knowledge_context, question=question, conversation_history=conversation_history):
+        async for response_chunk in self.rag_answer.stream(
+            context=knowledge_context,
+            question=question,
+            conversation_history=conversation_history,
+        ):
             yield response_chunk
             iterations_response += response_chunk
+
+        # ---- Optional enricher ----
         if self.context_enricher:
             enrichment_header = f"\n\n### 🌟 Let's enrich the context with more information...\n\n"
             yield enrichment_header
@@ -80,10 +94,11 @@ class RagAssistant():
             async for enricher_chunk in self.context_enricher.stream(question=question):
                 yield enricher_chunk
                 iterations_response += enricher_chunk
+
+        # ---- Optional final summarizer ----
         if self.final_summarizer:
             summarizer_header = f"\n\n### 🎯 Lets have one final revise on the question ...\n\n"
             yield summarizer_header
             iterations_response += summarizer_header
             async for summarizer_chunk in self.final_summarizer.stream(context=iterations_response, question=question):
                 yield summarizer_chunk
-        
