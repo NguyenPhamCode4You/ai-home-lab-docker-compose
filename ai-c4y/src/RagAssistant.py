@@ -16,6 +16,7 @@ class RagAssistant():
             llm_context_enricher: Task = None,
             llm_final_summarizer: Task = None,
             document_match_count: int = 200,
+            document_ranking_patch_percent: float = 5.0
         ):
         
         self.query_function_name = query_function_name
@@ -25,6 +26,7 @@ class RagAssistant():
         self.context_enricher = llm_context_enricher or None
         self.final_summarizer = llm_final_summarizer or None
         self.document_match_count = document_match_count
+        self.document_ranking_patch_percent = document_ranking_patch_percent
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         knowledge_context = self.vector_store.get_documents_string(
@@ -46,7 +48,7 @@ class RagAssistant():
                 if documents_context_length > max_ranking_context_tokens:
                     break
 
-            # Rank all documents in parallel
+            # Rank documents in parallel batches of 10% at a time
             async def rank_doc(idx, doc):
                 raw = await self.document_ranking.run(context=doc, question=question, conversation_history=conversation_history)
                 try:
@@ -57,24 +59,34 @@ class RagAssistant():
                     score = 0.0
                 return idx, score
 
-            tasks = [rank_doc(i, doc) for i, doc in enumerate(docs_to_rank)]
-            scores = [0.0] * len(docs_to_rank)
+            total = len(docs_to_rank)
+            batch_size = max(1, int(total * self.document_ranking_patch_percent / 100))
+            scores = [0.0] * total
             completed = 0
-            last_emitted = -1
-            for coro in asyncio.as_completed(tasks):
-                idx, score = await coro
-                scores[idx] = score
-                completed += 1
-                percentage = int(completed / len(docs_to_rank) * 100)
-                milestone = (percentage // 10) * 10
-                if milestone > last_emitted:
-                    yield f" ➜ {str(milestone)}%"
-                    last_emitted = milestone
+
+            for batch_start in range(0, total, batch_size):
+                batch = [(i, docs_to_rank[i]) for i in range(batch_start, min(batch_start + batch_size, total))]
+                batch_results = await asyncio.gather(*[rank_doc(i, doc) for i, doc in batch])
+                for idx, score in batch_results:
+                    scores[idx] = score
+                completed += len(batch)
+                percentage = int(completed / total * 100)
+                yield f" ➜ {percentage}%"
 
             documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
-            knowledge_context = "\n\n".join([doc[0] for doc in documents])
-            yield "\n</think>\n\n"
+
+            # Keep only top documents that fit within the answer LLM's context limit
+            top_docs = []
+            top_docs_length = 0
+            for doc, _ in documents:
+                if top_docs_length + len(doc) > self.rag_answer.max_context_tokens:
+                    break
+                top_docs.append(doc)
+                top_docs_length += len(doc)
+
+            knowledge_context = "\n\n".join(top_docs)
+            yield f"\n✅ Using top {len(top_docs)}/{total} documents ({top_docs_length} chars)\n</think>\n\n"
 
         # ---- Single-shot answer ----
         iterations_response = ""
