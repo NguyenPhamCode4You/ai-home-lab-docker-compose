@@ -123,8 +123,9 @@ class AssistantOrchestra:
                     if open_pos != -1:
                         safe = safe[:open_pos]  # suppress until think block closes
 
-                    # Stop displaying at the json routing block
-                    json_pos = safe.find('```json')
+                    # Stop displaying at the json routing block (suppress at ``` to avoid
+                    # yielding stray backticks before 'json' arrives in the next chunk)
+                    json_pos = safe.find('```')
                     if json_pos != -1:
                         safe = safe[:json_pos]
                         in_json_block = True
