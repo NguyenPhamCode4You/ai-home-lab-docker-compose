@@ -14,12 +14,7 @@ from src.agents.AnswerEvaluator import AnswerEvaluator
 from src.agents.IterationSummarizer import IterationSummarizer
 
 from dotenv import load_dotenv
-import os
 load_dotenv()
-
-TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
-CHARS_PER_TOKEN = 3  # ~3 chars/token (conservative); use 4 for English-heavy text
-CONTEXT_CHARS = int(TOKENS_LENGTH * CHARS_PER_TOKEN * 0.85)  # 85% of window → leaves room for prompt + output
 
 bvms_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -28,7 +23,6 @@ bvms_code_assistant = RagAssistant(
     ),
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(),
-        max_context_tokens=CONTEXT_CHARS,
         instruction_template="""
         You are an intelligient assistant that can provide code snippet and explaination for a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
@@ -45,18 +39,14 @@ assistant = AssistantOrchestra(
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
         llm_model=Ollama(),
-        max_context_tokens=CONTEXT_CHARS,
     ),
     llm_answer_evaluator=AnswerEvaluator(
         llm_model=Ollama(),
-        max_context_tokens=CONTEXT_CHARS,
     ),
     llm_iteration_summarizer=IterationSummarizer(
         llm_model=Ollama(),
-        max_context_tokens=CONTEXT_CHARS,
     ),
     max_iterations=3,
-    compact_threshold_tokens=TOKENS_LENGTH,
 )
 assistant.agents = {
     "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about a software named BVMS (BBC Voyager Management System)"},

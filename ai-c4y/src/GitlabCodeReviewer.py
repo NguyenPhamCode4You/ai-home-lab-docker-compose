@@ -29,7 +29,7 @@ class GitlabCodeReviewer():
 
         project_config_string = await Task(
             llm_model=self.llm_code_reviewer.llm_model if self.llm_code_reviewer else Ollama(),
-            max_context_tokens=self.llm_code_reviewer.max_context_tokens if self.llm_code_reviewer else 5000,
+            max_context_chars=self.llm_code_reviewer.max_context_chars if self.llm_code_reviewer else 5000,
             instruction_template="Given the following context: {question}. Return only the project_id and merge_request_id in format project_id/mr_iid, example is: 30/180."
         ).run(question=question)
         

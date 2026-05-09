@@ -35,7 +35,7 @@ class RagAssistant():
             match_count=self.document_match_count)
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
-            max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
+            max_ranking_context_chars = self.rag_answer.max_context_chars * 2.5
             yield "<think>📌 Retrieving documents: "
 
             # Collect documents up to the token limit first
@@ -45,7 +45,7 @@ class RagAssistant():
                 document = f"# {header}\n\n{content}"
                 docs_to_rank.append(document)
                 documents_context_length += len(document)
-                if documents_context_length > max_ranking_context_tokens:
+                if documents_context_length > max_ranking_context_chars:
                     break
 
             # Rank documents in parallel batches of 10% at a time
@@ -80,7 +80,7 @@ class RagAssistant():
             top_docs = []
             top_docs_length = 0
             for doc, _ in documents:
-                if top_docs_length + len(doc) > self.rag_answer.max_context_tokens:
+                if top_docs_length + len(doc) > self.rag_answer.max_context_chars:
                     break
                 top_docs.append(doc)
                 top_docs_length += len(doc)

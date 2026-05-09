@@ -1,23 +1,31 @@
 from typing import List
 from .models.Ollama import Ollama
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
+CHARS_PER_TOKEN = 3  # ~3 chars/token (conservative); use 4 for English-heavy text
+CONTEXT_CHARS = int(TOKENS_LENGTH * CHARS_PER_TOKEN * 0.85)  # 85% of window → leaves room for prompt + output
+
 class Task:
-    def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_tokens: int = 5000, context_chunk_size: int = None, user_instruction: str = None):
+    def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_chars = None, context_chunk_size: int = None, user_instruction: str = None):
         self.task_name = task_name or "GenericTask"
         self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
-        self.max_context_tokens = max_context_tokens
+        self.max_context_chars = max_context_chars or CONTEXT_CHARS
         self.user_instruction = user_instruction or None
         self.state = { "context": "", "question": "", "response": "" }
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
-        context = str(context)[:self.max_context_tokens] if context else None
+        context = str(context)[:self.max_context_chars] if context else None
         self.state["context"] = context
         self.state["question"] = question
         self.state["response"] = ""
         chunks = HardSplitContextChunks(context, self.context_chunk_size)
-        max_history_tokens = self.max_context_tokens - len(context or "")
+        max_history_tokens = self.max_context_chars - len(context or "")
         histories = get_chat_history_string(conversation_history, max_history_tokens)
         
         for index, chunk in enumerate(chunks):

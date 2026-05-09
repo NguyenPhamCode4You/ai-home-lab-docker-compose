@@ -4,7 +4,7 @@
 
 **Current problems:**
 
-- `str(context)[:self.max_context_tokens]` in `Task.py` is a brutal character-slice that cuts mid-sentence
+- `str(context)[:self.max_context_chars]` in `Task.py` is a brutal character-slice that cuts mid-sentence
 - History is included raw — older turns consume token budget that could be used for RAG context
 - No cross-request session memory; each request is stateless
 - `KnowledgeCompression` is defined but never used anywhere in the pipeline
