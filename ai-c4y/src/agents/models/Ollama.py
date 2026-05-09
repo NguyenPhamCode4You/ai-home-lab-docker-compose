@@ -5,11 +5,13 @@ import httpx
 from dotenv import load_dotenv
 load_dotenv()
 
+default_token_length = int(os.getenv("TOKENS_LENGTH", 28000))
+
 class Ollama:
     def __init__(self, url: str = None, model: str = None, num_ctx: int = None, num_predict: int = None):
         self.url = url or os.getenv("OLLAMA_URL") or None
         self.model = model or os.getenv("OLLAMA_GENERAL_MODEL") or None
-        self.num_ctx = num_ctx or 24000
+        self.num_ctx = num_ctx or default_token_length
         self.num_predict = num_predict or -1  # -1 = unlimited output length
 
     async def stream(self, prompt: str):

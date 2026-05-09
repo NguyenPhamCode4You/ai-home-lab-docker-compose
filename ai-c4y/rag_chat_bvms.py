@@ -9,6 +9,8 @@ import os
 load_dotenv()
 
 TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
+CHARS_PER_TOKEN = 3  # ~3 chars/token (conservative); use 4 for English-heavy text
+CONTEXT_CHARS = int(TOKENS_LENGTH * CHARS_PER_TOKEN * 0.85)  # 85% of window → leaves room for prompt + output
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -16,10 +18,8 @@ bvms_rag_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
-        max_context_tokens=TOKENS_LENGTH,
-        # llm_model=Gemini(model="gemini-2.5-flash"),
-        # max_context_tokens=100000,
+        llm_model=Ollama(num_ctx=TOKENS_LENGTH),
+        max_context_tokens=CONTEXT_CHARS,
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
