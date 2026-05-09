@@ -43,7 +43,7 @@ class RagAssistant():
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_chars = self.rag_answer.max_context_chars * default_document_search_buffer_multiplier
-            yield "<think>📌 Retrieving documents: "
+            yield "<think>📌 1. Retrieving documents: ... "
 
             # Collect documents up to the token limit first
             docs_to_rank = []
@@ -56,7 +56,7 @@ class RagAssistant():
                     docs_to_rank.append(document)
                     documents_context_length += len(document)
 
-            yield f"📚 {len(docs_to_rank)} documents searched for ranking ({int(max_ranking_context_chars):,} chars) \n📈 - Ranking progress: "
+            yield f"📚 {len(docs_to_rank)} documents searched for ranking ({int(max_ranking_context_chars):,} chars) \n📈 2. Ranking progress: "
 
             # Rank documents in parallel batches of 10% at a time
             async def rank_doc(idx, doc):
@@ -96,7 +96,7 @@ class RagAssistant():
                 top_docs_length += len(doc)
 
             knowledge_context = "\n\n".join(top_docs)
-            yield f"\n✅ - Using top {len(top_docs)}/{total} documents ({top_docs_length:,} / {int(max_ranking_context_chars):,} chars) for answering\n</think>\n\n"
+            yield f"\n✅ 3. Using top {len(top_docs)}/{total} documents ({top_docs_length:,} / {int(max_ranking_context_chars):,} chars) for answering...\n</think>\n\n"
 
         # ---- Single-shot answer ----
         iterations_response = ""
