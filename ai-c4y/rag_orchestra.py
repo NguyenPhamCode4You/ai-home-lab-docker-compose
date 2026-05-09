@@ -19,6 +19,8 @@ import os
 load_dotenv()
 
 TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
+CHARS_PER_TOKEN = 3  # ~3 chars/token (conservative); use 4 for English-heavy text
+CONTEXT_CHARS = int(TOKENS_LENGTH * CHARS_PER_TOKEN * 0.85)  # 85% of window → leaves room for prompt + output
 
 diagram_assistant = DiagramAssistant(
     llm_mermaid_code_writter=MermaidCodeWriter(
@@ -36,7 +38,7 @@ bvms_code_assistant = RagAssistant(
     ),
     llm_rag_answer=GeneralRagAnswer(
         llm_model=Ollama(model="gemma4:e4b", num_ctx=TOKENS_LENGTH),
-        max_context_tokens=TOKENS_LENGTH,
+        max_context_tokens=CONTEXT_CHARS,
         instruction_template="""
         You are an intelligient assistant that can provide code snippet and explaination for a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.

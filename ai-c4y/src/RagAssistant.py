@@ -36,7 +36,7 @@ class RagAssistant():
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
             max_ranking_context_tokens = self.rag_answer.max_context_tokens * 2.5
-            yield "<think>\n📌 Retrieving documents: "
+            yield "<think>📌 Retrieving documents: "
 
             # Collect documents up to the token limit first
             docs_to_rank = []
