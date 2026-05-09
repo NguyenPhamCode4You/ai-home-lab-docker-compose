@@ -5,6 +5,7 @@ from src.ChatBackend import create_chat_backend
 from src.agents.DocumentRanking import DocumentRanking
 from src.agents.models.Gemini import Gemini
 from dotenv import load_dotenv
+from src.agents.models.OpenRouter import OpenRouter
 
 load_dotenv()
 
@@ -14,7 +15,8 @@ bvms_rag_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(),
+        # llm_model=Ollama(),
+        llm_model=OpenRouter(),
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
