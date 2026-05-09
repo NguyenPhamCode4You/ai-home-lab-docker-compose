@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-TOKENS_LENGTH = int(os.getenv("TOKENS_LENGTH", 28000))
-CHARS_PER_TOKEN = 3  # ~3 chars/token (conservative); use 4 for English-heavy text
-CONTEXT_CHARS = int(TOKENS_LENGTH * CHARS_PER_TOKEN * 0.85)  # 85% of window → leaves room for prompt + output
+default_token_length = int(os.getenv("TOKENS_LENGTH", 28000))
+default_char_per_token = int(os.getenv("CHARS_PER_TOKEN", 3))
+default_context_chars = int(default_token_length * default_char_per_token * 0.85)  # 85% of window → leaves room for prompt + output
 
 class Task:
     def __init__(self, instruction_template: str, task_name: str = None, llm_model = None, max_context_chars = None, context_chunk_size: int = None, user_instruction: str = None):
@@ -15,7 +15,7 @@ class Task:
         self.llm_model = llm_model or Ollama()
         self.instruction_template = instruction_template
         self.context_chunk_size = context_chunk_size
-        self.max_context_chars = max_context_chars or CONTEXT_CHARS
+        self.max_context_chars = max_context_chars or default_context_chars
         self.user_instruction = user_instruction or None
         self.state = { "context": "", "question": "", "response": "" }
 

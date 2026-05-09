@@ -7,6 +7,13 @@ from .agents.GeneralRagAnswer import GeneralRagAnswer
 from .agents.DocumentRanking import DocumentRanking
 from .FileHanlder import split_markdown_header_and_content
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+default_document_ranking_patch_percent = float(os.getenv("DOCUMENT_RANKING_PATCH_PERCENTAGE", 5.0))
+default_document_search_buffer_multiplier = float(os.getenv("DOCUMENT_SEARCH_BUFFER_MULTIPLIER", 2.5))
+
 class RagAssistant():
     def __init__(self, 
             query_function_name: str, 
@@ -15,8 +22,8 @@ class RagAssistant():
             llm_document_ranking: Task = None,
             llm_context_enricher: Task = None,
             llm_final_summarizer: Task = None,
+            document_ranking_patch_percent: float = None,
             document_match_count: int = 200,
-            document_ranking_patch_percent: float = 5.0
         ):
         
         self.query_function_name = query_function_name
@@ -26,7 +33,7 @@ class RagAssistant():
         self.context_enricher = llm_context_enricher or None
         self.final_summarizer = llm_final_summarizer or None
         self.document_match_count = document_match_count
-        self.document_ranking_patch_percent = document_ranking_patch_percent
+        self.document_ranking_patch_percent = document_ranking_patch_percent or default_document_ranking_patch_percent
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         knowledge_context = self.vector_store.get_documents_string(
@@ -35,18 +42,21 @@ class RagAssistant():
             match_count=self.document_match_count)
         print(f"Knowledge context: {knowledge_context}")
         if self.document_ranking is not None:
-            max_ranking_context_chars = self.rag_answer.max_context_chars * 2.5
+            max_ranking_context_chars = self.rag_answer.max_context_chars * default_document_search_buffer_multiplier
             yield "<think>📌 Retrieving documents: "
 
             # Collect documents up to the token limit first
             docs_to_rank = []
             documents_context_length = 0
+            total_kb_docs = 0
             for header, content in split_markdown_header_and_content(knowledge_context):
-                document = f"# {header}\n\n{content}"
-                docs_to_rank.append(document)
-                documents_context_length += len(document)
-                if documents_context_length > max_ranking_context_chars:
-                    break
+                total_kb_docs += 1
+                if documents_context_length <= max_ranking_context_chars:
+                    document = f"# {header}\n\n{content}"
+                    docs_to_rank.append(document)
+                    documents_context_length += len(document)
+
+            yield f"📚 {len(docs_to_rank)} documents searched for ranking ({int(max_ranking_context_chars):,} chars) \n📈 - Ranking progress: "
 
             # Rank documents in parallel batches of 10% at a time
             async def rank_doc(idx, doc):
@@ -71,7 +81,7 @@ class RagAssistant():
                     scores[idx] = score
                 completed += len(batch)
                 percentage = int(completed / total * 100)
-                yield f" ➜ {percentage}%"
+                yield f"{percentage}% ➜ " if completed < total else f"{percentage}%"
 
             documents = list(zip(docs_to_rank, scores))
             documents.sort(key=lambda x: x[1], reverse=True)
@@ -86,7 +96,7 @@ class RagAssistant():
                 top_docs_length += len(doc)
 
             knowledge_context = "\n\n".join(top_docs)
-            yield f"\n✅ Using top {len(top_docs)}/{total} documents ({top_docs_length} chars)\n</think>\n\n"
+            yield f"\n✅ - Using top {len(top_docs)}/{total} documents ({top_docs_length:,} / {int(max_ranking_context_chars):,} chars) for answering\n</think>\n\n"
 
         # ---- Single-shot answer ----
         iterations_response = ""
