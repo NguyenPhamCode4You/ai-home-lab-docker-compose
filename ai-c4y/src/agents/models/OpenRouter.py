@@ -19,7 +19,7 @@ class OpenRouter:
 
     def __init__(self, api_key: str = None, model: str = None, max_retries: int = 8):
         self.api_key = api_key or os.getenv("OPENROUTER_API_KEY") or None
-        self.model = model or os.getenv("OPENROUTER_MODEL") or "openai/gpt-4o-mini"
+        self.model = model or os.getenv("OPENROUTER_DEFAULT_MODEL") or "openai/gpt-4o-mini"
         self.max_retries = max_retries
 
     async def stream(self, prompt: str):

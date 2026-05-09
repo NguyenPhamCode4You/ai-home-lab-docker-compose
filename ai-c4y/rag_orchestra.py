@@ -12,9 +12,13 @@ from src.agents.QuestionForwarder import QuestionForwarder
 from src.agents.FinalThoughtSummarizer import FinalThoughtSummarizer
 from src.agents.AnswerEvaluator import AnswerEvaluator
 from src.agents.IterationSummarizer import IterationSummarizer
+from src.agents.models.OpenRouter import OpenRouter
 
 from dotenv import load_dotenv
 load_dotenv()
+
+# default_model = Ollama()
+default_model = OpenRouter()
 
 bvms_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -22,7 +26,7 @@ bvms_code_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=Ollama(),
+        llm_model=OpenRouter(model="qwen/qwen3.6-27b"),
         instruction_template="""
         You are an intelligient assistant that can provide code snippet and explaination for a software named BVMS (BBC Voyager Management System).
         First, analyze carefully the below knowledge base to base your answer on.
@@ -35,16 +39,16 @@ bvms_code_assistant = RagAssistant(
 
 assistant = AssistantOrchestra(
     llm_question_forwarder=QuestionForwarder(
-        llm_model=Ollama(),
+        llm_model=default_model,
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=Ollama(),
+        llm_model=default_model,
     ),
     llm_answer_evaluator=AnswerEvaluator(
-        llm_model=Ollama(),
+        llm_model=default_model,
     ),
     llm_iteration_summarizer=IterationSummarizer(
-        llm_model=Ollama(),
+        llm_model=default_model,
     ),
     max_iterations=3,
 )
