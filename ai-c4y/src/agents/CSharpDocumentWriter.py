@@ -90,23 +90,41 @@ List every `mediator.Send(new X.Request...)` call, in order of invocation:
 [IF DOMAIN/DTO:]
 
 ## Members
-Non-trivial members ONLY:
-- Include: computed properties (`=>` expressions), `??` fallback chains, conditional logic, non-obvious default values that affect routing or behavior.
-- SKIP: plain auto-properties with no logic (e.g. `public string Name {{ get; set; }}`), trivial constructors, ToString/Equals.
+Document members in two tiers:
 
-IMPORTANT — if the class has NO non-trivial members (all properties are plain auto-properties):
-Do NOT invent explanations for simple properties. Instead write a single paragraph under `## Members` in this format:
-"This class is a pure data carrier with no computed logic. All properties are scalar auto-properties mapped directly to [EF Core table / AutoMapper target / DTO projection]. It serves as [specific role: the primary persistence entity / the API response shape / the command input for XHandler]. Key fields: list the 3-5 most domain-meaningful field names and what they represent."
+**Tier 1 — Computed / Logic members** (ALWAYS document these):
+- Computed properties with `=>` expressions
+- `??` fallback chains
+- Conditional logic (`? :`, `if/else`)
+- Non-obvious default values that affect routing or behavior
 
-When documenting a non-trivial member, name the specific downstream handlers, services, or calculations that consume its value.
+**Tier 2 — Significant scalar fields** (document these even if plain `{{ get; set; }}`):
+- Financial fields: anything named with Cost, Price, Amount, Fee, Rate, Revenue, USD, Total
+- Quantity fields: anything named with Quantity, Volume, Tons, Metric
+- Status / routing fields: Status, IsApproved, IsActive, PaidBy, OwnedBy, FreightType, Type, Category
+- Key date fields: OpeningDate, Laycan, ETA, ETD, ArrivedAt
+- Nullable fields whose null-vs-value distinction drives business logic (e.g. `ApprovedTotalCostInUSD` — null means unapproved)
+
+For Tier 2 fields, document as:
+### [FieldName] — [business role in one line]
+**Role**: What this field stores, what null/empty/default means in domain terms, and which handlers or workflows read or mutate it.
+
+HARD SKIP (never document): `Id`, `CreatedAt`, `UpdatedAt`, `Name`, `Description`, `Note`, `Remark`, navigation props that are just lists of child DTOs, trivial constructors, ToString/Equals.
+
+IMPORTANT — if the class genuinely has NO non-trivial AND no significant scalar fields (pure structural container):
+Write one paragraph: "Pure data carrier. All properties are structural mappings to [EF Core table / AutoMapper target]. Key fields: [list 3-5 domain-meaningful names and their roles]."
+
+When documenting any member, name the specific downstream handlers, services, or calculations that consume its value (from the index context).
 
 ### 1. [MemberName] — [one-line purpose]
 ```csharp
-[exact expression body or method body]
+[exact code — expression body, default assignment, or method body]
 ```
-**Explanation**: What it computes, which fields it reads, the fallback/priority order, and which specific handlers or calculations downstream consume this value. 2-5 sentences.
+**Explanation** (Tier 1): What it computes, fallback order, downstream consumers by name. 2-5 sentences.
+— OR —
+**Role** (Tier 2): What this field holds, what null/zero means, which handlers read or write it.
 
-[Repeat for each non-trivial member in file order.]
+[Repeat for ALL Tier 1 members and ALL Tier 2 significant fields, in file order.]
 
 [END DOMAIN/DTO TEMPLATE]
 
