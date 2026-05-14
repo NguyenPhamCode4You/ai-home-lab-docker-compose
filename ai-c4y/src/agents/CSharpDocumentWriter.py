@@ -52,8 +52,9 @@ What specific business operation does this class own? How critical is it?
 (e.g. "Core path for voyage cost finalization — called on every estimate save", "Low-impact DTO for list views")
 2-4 sentences max.
 
----
-IF HANDLER (IRequestHandler):
+[Now use the matching template below based on the file type identified above:]
+
+[IF HANDLER (IRequestHandler):]
 
 ## Request Parameters
 List each field on the Request class with its type and default value.
@@ -81,8 +82,9 @@ Cover every significant operation — do not skip mediator.Send calls or named h
 List every `mediator.Send(new X.Request...)` call, in order of invocation:
 - `HandlerName` — what business operation it performs and what it reads or mutates on the entity
 
----
-IF DOMAIN/DTO:
+[END HANDLER TEMPLATE]
+
+[IF DOMAIN/DTO:]
 
 ## Members
 Document every member with non-trivial logic or business meaning.
@@ -97,8 +99,9 @@ SKIP: simple auto-properties (e.g. public string Name {{ get; set; }}), trivial 
 
 [Repeat for each non-trivial member in file order.]
 
----
-IF VALIDATOR:
+[END DOMAIN/DTO TEMPLATE]
+
+[IF VALIDATOR:]
 
 ## Validation Rules
 For each RuleFor block:
@@ -106,13 +109,14 @@ For each RuleFor block:
 - Rule: [what FluentValidation rule is applied]
 - Business constraint: [why this field must satisfy this constraint in domain terms]
 
----
-IF OTHER (helper/extension/utility):
+[END VALIDATOR TEMPLATE]
+
+[IF OTHER (helper/extension/utility):]
 
 ## Members
 Same format as DOMAIN/DTO above but focus on non-obvious logic and side-effects.
 
----
+[END OTHER TEMPLATE]
 
 ## Dependencies
 Bullet list. For each injected service, base class, interface, or key referenced type:
@@ -121,8 +125,6 @@ Skip primitive types.
 
 # Impact Scope
 [PLACEHOLDER — will be filled in Phase 3]
-
----
 
 C# file to document:
 

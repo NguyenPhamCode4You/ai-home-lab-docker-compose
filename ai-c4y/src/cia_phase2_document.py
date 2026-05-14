@@ -108,6 +108,7 @@ async def write_csharp_documents(
     print(f"[Phase 2] {total} files to document.")
 
     effective_batch = max(1, concurrency) if (force_cloud or force_local) else batch_size
+    manifest_lock = asyncio.Lock()
     for batch_start in range(0, total, effective_batch):
         batch = to_process[batch_start : batch_start + effective_batch]
         used_cloud_this_batch = False
@@ -159,6 +160,8 @@ async def write_csharp_documents(
                         out_file.write(chunk)
                         out_file.flush()
                 manifest.set_phase(rel_path, "documented", {"doc_path": out_path, "lines": lines})
+                async with manifest_lock:
+                    manifest.save()  # serialized — prevents concurrent write corruption
                 ts = datetime.now().strftime("%H:%M:%S")
                 print(f"\n[Phase 2] {ts} [{file_idx}/{total}] DONE: {rel_path}")
             except Exception as exc:
