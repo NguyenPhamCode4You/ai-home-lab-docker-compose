@@ -343,6 +343,9 @@ async def _synthesize_architecture_overview(
 ):
     """Final Phase 4 synthesis: produce BVMS_Architecture_Overview.md."""
     output_path = os.path.join(workflows_folder, "BVMS_Architecture_Overview.md")
+    tmp_path = output_path + ".tmp"
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path)
     if os.path.exists(output_path):
         print("[Phase 4] SKIP (exists): BVMS_Architecture_Overview.md")
         return
@@ -416,13 +419,16 @@ graph TD
     )
     print("[Phase 4] Synthesizing BVMS_Architecture_Overview.md...")
     try:
-        with open(output_path, "w", encoding="utf-8") as out_file:
+        with open(tmp_path, "w", encoding="utf-8") as out_file:
             async for chunk in synthesizer.stream(context=summaries_text, question="BVMS System Overview"):
                 print(chunk, end="", flush=True)
                 out_file.write(chunk)
                 out_file.flush()
+        os.rename(tmp_path, output_path)
         print(f"\n[Phase 4] DONE: {output_path}")
     except Exception as e:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
         print(f"[Phase 4] ERROR synthesizing architecture overview: {e}")
 
 
@@ -897,6 +903,10 @@ async def synthesize_workflow_documents(
             cluster_label = f"{module} — {verb_cluster}"
             output_path = os.path.join(module_folder, f"{verb_cluster}_workflow.md")
 
+            tmp_path = output_path + ".tmp"
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
             if os.path.exists(output_path):
                 print(f"[Phase 4 Pass A] SKIP (exists): {output_path}")
                 with open(output_path, "r", encoding="utf-8") as f:
@@ -913,15 +923,18 @@ async def synthesize_workflow_documents(
             )
             print(f"[Phase 4 Pass A] Synthesizing: {cluster_label} ({len(file_paths)} files)")
             try:
-                with open(output_path, "w", encoding="utf-8") as out_file:
+                with open(tmp_path, "w", encoding="utf-8") as out_file:
                     async for chunk in synthesizer.stream(context=context, question=cluster_label):
                         print(chunk, end="", flush=True)
                         out_file.write(chunk)
                         out_file.flush()
+                os.rename(tmp_path, output_path)
                 with open(output_path, "r", encoding="utf-8") as f:
                     workflow_summaries.append(f.read()[:500])
                 print(f"\n[Phase 4 Pass A] DONE: {output_path}")
             except Exception as exc:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
                 print(f"[Phase 4 Pass A] ERROR: {cluster_label}: {exc}")
 
             await asyncio.sleep(CLOUD_BATCH_DELAY)
@@ -941,6 +954,10 @@ async def synthesize_workflow_documents(
         os.makedirs(module_folder, exist_ok=True)
         output_path = os.path.join(module_folder, f"{flow_name}_CRITICAL_deep_dive.md")
 
+        tmp_path = output_path + ".tmp"
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
         if os.path.exists(output_path):
             print(f"[Phase 4 Pass B] SKIP (exists): {output_path}")
             continue
@@ -955,13 +972,16 @@ async def synthesize_workflow_documents(
         )
         print(f"[Phase 4 Pass B] Deep diving: {flow_name} ({len(file_paths)} files)")
         try:
-            with open(output_path, "w", encoding="utf-8") as out_file:
+            with open(tmp_path, "w", encoding="utf-8") as out_file:
                 async for chunk in analyzer.stream(context=context, question=flow_name):
                     print(chunk, end="", flush=True)
                     out_file.write(chunk)
                     out_file.flush()
+            os.rename(tmp_path, output_path)
             print(f"\n[Phase 4 Pass B] DONE: {output_path}")
         except Exception as exc:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
             print(f"[Phase 4 Pass B] ERROR: {flow_name}: {exc}")
 
         await asyncio.sleep(CLOUD_BATCH_DELAY)
@@ -976,21 +996,27 @@ async def synthesize_workflow_documents(
         context = _load_enriched_docs_concat(cross_domain_paths, enriched_folder, max_chars=60000)
         if context:
             output_path = os.path.join(cross_folder, "EstimateToVoyageTransition_CRITICAL_deep_dive.md")
+            tmp_path = output_path + ".tmp"
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
             if not os.path.exists(output_path):
                 analyzer = CSharpCriticalWorkflowAnalyzer(
                     llm_model=OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
                 )
                 print(f"[Phase 4] Synthesizing cross-domain flow ({len(cross_domain_paths)} files)")
                 try:
-                    with open(output_path, "w", encoding="utf-8") as out_file:
+                    with open(tmp_path, "w", encoding="utf-8") as out_file:
                         async for chunk in analyzer.stream(
                             context=context, question="EstimateToVoyageTransition"
                         ):
                             print(chunk, end="", flush=True)
                             out_file.write(chunk)
                             out_file.flush()
+                    os.rename(tmp_path, output_path)
                     print(f"\n[Phase 4] DONE: {output_path}")
                 except Exception as exc:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
                     print(f"[Phase 4] ERROR cross-domain: {exc}")
                 await asyncio.sleep(CLOUD_BATCH_DELAY)
 
