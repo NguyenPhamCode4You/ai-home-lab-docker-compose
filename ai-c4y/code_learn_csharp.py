@@ -9,7 +9,10 @@ Usage examples:
   python code_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python code_learn_csharp.py --phase all --mode incremental --from-stdin
   python code_learn_csharp.py --phase index --cloud
-  python code_learn_csharp.py --phase all --cloud
+  python code_learn_csharp.py --phase index --cloud 5
+  python code_learn_csharp.py --phase all --cloud 3
+  python code_learn_csharp.py --phase index --local
+  python code_learn_csharp.py --phase index --local 3
 """
 
 import argparse
@@ -56,8 +59,21 @@ def parse_args():
     )
     parser.add_argument(
         "--cloud",
-        action="store_true",
-        help="Force all LLM requests through OpenRouter (skips local Ollama entirely)",
+        nargs="?",
+        const=1,
+        type=int,
+        default=None,
+        metavar="N",
+        help="Force all LLM calls through OpenRouter. Optional N sets concurrency (default: 1). Example: --cloud 5",
+    )
+    parser.add_argument(
+        "--local",
+        nargs="?",
+        const=1,
+        type=int,
+        default=None,
+        metavar="N",
+        help="Force all LLM calls through local Ollama. Optional N sets concurrency (default: 1). Example: --local 3",
     )
     return parser.parse_args()
 
@@ -78,6 +94,21 @@ async def main():
 
     if args.focus:
         os.environ["CIA_FOCUS_ONLY_FILES"] = args.focus
+
+    if args.cloud and args.local:
+        print("ERROR: --cloud and --local are mutually exclusive.")
+        sys.exit(1)
+
+    force_cloud = args.cloud is not None
+    force_local = args.local is not None
+    concurrency = args.cloud if force_cloud else (args.local if force_local else 1)
+
+    if force_cloud:
+        from src.agents.models.OpenRouter import OpenRouter as _OR
+        _OR.set_concurrency(concurrency)
+        print(f"[Cloud] Routing all LLM calls to OpenRouter (concurrency={concurrency})")
+    elif force_local:
+        print(f"[Local] Routing all LLM calls to Ollama (concurrency={concurrency})")
 
     codebase_path = os.getenv("CIA_CODEBASE_PATH", CSHARP_CODEBASE_PATH)
     manifest = CSharpManifest()
@@ -134,16 +165,16 @@ async def main():
         if not codebase_path:
             print("ERROR: CIA_CODEBASE_PATH is not set. Cannot run Phase 1.")
             sys.exit(1)
-        await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
+        await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_document:
         if not codebase_path:
             print("ERROR: CIA_CODEBASE_PATH is not set. Cannot run Phase 2.")
             sys.exit(1)
-        await write_csharp_documents(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
+        await write_csharp_documents(codebase_path=codebase_path, manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_enrich:
-        await enrich_with_cross_references(manifest=manifest, force_cloud=args.cloud)
+        await enrich_with_cross_references(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_synthesize:
         await synthesize_workflow_documents(manifest=manifest)

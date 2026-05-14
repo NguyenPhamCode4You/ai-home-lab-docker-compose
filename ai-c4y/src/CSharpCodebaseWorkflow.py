@@ -478,6 +478,8 @@ async def build_codebase_index(
     ignore_patterns: list[str] = None,
     checkpoint_every: int = 50,
     force_cloud: bool = False,
+    force_local: bool = False,
+    concurrency: int = 1,
 ):
     """
     Phase 1: Walk every .cs file in codebase_path, extract structural metadata via
@@ -534,49 +536,68 @@ async def build_codebase_index(
     to_process = [fp for fp in all_cs_files if manifest.get_phase(fp) not in already_indexed]
     print(f"[Phase 1] {len(to_process)} files need indexing ({len(all_cs_files) - len(to_process)} already indexed).")
 
-    # --- Index each file ------------------------------------------------------
+    # --- Index each file (batched concurrently) ---------------------------------
     processed_count = 0
-    for rel_path in to_process:
-        abs_path = os.path.join(codebase_path, rel_path.replace("/", os.sep))
-        try:
-            with open(abs_path, "r", encoding="utf-8", errors="replace") as f:
-                file_content = f.read()
-        except Exception as exc:
-            print(f"[Phase 1] SKIP (read error): {rel_path} — {exc}")
-            continue
+    effective_batch = max(1, concurrency)
+    total = len(to_process)
 
-        lines = file_content.count("\n") + 1
-        model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_analyzer_model(lines)
-        model_name = model.model if hasattr(model, "model") else str(model)
-        model_tag = "CLOUD" if isinstance(model, OpenRouter) else "LOCAL"
-        print(f"[Phase 1] [{processed_count + 1}/{len(to_process)}] {model_tag} ({model_name}) — {rel_path} ({lines} lines)")
+    for batch_start in range(0, total, effective_batch):
+        batch = to_process[batch_start : batch_start + effective_batch]
 
-        analyzer = CSharpFileAnalyzer(llm_model=model)
-        try:
-            entry = await analyzer.analyze(file_content=file_content, rel_path=rel_path)
-        except Exception as exc:
-            print(f"[Phase 1] ERROR analyzing {rel_path}: {exc}")
-            entry = dict(FALLBACK_RESULT)
-            entry["class_name"] = re.sub(r"\.cs$", "", rel_path.split("/")[-1])
+        async def _index_file(rel_path: str, slot: int):
+            abs_path = os.path.join(codebase_path, rel_path.replace("/", os.sep))
+            try:
+                with open(abs_path, "r", encoding="utf-8", errors="replace") as f:
+                    file_content = f.read()
+            except Exception as exc:
+                print(f"[Phase 1] SKIP (read error): {rel_path} — {exc}")
+                return None
 
-        file_hash = manifest.compute_hash(abs_path)
-        index["files"][rel_path] = entry
-        manifest.set_phase(rel_path, "indexed", {
-            "hash": file_hash,
-            "lines": lines,
-            "file_type": entry.get("file_type", "Other"),
-            "architecture_layer": entry.get("architecture_layer", "Other"),
-            "is_critical": entry.get("is_critical", False),
-        })
+            lines = file_content.count("\n") + 1
+            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_CODE_MODEL) if force_local else _select_analyzer_model(lines))
+            model_name = model.model if hasattr(model, "model") else str(model)
+            model_tag = "CLOUD" if isinstance(model, OpenRouter) else "LOCAL"
+            print(f"[Phase 1] [{batch_start + slot + 1}/{total}] {model_tag} ({model_name}) — {rel_path} ({lines} lines)")
 
-        # Save after every file so a crash loses no more than the current file's work.
-        # The manifest phase record is what makes restarts idempotent.
+            analyzer = CSharpFileAnalyzer(llm_model=model)
+            try:
+                entry = await analyzer.analyze(file_content=file_content, rel_path=rel_path)
+            except Exception as exc:
+                print(f"[Phase 1] ERROR analyzing {rel_path}: {exc}")
+                entry = dict(FALLBACK_RESULT)
+                entry["class_name"] = re.sub(r"\.cs$", "", rel_path.split("/")[-1])
+
+            file_hash = manifest.compute_hash(abs_path)
+            return (rel_path, entry, file_hash, lines)
+
+        results = await asyncio.gather(
+            *[_index_file(fp, i) for i, fp in enumerate(batch)],
+            return_exceptions=True,
+        )
+
+        for result in results:
+            if result is None:
+                continue
+            if isinstance(result, Exception):
+                print(f"[Phase 1] BATCH ERROR: {result}")
+                continue
+            rel_path, entry, file_hash, lines = result
+            index["files"][rel_path] = entry
+            manifest.set_phase(rel_path, "indexed", {
+                "hash": file_hash,
+                "lines": lines,
+                "file_type": entry.get("file_type", "Other"),
+                "architecture_layer": entry.get("architecture_layer", "Other"),
+                "is_critical": entry.get("is_critical", False),
+            })
+
+        # Checkpoint after every batch — crash loses at most one batch of work.
         _save_index(index, index_path)
         manifest.save()
 
-        processed_count += 1
-        if processed_count % checkpoint_every == 0:
-            print(f"[Phase 1] Progress: {processed_count}/{len(to_process)} files indexed.")
+        processed_count += len(batch)
+        if processed_count % checkpoint_every < effective_batch or processed_count >= total:
+            print(f"[Phase 1] Progress: {processed_count}/{total} files indexed.")
 
     # --- Build used_by reverse-lookup map ------------------------------------
     print("[Phase 1] Building used_by reverse-lookup map...")
@@ -640,6 +661,8 @@ async def write_csharp_documents(
     manifest: CSharpManifest = None,
     batch_size: int = BATCH_SIZE,
     force_cloud: bool = False,
+    force_local: bool = False,
+    concurrency: int = 1,
 ):
     """
     Phase 2: For every .cs file at phase="indexed", generate a structured markdown document.
@@ -662,8 +685,9 @@ async def write_csharp_documents(
     total = len(to_process)
     print(f"[Phase 2] {total} files to document.")
 
-    for batch_start in range(0, total, batch_size):
-        batch = to_process[batch_start : batch_start + batch_size]
+    effective_batch = max(1, concurrency) if (force_cloud or force_local) else batch_size
+    for batch_start in range(0, total, effective_batch):
+        batch = to_process[batch_start : batch_start + effective_batch]
         used_cloud_this_batch = False
 
         async def _doc_file(rel_path: str):
@@ -686,7 +710,7 @@ async def write_csharp_documents(
             injected_count = len(entry.get("injected_services", []))
             is_critical = entry.get("is_critical", False)
 
-            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_doc_writer_model(lines, injected_count, is_critical)
+            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_CODE_MODEL) if force_local else _select_doc_writer_model(lines, injected_count, is_critical))
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
                 print(f"[Phase 2] CLOUD — {rel_path} ({lines} lines)")
@@ -739,6 +763,8 @@ async def enrich_with_cross_references(
     manifest: CSharpManifest = None,
     batch_size: int = BATCH_SIZE,
     force_cloud: bool = False,
+    force_local: bool = False,
+    concurrency: int = 1,
 ):
     """
     Phase 3: Replace the '# Impact Scope [PLACEHOLDER]' in every Phase 2 doc
@@ -762,8 +788,9 @@ async def enrich_with_cross_references(
 
     critical_count = 0
 
-    for batch_start in range(0, total, batch_size):
-        batch = to_process[batch_start : batch_start + batch_size]
+    effective_batch = max(1, concurrency) if (force_cloud or force_local) else batch_size
+    for batch_start in range(0, total, effective_batch):
+        batch = to_process[batch_start : batch_start + effective_batch]
         used_cloud_this_batch = False
 
         async def _enrich_file(rel_path: str):
@@ -783,7 +810,7 @@ async def enrich_with_cross_references(
             caller_context = _build_caller_context(rel_path, index)
             combined_chars = len(doc_content) + len(caller_context)
 
-            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_impact_model(combined_chars, is_critical)
+            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else _select_impact_model(combined_chars, is_critical))
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
                 print(f"[Phase 3] CLOUD — {rel_path} ({combined_chars} chars)")

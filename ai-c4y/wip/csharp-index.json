@@ -41309,6 +41309,2134 @@
       ],
       "external_clients_used": [],
       "is_critical": false
+    },
+    "Core/Business/MasterData/CommissionType/SearchDynamicCommissionType.cs": {
+      "class_name": "SearchDynamicCommissionType",
+      "namespace": "Core.Business.MasterData.CommissionType",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<CommissionTypeDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ApplyDynamicFilters",
+            "Where",
+            "ApplyDynamicSorts",
+            "ToPagedResultAsync",
+            "MapUserCreateNames"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "CommissionTypeEntity",
+        "CommissionTypeDto",
+        "PagedResult",
+        "DynamicFilter",
+        "CommissionTypeSearchDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/CommissionType/UpdateCommissionType.cs": {
+      "class_name": "UpdateCommissionType",
+      "namespace": "Core.Business.MasterData.CommissionType",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<CommissionTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<CommissionTypeEntity>()",
+            "FirstOrDefaultAsync",
+            "throw new ApiException",
+            "_mapper.Map",
+            "_context.CommissionTypes.Update",
+            "SaveChangesAsync",
+            "_mapper.Map",
+            "result.MapUserCreateName"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "CommissionTypeEntity",
+        "CommissionTypeDto",
+        "CommissionTypeUpdateDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/CompanyType/CreateCompanyType.cs": {
+      "class_name": "CreateCompanyType",
+      "namespace": "Core.Business.VoyageManagement.Tco",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<CompanyTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_mapper.Map<CompanyTypeEntity>(companyTypeDto)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<CompanyTypeDto>(companyType)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMediator",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "CompanyTypeEntity",
+        "CompanyTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/CompanyType/GetCompanyTypeById.cs": {
+      "class_name": "GetCompanyTypeById",
+      "namespace": "Core.Business.MasterData.CompanyType",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<CompanyTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<CompanyTypeEntity>()",
+            "FirstOrDefaultAsync(cancellationToken)",
+            "_mapper.Map<CompanyTypeDto>(entity)",
+            "MapUserCreateName(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "CompanyTypeEntity",
+        "CompanyTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/CompanyType/SearchCompanyType.cs": {
+      "class_name": "SearchCompanyType",
+      "namespace": "Core.Business.MasterData.CompanyType",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<CompanyTypeDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ApplyDynamicFilters",
+            "Where",
+            "ApplyDynamicSorts",
+            "ToPagedResultAsync",
+            "MapUserCreateNames"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "CompanyTypeEntity",
+        "CompanyTypeDto",
+        "BaseSearch",
+        "PagedResult"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/CreateVesselConsumptionRate.cs": {
+      "class_name": "CreateVesselConsumptionRate",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "FindAsync",
+            "Map",
+            "Add",
+            "SaveChangesAsync",
+            "Map"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "Vessel",
+        "BunkerType",
+        "ConsumptionRateEntity",
+        "ConsumptionRateDto",
+        "VesselConsumptionRateCreateDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/DeleteVesselConsumptionRate.cs": {
+      "class_name": "DeleteVesselConsumptionRate",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.ConsumptionRates.Where",
+            "FirstOrDefaultAsync",
+            "_context.ConsumptionRates.Remove",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "ConsumptionRates"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/ImportPortConsumptionRates.cs": {
+      "class_name": "ImportPortConsumptionRates",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Import",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.Vessels.Where(v => v.VesselConsumptionRates != null).Include(v => v.VesselConsumptionRates!).ThenInclude(vcr => vcr.BunkerType).ToList()",
+            "_context.BunkerTypes.ToList()",
+            "request.FileStream.ReadPortConsumptionSettings()",
+            "_context.SaveChangesAsync(cancellationToken)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "OfficeOpenXml"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "Vessels",
+        "BunkerTypes",
+        "ConsumptionRateEntity",
+        "VesselPortConsumptionRates"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/ImportSeaConsumptionRates.cs": {
+      "class_name": "ImportSeaConsumptionRates",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Import",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.Vessels.Include(v => v.VesselConsumptionRates).ToList()",
+            "_context.BunkerTypes.Select(bt => bt.Id).ToList()",
+            "request.FileStream.ReadSeaConsumptionSettings()",
+            "vessel.RemoveAllSpeedConsumptions()",
+            "vessel.AddConsumptions(...)",
+            "_context.SaveChangesAsync(cancellationToken)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "OfficeOpenXml"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "VesselEntity",
+        "BunkerTypeEntity",
+        "ConsumptionRateEntity",
+        "VesselSeaConsumptionSetting",
+        "CargoTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/SearchVesselConsumptionRate.cs": {
+      "class_name": "SearchVesselConsumptionRate",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<ConsumptionRateDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "Include",
+            "Where",
+            "Select",
+            "ToPagedResultAsync",
+            "Map"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateEntity",
+        "BunkerType"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRate/UpdateVesselConsumptionRate.cs": {
+      "class_name": "UpdateVesselConsumptionRate",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "FirstOrDefaultAsync",
+            "FindAsync",
+            "Map",
+            "Update",
+            "SaveChangesAsync",
+            "Map"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "AutoMapper"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRate",
+        "BunkerType",
+        "ConsumptionRateDto",
+        "VesselConsumptionRateUpdateDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRateProfile/CreateConsumptionRateProfile.cs": {
+      "class_name": "CreateConsumptionRateProfile",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateProfileDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_mapper.Map<ConsumptionRateProfileEntity>(request.BodyData)",
+            "_context.ConsumptionRateProfiles.Add(entity)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<ConsumptionRateProfileDto>(entity)",
+            "result.MapUserCreateName(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateProfileEntity",
+        "ConsumptionRateProfileDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRateProfile/GetConsumptionRateProfileById.cs": {
+      "class_name": "GetConsumptionRateProfileById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateProfileDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<ConsumptionRateProfileEntity>()",
+            "Include(x => x.ConsumptionRates)",
+            "Where(x => x.Id == request.Id)",
+            "FirstOrDefaultAsync(cancellationToken)",
+            "_mapper.Map<ConsumptionRateProfileDto>(entity)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore",
+        "Core.Domain.MasterData.Entities"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateProfileEntity",
+        "ConsumptionRateProfileDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRateProfile/SearchConsumptionRateProfiles.cs": {
+      "class_name": "SearchConsumptionRateProfiles",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<ConsumptionRateProfileDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<ConsumptionRateProfileEntity>()",
+            "query.Include(x => x.ConsumptionRates)",
+            "query.ApplyDynamicFilters(dynamicFilters)",
+            "query.ApplyDefaultCreatedModifiedSorting(dynamicFilters, _context)",
+            "query.Where(x => ...)",
+            "dynamicFilters.ApplyDefaultSort(\"CreatedOn\", \"DESC\")",
+            "query.ApplyDynamicSorts(dynamicFilters)",
+            "_mapper.Map<ConsumptionRateProfileDto>(x)",
+            "ToPagedResultAsync(...)",
+            "result.Items.MapUserCreateNames(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateProfileEntity",
+        "ConsumptionRateProfileDto",
+        "BaseSearch",
+        "PagedResult"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRateProfile/SoftDeleteConsumptionRateProfileById.cs": {
+      "class_name": "SoftDeleteConsumptionRateProfileById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "SoftDelete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateProfileDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "BaseQuery",
+            "Include",
+            "FirstOrDefaultAsync",
+            "SoftDelete",
+            "SaveChangesAsync",
+            "Map"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateProfileEntity",
+        "ConsumptionRateProfileDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ConsumptionRateProfile/UpdateConsumptionRateProfileById.cs": {
+      "class_name": "UpdateConsumptionRateProfileById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ConsumptionRateProfileDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "_context.ConsumptionRateProfiles.Include(x => x.ConsumptionRates)",
+            "FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)",
+            "_mapper.Map(request.BodyData, entity)",
+            "SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<ConsumptionRateProfileDto>(entity)",
+            "result.MapUserCreateName(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ConsumptionRateProfileDto",
+        "ConsumptionRateProfile",
+        "ConsumptionRates"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Contact/CreateContact.cs": {
+      "class_name": "CreateContact",
+      "namespace": "Core.Business.MasterData.Contact",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContactDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_mapper.Map<ContactEntity>(request.BodyData)",
+            "_context.Contacts.Add(entity)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<ContactDto>(entity)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContactEntity",
+        "ContactDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Contact/DeleteContactById.cs": {
+      "class_name": "DeleteContactById",
+      "namespace": "Core.Business.MasterData.Contact",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "FirstOrDefaultAsync",
+            "SoftDelete",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "Contact"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Contact/GetContactById.cs": {
+      "class_name": "GetContactById",
+      "namespace": "Core.Business.MasterData.Contact",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContactDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "BaseQuery<ContactEntity>",
+            "Where",
+            "FirstOrDefault",
+            "Map<ContactDto>"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContactEntity",
+        "ContactDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Contact/SearchContacts.cs": {
+      "class_name": "SearchContacts",
+      "namespace": "Core.Business.MasterData.BusinessPartner",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<ContactDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<ContactEntity>()",
+            "ApplyDynamicFilters",
+            "Where",
+            "ApplyDynamicSorts",
+            "ToPagedResultAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContactEntity",
+        "ContactDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Contact/UpdateContactById.cs": {
+      "class_name": "UpdateContactById",
+      "namespace": "Core.Business.MasterData.Contact",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContactDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<ContactEntity>()",
+            "FirstOrDefaultAsync(cancellationToken)",
+            "_mapper.Map(request.BodyData, entity)",
+            "_context.Contacts.Update(entity)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<ContactDto>(entity)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContactEntity",
+        "ContactDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ContracType/CreateContractType.cs": {
+      "class_name": "CreateContractType",
+      "namespace": "Core.Business.MasterData",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContractTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "mapper.Map<ContractTypeEntity>(request.BodyData)",
+            "context.BaseQuery<ContractTypeEntity>()",
+            "FirstOrDefaultAsync()",
+            "context.ContractTypes.Add(requestedCreate)",
+            "SaveChangesAsync()",
+            "mapper.Map<ContractTypeDto>(requestedCreate)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContractTypeEntity",
+        "ContractTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ContracType/DeleteContractTypeById.cs": {
+      "class_name": "DeleteContractTypeById",
+      "namespace": "Core.Business.MasterData",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "FirstOrDefaultAsync",
+            "SoftDelete()",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "ContractTypeEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ContracType/GetContractTypeById.cs": {
+      "class_name": "GetContractTypeById",
+      "namespace": "Core.Business.MasterData",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContractTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "BaseQuery",
+            "FirstOrDefault",
+            "Map"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContractTypeEntity",
+        "ContractTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ContracType/SearchContractTypes.cs": {
+      "class_name": "SearchContractTypes",
+      "namespace": "Core.Business.MasterData",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<ContractTypeDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ApplyDynamicFilters",
+            "Where",
+            "ApplyDynamicSorts",
+            "Select",
+            "ToPagedResultAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContractTypeEntity",
+        "ContractTypeDto",
+        "BaseSearch",
+        "DynamicFilter"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ContracType/UpdateContractTypeById.cs": {
+      "class_name": "UpdateContractTypeById",
+      "namespace": "Core.Business.MasterData",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<ContractTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "context.BaseQuery<ContractTypeEntity>()",
+            "FirstOrDefaultAsync(cancellationToken)",
+            "mapper.Map(request.Body, entity)",
+            "context.ContractTypes.Update(entity)",
+            "SaveChangesAsync(cancellationToken)",
+            "mapper.Map<ContractTypeDto>(entity)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "MediatR",
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ContractTypeEntity",
+        "ContractTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/DynamicEnum/SearchDynamicEnum.cs": {
+      "class_name": "SearchDynamicEnum",
+      "namespace": "Core.Business.MasterData.DynamicEnum",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<DynamicEnumDto>>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "request.SetFactory(context)",
+            "query.Where",
+            "ApplyDynamicFilters",
+            "ApplyDynamicSorts",
+            "mapper.Map",
+            "ToPagedResultAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "BaseDynamicEnumEntity",
+        "DynamicEnumDto",
+        "BaseSearch",
+        "PagedResult"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/ImportDataFromXlsx/ImportBusinessPartners.cs": {
+      "class_name": "ImportBusinessPartners",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<List<string>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ReadRowsData",
+            "_context.BusinessPartners.Include(...).ToListAsync(...)",
+            "_context.OverwriteChanges",
+            "_context.SaveChangesAsync",
+            "_context.BusinessPartners.AddRange",
+            "_context.BusinessPartners.Remove",
+            "_context.Contacts.RemoveRange",
+            "_context.BusinessPartners.Update"
+          ]
+        },
+        {
+          "name": "ReadRowsData",
+          "return_type": "List<BusinessPartnerDto>",
+          "is_public": false,
+          "parameters": [
+            "Stream fileStream",
+            "int? startingRow",
+            "int? endingRow"
+          ],
+          "calls": [
+            "ExcelPackage.LicenseContext = LicenseContext.NonCommercial",
+            "new ExcelPackage(fileStream)",
+            "worksheet.Cells[...].Value?.ToString()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions.Logging",
+        "OfficeOpenXml"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper",
+        "ILogger<ImportBusinessPartners>"
+      ],
+      "entities_referenced": [
+        "BusinessPartnerEntity",
+        "BusinessPartnerDto",
+        "Contact"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/InvoiceType/CreateInvoiceType.cs": {
+      "class_name": "CreateInvoiceType",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<InvoiceTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_mapper.Map<InvoiceTypeEntity>(request.BodyData)",
+            "_context.InvoiceTypes.Add(entity)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "_mapper.Map<InvoiceTypeDto>(entity)",
+            "result.MapUserCreateName(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "InvoiceTypeEntity",
+        "InvoiceTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/InvoiceType/DeleteInvoiceType.cs": {
+      "class_name": "DeleteInvoiceType",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.InvoiceTypes",
+            "SoftDelete()",
+            "SaveChangesAsync(cancellationToken)",
+            "ApiException(ErrorCode.DATA_NOT_FOUND)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Infrastructure.DbContext",
+        "Core.Domain.Commons",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "InvoiceTypes"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/InvoiceType/GetInvoiceTypeById.cs": {
+      "class_name": "GetInvoiceTypeById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<InvoiceTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<InvoiceTypeEntity>()",
+            "FirstOrDefaultAsync",
+            "_mapper.Map<InvoiceTypeDto>(entity)",
+            "_context.BaseQuery<ArchetypeEntity>()",
+            "FirstOrDefaultAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "InvoiceTypeEntity",
+        "ArchetypeEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/InvoiceType/SearchInvoiceTypes.cs": {
+      "class_name": "SearchInvoiceTypes",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<InvoiceTypeDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<InvoiceTypeEntity>().AsNoTracking()",
+            "CustomFilterMap[filter.FieldName](query, filter, _context)",
+            "query.ApplyDynamicFilter(filter)",
+            "query.ApplyDefaultCreatedModifiedSorting(dynamicFilters, _context)",
+            "query.Where(x => ...)",
+            "dynamicFilters.ApplyDefaultSorts([...])",
+            "query.ApplyDynamicSorts(dynamicFilters)",
+            "_mapper.Map<InvoiceTypeDto>(x)",
+            "ToPagedResultAsync(request.SearchParams!.CurrentPage, request.SearchParams.PageSize)",
+            "result.Items.MapUserCreateNames(_context)",
+            "_context.BaseQuery<ArchetypeEntity>().Where(x => ...).ToDictionaryAsync(x => x.Id, x => x.Name)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities",
+        "System.Linq.Expressions"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "InvoiceTypeEntity",
+        "InvoiceTypeDto",
+        "ArchetypeEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/InvoiceType/UpdateInvoiceTypeById.cs": {
+      "class_name": "UpdateInvoiceTypeById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<InvoiceTypeDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "context.BaseQuery<InvoiceTypeEntity>()",
+            "FirstOrDefaultAsync",
+            "mapper.Map",
+            "context.InvoiceTypes.Update",
+            "SaveChangesAsync",
+            "mapper.Map",
+            "MapUserCreateName"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "InvoiceTypeEntity",
+        "InvoiceTypeDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/PIClub/CreatePIClub.cs": {
+      "class_name": "CreatePIClub",
+      "namespace": "Core.Business.MasterData.PIClub",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PIClubDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "mapper.Map<PIClubEntity>(request.BodyData)",
+            "context.PIClubs.Add(entity)",
+            "context.SaveChangesAsync(cancellationToken)",
+            "mapper.Map<PIClubDto>(entity)",
+            "result.MapUserCreateName(context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PIClubEntity",
+        "PIClubDto",
+        "PIClubCreateDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/PIClub/DeletePIClub.cs": {
+      "class_name": "DeletePIClub",
+      "namespace": "Core.Business.MasterData.PIClub",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "context.PIClubs.FirstOrDefaultAsync",
+            "entity.SoftDelete()",
+            "context.SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "PIClub"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/PIClub/GetPIClubById.cs": {
+      "class_name": "GetPIClubById",
+      "namespace": "Core.Business.MasterData.PIClub",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PIClubDto>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "context.PIClubs.FirstOrDefaultAsync(e => e.Id == request.Id, cancellationToken)",
+            "mapper.Map<PIClubDto>(entity)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PIClubDto",
+        "PIClub"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/PIClub/SearchPIClub.cs": {
+      "class_name": "SearchPIClub",
+      "namespace": "Core.Business.MasterData.PIClub",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "System.Threading.Tasks.Task<PagedResult<PIClubDto>>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "context.BaseQuery<PIClubEntity>()",
+            "query.AsNoTracking()",
+            "request.SearchParams?.Filters",
+            "request.SearchParams?.KeySearch",
+            "query.Where(x => x.Name.Contains(keySearch))",
+            "request.SearchParams!.FilterBy",
+            "query.Where(x => x.Name.Contains(request.SearchParams.FilterBy.Name))",
+            "query.ApplyDynamicFilters(dynamicFilters)",
+            "query.ApplyDefaultCreatedModifiedSorting(dynamicFilters, context)",
+            "dynamicFilters.ApplyDefaultSort(\"CreatedOn\", \"DESC\")",
+            "query.ApplyDynamicSorts(dynamicFilters)",
+            "mapper.Map<PIClubDto>(x)",
+            "ToPagedResultAsync(request.SearchParams!.CurrentPage, request.SearchParams.PageSize)",
+            "result.Items.MapUserCreateNames(context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PIClubEntity",
+        "PIClubDto",
+        "PIClubSearchDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/PIClub/UpdatePIClub.cs": {
+      "class_name": "UpdatePIClub",
+      "namespace": "Core.Business.MasterData.PIClub",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Update",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PIClubDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "context.PIClubs.FindAsync",
+            "SaveChangesAsync",
+            "mapper.Map",
+            "MapUserCreateName"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PIClubDto",
+        "PIClubUpdateDto",
+        "PIClubs"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/CreatePort.cs": {
+      "class_name": "CreatePort",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Create",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PortDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BusinessPartners.Include(x => x.Contacts)",
+            "_context.FirstOrDefaultAsync(x => x.Id == portAgentId, cancellationToken)",
+            "_mapper.Map(request.BodyData, portEntity)",
+            "TimeZoneHelper.GetTimeZoneByLatLong((double)portEntity.Lattitude, (double)portEntity.Longtitude)",
+            "_context.Ports.Add(portEntity)",
+            "_context.SaveChangesAsync(cancellationToken)",
+            "result.MapUserCreateName(_context)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore",
+        "Core.Domain.Commons",
+        "Core.Business.TaskAlert.RuleEvaluation"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper",
+        "IRuleEvaluationService"
+      ],
+      "entities_referenced": [
+        "PortEntity",
+        "PortCreateDto",
+        "PortDto",
+        "BusinessPartner",
+        "ApiException"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/DeletePort.cs": {
+      "class_name": "DeletePort",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Delete",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "request",
+            "cancellationToken"
+          ],
+          "calls": [
+            "_context.Ports.Where(x => x.Id == request.Id).FirstOrDefaultAsync(cancellationToken)",
+            "deleteEntity.SoftDelete()",
+            "_context.SaveChangesAsync(cancellationToken)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.Commons",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "System",
+        "System.Collections.Generic",
+        "System.Linq",
+        "System.Text",
+        "System.Threading.Tasks"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "Ports",
+        "Request",
+        "Response"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/GetPortById.cs": {
+      "class_name": "GetPortById",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Get",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PortDto>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.BaseQuery<PortEntity>()",
+            "Include(p => p.PortAgent)",
+            "ThenInclude(pa => pa.Contacts)",
+            "Include(p => p.TradeAreaOffice)",
+            "Include(p => p.SpecialPassingPoints)",
+            "FirstOrDefaultAsync(cancellationToken)",
+            "_mapper.Map<PortDto>(ports)",
+            "TZConvert.GetTimeZoneInfo(result.TimeZone)",
+            "tzInfo.GetUtcOffset(DateTime.UtcNow)",
+            "TimeZoneHelper.ConvertOffsetToString((int)offset.TotalHours)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.MasterData.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "TimeZoneConverter"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PortEntity",
+        "PortDto",
+        "PortAgent",
+        "Contacts",
+        "TradeAreaOffice",
+        "SpecialPassingPoints"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/SearchPort.cs": {
+      "class_name": "SearchPort",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<PortDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "BaseQuery",
+            "Include",
+            "ThenInclude",
+            "AsNoTracking",
+            "FilteringPort",
+            "ExactlySortingPortName",
+            "ToPagedResultAsync",
+            "MapUserCreateNames"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "AutoMapper",
+        "Microsoft.EntityFrameworkCore",
+        "MathNet.Numerics",
+        "System.Linq.Expressions"
+      ],
+      "injected_services": [
+        "DataContext",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "PortEntity",
+        "PortDto",
+        "PortSearchDto",
+        "DynamicFilter",
+        "PagedResult",
+        "CanalAlternatives"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/SearchPortCall.cs": {
+      "class_name": "SearchPortCall",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handler",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [
+            "DataContext dataContext"
+          ],
+          "calls": [
+            "_dataContext = dataContext;"
+          ]
+        },
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<PortCallItemDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_dataContext.BaseQuery<VoyageIteneraryItemEntity>()",
+            "AsNoTracking()",
+            "Where(x => ...)",
+            "Include(x => x.Port)",
+            "Include(x => x.Shipment).ThenInclude(s => s.Quantities)",
+            "Include(x => x.Voyage)",
+            "ApplyDynamicFilter(filter)",
+            "ApplyDynamicSorts(dynamicFilters)",
+            "ToPagedResultAsync(...)",
+            "EnrichBusinessPartnerNameField(...)",
+            "EnrichCargoTypeField(...)",
+            "EnrichShipmentPortInformation(...)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext",
+        "Microsoft.EntityFrameworkCore",
+        "MediatR",
+        "Core.Domain.MasterData.Entities"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "VoyageIteneraryItemEntity",
+        "PortEntity",
+        "ShipmentEntity",
+        "VoyageEntity",
+        "ShipmentPortEntity",
+        "CargoTypeEntity",
+        "BusinessPartnerEntity",
+        "ShipmentTermEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/SearchPortCargoHistory.cs": {
+      "class_name": "SearchPortCargoHistory",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "System.Threading.Tasks.Task<Core.Domain.Commons.PagedResult<Core.Domain.MasterData.Dtos.PortCargoHistoryItemDto>>",
+          "is_public": true,
+          "parameters": [
+            "Core.Business.SearchPortCargoHistory.Request request",
+            "System.Threading.CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_dataContext.BaseQuery<VoyageIteneraryItemEntity>()",
+            "query.AsNoTracking()",
+            "query.Where(x => x.PortId == request.SearchParams.PortId && x.ShipmentId != null && (x.ReasonForVisit == ReasonForVisitPortEnum.Loading.ToString() || x.ReasonForVisit == ReasonForVisitPortEnum.Discharging.ToString()))",
+            "query.Include(x => x.Shipment)",
+            "query.Include(x => x.Voyage)",
+            "query.Where(x => (x.ReasonForVisit != null && x.ReasonForVisit.Contains(keySearch)) || (x.Shipment != null && x.Shipment.ConfirmShipmentNumber != null && x.Shipment.ConfirmShipmentNumber.Contains(keySearch)) || (x.Voyage != null && x.Voyage.VoyageNumber != null && x.Voyage.VoyageNumber.Contains(keySearch)) || (x.Voyage != null && x.Voyage.Vessel != null && x.Voyage.Vessel.VesselName != null && x.Voyage.Vessel.VesselName.Contains(keySearch)) || (x.Shipment != null && x.Shipment.CargoType != null && x.Shipment.CargoType.Contains(keySearch)))",
+            "query.ApplyDynamicFilters(dynamicFilters)",
+            "dynamicFilters.ApplyDefaultSort(\"TimeOfArrival\", \"DESC\")",
+            "query.ApplyDynamicSorts(dynamicFilters)",
+            "new PortCargoHistoryItemDto { ReasonForVisit = EnumHelper.GetDescription(Enum.Parse<ReasonForVisitPortEnum>(x.ReasonForVisit)), CargoTypeId = x.Shipment != null ? x.Shipment.CargoTypeId : null, ShipmentId = x.ShipmentId, ShipmentNumber = x.Shipment != null ? x.Shipment.ConfirmShipmentNumber : null, VesselId = x.Voyage != null ? x.Voyage.VesselId : null, VesselName = x.Voyage != null && x.Voyage.Vessel != null ? x.Voyage.Vessel.VesselName : null, ChartererId = x.Shipment != null ? x.Shipment.CustomerId : null, VoyageId = x.VoyageId, VoyageNo = x.Voyage != null ? x.Voyage.VoyageNumber : null, CpQty = x.Shipment != null ? x.Shipment.CargoQuantity : null, CpQtyUnit = x.Shipment != null ? x.Shipment.CargoQuantityUnit : null, TimeOfArrival = x.TimeOfArrival, TimeOfBerth = x.TimeOfBerth, TimeOfDeparture = x.TimeOfDeparture, AgentId = x.PortAgentId, TimeZone = x.Port != null ? x.Port.TimeZone : null }",
+            "query.ToPagedResultAsync(request.SearchParams!.CurrentPage, request.SearchParams.PageSize)",
+            "result.Items.EnrichBusinessPartnerNameField(_dataContext, cancellationToken)",
+            "result.Items.EnrichCargoTypeField(_dataContext, cancellationToken)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Dtos",
+        "MediatR",
+        "Core.Infrastructure.DbContext",
+        "Core.Domain.Constants",
+        "Core.Domain.Commons",
+        "Microsoft.EntityFrameworkCore",
+        "Core.Domain.VoyageManagement.Entities",
+        "AutoMapper",
+        "Core.Domain.MasterData.Entities"
+      ],
+      "injected_services": [
+        "Core.Infrastructure.DbContext.DataContext",
+        "AutoMapper.IMapper"
+      ],
+      "entities_referenced": [
+        "Core.Domain.VoyageManagement.Entities.VoyageIteneraryItemEntity",
+        "Core.Domain.MasterData.Entities.PortCargoHistoryItemDto",
+        "Core.Domain.MasterData.Dtos.PortCargoHistorySearchDto",
+        "Core.Domain.Commons.PagedResult`1",
+        "Core.Domain.VoyageManagement.Entities.Shipment",
+        "Core.Domain.VoyageManagement.Entities.Voyage",
+        "Core.Domain.Constants.ReasonForVisitPortEnum",
+        "System.Collections.Generic.List`1<Core.Domain.Commons.DynamicFilter>",
+        "Core.Domain.Commons.DynamicFilter",
+        "Core.Domain.VoyageManagement.Entities.VoyageIteneraryItemEntity",
+        "Core.Domain.VoyageManagement.Entities.Shipment",
+        "Core.Domain.VoyageManagement.Entities.Voyage",
+        "Core.Domain.VoyageManagement.Entities.Shipment",
+        "Core.Domain.VoyageManagement.Entities.Voyage",
+        "Core.Domain.VoyageManagement.Entities.Voyage",
+        "Core.Domain.VoyageManagement.Entities.Shipment",
+        "Core.Domain.VoyageManagement.Entities.Shipment",
+        "Core.Domain.VoyageManagement.Entities.Voyage",
+        "Core.Domain.VoyageManagement.Entities.Port"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business/MasterData/Port/SearchPortItinerarySchedule.cs": {
+      "class_name": "SearchPortItinerarySchedule",
+      "namespace": "Core.Business",
+      "file_type": "Handler",
+      "architecture_layer": "Business",
+      "handler_verb": "Search",
+      "methods": [
+        {
+          "name": "Handle",
+          "return_type": "Task<PagedResult<ItineraryScheduleItemDto>>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ApplyKeySearch",
+            "SortByUserField",
+            "ApplyDynamicFilter",
+            "ToPagedResultAsync",
+            "EnrichItineraryScheduleItemsWithOperatorNames"
+          ]
+        },
+        {
+          "name": "EnrichItineraryScheduleItemsWithOperatorNames",
+          "return_type": "Task",
+          "is_public": false,
+          "parameters": [
+            "List<ItineraryScheduleItemDto> itineraryScheduleItems",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "ToDictionaryAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "PortItineraryScheduleSearchDto",
+        "ItineraryScheduleItemDto",
+        "VoyageIteneraryItemEntity",
+        "Voyage",
+        "Vessel",
+        "VesselType",
+        "Port",
+        "TradeAreaOffice",
+        "Shipment",
+        "User"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
     }
   },
   "used_by": {},

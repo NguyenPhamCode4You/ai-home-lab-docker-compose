@@ -6,15 +6,25 @@ import httpx
 from dotenv import load_dotenv
 load_dotenv()
 
+_CONCURRENCY    = int(os.getenv("OPENROUTER_CONCURRENCY", "1"))
+_MAX_TOKENS     = int(os.getenv("OPENROUTER_MAX_TOKENS",   "8192"))
+_PROVIDER_ORDER = [p.strip() for p in os.getenv("OPENROUTER_PROVIDER_ORDER", "").split(",") if p.strip()]
+
 class OpenRouter:
     # Global semaphore shared across all instances — limits concurrent requests to OpenRouter
     _semaphore: asyncio.Semaphore = None
-    _semaphore_limit: int = 1
+    _concurrency: int = _CONCURRENCY
+
+    @classmethod
+    def set_concurrency(cls, n: int) -> None:
+        """Override concurrency at runtime (e.g. from --cloud N CLI arg)."""
+        cls._concurrency = max(1, n)
+        cls._semaphore = asyncio.Semaphore(cls._concurrency)
 
     @classmethod
     def _get_semaphore(cls) -> asyncio.Semaphore:
         if cls._semaphore is None:
-            cls._semaphore = asyncio.Semaphore(cls._semaphore_limit)
+            cls._semaphore = asyncio.Semaphore(cls._concurrency)
         return cls._semaphore
 
     def __init__(self, api_key: str = None, model: str = None, max_retries: int = 8):
@@ -34,8 +44,11 @@ class OpenRouter:
         payload = {
             "model": self.model,
             "stream": True,
+            "max_tokens": _MAX_TOKENS,
             "messages": [{"role": "user", "content": prompt}],
         }
+        if _PROVIDER_ORDER:
+            payload["provider"] = {"order": _PROVIDER_ORDER, "allow_fallbacks": True}
 
         for attempt in range(self.max_retries):
             try:

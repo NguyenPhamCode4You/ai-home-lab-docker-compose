@@ -6374,5 +6374,365 @@
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false
+  },
+  "Core/Business/MasterData/CommissionType/SearchDynamicCommissionType.cs": {
+    "phase": "indexed",
+    "hash": "6d3ea9a5037892a9076fc47fc3a320919526f67085210397d2fac806ce669f8e",
+    "lines": 53,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/CommissionType/UpdateCommissionType.cs": {
+    "phase": "indexed",
+    "hash": "31a469768a85c87ecd43001349eb52c9f20beadd4624c916d518516ad415ac3d",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/CompanyType/CreateCompanyType.cs": {
+    "phase": "indexed",
+    "hash": "aa7fc1d3b1e68b84d364cfa2d70658c8df49c3ad1cf54d17ef0757bfa220d456",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/CompanyType/GetCompanyTypeById.cs": {
+    "phase": "indexed",
+    "hash": "7f92ee7ada01a53da7f6e4b4af793a56494d1fd6d27421f3b86e1f54b1add729",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/CompanyType/SearchCompanyType.cs": {
+    "phase": "indexed",
+    "hash": "e5fcc27ae3a6d535b5380f9fb75be27e76dff271f8790733b0df5aa11fb57c09",
+    "lines": 51,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/CreateVesselConsumptionRate.cs": {
+    "phase": "indexed",
+    "hash": "0b1df07c15b602febbf4de184da3fc7442fe062400790856b9c19d0967c95dc4",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/DeleteVesselConsumptionRate.cs": {
+    "phase": "indexed",
+    "hash": "03bcd3d235f77776f742c8240592508e54efac1611f1697f52d9557e9f962ca9",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/ImportPortConsumptionRates.cs": {
+    "phase": "indexed",
+    "hash": "cba67772d4957c53122d913584474ad15970881c6a784d8fd277a8bd1421bf05",
+    "lines": 137,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/ImportSeaConsumptionRates.cs": {
+    "phase": "indexed",
+    "hash": "dfd3b0f637b119561b508da9dc1e525a017403d9b3ef365a89f624adcb0b00ed",
+    "lines": 154,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/SearchVesselConsumptionRate.cs": {
+    "phase": "indexed",
+    "hash": "3735646c2c9393418e4d992a8f5df65cb70e83e4ada651d1a165304ec869c113",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRate/UpdateVesselConsumptionRate.cs": {
+    "phase": "indexed",
+    "hash": "57e44a22426da5c8ed0b87ff469a3f087262625915548a539d01ec01e68146b0",
+    "lines": 50,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRateProfile/CreateConsumptionRateProfile.cs": {
+    "phase": "indexed",
+    "hash": "b4e19a5311d8d8bfa18d6000d94f78388c6e366fe60f2c6f73220bc3f46fab27",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRateProfile/GetConsumptionRateProfileById.cs": {
+    "phase": "indexed",
+    "hash": "a32fdcde3bba2b2ebb073688897f72a812273e70a5bbbb1d6a48b0e50cad7adf",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRateProfile/SearchConsumptionRateProfiles.cs": {
+    "phase": "indexed",
+    "hash": "651944dcd3df02e1811509d89dc7f374f22e1739738b4a75ec7e52cfa902610b",
+    "lines": 61,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRateProfile/SoftDeleteConsumptionRateProfileById.cs": {
+    "phase": "indexed",
+    "hash": "fa627d99ae1012e333c0aac0c0d7d370c466a9d8ba99cce80efc1c0ba18492a0",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ConsumptionRateProfile/UpdateConsumptionRateProfileById.cs": {
+    "phase": "indexed",
+    "hash": "0e620081eb65c482be38a3c1ce5a53e1ccc52c9e78be505f327a39e7afe9644e",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Contact/CreateContact.cs": {
+    "phase": "indexed",
+    "hash": "c2e27c9c8171156b28d62b71b8fbcacd1e27811e6b4c38f349454756deab71e6",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Contact/DeleteContactById.cs": {
+    "phase": "indexed",
+    "hash": "bb997f6343da38240d468e3fc2289f9891a88fa3e1b926588ad1b6a324e9267d",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Contact/GetContactById.cs": {
+    "phase": "indexed",
+    "hash": "d47dbea50b5ca905d9384a1356b91d307a075018829953c26cb7170fd1c55c7d",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Contact/SearchContacts.cs": {
+    "phase": "indexed",
+    "hash": "95759e75bebc9fcaedaae48ecf4d316e9c4ec79060d7dcbc62337e6d2e9b457f",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Contact/UpdateContactById.cs": {
+    "phase": "indexed",
+    "hash": "8ba60c68fe67ec2f0a4246fbedc5d26546b9af12a32e9895ebdd0a0c9d0c6855",
+    "lines": 48,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ContracType/CreateContractType.cs": {
+    "phase": "indexed",
+    "hash": "0e4ea1eabc961f38721c031ed1e832806f636791c22629e1dc17d32d17aad2d7",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ContracType/DeleteContractTypeById.cs": {
+    "phase": "indexed",
+    "hash": "622b670308291904ad26fb1d2b07ba3b5beab7fbd7f6a8baaa6c7e1913b5b536",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ContracType/GetContractTypeById.cs": {
+    "phase": "indexed",
+    "hash": "15f20ba30d67f2604452685c3442f9199a9ef07a9a1518f029079c0cb3100ebb",
+    "lines": 31,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ContracType/SearchContractTypes.cs": {
+    "phase": "indexed",
+    "hash": "4c1873731dd04e6e2986a5dabf25b6c210d852a0413fbcd3c6bf75d336ca12c2",
+    "lines": 48,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ContracType/UpdateContractTypeById.cs": {
+    "phase": "indexed",
+    "hash": "93c97941b1f2550cdbf3726b314fe0436f673c0c0e654b7a101255351f7f90c4",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/DynamicEnum/SearchDynamicEnum.cs": {
+    "phase": "indexed",
+    "hash": "68e2c10a4db4dd697171f3548f7be97e858be69fd95e9164a25461bbf2f7d584",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/ImportDataFromXlsx/ImportBusinessPartners.cs": {
+    "phase": "indexed",
+    "hash": "9cab554bdfa262f2a2c2ca99ba4369b27627495ae63dcc308613ccf13f94e7e6",
+    "lines": 282,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/InvoiceType/CreateInvoiceType.cs": {
+    "phase": "indexed",
+    "hash": "aad633186afc191e991f8409e561a2f08c3588132688c80bcdd01061f0c2dfad",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/InvoiceType/DeleteInvoiceType.cs": {
+    "phase": "indexed",
+    "hash": "ccdd358e7bfe673012031fc98f0d8d7b60d92a39f34cf94643dca10d89eac388",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/InvoiceType/GetInvoiceTypeById.cs": {
+    "phase": "indexed",
+    "hash": "f50885e1ff74ece4918568be6c24cd86d5eb25bf3b3d049d0c080e525fe62b06",
+    "lines": 50,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/InvoiceType/SearchInvoiceTypes.cs": {
+    "phase": "indexed",
+    "hash": "15e631cb48fe09ef546c4f35e679956210edc31f36a3efa5f48620cd111fceb6",
+    "lines": 238,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/InvoiceType/UpdateInvoiceTypeById.cs": {
+    "phase": "indexed",
+    "hash": "c26050bbf08ab829e471e096a940e672c8fab90b3a6cc8571ca5654039474956",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/PIClub/CreatePIClub.cs": {
+    "phase": "indexed",
+    "hash": "46a77b6daae6eac0f2ccf0473ebc7c840b0b8d9a5ca44ea170d1d3f6168af0cf",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/PIClub/DeletePIClub.cs": {
+    "phase": "indexed",
+    "hash": "452ea9edc95fa635ad6a34355e0929979b3d6b451617ec99b6ffaaae576dc06c",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/PIClub/GetPIClubById.cs": {
+    "phase": "indexed",
+    "hash": "5a3f6addf5ca4073d62c3e0b46ceabedaa229315bcb957cab2522f8270a190fd",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/PIClub/SearchPIClub.cs": {
+    "phase": "indexed",
+    "hash": "1bc3fe0646f3a77d1aa33e36b484758e80553745d7809355ea2ed9037eb353e3",
+    "lines": 58,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/PIClub/UpdatePIClub.cs": {
+    "phase": "indexed",
+    "hash": "a28c48fae0d94961c0fccfd23b58cc369cf67fb9f297cf74bbf3d469df46ed5c",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/CreatePort.cs": {
+    "phase": "indexed",
+    "hash": "afe78792a0438e222691686c86eb94dffaea61a2f60f6fbd1a0c28925bc434d1",
+    "lines": 55,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/DeletePort.cs": {
+    "phase": "indexed",
+    "hash": "4d93d79420b934354040dd417cf088e55ce5852f9094af1f956e559c4287a801",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/GetPortById.cs": {
+    "phase": "indexed",
+    "hash": "5c109f1e605a7ea93d438cd0c5b997f2aa74c013aa14a6551d8f5a093d101040",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/SearchPort.cs": {
+    "phase": "indexed",
+    "hash": "a56f705b6f760b17f9384df62aad8185e184b326ad0c6b39ea45da5eda686caa",
+    "lines": 167,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/SearchPortCall.cs": {
+    "phase": "indexed",
+    "hash": "fff32bc22884f5ac959b2866fb17f4feccf4daca7a4658ddbe1ef99fadf4a564",
+    "lines": 287,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/SearchPortCargoHistory.cs": {
+    "phase": "indexed",
+    "hash": "675061d355cc4643126802ece399889c355e21edaa6bade235635160a9735177",
+    "lines": 141,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/SearchPortItinerarySchedule.cs": {
+    "phase": "indexed",
+    "hash": "9fb8ec5518bb500daebbc3b3d09841350cf31bf5ecb6f6bb9c98f79d31698c2f",
+    "lines": 306,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
   }
 }
