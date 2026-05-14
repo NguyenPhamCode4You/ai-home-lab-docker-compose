@@ -743,7 +743,7 @@ async def write_csharp_documents(
         await asyncio.gather(*[_doc_file(p) for p in batch])
         manifest.save()
 
-        if used_cloud_this_batch and batch_start + batch_size < total:
+        if used_cloud_this_batch and batch_start + effective_batch < total:
             print(f"[Phase 2] Sleeping {CLOUD_BATCH_DELAY}s (cloud rate-limit guard)...")
             await asyncio.sleep(CLOUD_BATCH_DELAY)
 
@@ -857,7 +857,7 @@ async def enrich_with_cross_references(
         await asyncio.gather(*[_enrich_file(p) for p in batch])
         manifest.save()
 
-        if used_cloud_this_batch and batch_start + batch_size < total:
+        if used_cloud_this_batch and batch_start + effective_batch < total:
             print(f"[Phase 3] Sleeping {CLOUD_BATCH_DELAY}s...")
             await asyncio.sleep(CLOUD_BATCH_DELAY)
 
@@ -878,6 +878,9 @@ async def synthesize_workflow_documents(
     workflows_folder: str = DEFAULT_WORKFLOWS_FOLDER,
     index_path: str = DEFAULT_INDEX_PATH,
     manifest: CSharpManifest = None,
+    force_cloud: bool = False,
+    force_local: bool = False,
+    concurrency: int = 1,
 ):
     """
     Phase 4: Two-pass workflow synthesis.
@@ -886,7 +889,8 @@ async def synthesize_workflow_documents(
     Pass B — Critical workflow deep dives (priority flows + is_critical clusters)
     Final  — BVMS_Architecture_Overview.md from all workflow summaries
 
-    All synthesis uses cloud models exclusively.
+    Model selection: Ollama if force_local, otherwise OpenRouter (cloud default).
+    Concurrent batches controlled by the `concurrency` parameter.
     """
     if manifest is None:
         manifest = CSharpManifest()
@@ -894,12 +898,12 @@ async def synthesize_workflow_documents(
     files_dict = index.get("files", {})
     os.makedirs(workflows_folder, exist_ok=True)
 
+    effective_batch = max(1, concurrency)
+
     # ----------------------------------------------------------------
     # Build cluster map
     # ----------------------------------------------------------------
-    # clusters[module][verb_cluster] = [rel_paths]
     clusters: dict[str, dict[str, list]] = {}
-    # critical_clusters["module|verb_cluster"] = [rel_paths with is_critical=True]
     critical_clusters: dict[str, list] = {}
 
     for rel_path, entry in files_dict.items():
@@ -911,110 +915,117 @@ async def synthesize_workflow_documents(
             entry.get("class_name", ""), entry.get("handler_verb", "")
         )
         clusters.setdefault(module, {}).setdefault(verb_cluster, []).append(rel_path)
-
         if entry.get("is_critical", False):
             key = f"{module}|{verb_cluster}"
             critical_clusters.setdefault(key, []).append(rel_path)
 
     # ----------------------------------------------------------------
-    # Pass A — module flow docs
+    # Pass A — module flow docs (concurrent batches)
     # ----------------------------------------------------------------
-    print(f"[Phase 4 Pass A] Modules: {list(clusters.keys())}")
-    workflow_summaries: list[str] = []
-
+    pass_a_tasks = []
     for module, verb_groups in clusters.items():
         module_folder = os.path.join(workflows_folder, module)
         os.makedirs(module_folder, exist_ok=True)
-
         for verb_cluster, file_paths in verb_groups.items():
-            cluster_label = f"{module} — {verb_cluster}"
             output_path = os.path.join(module_folder, f"{verb_cluster}_workflow.md")
+            pass_a_tasks.append((module, verb_cluster, list(file_paths), output_path))
 
-            tmp_path = output_path + ".tmp"
+    print(f"[Phase 4 Pass A] Modules: {list(clusters.keys())}, {len(pass_a_tasks)} clusters to synthesize")
+    workflow_summaries: list[str] = []
+
+    async def _pass_a_item(module_v, verb_cluster_v, file_paths_v, output_path_v):
+        cluster_label = f"{module_v} — {verb_cluster_v}"
+        tmp_path = output_path_v + ".tmp"
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        if os.path.exists(output_path_v):
+            print(f"[Phase 4 Pass A] SKIP (exists): {output_path_v}")
+            with open(output_path_v, "r", encoding="utf-8") as f:
+                return f.read()[:500]
+        context = _load_enriched_docs_concat(file_paths_v, enriched_folder, max_chars=40000)
+        if not context:
+            print(f"[Phase 4 Pass A] SKIP (no enriched docs): {cluster_label}")
+            return None
+        llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL)
+        synthesizer = CSharpWorkflowSynthesizer(llm_model=llm)
+        print(f"[Phase 4 Pass A] Synthesizing: {cluster_label} ({len(file_paths_v)} files)")
+        try:
+            with open(tmp_path, "w", encoding="utf-8") as out_file:
+                async for chunk in synthesizer.stream(context=context, question=cluster_label):
+                    if effective_batch == 1:
+                        print(chunk, end="", flush=True)
+                    out_file.write(chunk)
+                    out_file.flush()
+            os.rename(tmp_path, output_path_v)
+            with open(output_path_v, "r", encoding="utf-8") as f:
+                summary = f.read()[:500]
+            print(f"\n[Phase 4 Pass A] DONE: {output_path_v}")
+            return summary
+        except Exception as exc:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
+            print(f"[Phase 4 Pass A] ERROR: {cluster_label}: {exc}")
+            return None
 
-            if os.path.exists(output_path):
-                print(f"[Phase 4 Pass A] SKIP (exists): {output_path}")
-                with open(output_path, "r", encoding="utf-8") as f:
-                    workflow_summaries.append(f.read()[:500])
-                continue
-
-            context = _load_enriched_docs_concat(file_paths, enriched_folder, max_chars=40000)
-            if not context:
-                print(f"[Phase 4 Pass A] SKIP (no enriched docs): {cluster_label}")
-                continue
-
-            synthesizer = CSharpWorkflowSynthesizer(
-                llm_model=OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL)
-            )
-            print(f"[Phase 4 Pass A] Synthesizing: {cluster_label} ({len(file_paths)} files)")
-            try:
-                with open(tmp_path, "w", encoding="utf-8") as out_file:
-                    async for chunk in synthesizer.stream(context=context, question=cluster_label):
-                        print(chunk, end="", flush=True)
-                        out_file.write(chunk)
-                        out_file.flush()
-                os.rename(tmp_path, output_path)
-                with open(output_path, "r", encoding="utf-8") as f:
-                    workflow_summaries.append(f.read()[:500])
-                print(f"\n[Phase 4 Pass A] DONE: {output_path}")
-            except Exception as exc:
-                if os.path.exists(tmp_path):
-                    os.remove(tmp_path)
-                print(f"[Phase 4 Pass A] ERROR: {cluster_label}: {exc}")
-
+    for batch_start in range(0, len(pass_a_tasks), effective_batch):
+        batch = pass_a_tasks[batch_start : batch_start + effective_batch]
+        results = await asyncio.gather(*[_pass_a_item(*t) for t in batch])
+        workflow_summaries.extend(r for r in results if r)
+        if batch_start + effective_batch < len(pass_a_tasks):
+            print(f"[Phase 4 Pass A] Sleeping {CLOUD_BATCH_DELAY}s (rate-limit guard)...")
             await asyncio.sleep(CLOUD_BATCH_DELAY)
 
     # ----------------------------------------------------------------
-    # Pass B — critical deep dives
+    # Pass B — critical deep dives (concurrent batches)
     # ----------------------------------------------------------------
-    print("[Phase 4 Pass B] Starting critical deep dives...")
     pass_b_targets = _collect_pass_b_targets(files_dict, enriched_folder, critical_clusters)
-
     for target in pass_b_targets:
-        flow_name = target["flow_name"]
-        module = target["module"]
-        file_paths = target["file_paths"]
-
-        module_folder = os.path.join(workflows_folder, module)
+        module_folder = os.path.join(workflows_folder, target["module"])
         os.makedirs(module_folder, exist_ok=True)
-        output_path = os.path.join(module_folder, f"{flow_name}_CRITICAL_deep_dive.md")
+        target["output_path"] = os.path.join(module_folder, f"{target['flow_name']}_CRITICAL_deep_dive.md")
 
-        tmp_path = output_path + ".tmp"
+    print(f"[Phase 4 Pass B] {len(pass_b_targets)} critical deep dives...")
+
+    async def _pass_b_item(target_v):
+        flow_name = target_v["flow_name"]
+        file_paths_v = target_v["file_paths"]
+        output_path_v = target_v["output_path"]
+        tmp_path = output_path_v + ".tmp"
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-
-        if os.path.exists(output_path):
-            print(f"[Phase 4 Pass B] SKIP (exists): {output_path}")
-            continue
-
-        context = _load_enriched_docs_concat(file_paths, enriched_folder, max_chars=60000)
+        if os.path.exists(output_path_v):
+            print(f"[Phase 4 Pass B] SKIP (exists): {output_path_v}")
+            return
+        context = _load_enriched_docs_concat(file_paths_v, enriched_folder, max_chars=60000)
         if not context:
             print(f"[Phase 4 Pass B] SKIP (no enriched docs): {flow_name}")
-            continue
-
-        analyzer = CSharpCriticalWorkflowAnalyzer(
-            llm_model=OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
-        )
-        print(f"[Phase 4 Pass B] Deep diving: {flow_name} ({len(file_paths)} files)")
+            return
+        llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
+        analyzer = CSharpCriticalWorkflowAnalyzer(llm_model=llm)
+        print(f"[Phase 4 Pass B] Deep diving: {flow_name} ({len(file_paths_v)} files)")
         try:
             with open(tmp_path, "w", encoding="utf-8") as out_file:
                 async for chunk in analyzer.stream(context=context, question=flow_name):
-                    print(chunk, end="", flush=True)
+                    if effective_batch == 1:
+                        print(chunk, end="", flush=True)
                     out_file.write(chunk)
                     out_file.flush()
-            os.rename(tmp_path, output_path)
-            print(f"\n[Phase 4 Pass B] DONE: {output_path}")
+            os.rename(tmp_path, output_path_v)
+            print(f"\n[Phase 4 Pass B] DONE: {output_path_v}")
         except Exception as exc:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
             print(f"[Phase 4 Pass B] ERROR: {flow_name}: {exc}")
 
-        await asyncio.sleep(CLOUD_BATCH_DELAY)
+    for batch_start in range(0, len(pass_b_targets), effective_batch):
+        batch = pass_b_targets[batch_start : batch_start + effective_batch]
+        await asyncio.gather(*[_pass_b_item(t) for t in batch])
+        if batch_start + effective_batch < len(pass_b_targets):
+            print(f"[Phase 4 Pass B] Sleeping {CLOUD_BATCH_DELAY}s...")
+            await asyncio.sleep(CLOUD_BATCH_DELAY)
 
     # ----------------------------------------------------------------
-    # Cross-domain flows
+    # Cross-domain flows (single task, no batching needed)
     # ----------------------------------------------------------------
     cross_domain_paths = _detect_cross_domain_files(files_dict)
     if cross_domain_paths:
@@ -1027,9 +1038,8 @@ async def synthesize_workflow_documents(
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
             if not os.path.exists(output_path):
-                analyzer = CSharpCriticalWorkflowAnalyzer(
-                    llm_model=OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
-                )
+                llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
+                analyzer = CSharpCriticalWorkflowAnalyzer(llm_model=llm)
                 print(f"[Phase 4] Synthesizing cross-domain flow ({len(cross_domain_paths)} files)")
                 try:
                     with open(tmp_path, "w", encoding="utf-8") as out_file:
@@ -1045,7 +1055,6 @@ async def synthesize_workflow_documents(
                     if os.path.exists(tmp_path):
                         os.remove(tmp_path)
                     print(f"[Phase 4] ERROR cross-domain: {exc}")
-                await asyncio.sleep(CLOUD_BATCH_DELAY)
 
     # ----------------------------------------------------------------
     # Final synthesis: BVMS_Architecture_Overview.md

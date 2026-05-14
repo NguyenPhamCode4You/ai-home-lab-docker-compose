@@ -177,7 +177,7 @@ async def main():
         await enrich_with_cross_references(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_synthesize:
-        await synthesize_workflow_documents(manifest=manifest)
+        await synthesize_workflow_documents(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     print("\n[Pipeline] Done.")
 

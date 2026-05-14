@@ -6734,5 +6734,1605 @@
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false
+  },
+  "Core/Business/MasterData/Port/UpdatePortById.cs": {
+    "phase": "indexed",
+    "hash": "136e8926b6b8cb58d6c49d4b4be8b433ab1e130d0e12c18911e242852aba93f3",
+    "lines": 68,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/UpdatePortsTimeZone.cs": {
+    "phase": "indexed",
+    "hash": "f19575671547e5d8be7f8ab4ceed8c16ef7c2041aae6b9f179ed9b864293fdb1",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/ExportPDF/ExportPortCargoHistoryExcel.cs": {
+    "phase": "indexed",
+    "hash": "f5cab65d5e85f620bcddb0d90acc32284ba1cb8cb81e4bdc9adacbee6deead40",
+    "lines": 76,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/ExportPDF/ExportPortCargoHistoryPdf.cs": {
+    "phase": "indexed",
+    "hash": "5b20b71333ef87e2c411e967c4955cf88939bb3e794273b4bcf9df45f5347357",
+    "lines": 116,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Port/ExportPDF/PortCargoHistoryPdfUtil.cs": {
+    "phase": "indexed",
+    "hash": "3876bedc7de62af4ffe3d29739042c37cd816310cc2c717d445c1b3e4f26af88",
+    "lines": 51,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/RoutingEngine/ImportRoutingFromDataLoy.cs": {
+    "phase": "indexed",
+    "hash": "9a4e28c12a1002e66bc251581a8406a68e93645e20487e0bba4bd9d6cb35ae9c",
+    "lines": 131,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/RoutingEngine/ImportRoutingFromFolder.cs": {
+    "phase": "indexed",
+    "hash": "77aaa4ccce3e7547d8e4727c98f054cb60c7816b27d1339fab2078664b980c83",
+    "lines": 113,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Shipyard/CreateShipyard.cs": {
+    "phase": "indexed",
+    "hash": "42b1ad2c80e6da0fe92b0f8b7764ad4640bcb0d2e2b33b69a6c96878fae9d6e5",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Shipyard/DeleteShipyard.cs": {
+    "phase": "indexed",
+    "hash": "6262c60f9c25f8159119e551a332e251f93c7292747bb1a6cfd8834647024de7",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Shipyard/GetShipyardById.cs": {
+    "phase": "indexed",
+    "hash": "4b37e339d9b63cdc096e77e0274e665f901b114aad486ade455763d929b32cfb",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Shipyard/SearchShipyard.cs": {
+    "phase": "indexed",
+    "hash": "17f5e05404f249502f8368391f03283bedb503b0f5296fb3f624e8ddc64cb0b4",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Shipyard/UpdateShipyard.cs": {
+    "phase": "indexed",
+    "hash": "dace35a684b9bf6280fa2caf5f306a6f269011815482b9797f1b84ddacaa46f5",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Term/CreateTerm.cs": {
+    "phase": "indexed",
+    "hash": "ff06351dcd854ede6ef36656ace8cbef8800d952a5e4a20830577e8235035eb7",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Term/DeleteTerm.cs": {
+    "phase": "indexed",
+    "hash": "14f32fb2eca70dfb781ec9e75c988ccc8adc8c15206d3adbff79ccf4ae58e4c0",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Term/GetTermById.cs": {
+    "phase": "indexed",
+    "hash": "8a918f5ee916a2a2824e42d0d908e0734c1d32d631e5c88d04cf56508080c548",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Term/SearchTerms.cs": {
+    "phase": "indexed",
+    "hash": "c4c6ff01cbced4b042051be7ddaee624aba50905eca63a8333d02dc90f7841ab",
+    "lines": 76,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Term/UpdateTermById.cs": {
+    "phase": "indexed",
+    "hash": "def6c1d14db2994eff90982d9aac60077e2f01e8352012cb1fc6568892e80e03",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/TimeCharterBunkerEntry/EnsureBunkerEntryCorrect.cs": {
+    "phase": "indexed",
+    "hash": "faf7322e777a59b0e22625a0567980210ba54c0eac8c2a788482e39b485293e4",
+    "lines": 35,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/TradeArea/GetTradeAreaById.cs": {
+    "phase": "indexed",
+    "hash": "142c8ebba8b6834437df75f53d84fff3b6c9415d64bbc58ad891de84f11f8d38",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/TradeArea/SearchTradeArea.cs": {
+    "phase": "indexed",
+    "hash": "bd804ffd3000fd9aed4ff836e415a9112097e8f0a5bd8eab9b0df55ced41f0eb",
+    "lines": 71,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/CreateUserFilter.cs": {
+    "phase": "indexed",
+    "hash": "74262983f2beeb25be7f009fa8175cd34c4babd7258cd6f57d6197aa6d870b56",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/DeleteUserFilter.cs": {
+    "phase": "indexed",
+    "hash": "8fbe417d80cad2e16d7117e664f7e129134c6b78d6c9b94cbe8876c687df76c6",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/GetUserFilterByGridKey.cs": {
+    "phase": "indexed",
+    "hash": "d898efddfbdc6ba14e1f7b9235c359a202cdbd742e592d2601b2949e93262d67",
+    "lines": 34,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/GetUserFilterByUserId.cs": {
+    "phase": "indexed",
+    "hash": "51880a1391060c7bb1c43060de2286cda7339f72d31e155d4a47e5ff2295584c",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/UpdateLatestCheckGridView.cs": {
+    "phase": "indexed",
+    "hash": "e05a278f4c492a01cd2085b0e39294758e6b22fd432a40bb95c0009f13af2f6a",
+    "lines": 48,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserFilter/UpdateUserFilter.cs": {
+    "phase": "indexed",
+    "hash": "030cf7d929f87508b81669aef406638a0c2fe122451ebb359befe44998144165",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserSetting/CreateUserSetting.cs": {
+    "phase": "indexed",
+    "hash": "10e50636101a7380246be65913847cd46be6c3751ee101d116db1bf081471684",
+    "lines": 42,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserSetting/DeleteUserSetting.cs": {
+    "phase": "indexed",
+    "hash": "fc6e573927fe3b146a2802764a6331b9c15ed96c9db54b51a9d98ceb82dedf73",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserSetting/GetUserSettingByKey.cs": {
+    "phase": "indexed",
+    "hash": "7eff35b382168e6092d825c5b87c209968a932248bcd9827f792abe99a960103",
+    "lines": 34,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserSetting/GetUserSettingByUserId.cs": {
+    "phase": "indexed",
+    "hash": "753814972f24dcf49c1b0441be2533da98703367e144cf14ad4921ae3c80fbe2",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/UserSetting/UpdateUserSetting.cs": {
+    "phase": "indexed",
+    "hash": "3c4c1483cd7aac274b4a50ddb96fbadbbe6e7970c21b6d6d1b49634aeb937ba2",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/CreateDuplicateVessels.cs": {
+    "phase": "indexed",
+    "hash": "abf8d732c2d8e0ba15d454f302e3133a44f50af729ee0eebcc5f877362426d99",
+    "lines": 85,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/CreateVessel.cs": {
+    "phase": "indexed",
+    "hash": "09569b8c91746344a296df2eb30a0db3ad3a7feca1d1fcde96777089bdd37446",
+    "lines": 92,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/DeleteVessel.cs": {
+    "phase": "indexed",
+    "hash": "dd1544c8d61104bb22ab5918449698ba065f225c51550df8637e1cee1503eccc",
+    "lines": 58,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/GetVesselById.cs": {
+    "phase": "indexed",
+    "hash": "da4e6644852e66b8cdf91a8ba0570d900ac1ffe76ef28c9f9d28f2e1b574d76c",
+    "lines": 59,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/GetVesselSpeedConsumption.cs": {
+    "phase": "indexed",
+    "hash": "2abb00672817cd8f5cb2c8019216ca8ba7bcc6766d9babfc1aafbf0989c0c3d1",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/ImportVesselHireRate.cs": {
+    "phase": "indexed",
+    "hash": "03aeda6d73ef342dde3acf428eed3ef32cb0afa42c0dcfec4727c3036ed7cb29",
+    "lines": 85,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/SearchVessel.cs": {
+    "phase": "indexed",
+    "hash": "b0d1f62969f784ef0ac3652796854aaa9e1ec34569d1b699f0a5f41d91c0060e",
+    "lines": 279,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/SearchVesselSchedule.cs": {
+    "phase": "indexed",
+    "hash": "7e280b06a7afb420fb85557c4639fcd84990105cb61b503b42526387c624d258",
+    "lines": 214,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/UpdateVesselById.cs": {
+    "phase": "indexed",
+    "hash": "65bcdf1ba1d523501f34f4120844e5d8c6fabfad57d133ee6ebdd9912be08f36",
+    "lines": 119,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/Vessel/UpdateVesselSpecification.cs": {
+    "phase": "indexed",
+    "hash": "f00b79be26748dfa7ca48d09a336da50cb038274f9505d5589d927325f409055",
+    "lines": 77,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/VesselType/CreateVesselType.cs": {
+    "phase": "indexed",
+    "hash": "cc50c74152228db84521e0c5c0333146551e1ac9fef614ddf4079ee8fb0f35d6",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/VesselType/DeleteVesselType.cs": {
+    "phase": "indexed",
+    "hash": "9fbe93942c2954cd444b315fcf2368ae3cfde4e005a4768692d4de56ec72e410",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/VesselType/GetVesselTypeById.cs": {
+    "phase": "indexed",
+    "hash": "5dd120a9f3a8a35244fe4f9b58a1202e138c41da95b7c6fa586fa3523e6382a9",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/VesselType/SearchVesselTypes.cs": {
+    "phase": "indexed",
+    "hash": "28be36b14d0defae7705fde613fa5df6fb95d7e3c4bc27a0433e7bf5370d1b8c",
+    "lines": 77,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/MasterData/VesselType/UpdateVesselTypeById.cs": {
+    "phase": "indexed",
+    "hash": "2461094e9e6365a16f91f81843de36df39e70e5fe53dc5e68638b1fff241c5c5",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/OrderRequest/Commands/CreateOrUpdateRequest.cs": {
+    "phase": "indexed",
+    "hash": "51b38743dca46aed1687f32b019c1cbf32fde5ac86d080d6facf4405011547e7",
+    "lines": 89,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/OrderRequest/Request/GetRequestById.cs": {
+    "phase": "indexed",
+    "hash": "576bbecc6cf74d094bd44131214ba70a396371478db990186bcfba126bfdbb39",
+    "lines": 59,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/OrderRequest/Request/SearchRequests.cs": {
+    "phase": "indexed",
+    "hash": "54cef5c14f4e01e1d8b9a19c29da1fb9b24958be33bed38489b17ad7bd4333f1",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/RoutingEngine/GetDataLoyRoute.cs": {
+    "phase": "indexed",
+    "hash": "5631ab4d1f0d1daa17833d95bb9523eea366da9472be1c1794f1fb9c8c859b45",
+    "lines": 48,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/RoutingEngine/ValidateBlockCanals.cs": {
+    "phase": "indexed",
+    "hash": "e4caa0b7c97e4904e14174ea34b693a35438d07e321a95731d82d31db5209019",
+    "lines": 77,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/SednaClient.cs": {
+    "phase": "indexed",
+    "hash": "629f3b2bad65675f0c649e96514d2f4fd9048d3f835f66edd44fa6b3350d8d5c",
+    "lines": 370,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/AddEmailDocumentsCommand.cs": {
+    "phase": "indexed",
+    "hash": "4f11f88156a2995de06e735c637613a2c2f26498baa73858b2f1f8680e369543",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/CreateOrUpdateEmailCommand.cs": {
+    "phase": "indexed",
+    "hash": "ed00a973e5d1633370d472064b203d3d20a2c49319635de37729cd64842fac9f",
+    "lines": 80,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/GetAndCreateSednaEmailByMessageId.cs": {
+    "phase": "indexed",
+    "hash": "f673946eaa49b8247496f72ae07cfbff25b770bd6ef5aefad8632214650eed1d",
+    "lines": 81,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/SednaEmailAddCategoryTagCommand.cs": {
+    "phase": "indexed",
+    "hash": "61925b777588ff9fd1de1dec309b489f2b4c1c9bdcd63ccab8e7547e054b22e8",
+    "lines": 63,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/SednaEmailAddJobReferenceCommand.cs": {
+    "phase": "indexed",
+    "hash": "fcbd3d19222eed1a04b2ef402f00d634703fb08b4b7716b0056387ed91414091",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Commands/SednaEmailDownloadCommand.cs": {
+    "phase": "indexed",
+    "hash": "cfb04dfe9590c4830dc1423b09724c065f83a5c7845171e6fe744c5a86c746cb",
+    "lines": 270,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Queries/GetEmailById.cs": {
+    "phase": "indexed",
+    "hash": "943e3d196249ec6a4a1a3ef0813d8ee340224fcbacd4a449e5cfe55d2cf04808",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Queries/GetEmailByMessageId.cs": {
+    "phase": "indexed",
+    "hash": "1f48c2e450af8b3763f430b1a867f999bbbe018cea05bd77fdbae8cf8aa79275",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/SednaEmail/Queries/SearchEmails.cs": {
+    "phase": "indexed",
+    "hash": "da5996cf4fa1eb06e84dadfb7d573b35590594be8a22b28341467c643d39986b",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/IState.cs": {
+    "phase": "indexed",
+    "hash": "a8cba5180d74c42bb27fb50cd17dade88d913280fa3fcb4a33a504e3d52e5e8f",
+    "lines": 16,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/StateContext.cs": {
+    "phase": "indexed",
+    "hash": "d50f1e573d7806855113bfe5097b80a07d0d8cb30d2ea401d9a060ab8e8fd45c",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/StatusTransition.cs": {
+    "phase": "indexed",
+    "hash": "2893359b96ccd5c98c2d72b85d6ace0deb1117361794d715014b38fe6039d093",
+    "lines": 225,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/ValidateStatusTransitionPermission.cs": {
+    "phase": "indexed",
+    "hash": "eb3fd18ea810c326fb0e438e9705cc650cd35a670607915adc0c5671ca4c1d67",
+    "lines": 42,
+    "file_type": "Validator",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/IShipmentState.cs": {
+    "phase": "indexed",
+    "hash": "916cee987652b87937db9f5682f5fb7f765022be4ebf1bb743fd1ca5c1dc9b1e",
+    "lines": 10,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentArchivedState.cs": {
+    "phase": "indexed",
+    "hash": "76c9f6e1aca71fa5d5aa1d2b4176c50961065d4e74abdc1c7659d871d0dfbb94",
+    "lines": 90,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentCancelledState.cs": {
+    "phase": "indexed",
+    "hash": "2f13cc6470af49a88a5bff89bbdb9873101f1b3332c59b9e34a7245eb7648a8b",
+    "lines": 62,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentCompletedState.cs": {
+    "phase": "indexed",
+    "hash": "8482632140f10f20647e5a8024fd8b4dae06717142881968a8a9206d0d171f64",
+    "lines": 40,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentConfirmState.cs": {
+    "phase": "indexed",
+    "hash": "fa8249e544d140f4fe240012b87101391bb4e5afad711e4a412c026f355cfd71",
+    "lines": 64,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentDelayedState.cs": {
+    "phase": "indexed",
+    "hash": "27e75cf09016741db495fe1bced508585c164a4272dc5a0a853a2293175622a1",
+    "lines": 62,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentDischargedState.cs": {
+    "phase": "indexed",
+    "hash": "6fcb0fd71af52f4a949cec2672091a3e363f97d74ad1a9139d625852ff56cf41",
+    "lines": 58,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentInquiryState.cs": {
+    "phase": "indexed",
+    "hash": "33dae251e6952f66c9692fe1a00aa52e95ef94ffaa2b5be5e111acaaeecf1dd1",
+    "lines": 91,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentLoadedState.cs": {
+    "phase": "indexed",
+    "hash": "b060d240c0c348fe658a5ec9b757def7f30f5fc4c9254e0080015ff0c4c2a26b",
+    "lines": 58,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentNominatedState.cs": {
+    "phase": "indexed",
+    "hash": "71e1b6776a74c682f0fe6468259baa560e9bee547facd2bf9e179fcf2989d081",
+    "lines": 76,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentQuotedState.cs": {
+    "phase": "indexed",
+    "hash": "686bbec911bc60f222a9d0c05d6751a56a3adc71824d81fc06eb9d7800ea8972",
+    "lines": 91,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentStateEngine.cs": {
+    "phase": "indexed",
+    "hash": "334a30d83ee917c8b893e505a89a4659bf4f221f1158dd59856c632c4f4ae621",
+    "lines": 15,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentStateFactory.cs": {
+    "phase": "indexed",
+    "hash": "b7072b53ca4046f81c377f58702542618d9a22d07d95f9f493cd96a7ae7a1d3e",
+    "lines": 31,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Shipment/ShipmentWithdrawnState.cs": {
+    "phase": "indexed",
+    "hash": "fa9f4d82367f078fe56da386df0868630934db4b3a760625cc33e507753bfc22",
+    "lines": 65,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tci/TciCancelledState.cs": {
+    "phase": "indexed",
+    "hash": "3f5be84c5665ff5f0c27d90a4c6910e20eb8ebcf19d3b602330731e856e7cdd1",
+    "lines": 47,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tci/TciDraftState.cs": {
+    "phase": "indexed",
+    "hash": "39674e93d4725d192479f504c89349714631e9143d3918c9b012824afdec123a",
+    "lines": 52,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tci/TciFixedState.cs": {
+    "phase": "indexed",
+    "hash": "f8b37252ef1dfc413e77beaff5ebbb48c2a85d0cfcb5813545861adabd569f9f",
+    "lines": 53,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tci/TciStateEngine.cs": {
+    "phase": "indexed",
+    "hash": "a665422d50415b83cce4d6a116a9440ebdc7318f20f40cfaf0fb6066fd07c3bb",
+    "lines": 15,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tci/TciStateFactory.cs": {
+    "phase": "indexed",
+    "hash": "27178790cb6be9850f1c4ab77e49f55f11aafff30b94472feb30a96262877daa",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/ITcoState.cs": {
+    "phase": "indexed",
+    "hash": "8e74e647f77240a6cbb3a5afb5a3d21b5ba3c51bfa17189473c890d8c4704c6d",
+    "lines": 9,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoArchivedState.cs": {
+    "phase": "indexed",
+    "hash": "d38917b91ba6242fe8c6a7346988613da4d983abd219eea959b05d3fc736103b",
+    "lines": 57,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoCancelledState.cs": {
+    "phase": "indexed",
+    "hash": "ca0ac35377ae257714954c575e6eaf74ad822042f6c9808184837d2ccf20124d",
+    "lines": 55,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoCompletedState.cs": {
+    "phase": "indexed",
+    "hash": "60f235e82b221619d8b622f59dcede8110f9ea9ed98f19c3d8ab3265c64512a0",
+    "lines": 37,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoConfirmedState.cs": {
+    "phase": "indexed",
+    "hash": "25cb689cb3e1a91c152b57de56b17508daebdb70dcacbc6166df60b7e010fe66",
+    "lines": 52,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoDelayedState.cs": {
+    "phase": "indexed",
+    "hash": "f189112cfb0d3d8c3125253ed76be8ec73d59a01a39a6a8b93fa2f5fdd951acd",
+    "lines": 55,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoDeliveredState.cs": {
+    "phase": "indexed",
+    "hash": "d22f83c675ae3a7aed0cae42537fac5a2d3e01ff164b5f7cb3aaf48345700745",
+    "lines": 49,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoInquiryState.cs": {
+    "phase": "indexed",
+    "hash": "734260074415bf8f33452ebda3afc073bd8e89b2e152042ee375be2024490a86",
+    "lines": 57,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoNominatedState.cs": {
+    "phase": "indexed",
+    "hash": "7e184b1a181f596d1092f1b02aab3f3f16b9d64dad2db028edcb0757e1fdc9e3",
+    "lines": 49,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoQuotedState.cs": {
+    "phase": "indexed",
+    "hash": "b921a96308985ed684c870f29ebf853593feba3b4f73d98d38f00ce3aa59126f",
+    "lines": 55,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoRedeliveredState.cs": {
+    "phase": "indexed",
+    "hash": "d8b71de0e98310acf3892864974e796bf4f60810bab094cab75e2e016a8a59f2",
+    "lines": 48,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoStateEngine.cs": {
+    "phase": "indexed",
+    "hash": "a7d427b7a9cb0e6463157f949046973302ea4a732cabc45fa346702e0685e6d5",
+    "lines": 15,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Tco/TcoStateFactory.cs": {
+    "phase": "indexed",
+    "hash": "1393496440c730893a4a9f39663a4db7dac741e8fb7ee6ce2c367e4f27c7df35",
+    "lines": 26,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageClosedState.cs": {
+    "phase": "indexed",
+    "hash": "9bfc24282249555b9877069324261c16bf592ab7b6d9f3c07724b54901e12899",
+    "lines": 39,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageCommencedState.cs": {
+    "phase": "indexed",
+    "hash": "40855eb639f6fe4862a3ade02c551483885668d8d842f41c363b11eed693dcab",
+    "lines": 56,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageCompletedState.cs": {
+    "phase": "indexed",
+    "hash": "6923187596fa80a143d9384baca1f5d60e5cd638d539a883495a23ed8ea5c5e1",
+    "lines": 48,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageScheduledState.cs": {
+    "phase": "indexed",
+    "hash": "7f9f952c480788e2802ca651fa175cbfdf609b393a99cb877eff290715d51a82",
+    "lines": 57,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageStateEngine.cs": {
+    "phase": "indexed",
+    "hash": "7acce4281cc73d8b16475440912c750bad079cb6e6ddb0432b049b9daa3a4197",
+    "lines": 9,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/StateEngine/Voyage/VoyageStateFactory.cs": {
+    "phase": "indexed",
+    "hash": "a230edc7bcd9035721d962a8531a6780ef9afe2394b799accfc35822ec7e1832",
+    "lines": 21,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TagManagement/CreateTag.cs": {
+    "phase": "indexed",
+    "hash": "77d057e5d9c5a96e1af64a5fcd115d29054617e080372b2a2c2f825d01318b93",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TagManagement/GetTagsByEntityId.cs": {
+    "phase": "indexed",
+    "hash": "011bee0eb96d472de2804d2b7639cd6072cbeb9da4a0217bbcae0b9499e9873a",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TagManagement/GetTagsByEntityType.cs": {
+    "phase": "indexed",
+    "hash": "70514949b512f86bf37092e962d4051a7889ffdffd37c96ce75d147516d0bf78",
+    "lines": 50,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TagManagement/UpdateEntityTags.cs": {
+    "phase": "indexed",
+    "hash": "35f953b96bb1ae1341c2532883fef0e4bd7b256339c9391d39be604283d63eed",
+    "lines": 86,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/CreateAlert.cs": {
+    "phase": "indexed",
+    "hash": "ce79f6ad80c796718989841784d1e99d3be5946fc5ea172d0b347d5bd75535e5",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/CreateRuleSet.cs": {
+    "phase": "indexed",
+    "hash": "815a3195b9495d9fbaadfa142b377ef5be59c47e2ea47b2dfbd98d25d77a2dd9",
+    "lines": 51,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/CreateTask.cs": {
+    "phase": "indexed",
+    "hash": "ce00b355660e07b4a9217d3838d59101d902ae51b61302e4de0bbf4d42253b84",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/DeleteAlertById.cs": {
+    "phase": "indexed",
+    "hash": "e36333569e9e97da04b5e6700b3e5989f39f3ec589070dffb9712439ce43dbf6",
+    "lines": 30,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/DeleteRuleSet.cs": {
+    "phase": "indexed",
+    "hash": "62494b3499dfe35de2c0c92ce43c2132a09187d2dad1087d41a2a90bf4c5668f",
+    "lines": 32,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/DeleteTaskById.cs": {
+    "phase": "indexed",
+    "hash": "e3dd13054703b06ed2baba7cdf6f0fbc8d3de57619a8e2bbc557adf2a73a59f4",
+    "lines": 30,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/GetAlertsByTargetObject.cs": {
+    "phase": "indexed",
+    "hash": "cc46a3535485bc4063fb3caf3ef4a37fc4e6f41184faaa95222669b66a587183",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/GetFieldsForEntity.cs": {
+    "phase": "indexed",
+    "hash": "0bddcf0058ba25392fe45a4c6cf2ce333189d8546de6dcdcecd229ed70252b1f",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/GetRuleSetById.cs": {
+    "phase": "indexed",
+    "hash": "f89d686a23b27f0999b8c36b8cf74c865c5619f5b2213da57a53beb51e92b12c",
+    "lines": 34,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/GetTasksByTargetObject.cs": {
+    "phase": "indexed",
+    "hash": "bcc84fc47f8e5d9c43e5758fa4916d577dbeded5928e2a3c4fe01e5e9d1674b5",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/SearchAlerts.cs": {
+    "phase": "indexed",
+    "hash": "1f9ccb8525bd8409c0c43c993fc88e70c0032246927ff67130184f2d2759e85f",
+    "lines": 109,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/SearchRuleSets.cs": {
+    "phase": "indexed",
+    "hash": "3f9a525c0796ca05da4359cbf6c611dcfb9fd6db579311b25bca740ba4b4e911",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/SearchTasks.cs": {
+    "phase": "indexed",
+    "hash": "d1a4e7a92a1f36c23f135cc208bab4418e0620a89bbc09ae8ff9fe132a06c5f1",
+    "lines": 110,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/UpdateAlertById.cs": {
+    "phase": "indexed",
+    "hash": "645cd4f52c79741569bb0841927f32823c962700840d3d7c83f00d337c1484fb",
+    "lines": 35,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/UpdateRuleSetById.cs": {
+    "phase": "indexed",
+    "hash": "6867ba82a40291e0fdac64c909f487c09f390426701230d65a248d90fd1116b5",
+    "lines": 90,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/UpdateTaskById.cs": {
+    "phase": "indexed",
+    "hash": "1ca864b51d918a96de5d75320c4a6e5eaddc7a14537b84e5c9480fcbef104cf5",
+    "lines": 36,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/Helpers/TaskAlertHelper.cs": {
+    "phase": "indexed",
+    "hash": "6066f347872bb75bce53a5c2264158f19ca764d89eaf66a3aec4bc6346ad2178",
+    "lines": 176,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/RuleEvaluation/IRuleEvaluationService.cs": {
+    "phase": "indexed",
+    "hash": "dfa1c844843fd737d88089196d4f299fcc337b4ac34a2d4508156702a8d46b4c",
+    "lines": 32,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/TaskAlert/RuleEvaluation/RuleEvaluationService.cs": {
+    "phase": "indexed",
+    "hash": "accdc7c59ddcb3043fd03e805163e383221f7bf49ffcf9a3ef95908abcb7493d",
+    "lines": 319,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Claims/GetCategories.cs": {
+    "phase": "indexed",
+    "hash": "e5911235b73a7322f56af40ecb198c0c1e638afa4037c219e018626228c7a3f7",
+    "lines": 24,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/CreateOffice.cs": {
+    "phase": "indexed",
+    "hash": "39d96cc7252aa9fffd116f5772bf525055146de3be2b1cfeff05c47f9b90536b",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/DeleteOfficeById.cs": {
+    "phase": "indexed",
+    "hash": "077f3818984448def02232abb9c134ab06102b8d2d103f70ced3f52c01a26e8e",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/GetOfficeById.cs": {
+    "phase": "indexed",
+    "hash": "c6f3de31a20ce5056cc7fb4ca1bfec8bbbd2129757d7d1c2d4e21efff425e06d",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/SearchOffices.cs": {
+    "phase": "indexed",
+    "hash": "ad3eca322ef10afc5741193f541a84b1bb74c624ad7539544d798059e4b26fd9",
+    "lines": 83,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/SearchOwnOffices.cs": {
+    "phase": "indexed",
+    "hash": "0211a2923c54c33de666605fd497ca383f5907b82a721a1f5f073530655eb356",
+    "lines": 76,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Office/UpdateOfficeById.cs": {
+    "phase": "indexed",
+    "hash": "c36b8e36243ca2dc66662558a9b9a8f766b9b7e58249e9d1c669c53d74836704",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Role/CreateRole.cs": {
+    "phase": "indexed",
+    "hash": "85d0cdc723251a613486b1170c4874cc21cdc72f23b63a4cda905a59ca3bd568",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Role/DeleteRole.cs": {
+    "phase": "indexed",
+    "hash": "95ffa849c76eaddac946279d99c17e7c2ad893a677bab912b874f8f1f9314487",
+    "lines": 36,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Role/GetRoleById.cs": {
+    "phase": "indexed",
+    "hash": "09eeaaf4d4d77a7d1f5caff15484649a16402816eb0f5dd000e008dd24b691d4",
+    "lines": 31,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Role/SearchRole.cs": {
+    "phase": "indexed",
+    "hash": "76f58430799fb8ea39949dbffb0b4ec3fd149bf0f9faaccece7c5c28b0d83dd4",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Role/UpdateRole.cs": {
+    "phase": "indexed",
+    "hash": "99e94df5d9d14f9720a362a715b09c147237d92391d9b6709d8f8d281010f645",
+    "lines": 51,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/Sso/GenerateFeatureBaseSsoUrl.cs": {
+    "phase": "indexed",
+    "hash": "268267ce65d8c0a0c1292b24622b9732f03fd60121b9dc11730c9ae4ca546234",
+    "lines": 71,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/BbcMicrosoftLogin.cs": {
+    "phase": "indexed",
+    "hash": "b48449a85e794f8cd97699a8578b34ddf57c982171c7631ae1bfd88a8255d20f",
+    "lines": 176,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/ChangePassword.cs": {
+    "phase": "indexed",
+    "hash": "34076af09c58c7e5eafab3f732a9d6bdcb4c5aa9f5f31040e37abe11c2c4a286",
+    "lines": 34,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/DeleteUser.cs": {
+    "phase": "indexed",
+    "hash": "cb907ca4fedf41e78735cfd8685b64d6bdee1ff942576b759596c9939fad75bc",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/EnsureExistingExternalUsers.cs": {
+    "phase": "indexed",
+    "hash": "3dacb712d11271e04ca3a163c1ee21ba8743972e554b0d331503b474ee4b73d2",
+    "lines": 119,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/ForgotPassword.cs": {
+    "phase": "indexed",
+    "hash": "34707b9e616021969d29b807883161071ec801b88325da2ac8f6367f433a7239",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/GenerateLoginResponse.cs": {
+    "phase": "indexed",
+    "hash": "ef698a2bdeb0488210c27105bae2d43d1e9ffbdc1e679b76eb490d6ea34a9d80",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/GenerateToken.cs": {
+    "phase": "indexed",
+    "hash": "4c002648dfe985b2ecab17f33d84ddc6272464c44c8ce0d673cf4dacfeb743a5",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/GetUserById.cs": {
+    "phase": "indexed",
+    "hash": "3aa4d7c229c4e05375bb7e05b211fa947b31f5c2297aa84ff948a8e7ed6b1eaf",
+    "lines": 74,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/GetUserProfileById.cs": {
+    "phase": "indexed",
+    "hash": "83f25839a0ef444a5e306d09598a861286481a032006b8225ccda00c9bf4c094",
+    "lines": 51,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/GrantPermissionForUser.cs": {
+    "phase": "indexed",
+    "hash": "8d7498697cef224e56e3e336014e936207df4ecacd86567aef40b452ce74f39d",
+    "lines": 158,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/ImportAllUsers.cs": {
+    "phase": "indexed",
+    "hash": "43042e2872cfd80c2d48673e22e629b627c6d7f806ce7d23202e100a2073138b",
+    "lines": 65,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/RefreshToken.cs": {
+    "phase": "indexed",
+    "hash": "0f7e29dce6c1cda905f96dedf6cd5b38fb6d4d9cfbc41ce650c843d5cf58545a",
+    "lines": 68,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/RegisterUser.cs": {
+    "phase": "indexed",
+    "hash": "52df285f2ddd889d953aa93c037e60ecbfa16702f5133bb8ab9f7fbda026f6c5",
+    "lines": 113,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/ResetPassword.cs": {
+    "phase": "indexed",
+    "hash": "cfe187ccb48cec347fe1b5daf46c66d865cf07fbce97678d40750a4f31b0662c",
+    "lines": 65,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/RevokeRefreshToken.cs": {
+    "phase": "indexed",
+    "hash": "4ebfe804e1a6ed2319d9b63b0ecda7571493f5692c6fcf86dd069f561a752dce",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/SearchUser.cs": {
+    "phase": "indexed",
+    "hash": "53b92a20ae9bc1c9eabcb0a2faf978f366f5aa6bca1fafbff2788b29d39f9c2e",
+    "lines": 118,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/SearchUserByRoles.cs": {
+    "phase": "indexed",
+    "hash": "519086bf867dfffaad9bb9c05aa8dfbcb1e22e7e689dc9006dd05f0769173388",
+    "lines": 99,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/SignInUser.cs": {
+    "phase": "indexed",
+    "hash": "a49aa42d282889f2f67054bd66f7d3bdbcf8a483e65657e2b40f0f975a113864",
+    "lines": 47,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/SignInUserWithPassword.cs": {
+    "phase": "indexed",
+    "hash": "d7d2d008de353cded552c3f65f1d4eec5a9924bdd3037d3e3bdb23151eaa2ddd",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/UserManagement/User/UpdateUserStatus.cs": {
+    "phase": "indexed",
+    "hash": "d3fa9219b8d88b7df9b8e7afe54965eed665e6a66bd42a4c57267fc1d2dc722f",
+    "lines": 75,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/CreatePaymentManuallyValidator.cs": {
+    "phase": "indexed",
+    "hash": "da61ca5485ff80e8620c1297d52dd21131262ebb1788062490a4545a83957d42",
+    "lines": 22,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ExternalPaymentValidator.cs": {
+    "phase": "indexed",
+    "hash": "98cf1d1aa80d12ba3b7fc43189737fd771b2ad8b8444d2384e9ec173ac5d7756",
+    "lines": 19,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/LegacyShipmentConfirmValidator.cs": {
+    "phase": "indexed",
+    "hash": "cf295929a65d763bb8c2228becafa3c35f006a44020110b85167c9d13ed936aa",
+    "lines": 296,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentCommissionValidator.cs": {
+    "phase": "indexed",
+    "hash": "1260062d05dc3360dda9d03905f24dbf7ecfdfc54e3c74ed3370baa6c1e8f70e",
+    "lines": 23,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentConfirmValidator.cs": {
+    "phase": "indexed",
+    "hash": "4bd4e3cc4f573117d202140415559bbe00b515a063e4e942ebe7d293b2689736",
+    "lines": 174,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentInstructionValidator.cs": {
+    "phase": "indexed",
+    "hash": "ff49eb4e3a8a88643b435446c5e605018ac22c6d6dc726466ec35251a4a4fab6",
+    "lines": 26,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentPLItemCheck.cs": {
+    "phase": "indexed",
+    "hash": "dc408c2d1aa0037a5d25950f31091c3fecad1a02f259f714a2a7416b096a886a",
+    "lines": 62,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentPortListValidator.cs": {
+    "phase": "indexed",
+    "hash": "97bd14b0347ad04a228caf64fe50b8c3a42b58d7497ddb28d790bac36d5570b8",
+    "lines": 55,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentPortQuantityPLItemCheck.cs": {
+    "phase": "indexed",
+    "hash": "6bfde14a3f07958f6172fbe890984c9b446b8bfde43b746e1e224214e001b26a",
+    "lines": 52,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentPortValidator.cs": {
+    "phase": "indexed",
+    "hash": "cda97e46c69c74bbcd3200e7a9b8b40252388b44eed4cc692c20dfa20f4e674a",
+    "lines": 50,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentProfitAndLossItemValidator.cs": {
+    "phase": "indexed",
+    "hash": "79d48247cd5e66e52312739f038c8edec3dddee395145a2db2741b38c7338163",
+    "lines": 46,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentQuantitiesValidator.cs": {
+    "phase": "indexed",
+    "hash": "89f6b2e589a920aa00c841a286a0eb4ca04b235b00f79a71831b3ecfe4ea73ea",
+    "lines": 22,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/ShipmentValidator.cs": {
+    "phase": "indexed",
+    "hash": "baf1103375d342a66160e0b007a6034309c84969f1661628728f9f078eaf19ba",
+    "lines": 273,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Commons/PortService.cs": {
+    "phase": "indexed",
+    "hash": "c280bb692b3bd4778cc5a896e6a15b7076935d8c49267ebdc4ee09eb43eed1db",
+    "lines": 23,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Commons/TciService.cs": {
+    "phase": "indexed",
+    "hash": "ec8a2ee3679d3d7bd948c1136c1157ede3e7e9a0deb5ecbf8288db4a0bbc2701",
+    "lines": 79,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Commons/ValidationContextExtensions.cs": {
+    "phase": "indexed",
+    "hash": "fb4404fb032ca15be217bc86d6f7e2de612c264235f68fbaee8d5acdd6c53020",
+    "lines": 53,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateValidator.cs": {
+    "phase": "indexed",
+    "hash": "40bef9b09dbf00ebd4b7568c35ce6ca39a48a9fe24ccf2469e4d564064d484ca",
+    "lines": 234,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ShipmentLinkedValidator.cs": {
+    "phase": "indexed",
+    "hash": "f1e90f72eadb6c064b672cde49bb3ed867054e39d96aeebfbe3ff7dfc11dbde3",
+    "lines": 44,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/BunkerEvent/BunkerEventValidator.cs": {
+    "phase": "indexed",
+    "hash": "667778af5b5e675e9b4f95c86e05cb1f5800175da3fd6789cbaf23923787a8e5",
+    "lines": 236,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/EstimateShipmentCommissionConsistencyValidator.cs": {
+    "phase": "indexed",
+    "hash": "428411e209d8499f06d4ffecf630c3d14c32926470b83e9a2ab4a6019e5feddd",
+    "lines": 76,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/EstimateShipmentConsistencyPLItemValidator.cs": {
+    "phase": "indexed",
+    "hash": "e0c04814291cfea118652f5f21bd8d00ccf3ce4fb76aaefe59c3022202176be0",
+    "lines": 321,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/EstimateShipmentConsistencyValidator.cs": {
+    "phase": "indexed",
+    "hash": "d4a34978c9f83bdde39e84b150a24014ca52098be5c8970fdd4549b711ab710e",
+    "lines": 117,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/EstimateShipmentFreightConsistencyValidator.cs": {
+    "phase": "indexed",
+    "hash": "ab3cc2f2a3ac3524a1ef947e06137ba38723c0fd7ae1f49ed43345e8d7c91c45",
+    "lines": 45,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/ValidEstimateCommissionValidator.cs": {
+    "phase": "indexed",
+    "hash": "6d66f5b05a0408c81d18f2338030a842eff3b94096dbc1abdcfc416b09da8cb9",
+    "lines": 57,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/ValidEstimateShipmentValidator.cs": {
+    "phase": "indexed",
+    "hash": "d66d8837b33116c9992824c9a1e0f2c4db85a3e52771246146f8eaa0a88503f8",
+    "lines": 119,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EstimateShipment/ValidInternalCommission.cs": {
+    "phase": "indexed",
+    "hash": "f11c2e02674c0bba28a3fc23b28d9c52d6d48376f00552368de4bf5a8b3f50af",
+    "lines": 82,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/EtsEvent/EtsEventValidator.cs": {
+    "phase": "indexed",
+    "hash": "c1013ef13fbf75abb4b91972cb17320b315631a3caeaf12bc73eb831aa76acf5",
+    "lines": 51,
+    "file_type": "Validator",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/EstimateItineraryGroupValidator.cs": {
+    "phase": "indexed",
+    "hash": "bad38900d18793c14d46480f1e45c2d83ea651f7abc5a2800e83bd61c6df7cb1",
+    "lines": 112,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/EstimateItineraryItemValidator.cs": {
+    "phase": "indexed",
+    "hash": "3b624c1d1082f079007008acaa7819f7b5f19ca1401160fa2015133c17e8a8ee",
+    "lines": 131,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/EstimateItineraryValidator.cs": {
+    "phase": "indexed",
+    "hash": "fd1c29725a0758d8a41837af61ad1b8868df00ad39a0277cb24ebdad4f4d64c8",
+    "lines": 58,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/ValidCorRPortValidator.cs": {
+    "phase": "indexed",
+    "hash": "2c9a0f3a6665fc7f6e8d21d49c3634d2d11b8c9a94477f6bd1d90723f70ea6e4",
+    "lines": 40,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/ValidEstimateShipmentAndPortCallValidator.cs": {
+    "phase": "indexed",
+    "hash": "fd82c35b12da43d3a1ea3a0f2bebcc6a491daad9a77048f472f48da66efc8853",
+    "lines": 98,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ItineraryItems/ValidPortEntityValidator.cs": {
+    "phase": "indexed",
+    "hash": "46c75f5704c60fffff8f27afd35fdcd7f5952e9dfa25613a5ded95e1588df0a5",
+    "lines": 31,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/PortCalls/PortCallConsistencyShipmentPort.cs": {
+    "phase": "indexed",
+    "hash": "7dc11578f658be5cd60df62aba106297ff9b21dbd96f901ee2db9cb36f0edbf8",
+    "lines": 30,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/PortCalls/PortCallItemValidator.cs": {
+    "phase": "indexed",
+    "hash": "b3ae48eec5edebeeb054e0f30e114e590d37306b6a6b67190507296db750b030",
+    "lines": 39,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/PortCalls/ValidSettingPortCallsValidator.cs": {
+    "phase": "indexed",
+    "hash": "c3b6b81fafb1231e4fa52e43fef5f5043f1ff15d971c8504c835bf75dc68f514",
+    "lines": 68,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/ProfitAndLossItems/ProfitAndLossItemsValidator.cs": {
+    "phase": "indexed",
+    "hash": "b042e2615ce21f5a3ce9d34a9e8a6023e0a331927a011691b8eeaa95843633b1",
+    "lines": 53,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Estimate/Restrictions/EstimateRestrictionsConsistencyValidator.cs": {
+    "phase": "indexed",
+    "hash": "bcb9a55a4c4edef9424d9cd356934f65fabb8455af4a0df6c020b09f79f7b7e6",
+    "lines": 48,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Helpers/CompareValue.cs": {
+    "phase": "indexed",
+    "hash": "432ba439d3cc7c5f0ebd7cdf81db0d948fc61c73ca1709e3e702936309050067",
+    "lines": 228,
+    "file_type": "Validator",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Tco/TcoCommissionValidator.cs": {
+    "phase": "indexed",
+    "hash": "2a7ca401dbfad45370fc8a047defcb2ff12d12564a2e4a2d5a065aa2c2077717",
+    "lines": 26,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Tco/TcoConfirmValidator.cs": {
+    "phase": "indexed",
+    "hash": "21b31adee1bdcff2536af1153cb6cafd4364f2d457c4ba19c8ffdb976ae93458",
+    "lines": 75,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
   }
 }
