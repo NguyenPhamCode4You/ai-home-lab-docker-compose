@@ -83,6 +83,9 @@ Cover every significant operation — do not skip mediator.Send calls or named h
 
 ## Sub-handlers Invoked
 List every `mediator.Send(new X.Request...)` call, in order of invocation:
+```csharp
+[exact mediator.Send line]
+```
 - `HandlerName` — what business operation it performs and what it reads or mutates on the entity
 
 [END HANDLER TEMPLATE]
@@ -107,6 +110,9 @@ Document members in two tiers:
 
 For Tier 2 fields, document as:
 ### [FieldName] — [business role in one line]
+```csharp
+[exact field declaration including type, nullability, default value if any]
+```
 **Role**: What this field stores, what null/empty/default means in domain terms, and which handlers or workflows read or mutate it.
 
 HARD SKIP (never document): `Id`, `CreatedAt`, `UpdatedAt`, `Name`, `Description`, `Note`, `Remark`, navigation props that are just lists of child DTOs, trivial constructors, ToString/Equals.
@@ -133,6 +139,9 @@ When documenting any member, name the specific downstream handlers, services, or
 ## Validation Rules
 For each RuleFor block:
 ### [PropertyName]
+```csharp
+[exact RuleFor(...) chain — include all chained validators on the same property]
+```
 - Rule: [what FluentValidation rule is applied]
 - Business constraint: [why this field must satisfy this constraint in domain terms]
 
