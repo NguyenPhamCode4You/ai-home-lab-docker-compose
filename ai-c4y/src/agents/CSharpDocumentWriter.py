@@ -28,8 +28,12 @@ class CSharpDocumentWriter(Task):
         kwargs["llm_model"] = kwargs.get("llm_model", Ollama(model=OLLAMA_CODE_MODEL))
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
 You are a senior .NET architect writing internal reference documentation for the BVMS codebase.
-Be concise and direct. Do NOT explain what Clean Architecture, CQRS, or layers are in general —
-that is assumed knowledge. Focus only on THIS file.
+Do NOT explain what Clean Architecture, CQRS, MediatR, or layers are in general — that is assumed knowledge.
+Focus exclusively on THIS file: its specific logic, business rules, and role in the BVMS domain.
+
+Write with depth. Every explanation should answer: WHAT it does, WHY it exists, WHEN it is triggered,
+WHAT breaks or goes wrong if it is absent or incorrect, and HOW it interacts with other fields or handlers.
+Do NOT pad with generic sentences. Do NOT truncate to hit a "short" target — completeness matters more than brevity.
 
 File metadata (use to enrich your explanations — do not just repeat it verbatim):
 {question}
@@ -53,7 +57,8 @@ What specific business operation does this class own? How critical is it?
 IMPORTANT: Name the actual classes, DTOs, interfaces, and services from the index context that consume or depend on this file.
 For example: "Acts as the EF Core entity mapped by `DataContext`. Projected into `StorageObjectDto` via AutoMapper. Consumed by `CreateFile` and `CreateFolder` handlers."
 Do NOT write generic sentences like "core abstraction" or "canonical representation" without naming the real consumers.
-2-4 sentences max.
+Cover: what user-facing operation triggers use of this file, what it produces/mutates, and what downstream systems depend on its output.
+3-6 sentences.
 
 [Now use the matching template below based on the file type identified above:]
 
@@ -76,7 +81,10 @@ Cover every significant operation — do not skip mediator.Send calls or named h
 ```csharp
 [the exact code lines for this step]
 ```
-**Why**: Business reason this step exists. What does it fix, validate, or produce? What breaks if it is skipped?
+**Why**: Write a thorough explanation covering:
+- What business problem or invariant this step solves
+- What data it produces or mutates and why that matters for subsequent steps
+- What breaks, corrupts, or gives wrong results downstream if this step is skipped or runs out of order
 
 ### Step 2 — ...
 [continue for every meaningful step in execution order]
@@ -126,9 +134,18 @@ When documenting any member, name the specific downstream handlers, services, or
 ```csharp
 [exact code — expression body, default assignment, or method body]
 ```
-**Explanation** (Tier 1): What it computes, fallback order, downstream consumers by name. 2-5 sentences.
+**Explanation** (Tier 1): Write a thorough explanation covering ALL of:
+- What it computes and the fallback/priority order if applicable
+- What each input field represents and why that ordering/logic was chosen
+- Which specific handlers, calculations, or services downstream consume this value and how
+- What happens if this returns null/zero/wrong — what breaks in the business flow
+- Any edge case or design constraint visible from the code (e.g. division-by-zero guard, nullable intent)
 — OR —
-**Role** (Tier 2): What this field holds, what null/zero means, which handlers read or write it.
+**Role** (Tier 2): Write a thorough explanation covering ALL of:
+- What this field stores and what its type/nullability signals (null = unapproved, 0 = unset, etc.)
+- What user action or system event sets this field
+- Which handlers, calculations, or workflows read or mutate it, and what they use it for
+- How it interacts with other fields in this class (e.g. "when this is null, ActualTotalCostInUSD falls back to TotalCostInUSD")
 
 [Repeat for ALL Tier 1 members and ALL Tier 2 significant fields, in file order.]
 
@@ -153,6 +170,13 @@ For each RuleFor block:
 Same format as DOMAIN/DTO above but focus on non-obvious logic and side-effects.
 
 [END OTHER TEMPLATE]
+
+## Technical Notes
+Document any of the following found in the code — skip this section entirely if none apply:
+- TODO / FIXME / bug reference comments: quote them and explain their current impact
+- Ordering dependencies between steps or fields (e.g. "Step X must run before Step Y because...")
+- Non-obvious design decisions (e.g. why a nullable type was chosen, why a fallback chain exists)
+- Known edge cases or exceptional inputs the code explicitly handles
 
 ## Dependencies
 Bullet list. For each injected service, base class, interface, or key referenced type:

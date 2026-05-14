@@ -4,7 +4,7 @@ code_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 Usage examples:
   python code_learn_csharp.py --phase index
   python code_learn_csharp.py --phase all
-  python code_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
+  python code_learn_csharp.py --phase document --focus "**/CalculateEstimate/**" --cloud 5
   python code_learn_csharp.py --phase all --mode incremental
   python code_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python code_learn_csharp.py --phase all --mode incremental --from-stdin
