@@ -7,18 +7,17 @@ class CSharpDocumentWriter(Task):
     """
     Phase 2 agent.
 
-    Generates a structured markdown document for a single C# file.
+    Generates a concise, file-focused markdown document for a single C# file.
     Receives:
       context  = full .cs file content
       question = JSON index context (architecture_layer, file_type, injected_services, known_callers, ...)
 
     Output sections (in order):
-      # General Purpose
-      # Architecture Layer
-      # Class: <Name>
-      ## N. MethodName — purpose
-      ```csharp ... ``` + **Explanation**: ...
-      # Dependencies
+      # [ClassName]
+      ## Purpose
+      ## Business Responsibility
+      ## Methods
+      ## Dependencies
       # Impact Scope    ← PLACEHOLDER, replaced in Phase 3
 
     The **Explanation** delimiter is intentional — the existing insert_code_documents()
@@ -30,53 +29,46 @@ class CSharpDocumentWriter(Task):
         kwargs["task_name"] = kwargs.get("task_name", "csharp-document-writer")
         kwargs["llm_model"] = kwargs.get("llm_model", Ollama(model=OLLAMA_CODE_MODEL))
         kwargs["instruction_template"] = kwargs.get("instruction_template", """
-You are a senior .NET software architect documenting the BVMS C# backend codebase.
-BVMS (BBC Voyager Management System) is a shipping/voyage management platform.
-The codebase follows Clean Architecture with CQRS (MediatR), EF Core, FluentValidation, and AutoMapper.
+You are a senior .NET architect writing internal reference documentation for the BVMS codebase.
+Be concise and direct. Do NOT explain what Clean Architecture, CQRS, or layers are in general —
+that is assumed knowledge. Focus only on THIS file: what it does, why it matters, and how it behaves.
 
-File metadata from the index (use this to enrich your explanations):
+File metadata (use to enrich your explanations — do not just repeat it verbatim):
 {question}
 
-Generate a markdown document for the C# file below.
-Use EXACTLY these sections in this order — do not skip any section:
+Write a compact markdown document using EXACTLY these sections in this order:
 
 ---
 
-# General Purpose
-One paragraph explaining what this file does and WHY it exists in the system.
-Describe its role within its architecture layer of CQRS/Clean Architecture.
+# [Actual class name from the file]
 
-# Architecture Layer
-State the layer: Domain | Business | Infrastructure | API | ExternalClient | Functions
-Explain the responsibilities of this layer and how this specific file fits within it.
+## Purpose
+One or two sentences. What does this class do and why does it exist?
 
-# Class: [write the actual class name here]
-Brief class-level description.
-List constructor parameters / injected dependencies.
-Name any interface contracts the class implements (IRequestHandler, IValidator, etc.).
+## Business Responsibility
+What specific business operation or rule does this class own?
+How critical is it to the business process? (e.g. "Core path for voyage cost finalization", "Low-impact utility for formatting")
+Keep to 2–4 sentences.
 
-## 1. [MethodName] — [one-line purpose]
+## Methods
+
+### 1. [MethodName] — [one-line purpose]
 ```csharp
-[paste the exact code of this method from the file]
+[exact method signature only — no body needed unless the body IS the documentation value]
 ```
+**Explanation**: What this method does, what it returns or persists, and any embedded business rules. Be specific — name fields, entities, conditions. 2–5 sentences max.
 
-**Explanation**:
-Detailed explanation: what this method does step by step, what inputs it expects,
-what it returns or what side-effects it produces, and any business rules or conditions
-embedded in the logic. Reference field names, entity names, and service calls explicitly.
+[Repeat ### N. for each significant public method. Skip trivial getters/setters.]
 
-[Repeat ## N. for each public method in the class. Use sequential numbers starting at 1.]
-
-# Dependencies
-List every injected service, repository, DbContext, IMapper, and entity type referenced in this file.
-For each, write one line explaining WHY it is needed in this file's context.
+## Dependencies
+Bullet list. For each injected service or key type: `ServiceName` — why this file needs it specifically.
 
 # Impact Scope
 [PLACEHOLDER — will be filled in Phase 3]
 
 ---
 
-Now document this C# file:
+C# file to document:
 
 {context}
         """)
