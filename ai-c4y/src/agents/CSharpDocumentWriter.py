@@ -50,6 +50,9 @@ One or two sentences: what does this class do and why does it exist?
 ## Business Responsibility
 What specific business operation does this class own? How critical is it?
 (e.g. "Core path for voyage cost finalization — called on every estimate save", "Low-impact DTO for list views")
+IMPORTANT: Name the actual classes, DTOs, interfaces, and services from the index context that consume or depend on this file.
+For example: "Acts as the EF Core entity mapped by `DataContext`. Projected into `StorageObjectDto` via AutoMapper. Consumed by `CreateFile` and `CreateFolder` handlers."
+Do NOT write generic sentences like "core abstraction" or "canonical representation" without naming the real consumers.
 2-4 sentences max.
 
 [Now use the matching template below based on the file type identified above:]
@@ -87,15 +90,21 @@ List every `mediator.Send(new X.Request...)` call, in order of invocation:
 [IF DOMAIN/DTO:]
 
 ## Members
-Document every member with non-trivial logic or business meaning.
-Include: computed properties (=> expressions), ?? fallback chains, conditional logic, domain-named fields (financial, status, quantity, date).
-SKIP: simple auto-properties (e.g. public string Name {{ get; set; }}), trivial constructors, ToString/Equals.
+Non-trivial members ONLY:
+- Include: computed properties (`=>` expressions), `??` fallback chains, conditional logic, non-obvious default values that affect routing or behavior.
+- SKIP: plain auto-properties with no logic (e.g. `public string Name {{ get; set; }}`), trivial constructors, ToString/Equals.
+
+IMPORTANT — if the class has NO non-trivial members (all properties are plain auto-properties):
+Do NOT invent explanations for simple properties. Instead write a single paragraph under `## Members` in this format:
+"This class is a pure data carrier with no computed logic. All properties are scalar auto-properties mapped directly to [EF Core table / AutoMapper target / DTO projection]. It serves as [specific role: the primary persistence entity / the API response shape / the command input for XHandler]. Key fields: list the 3-5 most domain-meaningful field names and what they represent."
+
+When documenting a non-trivial member, name the specific downstream handlers, services, or calculations that consume its value.
 
 ### 1. [MemberName] — [one-line purpose]
 ```csharp
 [exact expression body or method body]
 ```
-**Explanation**: What it computes, which fields it reads, the fallback/priority order, downstream impact. 2-5 sentences.
+**Explanation**: What it computes, which fields it reads, the fallback/priority order, and which specific handlers or calculations downstream consume this value. 2-5 sentences.
 
 [Repeat for each non-trivial member in file order.]
 
@@ -120,7 +129,7 @@ Same format as DOMAIN/DTO above but focus on non-obvious logic and side-effects.
 
 ## Dependencies
 Bullet list. For each injected service, base class, interface, or key referenced type:
-`Name` — why this file specifically needs it (not a generic description of what it is).
+`Name` — why THIS file specifically needs it. Name the concrete capability it provides (e.g. "supplies `Id`, `CreatedAt`, `UpdatedAt` audit fields required by EF Core mapping and soft-delete contracts" not just "base entity").
 Skip primitive types.
 
 # Impact Scope
