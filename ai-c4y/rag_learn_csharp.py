@@ -1,18 +1,18 @@
 """
-code_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
+rag_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 
 Usage examples:
-  python code_learn_csharp.py --phase index
-  python code_learn_csharp.py --phase all
-  python code_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
-  python code_learn_csharp.py --phase all --mode incremental
-  python code_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
-  git diff --name-only origin/main HEAD | python code_learn_csharp.py --phase all --mode incremental --from-stdin
-  python code_learn_csharp.py --phase index --cloud
-  python code_learn_csharp.py --phase index --cloud 5
-  python code_learn_csharp.py --phase all --cloud 3
-  python code_learn_csharp.py --phase index --local
-  python code_learn_csharp.py --phase index --local 3
+  python rag_learn_csharp.py --phase index
+  python rag_learn_csharp.py --phase all
+  python rag_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
+  python rag_learn_csharp.py --phase all --mode incremental
+  python rag_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
+  git diff --name-only origin/main HEAD | python rag_learn_csharp.py --phase all --mode incremental --from-stdin
+  python rag_learn_csharp.py --phase index --cloud
+  python rag_learn_csharp.py --phase index --cloud 5
+  python rag_learn_csharp.py --phase all --cloud 3
+  python rag_learn_csharp.py --phase index --local
+  python rag_learn_csharp.py --phase index --local 3
 """
 
 import argparse
