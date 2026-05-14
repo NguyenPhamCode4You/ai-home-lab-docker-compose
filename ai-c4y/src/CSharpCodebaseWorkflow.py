@@ -470,6 +470,7 @@ async def build_codebase_index(
     focus_patterns: list[str] = None,
     ignore_patterns: list[str] = None,
     checkpoint_every: int = 50,
+    force_cloud: bool = False,
 ):
     """
     Phase 1: Walk every .cs file in codebase_path, extract structural metadata via
@@ -538,7 +539,7 @@ async def build_codebase_index(
             continue
 
         lines = file_content.count("\n") + 1
-        model = _select_analyzer_model(lines)
+        model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_analyzer_model(lines)
         model_tag = "CLOUD" if isinstance(model, OpenRouter) else "LOCAL"
         print(f"[Phase 1] {model_tag} — {rel_path} ({lines} lines)")
 
@@ -627,6 +628,7 @@ async def write_csharp_documents(
     output_folder: str = DEFAULT_RAW_DOCS_FOLDER,
     manifest: CSharpManifest = None,
     batch_size: int = BATCH_SIZE,
+    force_cloud: bool = False,
 ):
     """
     Phase 2: For every .cs file at phase="indexed", generate a structured markdown document.
@@ -673,7 +675,7 @@ async def write_csharp_documents(
             injected_count = len(entry.get("injected_services", []))
             is_critical = entry.get("is_critical", False)
 
-            model = _select_doc_writer_model(lines, injected_count, is_critical)
+            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_doc_writer_model(lines, injected_count, is_critical)
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
                 print(f"[Phase 2] CLOUD — {rel_path} ({lines} lines)")
@@ -725,6 +727,7 @@ async def enrich_with_cross_references(
     index_path: str = DEFAULT_INDEX_PATH,
     manifest: CSharpManifest = None,
     batch_size: int = BATCH_SIZE,
+    force_cloud: bool = False,
 ):
     """
     Phase 3: Replace the '# Impact Scope [PLACEHOLDER]' in every Phase 2 doc
@@ -769,7 +772,7 @@ async def enrich_with_cross_references(
             caller_context = _build_caller_context(rel_path, index)
             combined_chars = len(doc_content) + len(caller_context)
 
-            model = _select_impact_model(combined_chars, is_critical)
+            model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_impact_model(combined_chars, is_critical)
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
                 print(f"[Phase 3] CLOUD — {rel_path} ({combined_chars} chars)")

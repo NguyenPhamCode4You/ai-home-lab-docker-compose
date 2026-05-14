@@ -8,6 +8,8 @@ Usage examples:
   python code_learn_csharp.py --phase all --mode incremental
   python code_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python code_learn_csharp.py --phase all --mode incremental --from-stdin
+  python code_learn_csharp.py --phase index --cloud
+  python code_learn_csharp.py --phase all --cloud
 """
 
 import argparse
@@ -51,6 +53,11 @@ def parse_args():
         "--from-stdin",
         action="store_true",
         help="Read changed file paths from stdin (one per line) — use with git diff output",
+    )
+    parser.add_argument(
+        "--cloud",
+        action="store_true",
+        help="Force all LLM requests through OpenRouter (skips local Ollama entirely)",
     )
     return parser.parse_args()
 
@@ -127,16 +134,16 @@ async def main():
         if not codebase_path:
             print("ERROR: CODE_IMPACT_ANALYZER_CODEBASE_PATH is not set. Cannot run Phase 1.")
             sys.exit(1)
-        await build_codebase_index(codebase_path=codebase_path, manifest=manifest)
+        await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
 
     if run_document:
         if not codebase_path:
             print("ERROR: CODE_IMPACT_ANALYZER_CODEBASE_PATH is not set. Cannot run Phase 2.")
             sys.exit(1)
-        await write_csharp_documents(codebase_path=codebase_path, manifest=manifest)
+        await write_csharp_documents(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
 
     if run_enrich:
-        await enrich_with_cross_references(manifest=manifest)
+        await enrich_with_cross_references(manifest=manifest, force_cloud=args.cloud)
 
     if run_synthesize:
         await synthesize_workflow_documents(manifest=manifest)
