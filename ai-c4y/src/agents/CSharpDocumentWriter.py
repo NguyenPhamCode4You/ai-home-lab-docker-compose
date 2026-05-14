@@ -42,8 +42,6 @@ First, identify the file type from the code:
 
 Then write the document using the matching template below. Use EXACTLY the sections shown.
 
----
-
 # [Actual class name from the file]
 
 ## Purpose
