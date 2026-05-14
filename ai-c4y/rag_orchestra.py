@@ -17,8 +17,8 @@ from src.agents.models.OpenRouter import OpenRouter
 from dotenv import load_dotenv
 load_dotenv()
 
-# default_model = Ollama()
-default_model = OpenRouter()
+default_model = Ollama()
+# default_model = OpenRouter()
 
 bvms_code_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
