@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MANIFEST_FILE = os.getenv("CODE_IMPACT_ANALYZER_MANIFEST_PATH", "wip/csharp-manifest.json")
+MANIFEST_FILE = os.getenv("CIA_MANIFEST_PATH", "wip/csharp-manifest.json")
 
 # Phase ordering for comparison
 PHASE_ORDER = {

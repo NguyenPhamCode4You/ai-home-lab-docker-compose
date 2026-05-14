@@ -42,7 +42,7 @@ def parse_args():
     parser.add_argument(
         "--focus",
         default=None,
-        help="Comma-separated glob patterns — overrides CODE_IMPACT_ANALYZER_FOCUS_ONLY_FILES for this run",
+        help="Comma-separated glob patterns — overrides CIA_FOCUS_ONLY_FILES for this run",
     )
     parser.add_argument(
         "--changed-files",
@@ -77,9 +77,9 @@ async def main():
     )
 
     if args.focus:
-        os.environ["CODE_IMPACT_ANALYZER_FOCUS_ONLY_FILES"] = args.focus
+        os.environ["CIA_FOCUS_ONLY_FILES"] = args.focus
 
-    codebase_path = os.getenv("CODE_IMPACT_ANALYZER_CODEBASE_PATH", CSHARP_CODEBASE_PATH)
+    codebase_path = os.getenv("CIA_CODEBASE_PATH", CSHARP_CODEBASE_PATH)
     manifest = CSharpManifest()
 
     # ------------------------------------------------------------------
@@ -132,13 +132,13 @@ async def main():
 
     if run_index:
         if not codebase_path:
-            print("ERROR: CODE_IMPACT_ANALYZER_CODEBASE_PATH is not set. Cannot run Phase 1.")
+            print("ERROR: CIA_CODEBASE_PATH is not set. Cannot run Phase 1.")
             sys.exit(1)
         await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
 
     if run_document:
         if not codebase_path:
-            print("ERROR: CODE_IMPACT_ANALYZER_CODEBASE_PATH is not set. Cannot run Phase 2.")
+            print("ERROR: CIA_CODEBASE_PATH is not set. Cannot run Phase 2.")
             sys.exit(1)
         await write_csharp_documents(codebase_path=codebase_path, manifest=manifest, force_cloud=args.cloud)
 

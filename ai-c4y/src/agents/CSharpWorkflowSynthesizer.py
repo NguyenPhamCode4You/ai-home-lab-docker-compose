@@ -7,7 +7,7 @@ from .models.OpenRouter import OpenRouter
 
 load_dotenv()
 
-OPENROUTER_SYNTHESIS_MODEL = os.getenv("CODE_IMPACT_ANALYZER_SYNTHESIS_MODEL", "qwen/qwen3-32b")
+OPENROUTER_SYNTHESIS_MODEL = os.getenv("CIA_OPENROUTER_MODEL", "qwen/qwen3-32b")
 
 
 class CSharpWorkflowSynthesizer(Task):

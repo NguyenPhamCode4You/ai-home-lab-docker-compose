@@ -34,23 +34,23 @@ load_dotenv()
 # Configuration from env
 # -------------------------------------------------------------------
 
-CSHARP_CODEBASE_PATH            = os.getenv("CODE_IMPACT_ANALYZER_CODEBASE_PATH", "")
-CSHARP_FOCUS_ONLY_FILES         = os.getenv("CODE_IMPACT_ANALYZER_FOCUS_ONLY_FILES", "")
+CSHARP_CODEBASE_PATH            = os.getenv("CIA_CODEBASE_PATH", "")
+CSHARP_FOCUS_ONLY_FILES         = os.getenv("CIA_FOCUS_ONLY_FILES", "")
 CSHARP_IGNORE_FILES             = os.getenv(
-    "CODE_IMPACT_ANALYZER_IGNORE_FILES",
+    "CIA_IGNORE_FILES",
     "**/Migrations/**,**/*.Designer.cs,**/obj/**,**/bin/**",
 )
-CSHARP_LARGE_FILE_LINE_THRESHOLD = int(os.getenv("CODE_IMPACT_ANALYZER_LARGE_FILE_THRESHOLD", 200))
-OPENROUTER_SYNTHESIS_MODEL = os.getenv("CODE_IMPACT_ANALYZER_SYNTHESIS_MODEL", "qwen/qwen3-32b")
-OPENROUTER_CRITICAL_MODEL = os.getenv("CODE_IMPACT_ANALYZER_CRITICAL_MODEL", "google/gemini-2.5-pro")
-CLOUD_BATCH_DELAY = float(os.getenv("CODE_IMPACT_ANALYZER_CLOUD_BATCH_DELAY", "2.0"))
-BATCH_SIZE = int(os.getenv("CODE_IMPACT_ANALYZER_BATCH_SIZE", "10"))
+CSHARP_LARGE_FILE_LINE_THRESHOLD = int(os.getenv("CIA_LARGE_FILE_THRESHOLD", 200))
+OPENROUTER_SYNTHESIS_MODEL = os.getenv("CIA_OPENROUTER_MODEL", "qwen/qwen3-32b")
+OPENROUTER_CRITICAL_MODEL = os.getenv("CIA_OPENROUTER_CRITICAL_MODEL", "google/gemini-2.5-pro")
+CLOUD_BATCH_DELAY = float(os.getenv("CIA_CLOUD_BATCH_DELAY", "2.0"))
+BATCH_SIZE = int(os.getenv("CIA_BATCH_SIZE", "10"))
 
 # Output folder defaults — all scoped under wip/ for easy management
-DEFAULT_INDEX_PATH       = os.getenv("CODE_IMPACT_ANALYZER_INDEX_PATH",            "wip/csharp-index.json")
-DEFAULT_RAW_DOCS_FOLDER  = os.getenv("CODE_IMPACT_ANALYZER_RAW_DOCS_FOLDER",       "wip/csharp-docs/raw")
-DEFAULT_ENRICHED_FOLDER  = os.getenv("CODE_IMPACT_ANALYZER_ENRICHED_DOCS_FOLDER",  "wip/csharp-docs/enriched")
-DEFAULT_WORKFLOWS_FOLDER = os.getenv("CODE_IMPACT_ANALYZER_WORKFLOWS_FOLDER",      "wip/csharp-docs/workflows")
+DEFAULT_INDEX_PATH       = os.getenv("CIA_INDEX_PATH",            "wip/csharp-index.json")
+DEFAULT_RAW_DOCS_FOLDER  = os.getenv("CIA_RAW_DOCS_FOLDER",       "wip/csharp-docs/raw")
+DEFAULT_ENRICHED_FOLDER  = os.getenv("CIA_ENRICHED_DOCS_FOLDER",  "wip/csharp-docs/enriched")
+DEFAULT_WORKFLOWS_FOLDER = os.getenv("CIA_WORKFLOWS_FOLDER",      "wip/csharp-docs/workflows")
 
 # -------------------------------------------------------------------
 # Constants

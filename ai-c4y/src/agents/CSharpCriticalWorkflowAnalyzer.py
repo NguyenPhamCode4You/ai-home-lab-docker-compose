@@ -7,7 +7,7 @@ from .models.OpenRouter import OpenRouter
 
 load_dotenv()
 
-OPENROUTER_CRITICAL_MODEL = os.getenv("CODE_IMPACT_ANALYZER_CRITICAL_MODEL", "google/gemini-2.5-pro")
+OPENROUTER_CRITICAL_MODEL = os.getenv("CIA_OPENROUTER_CRITICAL_MODEL", "google/gemini-2.5-pro")
 
 
 class CSharpCriticalWorkflowAnalyzer(Task):
