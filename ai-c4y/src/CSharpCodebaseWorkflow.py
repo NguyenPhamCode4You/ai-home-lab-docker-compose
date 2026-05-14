@@ -562,11 +562,14 @@ async def build_codebase_index(
             "is_critical": entry.get("is_critical", False),
         })
 
+        # Save after every file so a crash loses no more than the current file's work.
+        # The manifest phase record is what makes restarts idempotent.
+        _save_index(index, index_path)
+        manifest.save()
+
         processed_count += 1
         if processed_count % checkpoint_every == 0:
-            print(f"[Phase 1] Checkpoint: {processed_count}/{len(to_process)} files indexed...")
-            _save_index(index, index_path)
-            manifest.save()
+            print(f"[Phase 1] Progress: {processed_count}/{len(to_process)} files indexed.")
 
     # --- Build used_by reverse-lookup map ------------------------------------
     print("[Phase 1] Building used_by reverse-lookup map...")
