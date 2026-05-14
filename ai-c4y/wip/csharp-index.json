@@ -95321,6 +95321,4889 @@
       ],
       "external_clients_used": [],
       "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Itenerary.Test.cs": {
+      "class_name": "IteneraryTest",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "IteneraryTest",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateClient",
+            "Setup",
+            "CreateMock",
+            "Create",
+            "GetTestContext",
+            "new Mapper",
+            "SeedMasterData",
+            "SeedShipmentData",
+            "SeedEstimateData",
+            "SeedDefaultBunkerChainForAllVessels"
+          ]
+        },
+        {
+          "name": "GroupIteneraryItemsWithChildren_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Include",
+            "Select",
+            "Map",
+            "GroupWithChildren"
+          ]
+        },
+        {
+          "name": "EnsurePortDataForIteneraryItemsShouldReturnSuccess",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Select",
+            "Map",
+            "new EnsurePortDataForEstimate.Request",
+            "Handle"
+          ]
+        },
+        {
+          "name": "GeneratePreCalculatedEstimateBunkerEvents_Should_Success",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "First",
+            "Handle",
+            "new GetEstimateById.Request",
+            "new GeneratePreCalculatedEstimateBunkerEvents.Request",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateShipments_Should_Success",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCurrencyExchangeRate",
+            "First",
+            "Handle",
+            "new GetEstimateById.Request",
+            "new CalculateShipments.Request",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "System.Threading.Tasks",
+        "AutoMapper",
+        "Core.Domain.VoyageManagement.AutoMapper",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure",
+        "Core.Infrastructure.DbContext",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq",
+        "RoutingEngineClient"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "Estimate",
+        "IteneraryItems",
+        "EstimateCrudDto",
+        "EstimateIteneraryItems",
+        "EstimateIteneraryItemDto",
+        "BunkerChainSeedingService",
+        "SeedingService"
+      ],
+      "external_clients_used": [
+        "DataLoyDistanceClient"
+      ],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/IteneraryActivitiy.Test.cs": {
+      "class_name": "IteneraryActivitiyTest",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "IteneraryActivitiyTest",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "ContextGenerator.GetTestContext",
+            "MapperConfiguration.AddProfile",
+            "CreateMapper",
+            "PrepareData",
+            "ConfigureAwait",
+            "GetAwaiter",
+            "GetResult"
+          ]
+        },
+        {
+          "name": "PrepareData",
+          "return_type": "System.Threading.Tasks.Task<System.Collections.Generic.List<Core.Domain.VoyageManagement.Entities.VoyageIteneraryActivityEntity>>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "AddRange",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "Search_Voyage_Itenerary_Using_DbContext_Should_Return_Three_Activities",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "ToList",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "FirstOrDefault"
+          ]
+        },
+        {
+          "name": "SearchIteneraryActivities_Should_Return_Three_Activities",
+          "return_type": "System.Threading.Tasks.Task<void>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "Assert.NotNull",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "SyncChanges_Should_Update_Activity",
+          "return_type": "System.Threading.Tasks.Task<void>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "ToList",
+            "FirstOrDefault"
+          ]
+        },
+        {
+          "name": "Create_Voyage_Activities_Should_Success",
+          "return_type": "Core.Domain.Commons.BaseIteneraryActivityEntity",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Add",
+            "SaveChanges"
+          ]
+        },
+        {
+          "name": "Create_Estimate_Activities_Should_Success",
+          "return_type": "Core.Domain.Commons.BaseIteneraryActivityEntity",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Add",
+            "SaveChanges"
+          ]
+        },
+        {
+          "name": "Update_Voyage_Activities_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Create_Voyage_Activities_Should_Success",
+            "Create_Estimate_Activities_Should_Success",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Update",
+            "SaveChanges",
+            "FirstOrDefault"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "System.Threading.Tasks",
+        "AutoMapper",
+        "Core.Business.VoyageManagement.Itinerary",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.VoyageManagement.AutoMapper",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.UnitTest.DbContext"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "VoyageIteneraryActivityEntity",
+        "EstimateIteneraryActivityEntity",
+        "BaseIteneraryActivityEntity",
+        "IteneraryActivityEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/IteneraryItemSorting.Test.cs": {
+      "class_name": "IteneraryItemSortingTest",
+      "namespace": "Core.Business.UnitTest.VoyageManagement",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "SortItineraryItems_ShouldPutCommencingFirst",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "Equal"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldPutRepositioningLast",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "Equal"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldPutDeliveryBeforeRedelivery",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "FindIndex",
+            "True"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldSwapFirstRedeliveryWithNonMainItem",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "NotEqual"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldHandleCompleteScenario",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "Equal",
+            "FindIndex",
+            "True"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldHandleEmptyList",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "Empty"
+          ]
+        },
+        {
+          "name": "SortItineraryItems_ShouldHandleListWithoutCommencingOrRepositioning",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SortItineraryItemsForTcoCharter",
+            "Equal"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.VoyageManagement.Dtos"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "EstimateIteneraryItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/PrepareData.cs": {
+      "class_name": "PrepareData",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateShipment",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "CreateOffice",
+            "CreatePort",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBusinessPartner",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyage",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreatePort",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVessel",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVesselType",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateTerm",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateCommission",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateOffice",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBunkerType",
+          "return_type": "Task<BunkerTypeEntity>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateCurrencyExchangeRate",
+          "return_type": "Task<List<CurrencyExchangeRateEntity>>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddRange",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateExchangeRate",
+          "return_type": "Task<bool>",
+          "is_public": false,
+          "parameters": [
+            "TestContext context"
+          ],
+          "calls": [
+            "AddRange",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.UserManagement.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.UnitTest.DbContext"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "BusinessPartnerEntity",
+        "VoyageEntity",
+        "PortEntity",
+        "VesselEntity",
+        "VesselTypeEntity",
+        "TermEntity",
+        "CommissionTypeEntity",
+        "OfficeEntity",
+        "BunkerTypeEntity",
+        "CurrencyExchangeRateEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Route.Test.cs": {
+      "class_name": "RouteTest",
+      "namespace": "Business.UnitTest.VoyageManagement",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "GenerateDistancePairs_Should_Return_Correct_Pairs",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [
+            "int itineraryItemsCount"
+          ],
+          "calls": [
+            "GenerateItineraryPairs",
+            "Math.Max",
+            "Should().HaveCount"
+          ]
+        },
+        {
+          "name": "GeneratePermutation_Should_Return_Correct_Permutation",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [
+            "int count"
+          ],
+          "calls": [
+            "GenerateLazyPermutations",
+            "ToList",
+            "Enumerable.Range",
+            "Aggregate",
+            "First",
+            "ToList",
+            "Zip",
+            "testOutputHelper.WriteLine",
+            "Should().HaveElementAt"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Business",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "FluentAssertions",
+        "Xunit.Abstractions"
+      ],
+      "injected_services": [
+        "ITestOutputHelper"
+      ],
+      "entities_referenced": [
+        "EstimateIteneraryItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment.Test.cs": {
+      "class_name": "ShipmentTest",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateShipment",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateOffice",
+            "PrepareData.CreatePort",
+            "PrepareData.CreateCommission",
+            "PrepareData.CreateBusinessPartner",
+            "PrepareData.CreateExchangeRate",
+            "new CreateShipment.Response(...).Handle",
+            "_context.ShipmentsPorts.Where(...).FirstOrDefaultAsync",
+            "Assert.NotNull",
+            "Assert.Null"
+          ]
+        },
+        {
+          "name": "GetShipmentByIdTest",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "new GetShipmentById.Request(...)",
+            "new GetShipmentById.Response(...).Handle",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "GetShipmentByIndexTest",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "new GetShipmentByIndex.Request(...)",
+            "new GetShipmentByIndex.Response(...).Handle",
+            "Assert.NotNull"
+          ]
+        },
+        {
+          "name": "SearchShipmentTest",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "new SearchShipment.Request(...)",
+            "new SearchShipment.Response(...).Handle",
+            "Assert.Equal",
+            "_context.Offices.FirstOrDefaultAsync",
+            "_context.BusinessPartners.FirstOrDefaultAsync",
+            "new SearchShipment.Request(...)",
+            "new SearchShipment.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "DeleteShipmentTest",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "new DeleteShipmentById.Request(...)",
+            "new DeleteShipmentById.Response(...).Handle",
+            "_context.Shipments.Where(...).FirstOrDefaultAsync",
+            "Assert.True"
+          ]
+        },
+        {
+          "name": "CreateShipmentShouldContainInstruction",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "_context.Shipments.Include(...).FirstOrDefaultAsync",
+            "Assert.NotNull",
+            "Assert.NotEmpty"
+          ]
+        },
+        {
+          "name": "GetShipmentByIdShouldContainInstruction",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateShipment",
+            "new GetShipmentById.Request(...)",
+            "new GetShipmentById.Response(...).Handle",
+            "Assert.NotNull"
+          ]
+        },
+        {
+          "name": "UpdateShipmentWithInstructionShouldSuccess",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateCurrencyExchangeRate",
+            "CreateShipment",
+            "_context.Shipments.Include(...).FirstOrDefaultAsync",
+            "Assert.NotNull",
+            "Assert.NotEmpty",
+            "_context.Ports.FirstOrDefault",
+            "new UpdateShipmentById.Request(...)",
+            "new UpdateShipmentById.Response(...).Handle",
+            "Assert.NotNull",
+            "Assert.True"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "BusinessCentralClient.ShipmentClient",
+        "Core.Business.Hubs.Notification",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.Engine",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure",
+        "Core.Infrastructure.DataSynchronization",
+        "Core.Infrastructure.DataSynchronization.Mapping",
+        "Core.Infrastructure.DbContext.Changelog",
+        "Core.Infrastructure.Security",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.AspNetCore.Http",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions.DependencyInjection",
+        "Microsoft.Extensions.Logging",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "ShipmentExportByIdDto",
+        "BcShipmentDto",
+        "ShipmentCreateDto",
+        "ShipmentPortDto",
+        "ShipmentInstructionDto",
+        "BusinessPartner",
+        "Office",
+        "Port",
+        "Commission",
+        "ExchangeRate",
+        "ShipmentSearchDto",
+        "DynamicFilter"
+      ],
+      "external_clients_used": [
+        "IShipmentClient"
+      ],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/ShipmentTransistionStatus.Test.cs": {
+      "class_name": "ShipmentTransistionStatusTest",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "UpdateShipmentById_BeforeConfirm_CanUpdateAllField_ShouldReturnSuccess",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateCurrencyExchangeRate",
+            "_context.Shipments.Include",
+            "_context.Ports.FirstOrDefault",
+            "new UpdateShipmentById.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "UpdateShipmentById_AfterConfirm_CanUpdateFewField_ShouldReturnSuccess",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateCurrencyExchangeRate",
+            "_context.Shipments.Include",
+            "new ConfirmShipment.Response(...).Handle",
+            "new UpdateShipmentById.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ShipmentStatusCorrection_Stage2_AddVoyage_StatusShouldChangeToNominated",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "PrepareData.CreateVoyage",
+            "new ConfirmShipment.Response(...).Handle",
+            "new CorrectShipmentStatus.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ShipmentStatusCorrection_Stage2_VoyageIsNull_LaycanToDateGreaterThanToday_StatusShouldChangeToDelayed",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "PrepareData.CreateVoyage",
+            "new ConfirmShipment.Response(...).Handle",
+            "new CorrectShipmentStatus.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ShipmentStatusCorrection_Stage3_HasLoadingPort_BLDateAndBLQuantityIsNotNull_StatusShouldChangeToLoaded",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "PrepareData.CreateVoyage",
+            "new ConfirmShipment.Response(...).Handle",
+            "new CorrectShipmentStatus.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ConfirmShipment_StatusShouldChangeToConfirmed",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "new ConfirmShipment.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "CompleteShipment_ShouldSuccess",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "PrepareData.CreateVoyage",
+            "new ConfirmShipment.Response(...).Handle",
+            "new CorrectShipmentStatus.Response(...).Handle",
+            "new CompleteShipment.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ChangeShipmentStatus_TargetStatusInvalid_ShouldReturn_STATUS_CHANGE_FORBIDDEN",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "new StatusTransition.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ChangeShipmentStatus_TargetStatusNotFound_ShouldReturn_INVALID_UPDATE",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "PrepareData.CreateShipment",
+            "new StatusTransition.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "ChangeShipmentStatus_ShipmentIdNotFound_ShouldReturn_DATA_NOT_FOUND",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new StatusTransition.Response(...).Handle"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "System.Security.Claims",
+        "AutoMapper",
+        "Core.Business.Hubs.Notification",
+        "Core.Business.TaskAlert.RuleEvaluation",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure",
+        "Core.Infrastructure.DataSynchronization",
+        "Core.Infrastructure.DataSynchronization.Mapping",
+        "Core.Infrastructure.DbContext.Changelog",
+        "Core.Infrastructure.Security",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "Core.Infrastructure.Validation",
+        "MediatR",
+        "Microsoft.AspNetCore.Http",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions.DependencyInjection",
+        "Microsoft.Extensions.Logging",
+        "Moq",
+        "Core.Business",
+        "Core.Domain.Engine"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "Shipment",
+        "ShipmentPortEntity",
+        "ShipmentInstructionEntity",
+        "Port",
+        "Voyage",
+        "ShipmentPortDto",
+        "ShipmentInstructionDto",
+        "ShipmentUpdateDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/ShipmentValidation.Test.cs": {
+      "class_name": "ShipmentValidationTest",
+      "namespace": "Business.UnitTest.VoyageManagement",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "ShipmentValidator_Should_Pass_When_All_Valid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "result.Errors.Where(...).ToList()",
+            "Assert.Empty(errorFailures)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Warn_When_ShipmentTerm_Is_Null",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(shipment)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_InstructionEmail_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_ProfitAndLossItem_Missing_Description",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MiscExpense_PaymentBasis_Empty",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_Commission_Missing_Type",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_Port_Missing_Loading",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_FreightTypeLumpSum_Missing_FreightRate",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_FreightTypeRate_TotalFreight_Incorrect",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_LaycanToDate_Before_LaycanFromDate",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_CargoOptionType_NOOPT_But_Percent_Not_Zero",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MinQuantity_Wrong",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MaxQuantity_Wrong",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_PortFields_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator()",
+            "validator.Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_Instructions_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MiscellaneousExpense_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MiscellaneousRevenue_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_Commissions_Invalid",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MiscExpense_TotalValue_NonPositive",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_MiscRevenue_Missing_InvoiceTypeId",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_Commission_Missing_BusinessPartnerId",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_PortName_Empty",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_FO_Term_Expense_NonZero",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_ShipmentValidator_Should_Fail_When_LoadDischarge_Qty_Mismatch",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(entity)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_RequiredFields_Are_Missing",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_ShipmentQuantities_Did_Not_Define",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment1)",
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment2)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_ShipmentQuantities_Have_At_Least_One_And_MT_CBM_FF_Are_Null_Or_Zero",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment2)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_PLItem_Port_Quantity_Payment_Has_Invalid_Type",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_PLItem_Port_Quantity_Payment_Missing_ShipmentPort",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentValidator_Should_Fail_When_PLItem_Port_Quantity_Payment_AmountOfUnit_Not_Equal_Port_CargoQuantity",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentEntity(...)",
+            "new ShipmentConfirmValidator().Validate(shipment)",
+            "Assert.Contains(...)"
+          ]
+        },
+        {
+          "name": "ShipmentPLItemCheck_MultipleScenarios",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new ShipmentPLItemCheck()",
+            "validator.SetContext(...)",
+            "new ShipmentProfitAndLossItemEntity(...)",
+            "validator.Validate(item)",
+            "Assert.False(result.IsValid)",
+            "Assert.Contains(...)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Business.Validator",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.UserManagement.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "FluentValidation"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "UserEntity",
+        "BusinessPartnerEntity",
+        "OfficeEntity",
+        "TermEntity",
+        "ShipmentInstructionEntity",
+        "ShipmentQuantityEntity",
+        "ShipmentProfitAndLossItemEntity",
+        "ShipmentCommissionEntity",
+        "ShipmentPortEntity",
+        "PortEntity",
+        "ProfitAndLossIdentifierEnum",
+        "ShipmentCpTypeEnum",
+        "FreightTypeEnum",
+        "CargoQuantityUnitEnum",
+        "CargoOptionTypeEnum",
+        "ProfitAndLossIdentifierEnum",
+        "PaymentBasisEnum",
+        "DischargingShipmentTermCode",
+        "LoadingShipmentTermCode"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Tco.Test.cs": {
+      "class_name": "TcoTest",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateTco_WithValidData_ShouldReturnCorrectRates",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [
+            "string estDeliveryDate",
+            "string estReDeliveryDate",
+            "string durationUnit",
+            "decimal expectedDuration",
+            "decimal expectedUntilEndDuration",
+            "decimal expectedRateInUsds"
+          ],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "UpdateTcoById_WithValidChanges_ShouldUpdateTco",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [
+            "string updatedEstDeliveryDate",
+            "string updatedEstRedeliveryDate",
+            "string updatedDurationUnit",
+            "decimal expectedDuration",
+            "decimal expectedUntilEndDuration",
+            "decimal expectedRateInUsds"
+          ],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)",
+            "_mediator.Send(new UpdateTcoById.Request { Id = tco.Id ?? Guid.Empty, BodyData = tcoUpdateDto }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "SearchTcos_WithValidParams_ShouldReturnPagedResults",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)",
+            "_mediator.Send(new SearchTcos.Request { SearchParams = searchDto }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "SearchTcos_WithKeySearch_ShouldFilterResults",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)",
+            "_mediator.Send(new SearchTcos.Request { SearchParams = searchDto }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "SearchTcos_WithExcludedIds_ShouldExcludeSpecifiedTcos",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)",
+            "_mediator.Send(new SearchTcos.Request { SearchParams = searchDto }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "GetTcoById_WithValidId_ShouldReturnTco",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_mediator.Send(new CreateTco.Request { BodyData = tcoCreateDto }, CancellationToken.None)",
+            "_mediator.Send(new GetTcoById.Request { Id = createdTco.Id ?? Guid.Empty }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "GetTcoById_WithInvalidId_ShouldThrowApiException",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_mediator.Send(new GetTcoById.Request { Id = nonExistentId }, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context?.Dispose()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "MediatR",
+        "FluentAssertions",
+        "Core.Domain.Commons",
+        "System.Globalization",
+        "Core.Domain.Constants",
+        "Business.UnitTest.Builders",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Business.VoyageManagement.Tco",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "Microsoft.Extensions.DependencyInjection"
+      ],
+      "injected_services": [
+        "TestContext",
+        "IMediator",
+        "IServiceProvider"
+      ],
+      "entities_referenced": [
+        "TcoCreateDto",
+        "TcoUpdateDto",
+        "TcoSearchDto",
+        "Tco",
+        "DynamicFilter",
+        "ApiException"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/BunkerCalculator.Test.cs": {
+      "class_name": "BunkerCalculatorTests",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "GetEstimate",
+          "return_type": "EstimateCrudDto",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new EstimateCrudDto()",
+            "_bunkerTypes.First()",
+            "_bunkerTypes.Last()",
+            "_context.BunkerTypes.ToList()"
+          ]
+        },
+        {
+          "name": "GetWeightedPrice_1_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetEstimate()",
+            "new BunkerOnboardCalculator(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "GetWeightedPrice_2_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetEstimate()",
+            "new BunkerOnboardCalculator(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "GetWeightedPrice_3_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetEstimate()",
+            "new BunkerOnboardCalculator(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "GetWeightedPrice_4_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetEstimate()",
+            "new BunkerOnboardCalculator(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "GetWeightedPrice_5_Should_Success",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetEstimate()",
+            "new BunkerOnboardCalculator(...)",
+            "BunkerOnboardCalculator.GetWeightedPrice(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.AutoMapper",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.DbContext",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MathNet.Numerics"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "BunkerTypeEntity",
+        "EstimateCrudDto",
+        "BunkerLotBaseDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/CreateAndGetFuelItineraryItemIdTests.cs": {
+      "class_name": "CreateAndGetFuelItineraryItemIdTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Handle_WithNullVoyageId_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.ThrowsAsync",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_WithNullPortId_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.ThrowsAsync",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_WithExistingItineraryItem_ShouldReturnExistingId",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_WithExistingItineraryItemSamePort_ShouldReturnExistingId",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_AtPosition0_ShouldCreateAtPosition1",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.True",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_BetweenConsecutiveSamePortItems_ShouldInsertAfterAll",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_WithSingleExistingItem_ShouldInsertAtCorrectPosition",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_WithBunkerEvents_ShouldCreateBunkerEvents",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.NotNull",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.Equal",
+            "Assert.Equal",
+            "Assert.Equal",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_WithNullItemPosition_ShouldUseDefaultPosition",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Handle_CreateNewItineraryItem_WithComplexScenario_ShouldHandleCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Assert.NotNull",
+            "Assert.Equal",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.BunkerOrder",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "PortEntity",
+        "VoyageIteneraryItemEntity",
+        "BunkerOrderItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/DeleteBunkerOrderById.Tests.cs": {
+      "class_name": "DeleteBunkerOrderByIdTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "DeleteBunkerOrderById_WithValidBunkerOrder_ShouldDeleteSuccessfully",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.BunkerOrders.FindAsync(bunkerOrderId)",
+            "_context.BunkerOrderItems.Where(...).ToListAsync()",
+            "_context.BunkerOrderAdditionalCosts.Where(...).ToListAsync()",
+            "_context.VoyageBunkerLots.Where(...).ToListAsync()",
+            "_context.VoyageBunkerEvents.Where(...).ToListAsync()",
+            "_mediatorMock.Verify(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithNonExistentId_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.ThrowsAsync<ApiException>(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithLiftedBunkerLots_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.ThrowsAsync<ApiException>(...)",
+            "_context.BunkerOrders.FindAsync(bunkerOrderId)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithChildFuelItineraries_ShouldDeleteChildItineraries",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageIteneraryItems.CountAsync(...)",
+            "_context.VoyageIteneraryItems.CountAsync(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithMainFuelItineraryAndNoOtherOrders_ShouldDeleteMainItinerary",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageIteneraryItems.FindAsync(itineraryItemId)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithMainFuelItineraryAndOtherOrders_ShouldNotDeleteMainItinerary",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageIteneraryItems.FindAsync(itineraryItemId)",
+            "_context.BunkerOrders.FindAsync(anotherBunkerOrderId)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithBunkerLotsAndConsumptionDetails_ShouldDeleteAll",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageBunkerLotConsumptionDetails.CountAsync(...)",
+            "_context.VoyageBunkerLotConsumptionDetails.CountAsync(...)",
+            "_context.VoyageBunkerLots.FindAsync(bunkerLotId)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithNonMainItinerary_ShouldNotDeleteItinerary",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageIteneraryItems.FindAsync(itineraryItemId)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithMultipleBunkerEvents_ShouldDeleteAllEvents",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.VoyageBunkerEvents.CountAsync(...)",
+            "_context.VoyageBunkerEvents.CountAsync(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithMultipleBunkerOrderItems_ShouldDeleteAllItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.BunkerOrderItems.CountAsync(...)",
+            "_context.BunkerOrderItems.CountAsync(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithMultipleAdditionalCosts_ShouldDeleteAllCosts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.BunkerOrderAdditionalCosts.CountAsync(...)",
+            "_context.BunkerOrderAdditionalCosts.CountAsync(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithEmptyCollections_ShouldStillSucceed",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.BunkerOrders.FindAsync(bunkerOrderId)",
+            "_mediatorMock.Verify(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_ShouldCallMediatorWithCorrectVoyageId",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_mediatorMock.Verify(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithCancellationToken_ShouldRespectCancellation",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, cancellationTokenSource.Token)",
+            "Assert.ThrowsAnyAsync<OperationCanceledException>(...)"
+          ]
+        },
+        {
+          "name": "DeleteBunkerOrderById_WithComplexScenario_ShouldMaintainDataIntegrity",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "_context.BunkerOrders.FindAsync(bunkerOrderId1)",
+            "_context.BunkerOrders.FirstOrDefaultAsync(...)",
+            "_context.VoyageIteneraryItems.FindAsync(mainItineraryId)",
+            "_context.VoyageIteneraryItems.FindAsync(childId1)",
+            "_context.VoyageIteneraryItems.FindAsync(childId2)",
+            "_context.Voyages.FindAsync(voyageId)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Business.BunkerOrder",
+        "Core.Domain.BunkerOrder",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "BunkerOrderCrudDto",
+        "DeleteBunkerOrderById.Request",
+        "BunkerOrder",
+        "BunkerOrderItem",
+        "BunkerOrderAdditionalCost",
+        "VoyageBunkerLot",
+        "VoyageBunkerEvent",
+        "VoyageIteneraryItem",
+        "ReCalculateAndSaveVoyageById.Request",
+        "ApiException"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/InitializeVoyageBunkerLots.Tests.cs": {
+      "class_name": "InitializeVoyageBunkerLotsTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "InitializeVoyageBunkerLotsTests",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GetTestContext",
+            "new DataPreparationHelper",
+            "new Mapper",
+            "new InitializeVoyageBunkerLots.Response"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithValidVoyage_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithNonExistentVoyage_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithNullVesselId_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithNullEstimateId_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithExistingBunkerLots_ShouldReturnTrueWithoutCreatingNew",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "CountAsync",
+            "CountAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithLastVoyageBunkerLots_ShouldCreateNewLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "CountAsync",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithZeroRemainingAmount_ShouldSkipLot",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "CountAsync",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithNoLastVoyageLotsButWithEstimate_ShouldCreateFromEstimate",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_WithMultipleBunkerTypes_ShouldCreateMultipleLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_NonConsecutiveVoyage_ShouldUseEstimateBunkerLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_NonConsecutiveVoyageWithPreviousLots_ShouldIgnorePreviousLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_NonConsecutiveVoyageWithNoEstimate_ShouldCreateNoLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "InitializeVoyageBunkerLots_ConsecutiveVoyageThenNonConsecutive_ShouldNotCarryOverLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToListAsync"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Dispose"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Business.VoyageManagement.BunkerLot",
+        "Core.Domain.Commons",
+        "Core.Infrastructure",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions.Logging",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "Voyage",
+        "Vessel",
+        "Estimate",
+        "VoyageBunkerLot",
+        "BunkerType"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/InitializeVoyageBunkerOrders.Tests.cs": {
+      "class_name": "InitializeVoyageBunkerOrdersTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Handle_WithValidVoyageAndReceivalEvents_ShouldReturnTrue",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithReceivalEventsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Where",
+            "ToListAsync",
+            "Assert.NotEmpty",
+            "Assert.All"
+          ]
+        },
+        {
+          "name": "Handle_WithNonExistentVoyage_ShouldReturnTrue",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateDefaultEntitiesAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Assert.Empty"
+          ]
+        },
+        {
+          "name": "Handle_WithNoMainItineraryItems_ShouldReturnTrue",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateVoyageWithNonMainItineraryItemsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Assert.Empty"
+          ]
+        },
+        {
+          "name": "Handle_WithNoReceivalEvents_ShouldReturnTrue",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateVoyageWithMainItineraryItemsButNoReceivalEventsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Assert.Empty"
+          ]
+        },
+        {
+          "name": "Handle_WithExistingBunkerOrder_ShouldUpdateExistingOrder",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithReceivalEventsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Where",
+            "ToListAsync",
+            "Assert.All"
+          ]
+        },
+        {
+          "name": "Handle_WithMultipleBunkerLotCodes_ShouldCreateMultipleBunkerOrderItems",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithMultipleReceivalEventsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Where",
+            "ToListAsync",
+            "Assert.Equal",
+            "Assert.All"
+          ]
+        },
+        {
+          "name": "Handle_ShouldUpdateBunkerLotsWithBunkerOrderId",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithBunkerLotsAsync",
+            "Handle",
+            "ToListAsync",
+            "Assert.True",
+            "Where",
+            "ToListAsync",
+            "Assert.NotEmpty",
+            "Assert.All"
+          ]
+        },
+        {
+          "name": "Handle_WithMissingDefaultBusinessPartner_ShouldThrowApiException",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithReceivalEventsAsync",
+            "ClearBusinessPartnersAsync",
+            "Handle",
+            "Assert.ThrowsAsync",
+            "Assert.Contains"
+          ]
+        },
+        {
+          "name": "Handle_WithMissingUsdCurrency_ShouldThrowApiException",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithReceivalEventsAsync",
+            "ClearUsdCurrencyAsync",
+            "Handle",
+            "Assert.ThrowsAsync",
+            "Assert.Contains"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions.DependencyInjection"
+      ],
+      "injected_services": [
+        "TestContext",
+        "IMediator"
+      ],
+      "entities_referenced": [
+        "VoyageBunkerEvents",
+        "BunkerOrders",
+        "VoyageBunkerLots",
+        "VoyageIteneraryItem",
+        "BunkerEventTypeEnum"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.Tests.cs": {
+      "class_name": "SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEventsTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "Sync",
+      "methods": [
+        {
+          "name": "Handle_WithNullBunkerOrderId_ShouldReturnFalse",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.False(result)"
+          ]
+        },
+        {
+          "name": "Handle_WithNonExistentBunkerOrder_ShouldThrowApiException",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.Contains(\"Bunker order not found\", exception.Message)"
+          ]
+        },
+        {
+          "name": "Handle_WithValidBunkerOrder_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateBunkerOrderWithItemsAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.True(result)",
+            "mediatorMock.Verify(...)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldGenerateBunkerLotCodeForItemsWithoutCode",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateBunkerOrderWithItemsAsync(...)",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.All(...)",
+            "Assert.NotNull(...)",
+            "Assert.NotEmpty(...)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldCreateNewReceivalEventsForOrderItemsWithoutMatchingEvents",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateBunkerOrderWithItemsAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.True(finalEventCount > initialEventCount)",
+            "Assert.Equal(bunkerOrder.Items.Count, receivalEvents.Count)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldUpdateExistingReceivalEventsForMatchingOrderItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithMatchingReceivalEventAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.Equal(bunkerOrderId, updatedEvent.BunkerOrderId)",
+            "Assert.NotNull(updatedEvent.BunkerOrderItemId)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldRemoveReceivalEventsNotMatchingAnyOrderItem",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithOrphanReceivalEventAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.Null(orphanEvent)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldRemoveDraftBunkerLotsAndConsumptionDetails",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithDraftBunkerLotsAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.True(finalBunkerLotCount < initialBunkerLotCount)",
+            "Assert.True(finalConsumptionCount < initialConsumptionCount)"
+          ]
+        },
+        {
+          "name": "Handle_WithMultipleBunkerOrderItems_ShouldProcessAllItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithMultipleItemsAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "Assert.Equal(bunkerOrder.Items.Count, receivalEvents.Count)",
+            "Assert.NotNull(matchingEvent)",
+            "Assert.Equal(item.RequestedQuantity, matchingEvent.ReceivedAmountInMetricTons)",
+            "Assert.Equal(item.TotalCostPerMetricTonsInUSD, matchingEvent.PricePerMetricTonInUsds)"
+          ]
+        },
+        {
+          "name": "Handle_ShouldCallReCalculateAndSaveVoyageById",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithItemsAsync()",
+            "mediatorMock.Send(...)",
+            "handler.Handle(...)",
+            "mediatorMock.Verify(...)"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context?.Dispose()"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderWithItemsAsync",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "bool includeBunkerLotCode"
+          ],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateBunkerType()",
+            "CreatePortAsync()",
+            "_dataHelper.CreateVoyage(...)",
+            "CreateItineraryItemAsync(...)",
+            "_context.BunkerOrders.AddAsync(...)",
+            "_context.BunkerOrderItems.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderWithMultipleItemsAsync",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateBunkerType(...)",
+            "_dataHelper.CreateBunkerType(...)",
+            "CreatePortAsync()",
+            "_dataHelper.CreateVoyage(...)",
+            "CreateItineraryItemAsync(...)",
+            "_context.BunkerOrders.AddAsync(...)",
+            "_context.BunkerOrderItems.AddRangeAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderWithMatchingReceivalEventAsync",
+          "return_type": "Task<(Guid bunkerOrderId, Guid receivalEventId)>",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithItemsAsync()",
+            "_context.BunkerOrders.Include(...).FirstAsync(...)",
+            "_context.VoyageBunkerEvents.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderWithOrphanReceivalEventAsync",
+          "return_type": "Task<(Guid bunkerOrderId, Guid orphanReceivalEventId)>",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithItemsAsync()",
+            "_context.BunkerOrders.FirstAsync(...)",
+            "_context.VoyageBunkerEvents.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderWithDraftBunkerLotsAsync",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerOrderWithItemsAsync()",
+            "_context.BunkerOrders.Include(...).FirstAsync(...)",
+            "_context.VoyageBunkerEvents.AddAsync(...)",
+            "_context.VoyageBunkerLots.AddAsync(...)",
+            "_context.VoyageBunkerLotConsumptionDetails.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreatePortAsync",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_context.Ports.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "CreateItineraryItemAsync",
+          "return_type": "Task<Guid>",
+          "is_public": false,
+          "parameters": [
+            "Guid voyageId",
+            "Guid portId"
+          ],
+          "calls": [
+            "_context.VoyageIteneraryItems.AddAsync(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.BunkerManagement.Entities",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq",
+        "Microsoft.Extensions.DependencyInjection"
+      ],
+      "injected_services": [
+        "TestContext",
+        "IMediator",
+        "IRequestHandler<SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.Request, bool>"
+      ],
+      "entities_referenced": [
+        "BunkerOrderEntity",
+        "BunkerOrderItemEntity",
+        "VoyageBunkerEventEntity",
+        "VoyageBunkerLotEntity",
+        "VoyageBunkerLotConsumptionDetailEntity",
+        "PortEntity",
+        "VoyageIteneraryItemEntity",
+        "VoyageCrudDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/UpdateVoyageBunkerLots.Test.cs": {
+      "class_name": "UpdateVoyageBunkerLotsTests",
+      "namespace": "Core.Business.UnitTest.BunkerLot",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "UpdateVoyageBunkerLots_WithNullBunkerLots_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVoyage()",
+            "_handler.Handle()",
+            "Assert.True()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithEmptyBunkerLots_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVoyage()",
+            "_handler.Handle()",
+            "Assert.True()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithNewBunkerLots_ShouldAddNewLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateVoyage()",
+            "_dataHelper.CreateBunkerType()",
+            "_handler.Handle()",
+            "Assert.True()",
+            "_context.VoyageBunkerLots.Where(...).ToListAsync()",
+            "Assert.Single()",
+            "Assert.Equal()",
+            "_context.VoyageBunkerLotConsumptionDetails.Where(...).ToListAsync()",
+            "Assert.Single()",
+            "Assert.True()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithExistingBunkerLots_ShouldUpdateLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateVoyage()",
+            "_dataHelper.CreateBunkerType()",
+            "_dataHelper.CreateVoyageBunkerLot()",
+            "_dataHelper.CreateConsumptionDetail()",
+            "_handler.Handle()",
+            "Assert.True()",
+            "_context.VoyageBunkerLots.FirstOrDefaultAsync()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "_context.VoyageBunkerLotConsumptionDetails.Where(...).ToListAsync()",
+            "Assert.Single()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithRemovedBunkerLots_ShouldDeleteLots",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateVoyage()",
+            "_dataHelper.CreateBunkerType()",
+            "_dataHelper.CreateVoyageBunkerLot()",
+            "_dataHelper.CreateConsumptionDetail()",
+            "_handler.Handle()",
+            "Assert.True()",
+            "_context.VoyageBunkerLots.Where(...).ToListAsync()",
+            "Assert.Single()",
+            "Assert.Equal()",
+            "_context.VoyageBunkerLotConsumptionDetails.Where(...).ToListAsync()",
+            "Assert.Empty()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithMixedOperations_ShouldHandleAllCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateVoyage()",
+            "_dataHelper.CreateBunkerType()",
+            "_dataHelper.CreateVoyageBunkerLot()",
+            "_dataHelper.CreateConsumptionDetail()",
+            "_handler.Handle()",
+            "Assert.True()",
+            "_context.VoyageBunkerLots.Where(...).ToListAsync()",
+            "Assert.Equal()",
+            "Assert.Contains()",
+            "Assert.DoesNotContain()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "_context.VoyageBunkerLotConsumptionDetails.Where(...).ToListAsync()",
+            "Assert.Equal()",
+            "Assert.Contains()",
+            "Assert.Contains()"
+          ]
+        },
+        {
+          "name": "UpdateVoyageBunkerLots_WithEmptyConsumptionDetails_ShouldHandleCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_dataHelper.CreateVessel()",
+            "_dataHelper.CreateVoyage()",
+            "_dataHelper.CreateBunkerType()",
+            "_handler.Handle()",
+            "Assert.True()",
+            "_context.VoyageBunkerLots.FirstOrDefaultAsync()",
+            "Assert.NotNull()",
+            "_context.VoyageBunkerLotConsumptionDetails.Where(...).ToListAsync()",
+            "Assert.Empty()"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context?.Dispose()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Business.VoyageManagement.BunkerLot",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "TestContext",
+        "IRequestHandler<UpdateVoyageBunkerLots.Request, bool>",
+        "DataPreparationHelper"
+      ],
+      "entities_referenced": [
+        "Voyage",
+        "BunkerLotBaseDto",
+        "BunkerLotConsumptionBaseDto",
+        "VoyageBunkerLot",
+        "VoyageBunkerLotConsumptionDetail"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/Helpers/CubicSplineInterpolator.Test.cs": {
+      "class_name": "CubicSplineInterpolatorTests",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Constructor_WithLessThan2Points_Should_ThrowException",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "Assert.Throws<ApiException>(...)"
+          ]
+        },
+        {
+          "name": "Constructor_WithMismatchedXYCount_Should_ThrowException",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "Assert.Throws<ApiException>(...)"
+          ]
+        },
+        {
+          "name": "Calculate_WithNormalIncreasingData_Should_ReturnValidResult",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "interpolator.Calculate(11)",
+            "Assert.True(...)",
+            "Assert.True(...)"
+          ]
+        },
+        {
+          "name": "Calculate_WithNormalDecreasingData_Should_ReturnValidResult",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "interpolator.Calculate(11)",
+            "Assert.True(...)",
+            "Assert.True(...)"
+          ]
+        },
+        {
+          "name": "Calculate_WithIrregularData_Y3GreaterThanY1GreaterThanY2_Should_NotThrowException",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "Record.Exception(...)",
+            "interpolator.Calculate(11)",
+            "Console.WriteLine(...)",
+            "Assert.Null(...)",
+            "interpolator.Calculate(11)",
+            "Console.WriteLine(...)"
+          ]
+        },
+        {
+          "name": "Calculate_WithIrregularData_Y2GreaterThanY3GreaterThanY1_Should_NotThrowException",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "Record.Exception(...)",
+            "interpolator.Calculate(11)",
+            "Console.WriteLine(...)",
+            "Assert.Null(...)",
+            "interpolator.Calculate(11)",
+            "Console.WriteLine(...)"
+          ]
+        },
+        {
+          "name": "Calculate_WithZigZagData_Should_NotThrowException",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "new CubicSplineInterpolator(xValues, yValues)",
+            "Record.Exception(...)",
+            "interpolator.Calculate(11.5)",
+            "Console.WriteLine(...)",
+            "Assert.Null(...)",
+            "interpolator.Calculate(11.5)",
+            "Console.WriteLine(...)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Commons"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "CubicSplineInterpolator"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Bunker/Helpers/DataPreparationHelper.cs": {
+      "class_name": "DataPreparationHelper",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateVessel",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBunkerType",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string code"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageBunkerLot",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid voyageId",
+            "Guid vesselId",
+            "Guid bunkerTypeId",
+            "string bunkerLotCode"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateConsumptionDetail",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid voyageBunkerLotId",
+            "bool isEstimated",
+            "decimal consumedAmount"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateEstimate",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithBunkerPrices",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimate",
+            "CreateBunkerType",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyage",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid? vesselId",
+            "Guid? estimateId",
+            "DateTime? commenceDate",
+            "bool? notConsecutive"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageBunkerLot",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid voyageId",
+            "Guid vesselId",
+            "Guid? bunkerTypeId",
+            "decimal remainingAmount",
+            "DateTime? dateOfReceival"
+          ],
+          "calls": [
+            "CreateBunkerType",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "SetupVoyageWithReceivalEventsAsync",
+          "return_type": "Task<(Guid voyageId, Guid bunkerTypeId)>",
+          "is_public": true,
+          "parameters": [
+            "Guid? existingBunkerOrderId"
+          ],
+          "calls": [
+            "CreateBunkerType",
+            "CreateDefaultEntitiesAsync",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "SetupVoyageWithMultipleReceivalEventsAsync",
+          "return_type": "Task<(Guid voyageId, Guid bunkerTypeId)>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerType",
+            "CreateDefaultEntitiesAsync",
+            "AddRangeAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "SetupVoyageWithBunkerLotsAsync",
+          "return_type": "Task<(Guid voyageId, Guid bunkerTypeId)>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "SetupVoyageWithReceivalEventsAsync",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageWithNonMainItineraryItemsAsync",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateDefaultEntitiesAsync",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageWithMainItineraryItemsButNoReceivalEventsAsync",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateDefaultEntitiesAsync",
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateDefaultEntitiesAsync",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "ClearBusinessPartnersAsync",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "ToListAsync",
+            "RemoveRange",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "ClearUsdCurrencyAsync",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "FirstOrDefaultAsync",
+            "Remove",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreatePort",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string portName",
+            "string unloCode"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBusinessPartner",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string name",
+            "string code"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateOffice",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string name",
+            "string code"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateCurrency",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string code",
+            "string name"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageItineraryItem",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid voyageId",
+            "Guid portId",
+            "int itemNumber",
+            "bool isMainItem",
+            "string reasonForVisit",
+            "Guid? parentItemId"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrder",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid voyageId",
+            "Guid itineraryItemId",
+            "Guid portId",
+            "Guid brokerId",
+            "Guid currencyId",
+            "string orderCode"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderItem",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid bunkerOrderId",
+            "Guid bunkerTypeId",
+            "string itemCode"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateBunkerOrderAdditionalCost",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid bunkerOrderId",
+            "Guid vendorId",
+            "Guid currencyId",
+            "string invoiceItem"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageBunkerLotForOrder",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid bunkerOrderId",
+            "Guid voyageId",
+            "Guid vesselId",
+            "Guid bunkerTypeId",
+            "bool isLifted",
+            "string bunkerLotCode"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageBunkerEvent",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid bunkerOrderId",
+            "Guid itineraryItemId",
+            "Guid bunkerTypeId",
+            "string eventType"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateVoyageBunkerLotConsumptionDetail",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid bunkerLotId",
+            "decimal consumedAmount"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateChildFuelItinerary",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "Guid parentItemId",
+            "Guid voyageId",
+            "Guid portId",
+            "int itemNumber"
+          ],
+          "calls": [
+            "CreateVoyageItineraryItem"
+          ]
+        },
+        {
+          "name": "CreateCompleteTestScenario",
+          "return_type": "Task<(Guid bunkerOrderId, Guid voyageId, Guid itineraryItemId, Guid vesselId, Guid bunkerTypeId)>",
+          "is_public": true,
+          "parameters": [
+            "bool withLiftedLots",
+            "bool withChildItineraries",
+            "bool withMainFuelItinerary"
+          ],
+          "calls": [
+            "CreateVessel",
+            "CreatePort",
+            "CreateBunkerType",
+            "CreateBusinessPartner",
+            "CreateCurrency",
+            "CreateVoyage",
+            "CreateVoyageItineraryItem",
+            "CreateBunkerOrder",
+            "CreateBunkerOrderItem",
+            "CreateBunkerOrderAdditionalCost",
+            "CreateVoyageBunkerLotForOrder",
+            "CreateVoyageBunkerEvent",
+            "CreateChildFuelItinerary"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Domain.BunkerManagement.Entities",
+        "Core.Domain.UserManagement.Entities",
+        "Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext",
+        "Microsoft.EntityFrameworkCore"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "VesselEntity",
+        "BunkerTypeEntity",
+        "VoyageBunkerLotEntity",
+        "VoyageBunkerLotConsumptionDetailEntity",
+        "EstimateEntity",
+        "EstimateBunkerPriceEntity",
+        "VoyageEntity",
+        "PortEntity",
+        "VoyageIteneraryItemEntity",
+        "VoyageBunkerEventEntity",
+        "BusinessPartnerEntity",
+        "CurrencyEntity",
+        "CurrencyExchangeRateEntity",
+        "OfficeEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Estimate/CommissionableMiscRev.Test.cs": {
+      "class_name": "CommissionableMiscRev",
+      "namespace": "Core.Business.UnitTest.EstimateCommission",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "GenerateCurrencyExchangeRate",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "Should_Generate_Simple_Internal_Commission",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateBasicEstimateWithOnlyShipmentAndInternalCommission()",
+            "_handler.Handle()",
+            "Assert.NotNull()",
+            "Assert.Single()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "Should_Generate_Broker_Address_Commission_PL_Items",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithShipmentAndMultipleCommission()",
+            "_handler.Handle()",
+            "Assert.Equal()",
+            "Assert.All()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "GetFreightBrokerAddressCommission()"
+          ]
+        },
+        {
+          "name": "Should_Generate_Commisable_Misc_Rev_PL_Items",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithSimpleCommisableMiscRevAndSimpleCommission()",
+            "_handler.Handle()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "GetFreightBrokerAddressCommission()"
+          ]
+        },
+        {
+          "name": "Should_Regenerate_Internal_Commission_Base_On_Commissable_MiscRev",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithSimpleCommisableMiscRevAndSimpleCommissionAndInternalComm()",
+            "_handler.Handle()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "Should_Ensure_CurrencyCode_Of_Commissionable_MiscRev",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithCommissableMiscRev()",
+            "_handler.Handle()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "Assert.NotEqual()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "Should_Generate_Commission_PlItem_Correctly_For_Multiple_Estimate_Shipment",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithMultipleShipmentAndCommissableMiscRev()",
+            "_handler.Handle()",
+            "Assert.Equal()",
+            "Assert.Single()",
+            "Assert.Single()",
+            "Assert.NotNull()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()",
+            "Assert.Equal()"
+          ]
+        },
+        {
+          "name": "GetFreightBrokerAddressCommission",
+          "return_type": "string",
+          "is_public": true,
+          "parameters": [
+            "EstimateShipmentCommissionDto",
+            "EstimateShipmentDto"
+          ],
+          "calls": [
+            "DescriptionBuilder.Create()",
+            "Add()",
+            "Build()"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Business.Common",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "Microsoft.Extensions.DependencyInjection",
+        "Core.Business.UnitTest.VoyageManagement.Estimate",
+        "Core.Domain.FinanceData.Entities",
+        "Business.UnitTest.VoyageManagement",
+        "Core.Domain.Constants",
+        "Core.Domain.VoyageManagement.Entities"
+      ],
+      "injected_services": [
+        "TestContext"
+      ],
+      "entities_referenced": [
+        "Estimate",
+        "ProfitAndLossItems",
+        "CurrencyExchangeRateEntity",
+        "EstimateShipmentCommissionDto",
+        "EstimateShipmentDto",
+        "ProfitAndLossIdentifierEnum",
+        "PaymentBasisEnum",
+        "ProfitAndLossItemOriginEnum",
+        "ProfitAndLossItem"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Estimate/Helpers/DataEstimateHelper.cs": {
+      "class_name": "DataEstimateHelper",
+      "namespace": "Core.Business.UnitTest.VoyageManagement.Estimate",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateBasicEstimateWithOnlyShipmentAndInternalCommission",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateEstimateWithShipmentAndMultipleCommission",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateEstimateWithSimpleCommisableMiscRevAndSimpleCommission",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateEstimateWithSimpleCommisableMiscRevAndSimpleCommissionAndInternalComm",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateEstimateWithCommissableMiscRev",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateEstimateWithMultipleShipmentAndCommissableMiscRev",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "EstimateCrudDto",
+        "EstimateShipmentDto",
+        "EstimateShipmentCommissionDto",
+        "ProfitAndLossItemDto",
+        "PaymentBasisEnum",
+        "ShipmentCommissionInvoicingTypeEnum",
+        "ProfitAndLossIdentifierEnum",
+        "CurrencyCodeEnum"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/FuelEu/CalculateFuelEuAndEtsForBunkerLotConsumption.Tests.cs": {
+      "class_name": "CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetailsTests",
+      "namespace": "Core.Business.UnitTest.FuelEu",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Handle_WithValidEstimate_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateBasicEstimateWithBunkerLots()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Contains(\"Bunker Total Expense\", result)",
+            "Assert.Contains(\"ETS Total Expense\", result)",
+            "Assert.Contains(\"Fuel EU Total Cost\", result)"
+          ]
+        },
+        {
+          "name": "Handle_WithBunkerLotsAndConsumptions_ShouldCalculateCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithBunkerLotsAndConsumptions()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "estimate.BunkerPrices.SelectMany(bp => bp.ConsumptionDetails).Sum(cd => cd.ConsumtionExpenseInUsds ?? 0)",
+            "Assert.True(totalBunkerExpense > 0)",
+            "estimate.BunkerPrices.SelectMany(bp => bp.ConsumptionDetails).Sum(cd => cd.EtsTotalExpenseInUsds ?? 0)",
+            "Assert.True(totalEtsExpense >= 0)",
+            "estimate.BunkerPrices.SelectMany(bp => bp.ConsumptionDetails).Sum(cd => cd.FuelEuVesselPenaltyValue ?? 0)",
+            "Assert.True(totalFuelEuPenalty >= 0)"
+          ]
+        },
+        {
+          "name": "EnsureFuelEuCoefficientsExistForAllBunkerLots_ShouldPopulateMissingCoefficients",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateBunkerTypeWithCoefficients()",
+            "_testDataHelper.CreateEstimateWithBunkerLotsAndConsumptions()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.NotNull(bunkerLot.Co2EmissionsFactor)",
+            "Assert.NotNull(bunkerLot.Ch4EmissionsFactor)",
+            "Assert.NotNull(bunkerLot.N2oEmissionsFactor)",
+            "Assert.NotNull(bunkerLot.LowerCalorificValue)",
+            "Assert.NotNull(bunkerLot.RelativeWeightingDensity)",
+            "Assert.NotNull(bunkerLot.Co2eqWellToTankFactor)"
+          ]
+        },
+        {
+          "name": "EnsureFuelEuCoefficientsExistForAllBunkerLots_WithExistingCoefficients_ShouldNotOverwrite",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateBunkerTypeWithCoefficients()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Equal(originalCo2Factor, bunkerLot.Co2EmissionsFactor)",
+            "Assert.NotNull(bunkerLot.Ch4EmissionsFactor)"
+          ]
+        },
+        {
+          "name": "ApplyFuelEuFactorsToBunkerLotConsumptions_WithPenaltyItems_ShouldApplyCorrectFactors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithPenaltyItems()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "estimate.BunkerPrices.SelectMany(bp => bp.ConsumptionDetails).ToList()",
+            "Assert.NotNull(cd.FuelEuFactor)",
+            "Assert.NotNull(cd.EtsFactor)",
+            "Assert.True(cd.FuelEuFactor >= 0 && cd.FuelEuFactor <= 1)",
+            "Assert.True(cd.EtsFactor >= 0 && cd.EtsFactor <= 1)"
+          ]
+        },
+        {
+          "name": "ApplyFuelEuFactorsToBunkerLotConsumptions_WithNonPenaltyItems_ShouldApplyMiddleFactors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateEstimateWithNonPenaltyItems()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "estimate.BunkerPrices.SelectMany(bp => bp.ConsumptionDetails).ToList()",
+            "Assert.NotNull(cd.FuelEuFactor)",
+            "Assert.NotNull(cd.EtsFactor)"
+          ]
+        },
+        {
+          "name": "CalculateBunkerExpenseForBunkerLotConsumption_ShouldCalculateCorrectExpense",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Equal(pricePerTon, consumption.PricePerMetricTonInUsds)",
+            "Assert.Equal(expectedExpense, consumption.ConsumtionExpenseInUsds)"
+          ]
+        },
+        {
+          "name": "CalculateEtsValuesForBunkerLotConsumption_ShouldCalculateCorrectEtsExpense",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Equal(etsPrice, consumption.EtsPricePerMetricTonInUsds)",
+            "Assert.True(consumption.EtsTotalExpenseInUsds > 0)",
+            "Assert.NotNull(consumption.EtsPhaseInFactor)"
+          ]
+        },
+        {
+          "name": "CalculateEtsValuesForBunkerLotConsumption_WithIceClass_ShouldApplyIceClassFactor",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.True(consumption.EtsTotalExpenseInUsds > 0)"
+          ]
+        },
+        {
+          "name": "CalculateFuelEuValuesForBunkerLotConsumption_ShouldCalculateBioFuelPenaltyCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.NotNull(consumption.FuelEuGhgIntensityReductionValue)",
+            "Assert.NotNull(consumption.FuelEuGhgWellToTankEmissionValue)",
+            "Assert.NotNull(consumption.FuelEuGhgTankToWakeEmissionValue)",
+            "Assert.NotNull(consumption.FuelEuGhgIntensityValue)",
+            "Assert.NotNull(consumption.FuelEuComplianceBalanceValue)",
+            "Assert.True(consumption.FuelEuVesselPenaltyValue < 0)"
+          ]
+        },
+        {
+          "name": "Handle_WithNullBunkerPrices_ShouldReturnTrueWithEmptyCalculation",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Contains(\"No Bunker Lots to calculate\", result)"
+          ]
+        },
+        {
+          "name": "Handle_WithEmptyBunkerPrices_ShouldReturnTrueWithZeroValues",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Contains(\"No Bunker Lots to calculate\", result)"
+          ]
+        },
+        {
+          "name": "Handle_WithNullConsumptionDetails_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)"
+          ]
+        },
+        {
+          "name": "Handle_WithZeroValues_ShouldHandleGracefully",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.Contains(\"0.00 USD\", result)"
+          ]
+        },
+        {
+          "name": "Handle_WithMissingBunkerType_ShouldSkipThatLot",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateBunkerTypeWithCoefficients()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.NotNull(validLot.Co2EmissionsFactor)",
+            "Assert.Null(invalidLot.Co2EmissionsFactor)"
+          ]
+        },
+        {
+          "name": "Handle_CompleteWorkflow_ShouldProcessAllStepsCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateCompleteEstimateScenario()",
+            "_handler.Handle(request, CancellationToken.None)",
+            "Assert.NotNull(result)",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.Co2EmissionsFactor))",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.Ch4EmissionsFactor))",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.N2oEmissionsFactor))",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.LowerCalorificValue))",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.RelativeWeightingDensity))",
+            "Assert.All(estimate.BunkerPrices, bp => Assert.NotNull(bp.Co2eqWellToTankFactor))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.FuelEuFactor))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.EtsFactor))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.PricePerMetricTonInUsds))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.ConsumtionExpenseInUsds))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.EtsTotalExpenseInUsds))",
+            "Assert.All(allConsumptions, cd => Assert.NotNull(cd.FuelEuVesselPenaltyValue))",
+            "Assert.Contains(\"Bunker Total Expense\", result)",
+            "Assert.Contains(\"ETS Total Expense\", result)",
+            "Assert.Contains(\"Fuel EU Total Cost\", result)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "Microsoft.Extensions.DependencyInjection",
+        "Core.Business.UnitTest.VoyageManagement.Estimate"
+      ],
+      "injected_services": [
+        "TestContext",
+        "CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetails.Response",
+        "DataHelper"
+      ],
+      "entities_referenced": [
+        "EstimateCrudDto",
+        "BunkerLotBaseDto",
+        "BunkerLotConsumptionBaseDto",
+        "EstimateIteneraryItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/FuelEu/SummarizeFuelCostForBunkerEvent.Tests.cs": {
+      "class_name": "SummarizeFuelEuAndEtsAndExpensesFromBunkerLotsIntoBunkerEventsAndEtsEventsTests",
+      "namespace": "Core.Business.UnitTest.FuelEu",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "Handle_WithValidEstimate_ShouldReturnTrue",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithBunkerEventsAndConsumptions",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithBunkerEventsAndConsumptions_ShouldCalculateCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithBunkerEventsAndConsumptions",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithReceivalEvent_ShouldSkipReceivalEvents",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithReceivalEvent",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithMultipleEventTypes_ShouldProcessOnlyNonReceivalEvents",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithMixedEventTypes",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapConsumptionExpense_WithValidData_ShouldCalculateCorrectExpense",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithKnownConsumptionValues",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapConsumptionExpense_WithZeroConsumption_ShouldHandleDivisionByZero",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithZeroConsumption",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapEtsExpense_WithValidData_ShouldCalculateCorrectEtsExpense",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithEtsData",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapEtsExpense_WithNullValues_ShouldHandleNullsGracefully",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithNullEtsValues",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapFuelEuPenalty_WithValidData_ShouldCalculateCorrectPenalty",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithFuelEuData",
+            "Handle"
+          ]
+        },
+        {
+          "name": "CalculateAndMapFuelEuPenalty_WithNullValues_ShouldHandleNullsGracefully",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateEstimateWithNullFuelEuValues",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithNullBunkerPrices_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithEmptyBunkerPrices_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithNullIteneraryItems_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithEmptyIteneraryItems_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithNullBunkerEvents_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithEmptyBunkerEvents_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_WithNoMatchingConsumptions_ShouldReturnTrueWithoutErrors",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients",
+            "Handle"
+          ]
+        },
+        {
+          "name": "Handle_CompleteWorkflow_ShouldProcessAllCalculationsCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteEstimateScenario",
+            "Handle"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.Constants",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "Microsoft.Extensions.DependencyInjection",
+        "Core.Business.UnitTest.VoyageManagement.Estimate"
+      ],
+      "injected_services": [
+        "TestContext"
+      ],
+      "entities_referenced": [
+        "EstimateCrudDto",
+        "EstimateIteneraryItemDto",
+        "EstimateIteneraryItemBunkerEventDto",
+        "BunkerLotBaseDto",
+        "BunkerLotConsumptionBaseDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/FuelEu/Helpers/DataHelper.cs": {
+      "class_name": "DataHelper",
+      "namespace": "Core.Business.UnitTest.VoyageManagement.Estimate",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateBasicEstimateWithBunkerLots",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithBunkerLotsAndConsumptions",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithPenaltyItems",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithNonPenaltyItems",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateCompleteEstimateScenario",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithBunkerEventsAndConsumptions",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithReceivalEvent",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithMixedEventTypes",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithKnownConsumptionValues",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithZeroConsumption",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithEtsData",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithNullEtsValues",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithFuelEuData",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateEstimateWithNullFuelEuValues",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients"
+          ]
+        },
+        {
+          "name": "CreateBunkerTypeWithCoefficients",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.DbContext"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "BunkerTypeEntity",
+        "EstimateCrudDto",
+        "BunkerLotBaseDto",
+        "EstimateIteneraryItemDto",
+        "EstimateIteneraryItemBunkerEventDto",
+        "BunkerLotConsumptionBaseDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/OverwriteEstimateShipmenToShipmentConfirmed.Test.cs": {
+      "class_name": "OverwriteShipmentConfirmed",
+      "namespace": "Core.Business.UnitTest.VoyageManagement",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "GenerateUserAccess",
+          "return_type": "HttpContextAccessor",
+          "is_public": false,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "GenerateCurrencyExchangeRate",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "Should_Throw_ApiException_When_Shipment_Is_Invalid",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [
+            "string status"
+          ],
+          "calls": [
+            "_shipmentDataHelper.CreateShipmentWithPortsAndPortCost()",
+            "_estimateShipmentDataHelper.CreateShipmentWithPortsAndPortCost(estimateId)",
+            "_context.SaveChangesAsync()",
+            "_handler.Handle(request, CancellationToken.None)"
+          ]
+        },
+        {
+          "name": "Should_Throw_ApiException_When_Shipment_CargoQuantity_Are_Mismatch",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_shipmentDataHelper.CreateShipmentWithPortsAndPortCost()",
+            "_estimateShipmentDataHelper.CreateShipmentWithPortsAndPortCost(estimateId)",
+            "OverwritingPortCostFromEstimateShipment.ValidateEstimateShipmentOverwriting(shipmentEntity, estimateShipment)"
+          ]
+        },
+        {
+          "name": "Should_Throw_ApiException_When_Shipment_CurrencyCode_Are_Mismatch",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_shipmentDataHelper.CreateShipmentWithPortsAndPortCost()",
+            "_estimateShipmentDataHelper.CreateShipmentWithPortsAndPortCost(estimateId)",
+            "OverwritingPortCostFromEstimateShipment.ValidateEstimateShipmentOverwriting(shipmentEntity, estimateShipment)"
+          ]
+        },
+        {
+          "name": "Should_Throw_ApiException_When_Shipment_FreightTotal_Are_Mismatch",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_shipmentDataHelper.CreateShipmentWithPortsAndPortCost()",
+            "_estimateShipmentDataHelper.CreateShipmentWithPortsAndPortCost(estimateId)",
+            "OverwritingPortCostFromEstimateShipment.ValidateEstimateShipmentOverwriting(shipmentEntity, estimateShipment)"
+          ]
+        },
+        {
+          "name": "Should_Throw_ApiException_When_Shipment_QuantityUnit_Are_Mismatch",
+          "return_type": "System.Threading.Tasks.Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_shipmentDataHelper.CreateShipmentWithPortsAndPortCost()",
+            "_estimateShipmentDataHelper.CreateShipmentWithPortsAndPortCost(estimateId)",
+            "OverwritingPortCostFromEstimateShipment.ValidateEstimateShipmentOverwriting(shipmentEntity, estimateShipment)"
+          ]
+        }
+      ],
+      "using_imports": [
+        "System.Security.Claims",
+        "AutoMapper",
+        "Core.Business.UnitTest.Shipment.Helpers",
+        "Core.Business.VoyageManagement.AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure",
+        "Core.Infrastructure.Security",
+        "MediatR",
+        "Microsoft.AspNetCore.Http",
+        "Moq"
+      ],
+      "injected_services": [
+        "IMediator",
+        "TestDataContext",
+        "DataShipmentHelper",
+        "DataEstimateShipmentHelper",
+        "UserAccessor",
+        "IMapper"
+      ],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "EstimateShipmentEntity",
+        "CurrencyExchangeRateEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/ShipmentGeneratePlItemFromCommission.Test.cs": {
+      "class_name": "ShipmentGeneratePlItemFromCommission",
+      "namespace": "Core.Business.UnitTest.Shipment",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "FormatNumber",
+          "return_type": "string",
+          "is_public": true,
+          "parameters": [
+            "decimal v"
+          ],
+          "calls": [
+            "InvoiceUtil.FormatCurrency(v)"
+          ]
+        },
+        {
+          "name": "GenerateBusinessPartner",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_context.BusinessPartners.AddRange(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "GenerateCurrencyExchangeRate",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "_context.CurrencyExchangeRates.AddRange(...)",
+            "_context.SaveChangesAsync()"
+          ]
+        },
+        {
+          "name": "Should_Not_Generate_Any_Commission_PlItem_When_Shipment_Commission_Is_Empty",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithoutAnyCommission()",
+            "_handler.Handle(...)",
+            "Assert.Empty(...)"
+          ]
+        },
+        {
+          "name": "Should_Generate_Freight_Commission_PlItem_When_Shipment_Commission_Is_Defined",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithFreightCommission()",
+            "_handler.Handle(...)",
+            "Assert.Single(...)",
+            "Assert.True(...)"
+          ]
+        },
+        {
+          "name": "Should_Generate_Multiple_Freight_Commission_PlItem_When_Shipment_Has_Multiple_Commission",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithMultipleFreightCommission()",
+            "_handler.Handle(...)",
+            "Assert.Equal(...)",
+            "Assert.All(...)"
+          ]
+        },
+        {
+          "name": "Should_Generate_Internal_Commission_PlItem_When_Shipment_Has_Internal_Commission",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithOnlyInternalCommission()",
+            "_handler.Handle(...)",
+            "Assert.Single(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "Should_Not_Generate_Any_Commissable_Misc_Rev_PlItems_When_Missing_Commissable_Misc_Rev_Items",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithMultipleFreightCommission()",
+            "_handler.Handle(...)",
+            "Assert.Empty(...)"
+          ]
+        },
+        {
+          "name": "Should_Not_Generate_Any_Commissable_Misc_Rev_PlItems_If_Missing_IsCommissable_Misc_Rev",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithNoneComissableMiscRev()",
+            "_handler.Handle(...)",
+            "Assert.Empty(...)"
+          ]
+        },
+        {
+          "name": "Should_Not_Generate_Commissable_Misc_Rev_PlItems_If_None_Percentage_Commissions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateShipmentWithComissableMiscRev()",
+            "_handler.Handle(...)",
+            "Assert.Empty(...)"
+          ]
+        },
+        {
+          "name": "Should_Generate_Commissable_Misc_Rev_PlItems_If_Has_Enough_Conditions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateSimpleShipment()",
+            "_handler.Handle(...)",
+            "Assert.Single(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "Should_Generate_InternalCommission_Again_With_Commissable_Misc_Rev_PlItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_testDataHelper.CreateSimpleShipment()",
+            "_handler.Handle(...)",
+            "Assert.Single(...)",
+            "Assert.Equal(...)"
+          ]
+        },
+        {
+          "name": "Dispose",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "_context.Dispose()"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Business.Finance.Invoice",
+        "Business.UnitTest.VoyageManagement",
+        "Core.Business.UnitTest.Shipment.Helpers",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Graph.Privacy",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "BusinessPartnerEntity",
+        "CurrencyExchangeRateEntity",
+        "ShipmentCommissionEntity",
+        "ShipmentProfitAndLossItemEntity",
+        "ProfitAndLossItemOriginEnum",
+        "CommissionTypeEnum",
+        "PaymentBasisEnum",
+        "ProfitAndLossIdentifierEnum",
+        "CurrencyCodeEnum"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/ShipmentProfitAndLossItems.Test.cs": {
+      "class_name": "ShipmentProfitAndLossItemsTests",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "ShipmentPlItem_Freight_Item_Should_Be_Generated_Automatically",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToList",
+            "Where",
+            "Should().HaveCount(1)",
+            "Assert.NotNull",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "ShipmentPlItem_Internal_Item_Should_Be_Generated_Automatically",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToList",
+            "Where",
+            "Should().HaveCount(1)",
+            "Assert.NotNull",
+            "Assert.Equal"
+          ]
+        },
+        {
+          "name": "ShipmentPlItem_Should_Be_Filter_Valid_Port_Quantity_Payment_Type",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToList",
+            "Where",
+            "Should().BeEmpty"
+          ]
+        },
+        {
+          "name": "ShipmentPlItem_Should_Be_Pass_Mapping_Correct_Port_Quantity_Item",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Handle",
+            "ToList",
+            "Where",
+            "Should().HaveCount(3)",
+            "FirstOrDefault",
+            "Should().NotBeNull",
+            "Assert.Equal",
+            "Should().AllSatisfy"
+          ]
+        },
+        {
+          "name": "GenerateCurrencyExchangeRate",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "AddRange",
+            "SaveChangesAsync"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext",
+        "FluentAssertions",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "ShipmentProfitAndLossItemEntity",
+        "CurrencyExchangeRateEntity",
+        "ShipmentPortEntity",
+        "ValidateShipmentPLItems.Request"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/UpdateShipmentByIdNewMethod.Tests.cs": {
+      "class_name": "UpdateShipmentByIdNewMethodTests",
+      "namespace": "Core.Business.UnitTest",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithValidData_ShouldUpdateSuccessfully",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.Shipments.FindAsync",
+            "_mockMediator.Verify"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithNewPorts_ShouldAddNewPorts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_dataHelper.CreatePort",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsPorts.Where",
+            "_context.ShipmentsPorts.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithUpdatedPorts_ShouldUpdateExistingPorts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "CreateShipmentPortAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsPorts.FindAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithRemovedPorts_ShouldDeletePorts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "CreateShipmentPortAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsPorts.Where",
+            "_context.ShipmentsPorts.FindAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithInstructions_ShouldUpdateInstructions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentInstructions.Where",
+            "_context.ShipmentInstructions.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithRestrictions_ShouldUpdateRestrictions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentRestrictions.Where",
+            "_context.ShipmentRestrictions.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithCommissions_ShouldUpdateCommissions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsCommissions.Where",
+            "_context.ShipmentsCommissions.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithProfitAndLossItems_ShouldUpdateProfitAndLossItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentProfitAndLossItems.Where",
+            "_context.ShipmentProfitAndLossItems.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithDimensions_ShouldUpdateDimensions",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentDimensions.Where",
+            "_context.ShipmentDimensions.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithMixedCollectionOperations_ShouldHandleAllCorrectly",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "CreateShipmentPortAsync",
+            "CreateShipmentInstructionAsync",
+            "_dataHelper.CreatePort",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsPorts.Where",
+            "_context.ShipmentsPorts.ToListAsync",
+            "_context.ShipmentInstructions.Where",
+            "_context.ShipmentInstructions.ToListAsync",
+            "_context.ShipmentRestrictions.Where",
+            "_context.ShipmentRestrictions.ToListAsync"
+          ]
+        },
+        {
+          "name": "UpdateShipmentByIdNewMethod_WithEmptyCollections_ShouldRemoveAllExistingItems",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "CreateCompleteShipmentAsync",
+            "CreateShipmentPortAsync",
+            "CreateShipmentInstructionAsync",
+            "CreateShipmentRestrictionAsync",
+            "_mockMediator.Setup",
+            "_handler.Handle",
+            "_context.ShipmentsPorts.Where",
+            "_context.ShipmentInstructions.Where",
+            "_context.ShipmentRestrictions.Where",
+            "_context.ShipmentsCommissions.Where",
+            "_context.ShipmentProfitAndLossItems.Where",
+            "_context.ShipmentDimensions.Where"
+          ]
+        }
+      ],
+      "using_imports": [
+        "AutoMapper",
+        "Core.Domain.Commons",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure",
+        "Core.Infrastructure.DbContext",
+        "Core.Infrastructure.UnitTest.DbContext",
+        "MediatR",
+        "Microsoft.EntityFrameworkCore",
+        "Moq"
+      ],
+      "injected_services": [
+        "TestContext",
+        "IMapper",
+        "IMediator",
+        "IRequestHandler<UpdateShipmentByIdNewMethod.Request, ShipmentDto>"
+      ],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "ShipmentPortEntity",
+        "ShipmentInstructionEntity",
+        "ShipmentRestrictionEntity",
+        "ShipmentCommissionEntity",
+        "ShipmentProfitAndLossItemEntity",
+        "ShipmentDimensionsEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/Helpers/DataEstimateShipmentHelper.cs": {
+      "class_name": "DataEstimateShipmentHelper",
+      "namespace": "Core.Business.UnitTest.Shipment.Helpers",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateShipmentWithPortsAndPortCost",
+          "return_type": "Task<EstimateShipmentEntity>",
+          "is_public": true,
+          "parameters": [
+            "Guid estimateId"
+          ],
+          "calls": []
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "EstimateShipmentEntity",
+        "EstimateShipmentPortCallEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/Shipment/Helpers/DataShipmentHelper.cs": {
+      "class_name": "DataShipmentHelper",
+      "namespace": "Core.Business.UnitTest.Shipment.Helpers",
+      "file_type": "Other",
+      "architecture_layer": "Business",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateShipmentWithoutAnyCommission",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateSimpleShipment",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithFreightCommission",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithMultipleFreightCommission",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithOnlyInternalCommission",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithNoneComissableMiscRev",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithComissableMiscRev",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "CreateShipmentWithPortsAndPortCost",
+          "return_type": "Task<ShipmentEntity>",
+          "is_public": true,
+          "parameters": [],
+          "calls": []
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Domain.VoyageManagement.Entities",
+        "Core.Infrastructure.DbContext"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "ShipmentEntity",
+        "ShipmentCommissionEntity",
+        "ShipmentProfitAndLossItemEntity",
+        "ShipmentPortEntity"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/TimeCharterClaim/DailyRateInternalCommissionWithTimeCharterClaim.Test.cs": {
+      "class_name": "DailyRateInternalCommissionWithTimeCharterClaimTest",
+      "namespace": "Business.UnitTest.VoyageManagement.TimeCharterClaim",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "GenerateNegativePlItems_OnOffHire_Should_Correct",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GenerateNegativePlItemsForTimeCharterClaims",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "AssertNegativePlItem"
+          ]
+        },
+        {
+          "name": "GenerateNegativePlItems_OnSpeedClaim_Should_Correct",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GenerateNegativePlItemsForTimeCharterClaims",
+            "Assert.NotNull",
+            "Assert.Equal",
+            "AssertNegativePlItem"
+          ]
+        },
+        {
+          "name": "ApplyNegativePlItems_Should_Correctly_Adjust_OriginalPlItems",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "Aggregate",
+            "ApplyNegativePlItemIntoOriginalPlItem",
+            "Assert.NotNull",
+            "Should().HaveCount",
+            "Should().BeApproximately",
+            "Should().BeEquivalentTo"
+          ]
+        },
+        {
+          "name": "CleanupPlItems_Should_WorkCorrectly",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "GroupAndSumUpPlItems",
+            "Should().HaveCount",
+            "Find",
+            "Should().BeEquivalentTo"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Business.VoyageManagement.Helpers",
+        "Core.Domain.Constants",
+        "Core.Domain.FinanceData.Dtos",
+        "Core.Domain.FinanceData.Entities",
+        "Core.Domain.TimeCharterClaim.Dtos",
+        "FluentAssertions"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "TimeCharterClaimDto",
+        "ProfitAndLossItemDto",
+        "TimeCharterClaimItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
     }
   },
   "used_by": {},

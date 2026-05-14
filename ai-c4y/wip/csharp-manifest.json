@@ -12174,5 +12174,245 @@
     "file_type": "Other",
     "architecture_layer": "Other",
     "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Itenerary.Test.cs": {
+    "phase": "indexed",
+    "hash": "405bad8e743f32430659df33bb7c20139c409c36a093585d48dbc627754b4546",
+    "lines": 119,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/IteneraryActivitiy.Test.cs": {
+    "phase": "indexed",
+    "hash": "0239415fd7d225206e41a625e2deb2a634d8f0f4cea73874ca0fcb19fa051cbd",
+    "lines": 184,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/IteneraryItemSorting.Test.cs": {
+    "phase": "indexed",
+    "hash": "ce683b495fde61256c2fe763b096f9bb340099b878c27480f6a91fd829626bf5",
+    "lines": 146,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/PrepareData.cs": {
+    "phase": "indexed",
+    "hash": "293c26af28c42dbc36f735ae3db32b5fffccee4fa256b4801cc7c80ff2b764bc",
+    "lines": 243,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Route.Test.cs": {
+    "phase": "indexed",
+    "hash": "3c185fb07a38566e7a77deb95a77fceecd7feee39b05c573dd2d482d1a80c566",
+    "lines": 87,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment.Test.cs": {
+    "phase": "indexed",
+    "hash": "53dcef2391f1aab9458023c4d2ae2e036ecacbdcd92c2b3ab95d9c17aea7489e",
+    "lines": 364,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/ShipmentTransistionStatus.Test.cs": {
+    "phase": "indexed",
+    "hash": "c567d0eb027a4f853a2b4d99fa6a0bdfdf375515b8d04c137a2ea5329f926d08",
+    "lines": 423,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/ShipmentValidation.Test.cs": {
+    "phase": "indexed",
+    "hash": "7cea28b36400de6a2f74245545e7c208e7361a69cad963c27eee5246182b8d00",
+    "lines": 1070,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Tco.Test.cs": {
+    "phase": "indexed",
+    "hash": "8469b853525e556cfb21e7ac3391cb0c5bd7de60dd19a9cbc7a4fbd655b92039",
+    "lines": 300,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/BunkerCalculator.Test.cs": {
+    "phase": "indexed",
+    "hash": "ae7cdc0509541a712d017ba0bcd1fc688b97a20dc4706bc7fd490d1f4981e681",
+    "lines": 125,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/CreateAndGetFuelItineraryItemIdTests.cs": {
+    "phase": "indexed",
+    "hash": "f6b44f3c69d537ff831d6d2ca7db941a74d92f0fc496fdceed576a20680dd549",
+    "lines": 470,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/DeleteBunkerOrderById.Tests.cs": {
+    "phase": "indexed",
+    "hash": "cf971ebcf0d5c74f2e9d4a4f137abc188715bc997d9c85e77bdde143282713e2",
+    "lines": 512,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/InitializeVoyageBunkerLots.Tests.cs": {
+    "phase": "indexed",
+    "hash": "b457b6f5e6b0428bdd79d14ea0234f3682c88a5902b91c5d8522d178eb895f91",
+    "lines": 464,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/InitializeVoyageBunkerOrders.Tests.cs": {
+    "phase": "indexed",
+    "hash": "4117b453787ac1cf8ac0634ebd5b723ab5081af0cc83514938afe8b084983d12",
+    "lines": 217,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.Tests.cs": {
+    "phase": "indexed",
+    "hash": "6bd3c0bcfcf913a72472b51fa20ec8014192fca2865e7d0bc118f2016a5605c0",
+    "lines": 571,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/UpdateVoyageBunkerLots.Test.cs": {
+    "phase": "indexed",
+    "hash": "387c335ff7434a173743fc6353f6b06072091c78195528a5b2a1e66b484d43ee",
+    "lines": 366,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/Helpers/CubicSplineInterpolator.Test.cs": {
+    "phase": "indexed",
+    "hash": "42b71d2f0f7cac94ad8929145d68afa85f677e89083756144b92e42d70c712bb",
+    "lines": 125,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Bunker/Helpers/DataPreparationHelper.cs": {
+    "phase": "indexed",
+    "hash": "6c0f242de27d5a90989379a3f32d868988b49c4baba1e245ec26e0b6fe5c29d0",
+    "lines": 689,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Estimate/CommissionableMiscRev.Test.cs": {
+    "phase": "indexed",
+    "hash": "908930fa43c2f08be211dd9ca8dcb9a840cc87885f9ed47d926b1b9ef78161bb",
+    "lines": 413,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Estimate/Helpers/DataEstimateHelper.cs": {
+    "phase": "indexed",
+    "hash": "522d01a6f4816152f6443d4d84f76b23dea7ba21126b4706f5622cca9fac3407",
+    "lines": 346,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/FuelEu/CalculateFuelEuAndEtsForBunkerLotConsumption.Tests.cs": {
+    "phase": "indexed",
+    "hash": "2de1a1a33c965b5545bdb1115e33b973cd9cdbb0f4dfa4feef65c7859ce496fe",
+    "lines": 573,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/FuelEu/SummarizeFuelCostForBunkerEvent.Tests.cs": {
+    "phase": "indexed",
+    "hash": "45f7eef7da21b62994b28c978ccb4e25f364e8146e300574cac51bd2cd2b3aee",
+    "lines": 527,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/FuelEu/Helpers/DataHelper.cs": {
+    "phase": "indexed",
+    "hash": "3128a871583922a4e14781531dc1f6384a0e86a0dc2b8c94a0bad335b2c1e4c3",
+    "lines": 706,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/OverwriteEstimateShipmenToShipmentConfirmed.Test.cs": {
+    "phase": "indexed",
+    "hash": "2181d46b795b54a97546c896aa68192349bf13066a95d823396ced73b696352b",
+    "lines": 197,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/ShipmentGeneratePlItemFromCommission.Test.cs": {
+    "phase": "indexed",
+    "hash": "5c521ce5f12bfeabaf1157960ee2cfc2f084432aa7834e5b94b2a902d65d514b",
+    "lines": 488,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/ShipmentProfitAndLossItems.Test.cs": {
+    "phase": "indexed",
+    "hash": "e3f44f7c7c64c3b5f908daa4d32e6e73f1198ed5de45759e3fc8a88f0b6b7434",
+    "lines": 418,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/UpdateShipmentByIdNewMethod.Tests.cs": {
+    "phase": "indexed",
+    "hash": "e573962e17fc887b261d3abb53bef25acd0c2d6e666c7420ed9ecec540813dff",
+    "lines": 790,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/Helpers/DataEstimateShipmentHelper.cs": {
+    "phase": "indexed",
+    "hash": "d8cbbd5af0f96c560829f50ba407fbafc364b7084bf718f3fc74bec873c441e5",
+    "lines": 68,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Shipment/Helpers/DataShipmentHelper.cs": {
+    "phase": "indexed",
+    "hash": "8fdd55435b09b7611b5275e2ecc1aa2692c3bad8ee3a9ba9136db03b7fb687ab",
+    "lines": 266,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/TimeCharterClaim/DailyRateInternalCommissionWithTimeCharterClaim.Test.cs": {
+    "phase": "indexed",
+    "hash": "f3f0ae21ed49cb23779406ab740a0d73d22697a34298d62a315b8462287a33b0",
+    "lines": 301,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
   }
 }

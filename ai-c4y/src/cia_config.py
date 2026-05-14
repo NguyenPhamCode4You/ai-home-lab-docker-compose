@@ -20,7 +20,9 @@ CSHARP_CODEBASE_PATH             = os.getenv("CIA_CODEBASE_PATH", "")
 CSHARP_FOCUS_ONLY_FILES          = os.getenv("CIA_FOCUS_ONLY_FILES", "")
 CSHARP_IGNORE_FILES              = os.getenv(
     "CIA_IGNORE_FILES",
-    "**/Migrations/**,**/*.Designer.cs,**/obj/**,**/bin/**",
+    "**/Migrations/**,**/*.Designer.cs,**/obj/**,**/bin/**"
+    ",**/*.Tests/**,**/*.Test/**,**/Tests/**,**/Test/**"
+    ",**/*Tests.cs,**/*Test.cs,**/*Spec.cs",
 )
 CSHARP_LARGE_FILE_LINE_THRESHOLD = int(os.getenv("CIA_LARGE_FILE_THRESHOLD", 200))
 OPENROUTER_SYNTHESIS_MODEL       = os.getenv("CIA_OPENROUTER_MODEL", "qwen/qwen3-32b")
