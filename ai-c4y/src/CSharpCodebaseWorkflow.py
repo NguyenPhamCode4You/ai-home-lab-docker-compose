@@ -149,6 +149,7 @@ def _load_index(index_path: str) -> dict:
 
 
 def _save_index(index: dict, index_path: str):
+    os.makedirs(os.path.dirname(os.path.abspath(index_path)), exist_ok=True)
     with open(index_path, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
 
