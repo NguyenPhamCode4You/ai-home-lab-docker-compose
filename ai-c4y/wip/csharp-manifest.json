@@ -8334,5 +8334,3845 @@
     "file_type": "Validator",
     "architecture_layer": "Business",
     "is_critical": false
+  },
+  "Core/Business/Validator/Tco/TcoProfitAndLossItemValidator.cs": {
+    "phase": "indexed",
+    "hash": "03e4bdf10beba47c3bfae41da0dddfabeba59389f62257438080417f0403cab0",
+    "lines": 33,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Tco/TcoRateValidator.cs": {
+    "phase": "indexed",
+    "hash": "ec08d7ca756e6bf0678b4b4c30061004489e9c6caeb55ee29c26f2407e1b381d",
+    "lines": 43,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Vessel/VesselService.cs": {
+    "phase": "indexed",
+    "hash": "4ff8b1ce79d328dfd2a0673053039728b919d0c0625a5b4e8e4fd8159f200a1a",
+    "lines": 26,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/Vessel/VesselValidator.cs": {
+    "phase": "indexed",
+    "hash": "cb768913634092a836ee6a83535a01ef11b28ac7c701b871d46ac25b490aef93",
+    "lines": 38,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/VesselReport/BaseVesselReportValidator.cs": {
+    "phase": "indexed",
+    "hash": "0c9f5bf20d64f6556644b905b42d69169e5460c9524f5f62f6486ed7577116b6",
+    "lines": 62,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/VesselReport/VesselReportApprovalValidator.cs": {
+    "phase": "indexed",
+    "hash": "4865ebd9bebeb941a3cb373e556e15d882bac000ce6fc638fea497c927b52814",
+    "lines": 287,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/VesselReport/VesselReportDraftValidator.cs": {
+    "phase": "indexed",
+    "hash": "60ab65439c5f8eaf409b5661be26cc4eb1c3195acf88b7e36d436c69795d695c",
+    "lines": 122,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/Validator/VesselReport/VesselReportValidator.cs": {
+    "phase": "indexed",
+    "hash": "a9d97ec4254a3564add4f259dfc71facc7bdd365dc0c1cceec4590d8bff0b7a2",
+    "lines": 205,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/AutoMapper/FromEstimateShipmentEntityToShipmentConfirmedEntity.cs": {
+    "phase": "indexed",
+    "hash": "272fe79b82750782df41abbcf7574aa91efb6961242d36b617126feb5caa4691",
+    "lines": 283,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/AutoMapper/FromEstimateShipmentEntityToShipmentEntity.cs": {
+    "phase": "indexed",
+    "hash": "4301517bd524d34d70d8b92b4f332594cc86d0ffd7a5a4f91eda8260949ec23b",
+    "lines": 302,
+    "file_type": "Configuration",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/AutoMapper/FromUpdateVoyageCrudToVoyageEntity.cs": {
+    "phase": "indexed",
+    "hash": "aa273b4d92e543e3cc1fa50666f1c114b3cd7dac6ab1686e139261f34b7cd4e3",
+    "lines": 365,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Bookmark/CreateBookmark.cs": {
+    "phase": "indexed",
+    "hash": "3aba5f427fae77c62476005aedaebd18f19a512adfd7936800b26e139de47771",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Bookmark/DeleteBookmark.cs": {
+    "phase": "indexed",
+    "hash": "c8f66162e434b076f46b8561d9d634fbe79a2c3864f1cfb8dba3e081b43f3585",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Bookmark/GetUserBookmarks.cs": {
+    "phase": "indexed",
+    "hash": "d85393d962eb9353f39d0613d53d3e50236fe60ba62db241f61354bf454ead4f",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/GetVoyageBunkerLotDetails.cs": {
+    "phase": "indexed",
+    "hash": "efae77a35e63ed6911ce9f8932c032f53ff39e79f1c6f0e81be16583fa0c2671",
+    "lines": 36,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/GetVoyageBunkerLots.cs": {
+    "phase": "indexed",
+    "hash": "706ce51f8d72693d357b3b92307c2e7ff0a4fa7d8641df6ae22645bcbef9d1f9",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/GetVoyageEndingBunkerLots.cs": {
+    "phase": "indexed",
+    "hash": "eaa6934d6f93914fe11076788324a28f4c9db14792b32185bd129fae63680089",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/InitializeVoyageBunkerLots.cs": {
+    "phase": "indexed",
+    "hash": "827ae2de191fd5321f72bd352950f50adc325e86da1da288e2e2f5972fe96713",
+    "lines": 117,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/UpdateVoyageBunkerLots.cs": {
+    "phase": "indexed",
+    "hash": "cab5d8515bffd6266f44d8d91e7d43069fb209ad4833538865709dc7c6f9d4f0",
+    "lines": 73,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerIteneraryCalculator.cs": {
+    "phase": "indexed",
+    "hash": "c067c89886849cecfa46604ae67a394eebdcd102fd9d96b6e2604284bcf5bcf1",
+    "lines": 240,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerLotCodeHelper.cs": {
+    "phase": "indexed",
+    "hash": "a3154dc40620df4773a8cea1fffd7581c9cb52d0f9795a7e08093584be4e8955",
+    "lines": 303,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerOnboardCalculator.cs": {
+    "phase": "indexed",
+    "hash": "f1172eb36730ffa2715e61e70540a7cfa8c6c0924fdae4b1a6131211214460e0",
+    "lines": 269,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerOwnershipHelper.cs": {
+    "phase": "indexed",
+    "hash": "1cc4d3721f6815763bd9d97e338adee501f1ec239d58823768b9594f37645460",
+    "lines": 469,
+    "file_type": "Helper",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerRobsCalculator.cs": {
+    "phase": "indexed",
+    "hash": "0793b9a4c2e88505aeb0d9c140fea8b949620b97553cc67deb6886092744b024",
+    "lines": 223,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerSummaryCalculator.cs": {
+    "phase": "indexed",
+    "hash": "e87f4b3f6ba7d1bab8091a076bbdcb5020f5a636fb04d694dbbdbb6de32e0bcb",
+    "lines": 152,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/BunkerLot/Helpers/VoyageBunkerLotHelper.cs": {
+    "phase": "indexed",
+    "hash": "ff41abc7e0eac2d164dfb6584bc02b82abf78a3506f0040f3c05af47c361adb1",
+    "lines": 550,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Coa/CreateCoa.cs": {
+    "phase": "indexed",
+    "hash": "59d57146e1f703df56d4a15daa6006d952dd6d76a0bb75d822582fcd296c9c54",
+    "lines": 84,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Coa/DeleteCoaById.cs": {
+    "phase": "indexed",
+    "hash": "700d7233e7e1504f00964af1570a612795cb16f2e4dce3efab304a5a7b16aa02",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Coa/GetCoaById.cs": {
+    "phase": "indexed",
+    "hash": "e19290cf33bc48802281e2dd64842eaf63678b2958f13a9238b49e62a86f415f",
+    "lines": 65,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Coa/SearchCoas.cs": {
+    "phase": "indexed",
+    "hash": "99c57b3aa2714cb63adf52eeb86bcf1f77110969701e0ef07a9847c989473821",
+    "lines": 83,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Coa/UpdateCoaById.cs": {
+    "phase": "indexed",
+    "hash": "095d034781cf1918e531d9dce2a33b67b2acab29fc2405c77b6ea2eab42a4aba",
+    "lines": 106,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/SyncItineraryItemToDaDesk.cs": {
+    "phase": "indexed",
+    "hash": "620d646550aff22e4066263d868eb2d8eb3177390b133347b16911660bd54807",
+    "lines": 185,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/SyncItineraryItemToDaDeskV2.cs": {
+    "phase": "indexed",
+    "hash": "a7e1f25da837328c817b346745218d08e60eadef042710c966952e22f79ac211",
+    "lines": 73,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/UnsyncItineraryItemFromDaDesk.cs": {
+    "phase": "indexed",
+    "hash": "c222a833a231a1ecfa344399f2097f43b9ddbfad40d8a952236f9adc2aa744fb",
+    "lines": 84,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/UpdateItineraryItemToDaDesk.cs": {
+    "phase": "indexed",
+    "hash": "6a12828198226225885b7655e5ac2e50eda637fe5bd3d2171bd0f0729e50246a",
+    "lines": 95,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/UpdateItineraryItemToDaDeskV2.cs": {
+    "phase": "indexed",
+    "hash": "431db92b4c3a940e8e232733f7007b78a25fdee3bf6d7df01e0fb55f951507b1",
+    "lines": 65,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/DaDesk/Builders/DisCreatePortCallRequestBuilder.cs": {
+    "phase": "indexed",
+    "hash": "32756c98d47406bc2442105825260d4f0d25825b301e8b19823db1a9d271b863",
+    "lines": 160,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Distance/CalculateDistance.cs": {
+    "phase": "indexed",
+    "hash": "4fc9dc376822581275ba168809d94916a07c8ae7e5d52e3e04280ef434edbbd0",
+    "lines": 84,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Distance/RecalculateOpeningDateTimezone.cs": {
+    "phase": "indexed",
+    "hash": "a14aa7c3bf2d745ae7ba0f18ed04ea23c2cb5991215ffddfdb0374cf8600f57f",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateAllBunkersCostsAndFeesForEstimate.cs": {
+    "phase": "indexed",
+    "hash": "6ad912123bb1f729ece01d62d9beb324a0700443faceca9f321382c5fb50b2d7",
+    "lines": 47,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateBioBlendOptions.cs": {
+    "phase": "indexed",
+    "hash": "10d2ec869f5e22372d69df150c2789a507955664fa8b8e70e765f7a6b1cc5b2d",
+    "lines": 174,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateEstimate.cs": {
+    "phase": "indexed",
+    "hash": "2badd6c9953cb26e49b71af52075c18ffa691fc39301f99aab2f026bfd75bcab",
+    "lines": 131,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateEstimateFromDailyPL.cs": {
+    "phase": "indexed",
+    "hash": "24644fa71ad9fccef9e47bef69b1480e0d4e8b200c21379046517d9142e78ff1",
+    "lines": 115,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateEstimateFromTce.cs": {
+    "phase": "indexed",
+    "hash": "5ff19046770927930a993c46da488fddb7672f08716287900a45b3af98ed4bef",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateEstimateFromTotalPL.cs": {
+    "phase": "indexed",
+    "hash": "022dffbf332bd59c4e7127f583a23e27ad4f4322c69c08f3d80145517be4c0b8",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateEstimateWithNewVessel.cs": {
+    "phase": "indexed",
+    "hash": "2705e9cb6b86ae915d1a28fd2c79855cafa99d52ac0fc4ff26d75df99ddff7c4",
+    "lines": 379,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetails.cs": {
+    "phase": "indexed",
+    "hash": "a0e1ddd31b9f6e7f1a929371c45daff5219f2372655182e12ee5bf9a3602da87",
+    "lines": 469,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateIteneraryGeo.cs": {
+    "phase": "indexed",
+    "hash": "c9c34b0d81ed758c77b7046c4cb592bf6acbc3799c312c861234da12a9509818",
+    "lines": 470,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateIteneraryStep.cs": {
+    "phase": "indexed",
+    "hash": "2c72abb929907a8eddc771aa80203899d63ea123ba8f603411e47bb1f1ab761d",
+    "lines": 301,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateMiscExpensePortQuantity.cs": {
+    "phase": "indexed",
+    "hash": "bce902a55cd48bcf944314a5f4300d9ab5f20e579daefab1cc114677eccf0d42",
+    "lines": 83,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateOptimalRoute.cs": {
+    "phase": "indexed",
+    "hash": "25806144ac0b3665d7e891c904edcd3eae317c7d772d8c8035e2bc84f0cd0e89",
+    "lines": 109,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateOptimalSpeed.cs": {
+    "phase": "indexed",
+    "hash": "e8f46ac692e4a54eadab8828a1307d6268c4a45c27be83926179b6a5fc7c2393",
+    "lines": 144,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateShipments.cs": {
+    "phase": "indexed",
+    "hash": "3ed4e5dcf682369ca70390ffcd8fa518a403e10ee374eea18563754951bed3bd",
+    "lines": 52,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateShortestRoute.cs": {
+    "phase": "indexed",
+    "hash": "afd516f22633ff6650f92447a6865f50b773503eb377f0e04dd9f380aa378266",
+    "lines": 137,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateSpeedConsumption.cs": {
+    "phase": "indexed",
+    "hash": "672a3605885d78108941beb40798dac186dd69adb639874b4540ac814b819d65",
+    "lines": 88,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CalculateTcoEstimate.cs": {
+    "phase": "indexed",
+    "hash": "613239ceb122c28e50a757db374246a855c2a7515ed1196dc93a2980aabe57ff",
+    "lines": 117,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CorrectFieldPLItems.cs": {
+    "phase": "indexed",
+    "hash": "7ec38f968fcbaab7e264a7aef00e39294c34d2f979f6a2114c3edd7082db54a2",
+    "lines": 72,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CreateTcoEstimate.cs": {
+    "phase": "indexed",
+    "hash": "6c2058a27c3a0ad1ecf9301ce6065153306064ecfd98df056a592c5f5c15c0a6",
+    "lines": 223,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/CreateVoyageEstimate.cs": {
+    "phase": "indexed",
+    "hash": "1a7e9488c9903d0adfe622f0e9388190d99aa911cf003388bf1bef832009be58",
+    "lines": 307,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsureBunkerLotsInitialPricingInSyncWithBunkerOrders.cs": {
+    "phase": "indexed",
+    "hash": "4ba8db7be95ab915737e68daabcb065e76515625ca07cbdcd7de69a50ceb8ee7",
+    "lines": 88,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsureDefaultValuesForShipmentEstimateBunkerLot.cs": {
+    "phase": "indexed",
+    "hash": "fa40193183ec527d0561e3c79778f7dadfb1559092576b56816d40595e48f4d9",
+    "lines": 31,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsureDistanceForItineraryPair.cs": {
+    "phase": "indexed",
+    "hash": "cef2953d431e4af403f38d3bb59189648f98123966832d4e9723ac6832890970",
+    "lines": 134,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsureFixedIteneraryCodeForEstimate.cs": {
+    "phase": "indexed",
+    "hash": "fd0592e372ca94a51f2be41b73b6a65e3c5c2e03cff2812717712973f9f1e219",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsureOpeningPort.cs": {
+    "phase": "indexed",
+    "hash": "42c0b0f28919e284fc9319da30d9199fa144b7cba9e5ef57d76b6d8b2c3a3732",
+    "lines": 61,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EnsurePortDataForIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "c65da88694bb3baba04ee018e178997c24f7e605885b0a7b1d72db58afba0fd1",
+    "lines": 108,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ExchangeCurrencyIntoUsds.cs": {
+    "phase": "indexed",
+    "hash": "67b290f8ede48bb1984fbc200b61417278f5dacf52f9a9e4acc479877a27567d",
+    "lines": 175,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ExportEstimatePdf.cs": {
+    "phase": "indexed",
+    "hash": "8b6dadaa5fe3b8f082558ac996150ed48fe5ed845a2865e3411a8c3f2c47a708",
+    "lines": 345,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ExportTcoEstimatePdf.cs": {
+    "phase": "indexed",
+    "hash": "d79cd032e367bc1f2ab7a279687c37e511020b69ebf90b101ee781b5eb988245",
+    "lines": 311,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GenerateDailyRateInternalCommissionPlItems.cs": {
+    "phase": "indexed",
+    "hash": "b1987d898fac061d80e151aada606768b56d07d97e6050627ef0071d07e10b62",
+    "lines": 131,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GenerateDailyRatePnIPlItems.cs": {
+    "phase": "indexed",
+    "hash": "e2f14187cd12b2c8f42351a20c2274d6c467df7ef86872131725d26b60226d06",
+    "lines": 106,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GenerateEstimateCode.cs": {
+    "phase": "indexed",
+    "hash": "025c8a7dcf5649b52c6920b85df8f7c71f2359077970b52e7ae9e08b87ba84df",
+    "lines": 58,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GenerateEstimateName.cs": {
+    "phase": "indexed",
+    "hash": "0b511ab2ae06f9a4b29dce8d68540d6ea0877d02823a3ce7227219a298374cbd",
+    "lines": 47,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GenerateEstimateShipmentCommission.cs": {
+    "phase": "indexed",
+    "hash": "e8e5dac1cf7881f300fbdfa0fdb82eb9fd3ba629809bd70ee1fe570f20994f2f",
+    "lines": 72,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GeneratePreCalculatedEstimateBunkerEvents.cs": {
+    "phase": "indexed",
+    "hash": "2a5d52b7733ce1b3a91abb2fae06192d5e15c1d4eb9c470cefa0a786af735b14",
+    "lines": 167,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GeneratePreCalculatedEstimateEtsFuelEuEvents.cs": {
+    "phase": "indexed",
+    "hash": "b59bc8851174e2e63400fb2ede5107630bd66a2a2de8c9d5219c089ff5234124",
+    "lines": 67,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetConsumptionByVesselID.cs": {
+    "phase": "indexed",
+    "hash": "23e2cfdbd0e0261e2bc17f1a98baec474b8ccadd02b213e0eb48dd382a276287",
+    "lines": 55,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetEstimateById.cs": {
+    "phase": "indexed",
+    "hash": "eaae191aafa50ae6f2932f80bd2faba3f24d10bade81ef85f320948ffc4c2c22",
+    "lines": 151,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetEstimateVersions.cs": {
+    "phase": "indexed",
+    "hash": "57d288255dca127598b6f2127662c3bd3446993921f83910288941d96f4a8920",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetItineraryRoute.cs": {
+    "phase": "indexed",
+    "hash": "aedb31dc81f4fa9e7f2d3719740fd8e183bbf78e29843dde6424ddcb963cb2fc",
+    "lines": 105,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetRoutingResult.cs": {
+    "phase": "indexed",
+    "hash": "79195d4b8bb67c7c3ea6b9079522cfafc5c529ff8bbaa688df12e53533703eb9",
+    "lines": 118,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetTcoEstimateById.cs": {
+    "phase": "indexed",
+    "hash": "416aee64032ea803dd7380b4b6f512e55bbe051c0b12285ebbd33a099f8354b0",
+    "lines": 157,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/GetValidTciByEstimateId.cs": {
+    "phase": "indexed",
+    "hash": "de90a28a446511aa78be66fdd85a4435b582af16c6a4876317e7d62238610448",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/LoadEstimateEager.cs": {
+    "phase": "indexed",
+    "hash": "926c350fb2351c73647ea8f9292cb0b80aeb9d242efb372d23150060624f496f",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/MigrateCommissionPLItem.cs": {
+    "phase": "indexed",
+    "hash": "c20364bfef0ea9309ec9b1eccecca77683afda5c86ed5504ec5751b72c714fed",
+    "lines": 72,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/OverwriteEstimateById.cs": {
+    "phase": "indexed",
+    "hash": "37397797ebece183e2755062a29533de385a200ed4adb7e693dda915f46d6cf3",
+    "lines": 442,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/OverwriteShipment.cs": {
+    "phase": "indexed",
+    "hash": "9a8836485a0188509c3d67376a511ff79c68c93dfc7bd319fdce6940809ca45c",
+    "lines": 154,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/RemapEstimateVersionNumbers.cs": {
+    "phase": "indexed",
+    "hash": "7e9f25191d58ab7dc563412f34e9de4c231c04c81a3691cb98fdadf3ba790cc5",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/SearchEstimateIteneraryItems.cs": {
+    "phase": "indexed",
+    "hash": "a05436a05cdedb13e7f78f61f186ff4bbd8de6ca50f23b0e32a168832f0da606",
+    "lines": 85,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/SearchEstimates.cs": {
+    "phase": "indexed",
+    "hash": "74b5f823a3d431f5fe34d78a8a9cf1ed88462bf3754fa78f80e3b0038b6acad2",
+    "lines": 359,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/SummarizeFuelEuAndEtsAndExpensesFromBunkerLotsIntoBunkerEventsAndEtsEvents.cs": {
+    "phase": "indexed",
+    "hash": "59838b97f29c5d80dbed785b53a6107072abcda66b3d2ad8adb1bf1c046f2dcf",
+    "lines": 127,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ValidateEstimatePLItems.cs": {
+    "phase": "indexed",
+    "hash": "61ced254eafd14b9afa9fc87913d62c2c920d4238f729ab578e9df6481bee661",
+    "lines": 987,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ValidateEstimateProfitAndLossItems.cs": {
+    "phase": "indexed",
+    "hash": "c78c481c03fc51adafa8d0d81d854468f04f337a8ae694b9ff3231aeef167730",
+    "lines": 35,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ValidateEstimateRelationships.cs": {
+    "phase": "indexed",
+    "hash": "4bb1a01380603ad0326c55206439b955175495f9f9032ea209dcbf8154c59850",
+    "lines": 173,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/ValidateTcoEstimatePLItems.cs": {
+    "phase": "indexed",
+    "hash": "c008faa22435574f629de9bf6d723a7b56b81f47b4f4544570a911d047193f32",
+    "lines": 59,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/VoyageCreationValidation.cs": {
+    "phase": "indexed",
+    "hash": "d6392e2c0530cb6ef6f7a14f864163680ff5075813c4b0a08e5cc83fbc3fe5f5",
+    "lines": 114,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/EstimateShipmentCommissionPLItemGenerator.cs": {
+    "phase": "indexed",
+    "hash": "d657f8836f6d07a0e6ee82433fe0785a7f8555a9ec42e8aa34bcc6eeb7cb08ca",
+    "lines": 79,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/GenerateFreightCommissionPlItemsHelper.cs": {
+    "phase": "indexed",
+    "hash": "c91242b64d7800039e1d9a6665a7aed4b81e290ef1efe1d51642c218992dbdbd",
+    "lines": 108,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/GenerateInternalCommissionPlItemsHelper.cs": {
+    "phase": "indexed",
+    "hash": "fcfe3fcc5e99ebac2410c33b1b8b2b543d53259771262e881ef7e0e685b65d01",
+    "lines": 88,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/GenerateMiscRevCommissionPlItemsHelper.cs": {
+    "phase": "indexed",
+    "hash": "e932a175046b1dcc574eb37a89f1bbf4ff20b78c0b70307a7e0e604e9a57e81c",
+    "lines": 108,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/BunkerConsumptionEventHelper.cs": {
+    "phase": "indexed",
+    "hash": "cec92027bc207c9f8d00de28818161d7687c9cde49c938476eb4bd436c83c5b7",
+    "lines": 457,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/BunkerEventDtoExtensions.cs": {
+    "phase": "indexed",
+    "hash": "fac63ee8530ebd3675ecd7b5ecc1977c52daffcadc9d21cb17b6fadac6be8a5c",
+    "lines": 89,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/BunkerEventHelper.cs": {
+    "phase": "indexed",
+    "hash": "112d00c47680969e7802684d1cc6f29a87ffbe77e5c59ab62aff8e24b2e5f6a7",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/BunkerProfitAndLossItemHelper.cs": {
+    "phase": "indexed",
+    "hash": "c874289b34f651383e1752c236284f188b008a9e5096ddcec90f7caa4c47f90f",
+    "lines": 164,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/CalculateConsecutiveVoyageHelper.cs": {
+    "phase": "indexed",
+    "hash": "2e58ea70aa5032b05f8db130cc32a2b81a8bd4c2a68cb2b49af1ddb56eaa93b6",
+    "lines": 394,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/CloneEstimateIteneraryItemsHelper.cs": {
+    "phase": "indexed",
+    "hash": "ff68abfea6d7b958406f0053a8665bf02cf3a3e7c941498afdc9265efe96999a",
+    "lines": 64,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/ConsumptionRateCalculator.cs": {
+    "phase": "indexed",
+    "hash": "433ef5f38b4e699f013c02865a6ff905fdd32bcc0d0fad81d0246d7f36cc5c16",
+    "lines": 148,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/CubicSplineInterpolator.cs": {
+    "phase": "indexed",
+    "hash": "e880181cf6c44a9c5b6aa3b3646ce6269d2cf4c2127a9ccd847509e8bdbdaef9",
+    "lines": 56,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/DADeskInvoiceHelper.cs": {
+    "phase": "indexed",
+    "hash": "3eeb90ff3636f2f2d83667df220ca4891d7d97e65516e74fa8028a97527cb5fd",
+    "lines": 63,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/DailyRateInternalCommissionPLHelper.cs": {
+    "phase": "indexed",
+    "hash": "1af857bf179df536464a841a34189a94cc88bd08fc1abd966bcfc45309cc1eab",
+    "lines": 154,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/DailyRateInternalCommissionPLHelper.TimeCharterClaims.cs": {
+    "phase": "indexed",
+    "hash": "914057d446d995d61d30dbd9f3ea25fb1cee088edfb9ee9c7353b8cad331d044",
+    "lines": 231,
+    "file_type": "Helper",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/DailyRatePnIPLHelper.cs": {
+    "phase": "indexed",
+    "hash": "75bd1560a901fb5b1ecd791f581ab7e5ff979aaf3e9d4589dabe837920010446",
+    "lines": 166,
+    "file_type": "Helper",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/EstimateCargoIteneraryHelper.cs": {
+    "phase": "indexed",
+    "hash": "b3cb5176b33471e1ff3be7d62319f8c233dcca4398e16579a2963a03b3081ebb",
+    "lines": 1245,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/EstimateShipmentHelper.cs": {
+    "phase": "indexed",
+    "hash": "fae922f7eabd719ae1e689ee5ec1f65d4fd34a9cd9037a4e107ec86910eae4ba",
+    "lines": 356,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/EstimateTcoHelper.cs": {
+    "phase": "indexed",
+    "hash": "980835293a1947662926e89f0abbabc74db887cefa05bae98dd360cdebacbbf0",
+    "lines": 162,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/EtsIteneraryHelper.cs": {
+    "phase": "indexed",
+    "hash": "2622fafef80e0d9ac5be0b0909336103c24c6ab9c0a3ff89fd475921e69feeee",
+    "lines": 353,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/FuelEuIteneraryHelper.cs": {
+    "phase": "indexed",
+    "hash": "1778a506dfae0597d8d1e253d173251fddb18a3344a38026c4794973fb4f458c",
+    "lines": 154,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/IInterpolator.cs": {
+    "phase": "indexed",
+    "hash": "310ba255dd82b12245a33c566ae6a005c77f4219f8c4151c762133d05afbf550",
+    "lines": 9,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/LaytimeHelper.cs": {
+    "phase": "indexed",
+    "hash": "cbac79d9ebb7e999b0678819197c05c21384664b6cafdf3b915a4e5ef70a09e5",
+    "lines": 170,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/LinearLineInterpolator.cs": {
+    "phase": "indexed",
+    "hash": "3f334d61b065988619e4f35b535ca46f41961ae85d4ded5607f3c77ebdb076a8",
+    "lines": 65,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/MapDefaultValueUsdByInvoiceTypeForPlItems.cs": {
+    "phase": "indexed",
+    "hash": "bdaa3d6a1a3576622a56e19fd2717f724a2e39d2c6b269b33e79d64a63534d02",
+    "lines": 66,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/OptimalRouteHelper.cs": {
+    "phase": "indexed",
+    "hash": "6773ed28cce961046ddb3e20a3433aafdee00e03da272aef3f260df10df84128",
+    "lines": 526,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/ProfitAndLossItemHelper.cs": {
+    "phase": "indexed",
+    "hash": "38343ee9136bd62f043816558723c68ca8fcd5b0b0389f787cef1f5dee2aba46",
+    "lines": 303,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/ShipmentHelper.cs": {
+    "phase": "indexed",
+    "hash": "5c1bec02e700b998c0d8630c9325013414f060e851232e95209186cf9ac2adb5",
+    "lines": 614,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/TimeCharterClaimExtensions.cs": {
+    "phase": "indexed",
+    "hash": "9d420bfd31e3e65c41c319d348b49edb2a8be5b441cf5071940dc3837f92a259",
+    "lines": 129,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/TimeCharterCostAndRevenueHelper.cs": {
+    "phase": "indexed",
+    "hash": "752478fc40d40d59c6cdbcc147b10bdaf69ed38b720f5463a0f24b9573c63fcc",
+    "lines": 322,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/TimeRange.cs": {
+    "phase": "indexed",
+    "hash": "bee170514232650882268c9d7558ce29e20ae2c56b56d1286ed7b28410b5dac4",
+    "lines": 87,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/TransferCanalDataIntoFuelingOrCanalHelper.cs": {
+    "phase": "indexed",
+    "hash": "183d90fc157ba593b34aa455af18c50f453aa2768fad1aac9ad79e2add02567f",
+    "lines": 179,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/VoyageCargoItineraryHelper.cs": {
+    "phase": "indexed",
+    "hash": "cef9e77afe03b17274a7a2660076d4643c9fe808a0a90f91e7b099f31da69bba",
+    "lines": 208,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/VoyageEstimateHelper.cs": {
+    "phase": "indexed",
+    "hash": "5edd71216121217e26d7a20302f36c75ed6012e33e8327293506b6bd12810bad",
+    "lines": 86,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Helpers/VoyageEstimateMappingHelper.cs": {
+    "phase": "indexed",
+    "hash": "7028eede9fee7d6be7d2300ff135c5da839d06c8f3a619792305f67b0ea7e62f",
+    "lines": 144,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/IteneraryActivity/ApplyDefaultTimeLine.cs": {
+    "phase": "indexed",
+    "hash": "ea50fe19f08393c284ed6f472e2f031b57e05fb2e07e27b01cc65bc2650565bd",
+    "lines": 116,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/IteneraryActivity/SearchIteneraryActivities.cs": {
+    "phase": "indexed",
+    "hash": "7de2f9921d5cd88bf3182b1be82be150d07a08c5814d0d1ebb37f93823b354bf",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/IteneraryActivity/SyncIteneraryActivities.cs": {
+    "phase": "indexed",
+    "hash": "5460e4e477b2f4243cf1d765de3ca7900a6bd288d0622b2236fa38164081b461",
+    "lines": 55,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Itinerary/GetItineraryById.cs": {
+    "phase": "indexed",
+    "hash": "1a06adc95b085c8ca5f78aec76cfb8a7a5593de63b4ae6447efcbe1777d4207b",
+    "lines": 106,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/CalculateLaytimeGroup.cs": {
+    "phase": "indexed",
+    "hash": "191c69f9b825d2ed9b2963e55bf49e336edbb99a14e64e6651079bc7bf813fff",
+    "lines": 208,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/CreateLaytimeGroup.cs": {
+    "phase": "indexed",
+    "hash": "f91b0dbab011bb4a2c4dfafa19a3818f0aa41f0f8949d8b4baf5793f3709531b",
+    "lines": 185,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/DeleteLaytimeGroupItem.cs": {
+    "phase": "indexed",
+    "hash": "8c82562c7ddeadf64fe0046fd4f93d4d59fd0bc0c692b29c112770830249134a",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/GetAllClaimInfoItemsByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "b972a9edd5fbd277330c1bc32a33d4b16d7c4bf781ad74dfeb3488cd6cea5a86",
+    "lines": 99,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/GetAllItineraryItemsByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "05f5e208b6c1436d02e04c0c09f9bfe0d01f0eef0b23b6c738c9d6b0626a7b91",
+    "lines": 75,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/GetCurrencyExchangeRateForLaytime.cs": {
+    "phase": "indexed",
+    "hash": "a356d6ea03be7ce039e2a4e360e9b0422d54150e4889e9de190d428caf29476b",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/GetLaytimeCalculationPdf.cs": {
+    "phase": "indexed",
+    "hash": "756f772eba91db9bb88a86ee36bb1a3e98f8b6f397344367995ec3bb27150540",
+    "lines": 508,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/GetLaytimeGroupById.cs": {
+    "phase": "indexed",
+    "hash": "8f3e4fe5e24e2d0c9108f4b1facd3e0139706764052d5c755b3321b1c2be93ec",
+    "lines": 36,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Laytime/UpdateLaytimeGroupById.cs": {
+    "phase": "indexed",
+    "hash": "b02138d2649b75d96f8f2809edd35161a5198e7eb7954cfa6f3d96a46529ff44",
+    "lines": 138,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/OffHires/ExportOffHiresExcel.cs": {
+    "phase": "indexed",
+    "hash": "e6b62c9f39bd23b10151270189921978daab47b58c8a7204daea04d7c1ffd61e",
+    "lines": 144,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/OffHires/ExportOffHiresToBc.cs": {
+    "phase": "indexed",
+    "hash": "bd2d6292feb7b8b46478062cd72d35adc9dc102ed47b859159f6b2532a9b658f",
+    "lines": 74,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/OffHires/SearchOffHires.cs": {
+    "phase": "indexed",
+    "hash": "de9694fb02e2314b40be51611423097f59b2d4879721c9fd25139ff70c32fbd7",
+    "lines": 386,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/GetEstimateProfitAndLossItems.cs": {
+    "phase": "indexed",
+    "hash": "0427d84bb4d1279d9e2f2b070afbc1466fb2925d4296062eca4c280a4f7df08a",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/GetPLByEstimateId.cs": {
+    "phase": "indexed",
+    "hash": "a6590bea70eaf9aa66141ad3872fd6faab73900c5059f75057a6f8f19fd14917",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/PLCaculate.cs": {
+    "phase": "indexed",
+    "hash": "9cf362bf14c47e2f882097f256095ccfdf748f8f82a837e3dc8af7302b940ba0",
+    "lines": 134,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/PLGroup.cs": {
+    "phase": "indexed",
+    "hash": "ef8d53ce84cb73b94676b44e5ce9240a370e9a9b56e97c2b92af08f06e4aea4e",
+    "lines": 903,
+    "file_type": "Configuration",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/PLItemDescription.cs": {
+    "phase": "indexed",
+    "hash": "af426c4a04405a949db1d421d35d851a99bb9fb333b536fbd0fec2264463aa08",
+    "lines": 765,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/PLTcoCalculate.cs": {
+    "phase": "indexed",
+    "hash": "b4d229ebdb5ecb531725622a06c953601a7ccc5625d6302768f8f883c0f749d7",
+    "lines": 132,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/ProfitAndLossCategory.cs": {
+    "phase": "indexed",
+    "hash": "32117c24ca0837f66f548d099202d50a36d938a91aa44a2546a142617de0579e",
+    "lines": 727,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/ProfitAndLossSetter.cs": {
+    "phase": "indexed",
+    "hash": "dc6ee5b4e0271d7ea9d9f4103a0b477dc9ee4b12dcb810e793599ce4b6fa1a76",
+    "lines": 133,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/SearchPLs.cs": {
+    "phase": "indexed",
+    "hash": "aa2dbabc33d720f38958918b5a16661f2374ebf86300b2873d3cb3e1ecb03758",
+    "lines": 73,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/VoyageOperationalProfitAndLossOverallCalculate.cs": {
+    "phase": "indexed",
+    "hash": "ed73071a11d0f4b8a86dcd3a6c7ade37c5c4726741d4a6aa89d17608a08dab0b",
+    "lines": 330,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/VoyageOperationalProfitAndLossOverallRawCalculate.cs": {
+    "phase": "indexed",
+    "hash": "6411d2c6b41926a1e9e287ed41fff258e170fe13cbd4d57850f2d5a09a37a5fe",
+    "lines": 68,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/VoyageSummaryRecordsAssurance.cs": {
+    "phase": "indexed",
+    "hash": "d85c1457127570d16a14257312ecbe62e89fe595171b2dd76c39bce5fbe72e06",
+    "lines": 143,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/PL/VoyageSummaryStaticCalculation.cs": {
+    "phase": "indexed",
+    "hash": "57d5cfb8a9b824ae61c414c729bc1f399238d2f0147497a034fc890535ad1cb8",
+    "lines": 213,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/CreateQuotation.cs": {
+    "phase": "indexed",
+    "hash": "bbfeb19ffe763de8d647963bc5d284b5d324e596976bf1710e04843160cca4f7",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/GetQuotationByEstimateShipmentId.cs": {
+    "phase": "indexed",
+    "hash": "bf6c63eed51ba2beab36f4277239af7711299dccd6f44e88048415c0b9a367db",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/GetQuotationById.cs": {
+    "phase": "indexed",
+    "hash": "f9e621f5feb4b974e5118ca8b8dad1762bd8a43e0f01d4d36f3797eb6bce1de7",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/SearchQuotation.cs": {
+    "phase": "indexed",
+    "hash": "53c75eaccafd8c7c5e08f7d949c296727e497c71c71c9e812620f39915a1054b",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/UpdateQuotationById.cs": {
+    "phase": "indexed",
+    "hash": "0b645446394bb35d2bbf76a9bf7800f7d1e624eef8f5d26d9c7a870841a73fb9",
+    "lines": 46,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Quotation/UpdateQuotationToEstimateShipment.cs": {
+    "phase": "indexed",
+    "hash": "4057a78dc7635952620b821f8c1d66fc262d352b4241fe02a00e59266105285a",
+    "lines": 52,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Services/CalculateConsecutiveVoyageService.cs": {
+    "phase": "indexed",
+    "hash": "62925b788c01c47bddcf3c1c110ec62b2dac60068dab25d25c922dc077c648a6",
+    "lines": 66,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/CalculateInvoicedShipment.cs": {
+    "phase": "indexed",
+    "hash": "9dce5b45a6b279d2af5560a2720526c1cbd9144e037ce29e045760901fa323b5",
+    "lines": 70,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/CalculateShipmentWithDeletedInvoice.cs": {
+    "phase": "indexed",
+    "hash": "4c7a07c36eaac15611a672c357ee7d1bec6f67841387e68d83ad3f0029f39bf5",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/CompleteShipment.cs": {
+    "phase": "indexed",
+    "hash": "73604f0c0199159d07f01a4a9a2c5f480b5458d584b7e547933419abc069a742",
+    "lines": 70,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ConfirmShipment.cs": {
+    "phase": "indexed",
+    "hash": "b505a74cccf7abd93a704068c881598815a245cdf4766ba843652a3f95931539",
+    "lines": 75,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ConfirmShipmentValidation.cs": {
+    "phase": "indexed",
+    "hash": "189553801f355b49bf64e01180791c3631753cb4e29312ad1b5ae35b81925b96",
+    "lines": 39,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/CorrectShipmentStatus.cs": {
+    "phase": "indexed",
+    "hash": "cd4a711d258b1f9f2723de441d992bb1dba1cce7bef2eff0f04eb32b1e98f5b2",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/CreateShipment.cs": {
+    "phase": "indexed",
+    "hash": "a99f490f2d4bf8adb45f9833a400525cf71c69727c8ff49e7831c77e0693a31d",
+    "lines": 215,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/DeleteShipmentById.cs": {
+    "phase": "indexed",
+    "hash": "21469c85a7b1daf1374ab6872c28907e5a95fde764edfd7ed88babcb33feeaa2",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/EnrichMetaDataForPorts.cs": {
+    "phase": "indexed",
+    "hash": "6fbe79d8e98f5a945e222b600ea84e613a2773180b44525341eeefd9a0ae6937",
+    "lines": 29,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/EnsureShipmentsPLItemsCorrect.cs": {
+    "phase": "indexed",
+    "hash": "076a20364cb6b160e2ab237ca2d57c9f55327592f81e33a1d70aed241e4c3276",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportShipmentsExcel.cs": {
+    "phase": "indexed",
+    "hash": "069259a8c0c8cce90341c7ffb771637e0eea44d34a1c4a07aec930e7768a2d88",
+    "lines": 52,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportShipmentsPdf.cs": {
+    "phase": "indexed",
+    "hash": "34a4cc8f13f32cc7da056416242aaed2f9c234e9f4fe027074c505ac1e86f528",
+    "lines": 52,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GenerateDefaultShipmentQuantities.cs": {
+    "phase": "indexed",
+    "hash": "20f5bf6e18fffc11c4ede30c78f6222a785279297267cde985b941f88415e71b",
+    "lines": 62,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GeneratePlItemFromCommission.cs": {
+    "phase": "indexed",
+    "hash": "470ef6a4088fa94d169d961198f9e47aba322b174796b2ac7ecf7ee6a4be904e",
+    "lines": 50,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GenerateShipmentReportEmail.cs": {
+    "phase": "indexed",
+    "hash": "d9332a1cba77b8d26f30c1d1211e5f75a202cfc000d61c4230c2d837477cb581",
+    "lines": 146,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GetMostRecentExchangeRatesByShipment.cs": {
+    "phase": "indexed",
+    "hash": "e0aa8234749ea3a3c342a0d96a445d7a4c3e8f6d6edc66b564458afffc7af420",
+    "lines": 50,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GetShipmentByEmailId.cs": {
+    "phase": "indexed",
+    "hash": "b602a2f987c0907cd39ea9f272a373e7bb59cbc42945b405ebbc442663768654",
+    "lines": 47,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GetShipmentById.cs": {
+    "phase": "indexed",
+    "hash": "af83842a04576bdc89f3d7e11b20fe664469638123650ab680e82e79d092d4aa",
+    "lines": 150,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GetShipmentByIndex.cs": {
+    "phase": "indexed",
+    "hash": "68dc5d9bdc0d43c0ee234fe485c6129b89d18983a9055a2e8553b00044a57cb0",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/GetShipmentByRequestId.cs": {
+    "phase": "indexed",
+    "hash": "2d268f85946357e2e5c978be8c61743e5a0efd6d6de30cda00c4c9d4e005e436",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/LoadShipmentEager.cs": {
+    "phase": "indexed",
+    "hash": "5340393f2ce21c241c1e35ae594a62d44ec2b11403fd4437aa0e79742443adfe",
+    "lines": 77,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/MapInvoiceInfoToCommission.cs": {
+    "phase": "indexed",
+    "hash": "948335136c85a94eef6f339be1f37789db7c2869d95534a09a6fb954acabb40a",
+    "lines": 96,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/MapInvoiceInfoToPlItem.cs": {
+    "phase": "indexed",
+    "hash": "534aa0d15dc0c874970d40b88553aa828ef31e9984f52524b9f8c2a63972e7d7",
+    "lines": 68,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/SearchEstimateShipments.cs": {
+    "phase": "indexed",
+    "hash": "7ddbdc6815ca7b4e8309650d6a5c7e6fa8d0adcd0d2d4a13cf64c4d55e8ab2b8",
+    "lines": 70,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/SearchShipment.cs": {
+    "phase": "indexed",
+    "hash": "055182454623613955b673e9a77c585c863384bc6e5b4637dab5a0c3b7eab9d7",
+    "lines": 156,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/SearchShipmentNew.cs": {
+    "phase": "indexed",
+    "hash": "6a59c78d83f4e9e4aac194ef4a9ee3d60e7302e4862b2d55fb8c00ad6f8bbd16",
+    "lines": 177,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/SearchShipmentRestrictions.cs": {
+    "phase": "indexed",
+    "hash": "d602b52953d830bf8771b92a7f8e77e5de1b8726647958dbac846ba52973c8d2",
+    "lines": 47,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/UpdateShipmentById.cs": {
+    "phase": "indexed",
+    "hash": "7288f9383c0ed2329353bb7da27751915e740e3ab800a4299aaedc3fb82a1dec",
+    "lines": 112,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/UpdateShipmentPortPlanning.cs": {
+    "phase": "indexed",
+    "hash": "cf13876bf62d3417d1d72eead7ebfb7c614fdd3e508ad64de7d4f378c7b12ac7",
+    "lines": 88,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/UpdateShipmentQuantitiesByShipmentId.cs": {
+    "phase": "indexed",
+    "hash": "bd27ff7ede0f68accd7451fe84413902deae8429e1b870e25d8012ba02862c70",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ValidateShipmentCommission.cs": {
+    "phase": "indexed",
+    "hash": "818a504e58394fdcea0213358b759af1e4e17c6aa145a71de37d444ab601edbe",
+    "lines": 38,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ValidateShipmentInfo.cs": {
+    "phase": "indexed",
+    "hash": "be20f157d24f7cf0c5371d129400ad9b36ccd4a7f050d41320c57f985d15388f",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ValidateShipmentPLItems.cs": {
+    "phase": "indexed",
+    "hash": "9dc8692ee466e2628a6fb6bf71f1ba7e4fffa42d635bf8c2e211d2a60f8d07b7",
+    "lines": 142,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ValidateShipmentPorts.cs": {
+    "phase": "indexed",
+    "hash": "8b4a8d81905b0b8182190e53b37bedef208158062aecdef910e9cd2d877eaa2c",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ValidateTotalPortCost.cs": {
+    "phase": "indexed",
+    "hash": "fece0f32bb850f9939fb9f5cb1a67fff96f2e4000247cfc6404a9a576f395a60",
+    "lines": 31,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/ConfirmedShipmentExportStrategyPdf.cs": {
+    "phase": "indexed",
+    "hash": "e1c303f7318ebbe75ad074afe6b8533d109e9e386ba597962aa97e7588eab398",
+    "lines": 256,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/IShipmentExportPdfStrategy.cs": {
+    "phase": "indexed",
+    "hash": "4071e20d2112aa9b37d634257cb990b961680fe961710b654d8abdf7d0f61196",
+    "lines": 11,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/LoadedShipmentExportStrategyPdf.cs": {
+    "phase": "indexed",
+    "hash": "480b0b98e42ab398359d2019591d758492954e67718a67e7b6ce23055ef2a53a",
+    "lines": 258,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/NominatedShipmentExportStrategyPdf.cs": {
+    "phase": "indexed",
+    "hash": "679ed2414219227faa55c390ca62cafb9b931fd7b68fc4ce41788b4c2bd9d905",
+    "lines": 220,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/ShipmentExportPdfStrategyFactory.cs": {
+    "phase": "indexed",
+    "hash": "aa09b31626be1467636ee576e01aade476b9ec6fc7e2d92e09580445c17f497c",
+    "lines": 24,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/ExportPDF/ShipmentExportPdfUtil.cs": {
+    "phase": "indexed",
+    "hash": "f23368a79bde3ec5708dace5987e3ea89ae142aa69226ea7265806e404c59f5e",
+    "lines": 119,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/AfterConfirmShipmentUpdateHelper.cs": {
+    "phase": "indexed",
+    "hash": "1608da270141459d113c403a12a1485f908660fd26e63a438137c698bfd1c519",
+    "lines": 241,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/FromShipmentUpdateDtoToShipmentEntity.cs": {
+    "phase": "indexed",
+    "hash": "38beef665c30a78d3c5c8a785e2139a3e00125a62f945f213785104cbbf3e8fa",
+    "lines": 554,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/IShipmentUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "31a275949e70c5fdaa362eadf371be9cfd89e9eb7480252c3cb0faee9f6a4ad8",
+    "lines": 9,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentBeforeConfirmUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "903d835a81822329ded4097f4d349304d7de640af5f269857c9c15f74d697232",
+    "lines": 201,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentCommissionHelper.cs": {
+    "phase": "indexed",
+    "hash": "c15f1e303fa3e30d51e5bdbbbcc08240a9a9d0e4a5f277062cec12b00520d423",
+    "lines": 498,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentGeneralInforHelper.cs": {
+    "phase": "indexed",
+    "hash": "cfc14922c57b96833c8fbbd000e42de66353b0cb8390633e2b043d9f223e16e4",
+    "lines": 59,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentInConfirmUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "d10c1b8e091162ad72792e0553b35244992e08c98cbc657e53abd44b5e5973b2",
+    "lines": 98,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentInTransportUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "f77cfc6a9457e89bd007a8994931f2362f08017f8a12c7c36ba2a007590b75ab",
+    "lines": 59,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentNoUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "d027f7d376f153ecfe9ddcdfd6d85ea05cb282aaf24ebe72ae96d87d6df2ab0c",
+    "lines": 58,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentPortHelper.cs": {
+    "phase": "indexed",
+    "hash": "7901537851162139602f1a40d3e74a092b0459f92d1aadfe89e8b9018a70018b",
+    "lines": 24,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentProfitAndLostHelper.cs": {
+    "phase": "indexed",
+    "hash": "7005f6f94e307cc911b568610b88ffc7fadc399b8b0eba455b99d1426c846856",
+    "lines": 105,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentStatusCorrection.cs": {
+    "phase": "indexed",
+    "hash": "ebe5c9d78f2dd268aaf267b99d69c214ea600babe2a76e21e54febdc199fbcb5",
+    "lines": 80,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentStatusHelper.cs": {
+    "phase": "indexed",
+    "hash": "42599da6d933f492f45351f1ff1f0dc0fdc36b19df4c25bdca9c345dc273c589",
+    "lines": 239,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentStatusUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "9c876cd4af529d0526215e5708c18e0079250b2d0e0daac6e3ee56e1fc980997",
+    "lines": 66,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentUpdateStrategyFactory.cs": {
+    "phase": "indexed",
+    "hash": "b0da90c43f0c0c9741d137538ce1b20ad9b36440c0633c12803d6d079d504c8c",
+    "lines": 78,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Shipment/Update/ShipmentValidationHelper.cs": {
+    "phase": "indexed",
+    "hash": "e2ebf31122b9d66a35a765e6f72d12405b56232ff030789783c638d2e281be4d",
+    "lines": 213,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/SplitVoyage/GetSplitVoyageDetail.cs": {
+    "phase": "indexed",
+    "hash": "6b412f110df21d0fee39dc0ed91268eb8d7d184ef4bd7fc36cabb0fbd8d94530",
+    "lines": 207,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/SplitVoyage/SearchSplitVoyages.cs": {
+    "phase": "indexed",
+    "hash": "3780a388732d69d7c5e0f421d37095d38a30fa7fa04634b37ca526de1cbb60b5",
+    "lines": 148,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/SyncBunker/InitializeVoyageBunkerOrders.cs": {
+    "phase": "indexed",
+    "hash": "a56f9c0c7cbd95ada4d300a5965ad4587c8913baa9ee8e7dbe10b21b08aeedcf",
+    "lines": 249,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/SyncBunker/SyncChangesOfBunkerOrderIntoVoyageBunkerLotsAndReceivalEvents.cs": {
+    "phase": "indexed",
+    "hash": "13f94e8ff7631a26f7ea8e716a24331a3cb2eecc4fc9e7816d2955844150b39f",
+    "lines": 260,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/CheckOverlapTci.cs": {
+    "phase": "indexed",
+    "hash": "4f65b4687c00668e2ca0df5c0da01b8acea964447f94a986d76a5bc7940b1346",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/CreateTci.cs": {
+    "phase": "indexed",
+    "hash": "12651f9e5838000ded098c07251e003bee562288587fd012ed0c59c55268a18a",
+    "lines": 79,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/DeleteTci.cs": {
+    "phase": "indexed",
+    "hash": "bc0c6a528360408e60bdec46a7e0b912655c5880f0d94061b7dc0e6d201aaddd",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/GetTciById.cs": {
+    "phase": "indexed",
+    "hash": "3dc0451bda7ec3551ef641dc07181d4b2fa16f4e6acbcc6df91350f0ba9c172c",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/GetTciHireRateForPeriod.cs": {
+    "phase": "indexed",
+    "hash": "c3d3517b8a5f0c3238a4a5a1ed579cfd6de8abf3a467336719baffdbedfe9137",
+    "lines": 123,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/ProcessTciCommission.cs": {
+    "phase": "indexed",
+    "hash": "e13e3f459baa9590302dc637e94a33943207869112430b91d8a00d4d1b543256",
+    "lines": 30,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/ProcessTciCommissionPlitems.cs": {
+    "phase": "indexed",
+    "hash": "2ed42fc4c035f63872e8f24ecbffa2942da9bb158cdea0df1c4fc8f0d9d2412c",
+    "lines": 24,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/ProcessTciPlItems.cs": {
+    "phase": "indexed",
+    "hash": "0901c978b5b3e1e72cc7d122c53431abb17a50912a42e2c16459fa8adc752ad9",
+    "lines": 28,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/PullTciBunkerEntry.cs": {
+    "phase": "indexed",
+    "hash": "8121a42dfc612ae1e0431580aea8678015df1fec46e98636561c56bd33691be1",
+    "lines": 186,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/SearchTcis.cs": {
+    "phase": "indexed",
+    "hash": "c7eb85695ae9f95fb240ae8603074e5d729fc9318619bd58d7190cb574fbfbd3",
+    "lines": 294,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/TCICostCalculator.cs": {
+    "phase": "indexed",
+    "hash": "ca0ee25abc43bc04910b8708d5454ea5bb93a124c98d96786a3df8153ddd5949",
+    "lines": 233,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/UpdateTciById.cs": {
+    "phase": "indexed",
+    "hash": "eb082772973e9bed08f08ec4fe460e06099d226b706b22048979e18b7a96d468",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/Update/ITciUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "d88d4f2dbeeacea751205bcf95f73daa6b4c8d95340f5b36a38ebd5deea303aa",
+    "lines": 10,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/Update/TciFullUpdateHelper.cs": {
+    "phase": "indexed",
+    "hash": "6241308855a90a027b958c62a7b13bcf615bb05000b0eaaf0d590e976038bef4",
+    "lines": 136,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/Update/TciFullUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "a7907061221dd61486d0f356836c7758914b3c1cd570f333853b88da94389721",
+    "lines": 97,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/Update/TciNoUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "25e0dff45b591109398fe3cc944e46dcd7e300a424a6bc0f09cb493fc60e14d3",
+    "lines": 30,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tci/Update/TciUpdateStrategyFactory.cs": {
+    "phase": "indexed",
+    "hash": "25042efebc5bfaad6d2c25aa15c79de35b18453d0399c87ffe5ba5a435fa3166",
+    "lines": 33,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/CalculateVoyageOperationalTcoActualTime.cs": {
+    "phase": "indexed",
+    "hash": "3c72d21d11be1bb39b48e19fc019b61ef22b53d2edea1c959b9b82b8ce1ffa45",
+    "lines": 150,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/CompleteTco.cs": {
+    "phase": "indexed",
+    "hash": "f870df7f17bdc524e5b67ae06f1a03542aa7faecf9003cdeaa7e022f35485427",
+    "lines": 55,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/ConfirmTco.cs": {
+    "phase": "indexed",
+    "hash": "5c1be33d79f00c91e5c1207c4c18e2dd00f3601eb9ba60ed158c74f2ef10c183",
+    "lines": 62,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/ConfirmTcoValidation.cs": {
+    "phase": "indexed",
+    "hash": "17251438b23286748ac2a548208193325c8a7d7577aaf8344b7bc49a188f4172",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/CreateTco.cs": {
+    "phase": "indexed",
+    "hash": "b595302556b99d57bd490328f95d9e199728d8be844585c1272308711c4323f4",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/CreateTcoFromEstimate.cs": {
+    "phase": "indexed",
+    "hash": "a17f9b57b7ab42a81ffce7445376d26f2cc8447e46147387ce820c24c3fd93d2",
+    "lines": 79,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/DeleteTco.cs": {
+    "phase": "indexed",
+    "hash": "3cf199712d610f1924c5477dede16a6d5a16d636db7c51d1eeaf38e2b2505855",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/GetTcoById.cs": {
+    "phase": "indexed",
+    "hash": "c198c73d1b540b241da1d2ae7c6cc6e4535075c085311bf70e403c52aa340bdd",
+    "lines": 247,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/PullBunkerEntry.cs": {
+    "phase": "indexed",
+    "hash": "1c784282d06cbfad4255132a94288c6179655f7057921c3077e84e63854a2cf4",
+    "lines": 183,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/SearchTcos.cs": {
+    "phase": "indexed",
+    "hash": "d3eab995de830a4bf35dc597c5073376b039ba1e2ccac3989707b2a29c323d83",
+    "lines": 293,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/TcoEstimationMappingHelper.cs": {
+    "phase": "indexed",
+    "hash": "e02da60e721aff7926a06c7820181ee32ec6c39feb9d8a3fe2c3d7ada1c2a6d7",
+    "lines": 62,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/TCORevenueCalculator.cs": {
+    "phase": "indexed",
+    "hash": "5ec195ee54a3bdc612c40e1e8e9c6fc6e26462da35ef8234af783b6309730e99",
+    "lines": 302,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/UpdateTcoById.cs": {
+    "phase": "indexed",
+    "hash": "c88e30075f7294d0b85f03bf9c4231c149e37c342a9f6df93a9b5788975488f0",
+    "lines": 81,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/ITcoUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "65642f42a96eebbe8867098e444064c8da0d11e2f9102be000bfc81ac91de383",
+    "lines": 10,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoFullUpdateHelper.cs": {
+    "phase": "indexed",
+    "hash": "4cf33cd914fc8cfad62274d010d61ce2bfb43a40b36d98c1095a4dcfd2fc9b29",
+    "lines": 197,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoFullUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "3333fe7f0db47d47c0bafdb54caa4f8fbfdd7af8605a91b9444a64477ebbd9fc",
+    "lines": 92,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoNoUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "b4687ffe9068375804695ef56e381bf9055cb13b93218c19e436597bd1d4f680",
+    "lines": 34,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoRestrictedUpdateHelper.cs": {
+    "phase": "indexed",
+    "hash": "92cdeefca1c6151b47522dcc1cd6aa87fce1e4782e644d29f568cacdd66cf317",
+    "lines": 185,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoRestrictedUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "2ae2be4196517b9395d0425738ccef4103b58b5d11e2ae56524b3f8260cdde49",
+    "lines": 89,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoStatusCorrection.cs": {
+    "phase": "indexed",
+    "hash": "d34e1aa26e61103dcab486afb554fc217453751dad85b015ff02c9bfcd52e66a",
+    "lines": 50,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoStatusUpdateStrategy.cs": {
+    "phase": "indexed",
+    "hash": "111eb300a5f4f25e089767b626700af20ba96e2a66c531ddac220e1f0b943f76",
+    "lines": 62,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Tco/Update/TcoUpdateStrategyFactory.cs": {
+    "phase": "indexed",
+    "hash": "744e5f79494dd0e9fe37c8df7cb57645a01cba24a4a4237621f747e38cecb2b7",
+    "lines": 53,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/TimeCharterCommissionProcessor.cs": {
+    "phase": "indexed",
+    "hash": "013b1bf1051aca8b27de684f8d121928007bbc1ef0132527d59a5fa8f02d2e71",
+    "lines": 103,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/AutoMapper/TimeCharterMappingConfiguration.cs": {
+    "phase": "indexed",
+    "hash": "3b53fdd4b8262f8f95f65dbb2f88c1a542d341b20cedf423163ee63e5bb836e9",
+    "lines": 159,
+    "file_type": "Configuration",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Extensions/EstimateExtensions.cs": {
+    "phase": "indexed",
+    "hash": "a8b03be882632da4cbd46c42db858487bfbf5cbf604cc0a4b0afff0484212562",
+    "lines": 22,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Extensions/TimeCharterExtensions.cs": {
+    "phase": "indexed",
+    "hash": "aa14fa9ac2684ebaad9b778adf96929a0d34aebfe956cf1626ce1a948ea33452",
+    "lines": 25,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterBunkerAdjustmentHelper.cs": {
+    "phase": "indexed",
+    "hash": "dbf013813ddc90f8aa9505b3ce624117ad8de722bb70422020da2119e6e2e84c",
+    "lines": 49,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterBunkerEntryExtensions.cs": {
+    "phase": "indexed",
+    "hash": "b61561049336b62f81a510d14146e037d6b38987b462874ccf546681fff46345",
+    "lines": 88,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterBunkerEntryHelpers.cs": {
+    "phase": "indexed",
+    "hash": "893aff15cc25abf7f83c7269cc1885a9a85aa192009a3f380bd3ba596d4da8dd",
+    "lines": 374,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterCalculationUtil.cs": {
+    "phase": "indexed",
+    "hash": "450da69727fcf1c51cf8f42a08688134e0ee578af2686530697b7efaccaf4922",
+    "lines": 1281,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterCommissionHelper.cs": {
+    "phase": "indexed",
+    "hash": "569986e45f11d2a830b6df934e649e38ade8acad6b6233495c6dde070bcf8a39",
+    "lines": 322,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Helpers/TimeCharterHireRateCalculatorHelper.cs": {
+    "phase": "indexed",
+    "hash": "9669e0277caa8075e2fdf48474e3e2b1f80b078dd3fd44bef1e745754bbe7a61",
+    "lines": 183,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/PlItems/BaseTimeCharterPlItemUpdater.cs": {
+    "phase": "indexed",
+    "hash": "871cb78512670387716dadec45d4e67285c9d456d8259a5b87f5f903921af87a",
+    "lines": 49,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/PlItems/TimeCharterProfitAndLossOrchestrator.cs": {
+    "phase": "indexed",
+    "hash": "3c379d484ee8a69d3a4d337581a9deddf1e9813d75c8adecd6360d01b1ee818b",
+    "lines": 299,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Services/BunkerCalculationService.cs": {
+    "phase": "indexed",
+    "hash": "cfddb9f5d2072b4865164e707541a3744ddbde385c60811cd0f74f47c247afc8",
+    "lines": 422,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharter/Services/PaymentBasisCalculationService.cs": {
+    "phase": "indexed",
+    "hash": "9387378a5d572b8a927232fb7eeade03ce9c4de54c9f1e4ea0efdf73a8ebbfb7",
+    "lines": 303,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/CalculateOffHireDaysByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "c083fc3cdf328199de00428d81eff99b3012542145cde483b1dde1054449bcc0",
+    "lines": 49,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/CalculateTimeCharterClaim.cs": {
+    "phase": "indexed",
+    "hash": "dc50bee5b6386cbe5ad16525a4fa11c4ec4b3e262f673687dc3008d949b9c051",
+    "lines": 122,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/EstimatePriceForBunkerPlItem.cs": {
+    "phase": "indexed",
+    "hash": "e357fb37843ac39da9c934c1fcdb55b00a3658051c86f1ce54216393337ea81d",
+    "lines": 71,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/GetTimeCharterClaimsByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "b4a71070aa57d163c99ed7d10229872b6d56814705c3e021a113e7c12babed9c",
+    "lines": 111,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/SetTimeCharterClaimsByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "cbbe3b4042fee5caea9ee78116030a3de5885f7fec4eb1baf9792367fe93a2ee",
+    "lines": 202,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimHelper.cs": {
+    "phase": "indexed",
+    "hash": "7b95b6f5206cabd042a1a6dd55140e11b9bf0418469c4402789a1607559f6591",
+    "lines": 99,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimPLCalculator.cs": {
+    "phase": "indexed",
+    "hash": "95f89f4e6df930e050b3790d3d35e32e6167f178074f269da48d1cde59088310",
+    "lines": 270,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimPLSanitizer.cs": {
+    "phase": "indexed",
+    "hash": "e772f1d4c7ba296d62a33d7a18cfeb4ca209f18fa322faed67ab5d2b5e263837",
+    "lines": 42,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimSanitizer.cs": {
+    "phase": "indexed",
+    "hash": "5e6a3f12a5b0d8186a5967a4209bb5b9728d605c56ef260e743a552ed418c28c",
+    "lines": 374,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Shared.cs": {
+    "phase": "indexed",
+    "hash": "7956ff65cfdf746e197edfa6612d9a1efe788efc78cab1e6ba9269dd814f38a5",
+    "lines": 47,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/TimeCharterClaimPLDataSource.cs": {
+    "phase": "indexed",
+    "hash": "747fe3f378cba01a535da099fc738e6de9794fbdf69a0279bf92ce75bec41b49",
+    "lines": 368,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Bunker.cs": {
+    "phase": "indexed",
+    "hash": "32c103112cf2a4ee783fd2bbc731c65de828de15421cae8a2080fe932ac98a97",
+    "lines": 201,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Commission.cs": {
+    "phase": "indexed",
+    "hash": "17c9326697e37c62b8e044fc4de0d4cc04769f57b0686c0f3494188c3c747d5d",
+    "lines": 155,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Cve.cs": {
+    "phase": "indexed",
+    "hash": "729917ffd303014ae26636a2d6080cdb2c2677f7811c07742ea101658f6f2259",
+    "lines": 98,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Ets.cs": {
+    "phase": "indexed",
+    "hash": "d7612f8530da7c16d893233c4e76472c5f08b3ab4d386aeaf8548f463847a566",
+    "lines": 152,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/FuelEu.cs": {
+    "phase": "indexed",
+    "hash": "3b08dcf588502671f7590e58244f1b2d6010a8f6c1e30fed0f445a6650be2ac9",
+    "lines": 180,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Hire.cs": {
+    "phase": "indexed",
+    "hash": "1269f136fe8b5b93877930bc5f0ab13b6df1c6a9ac2a7edd2aaad20b0be71f43",
+    "lines": 112,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ApproveVesselReport.cs": {
+    "phase": "indexed",
+    "hash": "4c8f3ad09da5aa2f4348c84a7dad64a26bcca0cb835d2175ae7dde9d61e4baab",
+    "lines": 121,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/CleanVoyageReportedData.cs": {
+    "phase": "indexed",
+    "hash": "e59da5ca5c2de7f49df8117be88b10b2df8ed73ca8ac6b22e3f377c035e8d99d",
+    "lines": 88,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/CreateVesselReport.cs": {
+    "phase": "indexed",
+    "hash": "5f326bf6755a20676df9d34649ddc00b9d5ca22a86ee5fe73517985daf9b7e2f",
+    "lines": 48,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/DeleteVesselReports.cs": {
+    "phase": "indexed",
+    "hash": "4bba3604a973de52b96c89036170872858b84b64d0d9466e0d01d0aae0875414",
+    "lines": 95,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ExecuteWfosImportWithHistory.cs": {
+    "phase": "indexed",
+    "hash": "9846e5dfe3aec712aec84263a6553bcebb0d561fc81d35bfabf64d1d8f264dd0",
+    "lines": 157,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ExportVesselReportFinanceExcel.cs": {
+    "phase": "indexed",
+    "hash": "03e85c9b38f47e38aeccaff2647faf87e231fe987be151dfc6c7f9e5662597fe",
+    "lines": 87,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/GetTimeZoneByLatAndLong.cs": {
+    "phase": "indexed",
+    "hash": "53523dff4636acca6da4abd153dc89f2e5f0ad2c559fa255aece36724370c5fb",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/GetVesselReportById.cs": {
+    "phase": "indexed",
+    "hash": "5a762c487ea59b61e1243f2a81f3a9777a5ec15421d447d80d61957cfc085675",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/GetVesselReportFinanceById.cs": {
+    "phase": "indexed",
+    "hash": "fc734946e1de1ca2b386e352b30cea886f718d1949ebe904b2e694e2e90c1308",
+    "lines": 82,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/HandleShouldCompletePreviousVoyageAndCommenceCurrentVoyage.cs": {
+    "phase": "indexed",
+    "hash": "0134fc683d1cdd4eb403a273bd58433a0089ea34e8f743d8783da52aab1f57cc",
+    "lines": 238,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ImportRecentWfosReportsForVessel.cs": {
+    "phase": "indexed",
+    "hash": "336ad17f3b01c04112caf36b6dbf955bc048913f2ee0b788a701f0160541af85",
+    "lines": 134,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ImportWfosReportsForVoyage.cs": {
+    "phase": "indexed",
+    "hash": "12198ea8a4613f3a4ba7798e04cdcb20dc067f217efe1680967b6da128731b2e",
+    "lines": 150,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ProcessDestinationIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "bbadf2598479ba61d096634b2dfa3a355fc1f951e112e39f44d48afdc2c32ba3",
+    "lines": 221,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ProcessOriginIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "7a94a1aea9d0cef4dc32b884bed7c053ff161a3def93e0a636c9bc1f24c8cf50",
+    "lines": 186,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ProcessVesselReport.cs": {
+    "phase": "indexed",
+    "hash": "f9678ef15d74d4015e9e6fb96a22e09e86f411aa301b56f235c864cbab38bd3d",
+    "lines": 659,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ProcessVesselReportFinance.cs": {
+    "phase": "indexed",
+    "hash": "8ead80977bdedf34a31220721f9b49060a306a6dd43471cb8b5834df22cb40e2",
+    "lines": 117,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ProcessWfosReportRawDataV2.cs": {
+    "phase": "indexed",
+    "hash": "575e8a686d706c8d58049c3dd994912bd05f5b3a848b93e27297f5875bd13f92",
+    "lines": 125,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/PropergateUpdatesFromOneVesselReportIntoOtherReports.cs": {
+    "phase": "indexed",
+    "hash": "eb3490d1392a4b1f9e75de38cd56b46ec59fa061ad340664020c99ffa1da05ab",
+    "lines": 206,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/SearchVesselReports.cs": {
+    "phase": "indexed",
+    "hash": "7fb35af4a2b569ab074f3de12d50c34a2a3cd9acfc4ac070a25945f0f66c307b",
+    "lines": 112,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/SearchVesselReportsFinance.cs": {
+    "phase": "indexed",
+    "hash": "741ba6f7b55702b88cea6dbac498dcb3a293a719d12aa21240e71eeb257ff719",
+    "lines": 209,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/SyncWfosVesselReportByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "2150c20596e6ee18e9eed9a964c5258b2675bbd15ef83123373f3e13c620c0eb",
+    "lines": 110,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/UpdateVesselReportById.cs": {
+    "phase": "indexed",
+    "hash": "8d8a437907790aa3632529b5a78e0cc160a9d58dc11fb86ad44422f34293776e",
+    "lines": 120,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/ValidateVesselReportForApproval.cs": {
+    "phase": "indexed",
+    "hash": "dfc3978ddb910715d9f03fa4556873679f237097daa3bb536e987a0eadf42754",
+    "lines": 405,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/Helper/ActivityTimeLineHelper.cs": {
+    "phase": "indexed",
+    "hash": "f9ec949d2b0f9e46b7713dcfb7e3fb2f826f825cd3cec0f366fa00f6eb5baef5",
+    "lines": 271,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/Helper/ApproveVesselReportHelpers.cs": {
+    "phase": "indexed",
+    "hash": "79676848f2bd75d0dcc200908e03cbf0a26e17993c7dfce38b398c66b20016b5",
+    "lines": 351,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/Helper/ConsumptionPriceHelper.cs": {
+    "phase": "indexed",
+    "hash": "e78d3f67bf8245f506c285262630b4a9564b0b6197ad3cd22b6401232b3b5205",
+    "lines": 44,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/Helper/ReportConsumptionHelper.cs": {
+    "phase": "indexed",
+    "hash": "850421df3fd3536e6fd58126552679db5d866ccddd030ed310c38d36bceb1c94",
+    "lines": 479,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessor/Sync/SyncBuilder.cs": {
+    "phase": "indexed",
+    "hash": "645488d76ca9b67f11e2232a218be1b3fd73a2c6746c5ce81ae4a66f8b4630b4",
+    "lines": 157,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessor/Sync/Helper/ApplyHelper.cs": {
+    "phase": "indexed",
+    "hash": "c2b46471ddb3bb62a2442066509aff7099c1f75f4242c9647ae986d5ad9e9c1c",
+    "lines": 90,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/ImportContext.cs": {
+    "phase": "indexed",
+    "hash": "aa4fe68e99a22161004b65fe18bb3745fa7850a8866820f4b11bd6066130b981",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/ImportHandler.cs": {
+    "phase": "indexed",
+    "hash": "08ad064619099461a34a7ea2efb471095af6add57bfaeafe8cb40f0cf97160e6",
+    "lines": 98,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Handle/ArrivalHandler.cs": {
+    "phase": "indexed",
+    "hash": "27909357f4bee60d58496190c3ec5dbd040b0fc19a5544e4abd561a4395c3015",
+    "lines": 24,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Handle/BunkeringHandler.cs": {
+    "phase": "indexed",
+    "hash": "2e788c437f26447389ef57aa2d6ad0d83977140d3a516f8f696b151f0c853f4e",
+    "lines": 28,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Handle/DepartureHandler.cs": {
+    "phase": "indexed",
+    "hash": "7d6ca4d95fef854c4b33507881d7b3b059f1a9364e0e96445b91aa8866c11c0f",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Handle/InPortHanlder.cs": {
+    "phase": "indexed",
+    "hash": "90d409f5f069b5458b365786928ba88d7e179df895777aad158d5cacb0f29ba0",
+    "lines": 24,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Handle/PositionHandler.cs": {
+    "phase": "indexed",
+    "hash": "c6e8da7a2c0e8fa3d669cd281d14ab492541639245c6141656571458ca94d327",
+    "lines": 117,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Helper/BunkerHelper.cs": {
+    "phase": "indexed",
+    "hash": "e8ac9bb95f63e6fdff568d19b519c04e57c04960abe9ea8be0980a5732729714",
+    "lines": 193,
+    "file_type": "Helper",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Helper/ItineraryHelper.cs": {
+    "phase": "indexed",
+    "hash": "b0006c2d16505be1b7921cab8b244f1e1735d0248a412aa8a81027f087482500",
+    "lines": 70,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Helper/TimeHelper.cs": {
+    "phase": "indexed",
+    "hash": "307462c53388034fba6e5d44c9426d6d5eb5da0317d5e1285268c7914738162f",
+    "lines": 63,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/VesselReport/WfosProcessorV2/ImportV2/Helper/WfosParseHelper.cs": {
+    "phase": "indexed",
+    "hash": "157903c7fee2fa7b76cad62ea94f9aaf2bc82f041ee1557879ad2499f9453b43",
+    "lines": 40,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/AddEstimateToVoyageEstimateList.cs": {
+    "phase": "indexed",
+    "hash": "887296151e560f396a9813a8eeea71244fcb62a69a26de12b462b40b0448e22e",
+    "lines": 58,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ArangeVoyageNumber.cs": {
+    "phase": "indexed",
+    "hash": "7c007076527933093e3d1ffa1abc2194fec39c8b8beb46818b48e9740d7ea150",
+    "lines": 79,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CalculateAndSaveConsecutiveVoyage.cs": {
+    "phase": "indexed",
+    "hash": "b982a59cd500ebf6fa5ebe8cfe7a0543f04a4872be78ff62d4bd91ff8d1e4416",
+    "lines": 180,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CalculateVoyage.cs": {
+    "phase": "indexed",
+    "hash": "4fe0c30093df77bd8046670e7676f49fdd67979ddc345583a2d71e9963b61b3d",
+    "lines": 191,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CommenceVoyage.cs": {
+    "phase": "indexed",
+    "hash": "60674c6fd3be3e26ff66e2079ff31cf4b5aed76013bada812cc13a2a2b3a4a68",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CompleteVoyage.cs": {
+    "phase": "indexed",
+    "hash": "2944671c575fb567a0e5afc4576cef467c99b190f1d46a1ea95cff9416410262",
+    "lines": 75,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CreateAndGetFuelItineraryItemId.cs": {
+    "phase": "indexed",
+    "hash": "52cac3ca6a423290b7d0c3faad222291808a764087bff5349548724aa6dc52c5",
+    "lines": 146,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CreateEstimateLinkForAllVoyages.cs": {
+    "phase": "indexed",
+    "hash": "47a2f17468b7811605366f9651fff64dfb4a1e1aa578740cbf765e418ace1873",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CreateVoyageFromEstimate.cs": {
+    "phase": "indexed",
+    "hash": "9c3ecd61df424e316897c4d5fbb2321b91c791698c19142f9cf1e3defb6de426",
+    "lines": 754,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CreateVoyageProfitAndLossPdf.cs": {
+    "phase": "indexed",
+    "hash": "6d786be7e9eddbb2c330b0331660f23d6a257e8a309f6afc77236da9b5a312d3",
+    "lines": 505,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/CreateVoyageRemark.cs": {
+    "phase": "indexed",
+    "hash": "02b6c29d8c0a913d9ba2daeb15741def6bfaf0f9aac3c15f57bec0320e12f9cf",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/DeleteVoyageById.cs": {
+    "phase": "indexed",
+    "hash": "21598ea7a228c8c0322519856b9d2b2ec45bcd93f80c81de11fc3474c9a2cad8",
+    "lines": 487,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/DeleteVoyageFinancialData.cs": {
+    "phase": "indexed",
+    "hash": "3810b3c120d6c394dc9291ef48a274873db1053125ac18a759d60d3964331396",
+    "lines": 80,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/DeleteVoyageRemarkById.cs": {
+    "phase": "indexed",
+    "hash": "09d654fe34c0272c82afaf4a2bf61e3b11944d742d3fa9d94a0a893b161a2c94",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ExportTcoVoyagePdf.cs": {
+    "phase": "indexed",
+    "hash": "51fbcfaf79c4bcd4a3a7099f37fac6508b779a10fe2827c3415ddd9490c1957c",
+    "lines": 234,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ExportVoyagePdf.cs": {
+    "phase": "indexed",
+    "hash": "ed4d477b52ba13d9ed31dae36d3f01fe16f774610b85687dc5f12001c6b7ae61",
+    "lines": 325,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetAllVoyageEstimateLinks.cs": {
+    "phase": "indexed",
+    "hash": "ad90c6ab7970f248dccc955e4a628b20001d6366b67602f134fe91994cc6a6a5",
+    "lines": 57,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetBunkerSummaryAtVoyageIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "6f74bc496ed1fc827d462c59e221ab266611d1f580ad11283431009212e66cb0",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetDraftEstimateByVoyageId.cs": {
+    "phase": "indexed",
+    "hash": "0a8a5dade3253b21a850c7f5967d4c3326d2380285dca4a1e5cc488a91f4fdfb",
+    "lines": 110,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetMinimalVoyageById.cs": {
+    "phase": "indexed",
+    "hash": "50c0a8faef3430d57e3fb0dc0d8b50c59a0aac959942cb41a0579c1dbc0a4ffd",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetProfitAndLoss.cs": {
+    "phase": "indexed",
+    "hash": "d4695f99c8364088fb052f461ad25c6098e7fcbbb6a118df1884b66248e3e32a",
+    "lines": 1257,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetSuggestedVoyageNumber.cs": {
+    "phase": "indexed",
+    "hash": "5ca016acc3d5b27dd0b996ceecd0f9e458065ac7a0976d0d5c250f300f22782b",
+    "lines": 36,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetVoyageById.cs": {
+    "phase": "indexed",
+    "hash": "716e7d6c22cb1e1e2f0e1d4ba0d6d2de8d2538bf3263019f23805dc601c6a717",
+    "lines": 304,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetVoyageIteneraryById.cs": {
+    "phase": "indexed",
+    "hash": "a2f3110c14386dc694fc47ce45001acf9ec81aae6d01e3b405d6e867792dd90a",
+    "lines": 44,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetVoyageRemarksById.cs": {
+    "phase": "indexed",
+    "hash": "219b674ea78b2922e76ae8baddd2efa03a34bdfb49f5d22cf415bc1d07928aba",
+    "lines": 41,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/GetVoyageShipmentRelationshipsById.cs": {
+    "phase": "indexed",
+    "hash": "390f0b05658bd71042381e448a09976a3f7e29fc034de1ac6b6113f318a0f122",
+    "lines": 84,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/LoadVoyageEager.cs": {
+    "phase": "indexed",
+    "hash": "1246bb6ca77bca1c93ebae64977fb06c976461f3c1d7dee0c5bbe2e545b3adc1",
+    "lines": 175,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/MarkEstimateAsPrimaryForVoyage.cs": {
+    "phase": "indexed",
+    "hash": "5acc15c9bc1ac2d5c513fd63059d9689b9131d2089e506ac7d796e16966ac4b4",
+    "lines": 105,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ReCalculateAndSaveVoyageById.cs": {
+    "phase": "indexed",
+    "hash": "0f4bbf9df578b91da3b71f420109d49a2118b426e26d8a2d6ae62febd5d4c0df",
+    "lines": 54,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/RemoveEstimateFormVoyageEstimateList.cs": {
+    "phase": "indexed",
+    "hash": "91657fcb4d29077195b7d22fcca13b3a1bde065e00357d8a912f4d4d415c1ee0",
+    "lines": 56,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchConsecutiveVoyageOptionsForVesselId.cs": {
+    "phase": "indexed",
+    "hash": "cd3287a0d2324737b543fa99c849c4a0e6759d48e5b5afba26f340e0598f889b",
+    "lines": 63,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchVoyageIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "1936b658c3a873b0369f383c6fd98367287effe6763f92e6c1efc8640ce25196",
+    "lines": 86,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchVoyagePLItems.cs": {
+    "phase": "indexed",
+    "hash": "6dbe3733c8878b45cb0b7cbb37f9cedc40d968da8ade7da98269b5657977c534",
+    "lines": 224,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchVoyageReceivalEvents.cs": {
+    "phase": "indexed",
+    "hash": "6d278c3552ae4d864affa457c494db115544f6014562cedc99c2976c68a54610",
+    "lines": 37,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchVoyageRemarks.cs": {
+    "phase": "indexed",
+    "hash": "fd47744cd7e3de09915152991a401a49f4d81711f34536a5651851801fd60388",
+    "lines": 51,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SearchVoyages.cs": {
+    "phase": "indexed",
+    "hash": "8a1b5d4cec35f9fb883cd6573f870e0eb7e61b5c4ff22eef98232a759c7b81f1",
+    "lines": 611,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SyncAllVoyagesDataToBusinessCentralByVoyageIds.cs": {
+    "phase": "indexed",
+    "hash": "f8c09c9c62f99ba951924000d99f074cac676f04f295e330438a3d8a34b9ee64",
+    "lines": 58,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SyncBuyBackPricingFromTcoIntoTimeCharterOutVoyageBunkerOrdersOwnershipChangeLogs.cs": {
+    "phase": "indexed",
+    "hash": "55bf6543201989e2deea9a6478ad800c23b69ebd8ae4149e388244305e201672",
+    "lines": 78,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SyncVoyageItineraryPortDa.cs": {
+    "phase": "indexed",
+    "hash": "94108467d4035b188280d682fb5c13c63a7f0af1cd8fd41983bc663b31a6ebff",
+    "lines": 95,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SyncVoyageWithShipments.cs": {
+    "phase": "indexed",
+    "hash": "cafd9585a8062b427218c0a51931b8b640d2679ac30682d35a69ec08065fb938",
+    "lines": 182,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/SyncVoyageWithTCO.cs": {
+    "phase": "indexed",
+    "hash": "582dc0fa40491b117fc0102fe598c54c10a5048e83981070d88a2a8af1d287ad",
+    "lines": 258,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UndoVesselStatusFromIteneraryItem.cs": {
+    "phase": "indexed",
+    "hash": "af7f1106fa9f53d87564c0dc51545c9d1ecf706c8e489d21b0b3e293bee069fe",
+    "lines": 103,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UpdateConsecutiveVoyagesSequenceNumbers.cs": {
+    "phase": "indexed",
+    "hash": "6829bcde0bded3e1dc4f87187ec36011483f2354b39fb4afd934982f39b69fea",
+    "lines": 212,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UpdateVoyageById.cs": {
+    "phase": "indexed",
+    "hash": "6f7ece41b3422326555e4c1798002740901298110ff55f670d75417a4b4906e9",
+    "lines": 267,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UpdateVoyageRemarkById.cs": {
+    "phase": "indexed",
+    "hash": "76d3745b0e7568775c5ff7dda1efb478d50d0b89e2c86dadc64f1ce780631290",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UpdateVoyageRole.cs": {
+    "phase": "indexed",
+    "hash": "4a1900b18006212879429b8657d56ee8b8f63f6590a6ebc0b9925e9d70539e0e",
+    "lines": 69,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/UpdateVoyageStatus.cs": {
+    "phase": "indexed",
+    "hash": "58704b9f0ec0d9a02d122679b74303505b7f9179b25817f038e5b9c528bae081",
+    "lines": 39,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ValidateVoyageCanBeDelete.cs": {
+    "phase": "indexed",
+    "hash": "c5ab79fdb7c2f82d572d638762a3680f1efe6c9564653c714dee84b7935d10a8",
+    "lines": 250,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ValidateVoyageNumberCanBeChange.cs": {
+    "phase": "indexed",
+    "hash": "53981e85969f969f987f13028445c0b7469ded04592c2af3d9429caca7d1ef9b",
+    "lines": 167,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ValidateVoyageSequenceNumbersCanBeChange.cs": {
+    "phase": "indexed",
+    "hash": "74e5d5964d944c29b5535349bd61e7c4c912002a43cc5cad6e22faa942dfd9f9",
+    "lines": 132,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/ValidateVoyageSequenceNumbersCanBeReducedByOne.cs": {
+    "phase": "indexed",
+    "hash": "0b4df638ff1aa5e4debcb6a4a34f382572b3fae67a218b8ce8be89e7c8721f84",
+    "lines": 64,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/VoyageDataValidationHelpers.cs": {
+    "phase": "indexed",
+    "hash": "6d1837e048e65a07cade1e86efa14b2cdcf817b6740ec1ae4720bf4474445bd0",
+    "lines": 192,
+    "file_type": "Validator",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/VoyageProfitAndLossService.cs": {
+    "phase": "indexed",
+    "hash": "4b0168ea6ee6ade562f055e06fdbf7e050c611f04bef5684a5a48dd612e267bd",
+    "lines": 312,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/RemoveShipmentFromVoyage/CheckCanRemoveShipmentFromVoyage.cs": {
+    "phase": "indexed",
+    "hash": "7048f3c4603101305ea1e20139c20119f64538f1f5fa0a359b99cb08b695adf0",
+    "lines": 375,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/RemoveShipmentFromVoyage/LinkedItineraryItemQuery.cs": {
+    "phase": "indexed",
+    "hash": "9d43a9b03687cdea5829d6010ea5810e66db4cb7ea7ceed6762e9d66e57a6578",
+    "lines": 127,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/Voyage/RemoveShipmentFromVoyage/RemoveShipmentFromVoyage.cs": {
+    "phase": "indexed",
+    "hash": "32fa026d82f1ab9c68961999f6287d2c36f4691eb910161d70bedfe4a6afa663",
+    "lines": 268,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/AddEstimate.cs": {
+    "phase": "indexed",
+    "hash": "b51143676cb2d44bc31a35030b26e1668660b798bfd16b76341e91488e850190",
+    "lines": 60,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/CreateWorksheet.cs": {
+    "phase": "indexed",
+    "hash": "0a7f7f14703a9091baf4042673c77115b30439e0cee1cd27a434d58f36ebd5bf",
+    "lines": 53,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/CreateWorksheetEstimates.cs": {
+    "phase": "indexed",
+    "hash": "86eda591d3c1677061eb03d81c6d2933d7eca156ee86702908aca6840de636be",
+    "lines": 76,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/GetAllWorksheetEstimates.cs": {
+    "phase": "indexed",
+    "hash": "f13fc47ab3d46f5e81ef935c9cfd1ef2cf40dd2d2f5cbb0833fbd49555bed735",
+    "lines": 83,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/GetWorksheetById.cs": {
+    "phase": "indexed",
+    "hash": "dd047d71de409933242c95e3d15566a7dba29ade4fc84af0aded5fbd83b04a7a",
+    "lines": 40,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/GetWorksheetsByEstimateId.cs": {
+    "phase": "indexed",
+    "hash": "fc333a925572c309467813a1c360825bb21a7044a996d6e67ae34e63b87b98c0",
+    "lines": 45,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/SearchWorksheets.cs": {
+    "phase": "indexed",
+    "hash": "af6c461b729259cdde4a3ffc9305b72821add8f0888cc539cdd73e1cb3a427ca",
+    "lines": 107,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/UpdateWorksheet.cs": {
+    "phase": "indexed",
+    "hash": "f147c680f3614edb14fda36f6312590c808e97fe74246ceb2fa37225e4981f49",
+    "lines": 93,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/ValidateWorkSheetEstimates.cs": {
+    "phase": "indexed",
+    "hash": "97b0005c37f75e91414b5697259854d90a05636dc16afc29933d2ff8c65f9d7c",
+    "lines": 49,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business/VoyageManagement/WorkSheet/ValidateWorkSheetName.cs": {
+    "phase": "indexed",
+    "hash": "98ef828e3c0e18624b863852284ff2b8e84a98d42cf2adbbca9c1d6179ada2ca",
+    "lines": 43,
+    "file_type": "Handler",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/CommandDescriptor.cs": {
+    "phase": "indexed",
+    "hash": "2963ec1067edf160ce8ba758a6a9be78ee5245722f62222df65328d2025b14a1",
+    "lines": 193,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Program.cs": {
+    "phase": "indexed",
+    "hash": "2b192f6e32ff2730aa2ac38d5ff833df28807c3ae1b6226ae64700841504596f",
+    "lines": 88,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Hosts/OrderRequestHost.cs": {
+    "phase": "indexed",
+    "hash": "22dbd1ff0c929d80b7df3d797150cf48d5792e2c0ff5c8b96548d8583d12780a",
+    "lines": 131,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Hosts/Override/DummyEmailClient.cs": {
+    "phase": "indexed",
+    "hash": "ba9302c1d73fad4b8bec1d0aec29b4a3a920d5517f8242532854a17b476d030b",
+    "lines": 11,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/LogToReportProvider.cs": {
+    "phase": "indexed",
+    "hash": "a90ab90be7a3c58cf5991b7f749121c15f4976eb72117e135ed6b21c074355e7",
+    "lines": 35,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/ProfilingHelper.cs": {
+    "phase": "indexed",
+    "hash": "6bf9f99d105f44cfa1816a2b213026d3a6f2a577ae293589726bf37396ab2686",
+    "lines": 25,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/ReflectionUtils.cs": {
+    "phase": "indexed",
+    "hash": "a60ebbd42eaf7bf4945682987e62f8601d7bd6217a1985bdb8a0039a91493d11",
+    "lines": 24,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/TestcaseStorage.cs": {
+    "phase": "indexed",
+    "hash": "8015ea9d679d7a5bf7aa387d45e6ad55358de3396c27faa75bf840ac377669a5",
+    "lines": 41,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Database/DatabaseBackup.cs": {
+    "phase": "indexed",
+    "hash": "20fb84d41a54ab6ec8a53f509599fd491f84e9deafecc9eab7118937de941bfb",
+    "lines": 43,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Database/DatabaseBackupEngine.cs": {
+    "phase": "indexed",
+    "hash": "0877055c653ac6beea7d1db2a10c0ec2f03e36b1d421de1eb49390ffa7b202e7",
+    "lines": 145,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Database/DatabaseRestoreEngine.cs": {
+    "phase": "indexed",
+    "hash": "74a105decb752795a896eee30f5f157a7946816e8982fc3e275c1fad2d36131a",
+    "lines": 48,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Database/DatabaseRetore.cs": {
+    "phase": "indexed",
+    "hash": "d86202051c84899c9fa0000f98183bd68511c085255c80fc9b39c36e02159ab9",
+    "lines": 63,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Report/ReportBuilder.cs": {
+    "phase": "indexed",
+    "hash": "61f265e4612614f436c10c4d67d825de85d09891641d8388f50b075e691923e2",
+    "lines": 102,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Report/ReportBuilderExtensions.cs": {
+    "phase": "indexed",
+    "hash": "9d021389117c6d31cd86a73628273420c9ccbbcf9f0c92bfc115f93cc1ff7e03",
+    "lines": 52,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Misc/Report/ReportSchema.cs": {
+    "phase": "indexed",
+    "hash": "9915d4bd7b0b886e87b3d9936d1320836e4206f895fa8be16afef63070c24026",
+    "lines": 26,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Schema/RequestSchema.cs": {
+    "phase": "indexed",
+    "hash": "03ff40f986c43fdf1bc9865ca2ba558db13b87b4eb68b6a6120225c045a133cd",
+    "lines": 89,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Schema/ResponseSchema.cs": {
+    "phase": "indexed",
+    "hash": "6272a3089c0bc2ee9d619fce4e5a0352e4c13a864135c69c9df3a5c03c34de1d",
+    "lines": 7,
+    "file_type": "Dto",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Schema/TestcaseSchema.cs": {
+    "phase": "indexed",
+    "hash": "cfcb4bb57669e50f9cce81aeb28dfe01c0dc6c105feb6165c6e5fb0c00517b6b",
+    "lines": 21,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestAsRoot/IntegrationTestAsRoot.cs": {
+    "phase": "indexed",
+    "hash": "3f39186224001925d7526941db1263d9b44e379d3d48714788fa9e36ce038999",
+    "lines": 39,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestAsRoot/Steps/GenerateToken.cs": {
+    "phase": "indexed",
+    "hash": "85725b3bfc0876b26c1c3b08c67ad146c19a9a507b073cea720907aa34a31dd9",
+    "lines": 17,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestAsRoot/Steps/CalculateEstimateFlow/CalculateEstimateFlow.cs": {
+    "phase": "indexed",
+    "hash": "78bb74a4c1ef410a5df88d75cd4c948492be737f55d5ebcd10602bdd58a56900",
+    "lines": 20,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestAsRoot/Steps/CalculateTcoEstimateFlow/CalculateTcoEstimateFlow.cs": {
+    "phase": "indexed",
+    "hash": "ef40cffe20c0468e0d074c1099642427d420530646554d57fbfe59eeba5c474e",
+    "lines": 20,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestAsRoot/Steps/CreateVoyageFlow/CreateVoyageFlow.cs": {
+    "phase": "indexed",
+    "hash": "a04a49298cbdc37d5188b5c9f0740f04eb99197ae5ad3545ab59cb683539af15",
+    "lines": 38,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestQueryHelpers/Test.cs": {
+    "phase": "indexed",
+    "hash": "babaac406850b225648f081e33aebe460a4e1e4074f824cb0952930abd498321",
+    "lines": 46,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestQueryHelpers/Steps/SoftIncludeShouldFilterDeletedEntities.cs": {
+    "phase": "indexed",
+    "hash": "e995a7df9b8fda874ea7365c0357b592f25868efbf9746c5c6797f48e4a873e1",
+    "lines": 120,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/TestQueryHelpers/Steps/SoftIncludeShouldReturnParentWithEmptyCollection.cs": {
+    "phase": "indexed",
+    "hash": "4939bb3b5d5f2a578b68c03d18f1fa1e60d8dfd5f6f193ead21416c3a0c9b14c",
+    "lines": 107,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/[Abstract]/BaseIntegrationTest.cs": {
+    "phase": "indexed",
+    "hash": "efb7241b05a6d7b31362ecff103c4159f2314329b720feb7f57bc8e829dfe086",
+    "lines": 252,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/[Abstract]/BaseTestStep.cs": {
+    "phase": "indexed",
+    "hash": "8f342e72b625b8309cec3d723b8902dbafb805d901e8a5fab10674b65ef1b45a",
+    "lines": 220,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.IntegrationTest/Tests/[Abstract]/IntegrationTestAttribute.cs": {
+    "phase": "indexed",
+    "hash": "ba93c659ed482fe2b9627c3809ca84f2282e352f86dc0e639a73b0b1b21e23fd",
+    "lines": 8,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Usings.cs": {
+    "phase": "indexed",
+    "hash": "e8de9b91579ba661cbfebd3912328c2dc917d2a519cc565b717446c7f39e6d33",
+    "lines": 1,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Builders/TcoBuilder.cs": {
+    "phase": "indexed",
+    "hash": "94f33a9df3b04d59067cbdacd6932bbd35624e72800cf49727ca072e972fe5e5",
+    "lines": 188,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/BunkerOrder/CalculateBunkerOrderCosts.Tests.cs": {
+    "phase": "indexed",
+    "hash": "5b871ac520c8e2934f40e22d6d5b1b098d7681600c9e33d9a134075748ed244f",
+    "lines": 774,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/BunkerOrder/GetBunkerOrderDetailByIdTests.cs": {
+    "phase": "indexed",
+    "hash": "58dbdb82b73f33cb2d4bbc77516d80abb67e69d8315f4baeb4c027be58b51a97",
+    "lines": 110,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/DaylighSavingTime.Test.cs": {
+    "phase": "indexed",
+    "hash": "050bcde4567059f146391eaa13da42a57c354de9f44a9662c0e49a90287eaa92",
+    "lines": 45,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/DummyMediator.cs": {
+    "phase": "indexed",
+    "hash": "4943e0159466f357d4bef6482fe5099be52bbfb1700a1408086fda66ad701db2",
+    "lines": 43,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/InjectServiceExtensions.cs": {
+    "phase": "indexed",
+    "hash": "fe487e7d4478c6132b5c3f8009dcc7daeb2938fffd05e39b962bd294860cf796",
+    "lines": 46,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/TestServiceProviderFactory.cs": {
+    "phase": "indexed",
+    "hash": "5fcd858a8f67511ef553c97c3c440b1c730fa0b2ec601efefb1424135e931773",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/TestUserAccessor.cs": {
+    "phase": "indexed",
+    "hash": "74274a7a8bb220ba67a5de2ecb1c71ad8a3139d7068adb0b189b24014d1c5d79",
+    "lines": 41,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Common/TimeZoneConverter.Test.cs": {
+    "phase": "indexed",
+    "hash": "f5f6b25ddc26f0a39ce10760c85da40d831a4eaab73e3223e9472a82b71109ab",
+    "lines": 34,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/Finance/ProfitAndLoss/ProfitAndLossItemPropagateService.Test.cs": {
+    "phase": "indexed",
+    "hash": "cbec1a8281ebe8dd5cf9725351a7edb8794f1b9c996882e0d6745ad728ce5dd6",
+    "lines": 156,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Archetype.Test.cs": {
+    "phase": "indexed",
+    "hash": "f60de68f3e84cff45d302fc6366ed71c2dce60f96b0a06613255bc628cc0c358",
+    "lines": 137,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/BunkerType.Test.cs": {
+    "phase": "indexed",
+    "hash": "771800e102acffe1837cce8be74827c0effa8e78a4ce0b4aba5aa1716a723912",
+    "lines": 151,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/BusinessPartner.Test.cs": {
+    "phase": "indexed",
+    "hash": "764138d54d8297a0f5bfaed97044ae47ea8895c6bf3783e92556353dc8c209e5",
+    "lines": 93,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/CompanyType.Test.cs": {
+    "phase": "indexed",
+    "hash": "2aa25e31fcd3695601493a2939c8c443c16bde90064bb572a01b8dbb681b068f",
+    "lines": 89,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Contact.Test.cs": {
+    "phase": "indexed",
+    "hash": "f4f21f3d4065e01c2e02f01bbe4d39bd0a6abb39f96de95e5db99d27f4495301",
+    "lines": 120,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/DataSyncJob.Test.cs": {
+    "phase": "indexed",
+    "hash": "f207e26975fc21b34283540b0cb5abc90cfe1f5c93cd4974adc28885447d3d00",
+    "lines": 75,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/InvoiceType.Test.cs": {
+    "phase": "indexed",
+    "hash": "4b8845d626cb7f34c8ca43bd4086c45c9bcd24b2a6fde93e3d204d501278af53",
+    "lines": 137,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Port.Test.cs": {
+    "phase": "indexed",
+    "hash": "380a7f4f4b90a8dcc5fd325ab0d4bfc5ae4e35244226ab6ce945c0d86307a469",
+    "lines": 148,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Term.Test.cs": {
+    "phase": "indexed",
+    "hash": "f5164f9e8ecbe8d7cff4b52ce5742ffdba927e8bdc4836a1f51eef80c0d88512",
+    "lines": 129,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Vessel.Test.cs": {
+    "phase": "indexed",
+    "hash": "e1e28742a0baa9ba9fb682c41086e7928a1803f1b1be07eaf914fe94d82f3be9",
+    "lines": 429,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/VesselConsumption.Test.cs": {
+    "phase": "indexed",
+    "hash": "ff61e61fe61dff99fa96494ccb2ffc682f907d110953cf7d818a73ac9c860f3f",
+    "lines": 188,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/VesselType.Test.cs": {
+    "phase": "indexed",
+    "hash": "1d3f39eb7525498624a6e8140f394183b458f5b7364290b967af5ae7ac23ad2e",
+    "lines": 127,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/BusinessLine.Test.cs": {
+    "phase": "indexed",
+    "hash": "411b1a0db01cf0830402486f5311f7998cba49fc1d06d67c7e21ff4813708fad",
+    "lines": 207,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/BusinessRule.Test.cs": {
+    "phase": "indexed",
+    "hash": "6d3419f246e97d251dcd02f3818faed45e68ee197a143b70e943dd318d592285",
+    "lines": 299,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/CompanyBank.Test.cs": {
+    "phase": "indexed",
+    "hash": "ad90af0da50e63242ba41340ae8792620ac626146d596718e1e0072b59579ca6",
+    "lines": 167,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/Currency.Test.cs": {
+    "phase": "indexed",
+    "hash": "25b7d03b59ca56ef4148d2f0be05ac8ec9ae925e6349ebb419247d802e668329",
+    "lines": 235,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/DaInvoice.Test.cs": {
+    "phase": "indexed",
+    "hash": "6f5bda80badc8a91872daa10c4cfc960fb7df7f881537b30b285351d75b84238",
+    "lines": 1819,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/FreightInvoice.Test.cs": {
+    "phase": "indexed",
+    "hash": "8da9171bb81b1cba56921c880b421aa5a6358a634949b0c98c15c17a6299c25f",
+    "lines": 281,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/GeneralAccount.Test.cs": {
+    "phase": "indexed",
+    "hash": "6cc8039d8566f5ba2533ae2dca5d61c2891327484bdbd151092ad96ba3b37cef",
+    "lines": 245,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/Invoice.Test.cs": {
+    "phase": "indexed",
+    "hash": "5c1c373621ab40ba3694c1d3013328c9d76e566178ede05cbc19dfd620757206",
+    "lines": 158,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/InvoiceTransaction.Test.cs": {
+    "phase": "indexed",
+    "hash": "606db80b254333b6cf04638399af2abee701e0d5e7cd13a83f0c6e0d26b97509",
+    "lines": 610,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/Payment.Test.cs": {
+    "phase": "indexed",
+    "hash": "ee4cd07d538309172464221bedde7959eb066d3f79558eeecc55bce63f86edef",
+    "lines": 185,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/PaymentTerm.Test.cs": {
+    "phase": "indexed",
+    "hash": "96f9483ff466fd54ffb7fa0ab80a148570c9b8f41f4519048c3e63e4d8e9dd31",
+    "lines": 154,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/Receivable.Test.cs": {
+    "phase": "indexed",
+    "hash": "5e889e7f8085263e07f424bde25d5b6933e7c20eb944195011123fcf6260506b",
+    "lines": 876,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/ReversalReason.Test.cs": {
+    "phase": "indexed",
+    "hash": "1411ebec299bcb505f3cf86cacc772937acad0aff8457324e8fdb000c446f584",
+    "lines": 245,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/Finance/VoyageOtherRevenueInvoice.Test.cs": {
+    "phase": "indexed",
+    "hash": "a13e15aed056b176ec1c899e56f1052e2336ba8b2cae62b03878fade6b70562f",
+    "lines": 402,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/MasterData/PL/VoyageProfitAndLossOveralCalculate.Test.cs": {
+    "phase": "indexed",
+    "hash": "ccc4b5fcf826ce5f23b268471dbbe6bd27dd4e7c88c8d0f285c5e93c98d27ae0",
+    "lines": 54,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/ProfitAndLoss/VoyageOperationalProfitAndLossOverallCalculate.Test.cs": {
+    "phase": "indexed",
+    "hash": "0afbbb0a550939c903dea4cc245c9a52c9b9461fef66ee61e31905ab2d380db3",
+    "lines": 46,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/TaskAlert/GetFieldsForEntity.Test.cs": {
+    "phase": "indexed",
+    "hash": "d3938df71a039df3eeff49043a204f622bdc2313d2e9b827740c50e6506a24ae",
+    "lines": 59,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/TaskAlert/RuleSet.Test.cs": {
+    "phase": "indexed",
+    "hash": "846db53e147f33276d5120117c7d4d02a9742889d4f0fb4434adeeeb5793d10c",
+    "lines": 531,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/TaskAlert/TaskAlert.Test.cs": {
+    "phase": "indexed",
+    "hash": "5355528a5b2604e333e9c4b94834334e26723395ba5e707a503cca585fdcb084",
+    "lines": 494,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/TaskAlert/RuleEvaluation/RuleEvaluationService.Test.cs": {
+    "phase": "indexed",
+    "hash": "f1528fdcb44cda5a605e9896759d1c232624ab06d03ffc1f0e9875de5f8befa1",
+    "lines": 795,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/UserManagement/Office.Test.cs": {
+    "phase": "indexed",
+    "hash": "6d7d72e7c9137990699e11f4633f92a135a5cdc8244900b41fdac9ab00d28772",
+    "lines": 172,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/UserManagement/SearchUserTest.cs": {
+    "phase": "indexed",
+    "hash": "ee35fb05ea2cb5d5170382ee4dbeb064a1a79f63b000615aad66d8ecbdebb9b2",
+    "lines": 153,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/UserManagement/User.Test.cs": {
+    "phase": "indexed",
+    "hash": "668034868da999a0d26d3300217eee25dd646ebc6ca7ae31e27e02df6104c22d",
+    "lines": 113,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/Estimate.Test.cs": {
+    "phase": "indexed",
+    "hash": "571676a8ffe1d085116a8f211688de38de0cca8b40394ca7b2250cc142afc783",
+    "lines": 100,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Business.UnitTest/VoyageManagement/HireRateCalculator.Test.cs": {
+    "phase": "indexed",
+    "hash": "bc1704cc5ebf0158b00320ff8cadbd58eccd0f7bfd04cbffa3a17fb28ac32f1d",
+    "lines": 385,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
   }
 }
