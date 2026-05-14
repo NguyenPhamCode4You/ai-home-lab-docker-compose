@@ -16,6 +16,7 @@ Concurrent batches controlled by the `concurrency` parameter.
 import asyncio
 import os
 import re
+from datetime import datetime
 
 from .cia_config import (
     OPENROUTER_SYNTHESIS_MODEL,
@@ -316,15 +317,17 @@ async def synthesize_workflow_documents(
             pass_a_tasks.append((module, verb_cluster, list(file_paths), output_path))
 
     print(f"[Phase 4 Pass A] Modules: {list(clusters.keys())}, {len(pass_a_tasks)} clusters to synthesize")
+    total_a = len(pass_a_tasks)
     workflow_summaries: list[str] = []
 
-    async def _pass_a_item(module_v, verb_cluster_v, file_paths_v, output_path_v):
+    async def _pass_a_item(module_v, verb_cluster_v, file_paths_v, output_path_v, task_idx: int):
         cluster_label = f"{module_v} — {verb_cluster_v}"
         tmp_path = output_path_v + ".tmp"
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
         if os.path.exists(output_path_v):
-            print(f"[Phase 4 Pass A] SKIP (exists): {output_path_v}")
+            ts = datetime.now().strftime("%H:%M:%S")
+            print(f"[Phase 4 Pass A] {ts} [{task_idx}/{total_a}] SKIP (exists): {output_path_v}")
             with open(output_path_v, "r", encoding="utf-8") as f:
                 return f.read()[:500]
         context = _load_enriched_docs_concat(file_paths_v, enriched_folder, max_chars=40000)
@@ -333,7 +336,8 @@ async def synthesize_workflow_documents(
             return None
         llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL)
         synthesizer = CSharpWorkflowSynthesizer(llm_model=llm)
-        print(f"[Phase 4 Pass A] Synthesizing: {cluster_label} ({len(file_paths_v)} files)")
+        ts = datetime.now().strftime("%H:%M:%S")
+        print(f"[Phase 4 Pass A] {ts} [{task_idx}/{total_a}] Synthesizing: {cluster_label} ({len(file_paths_v)} files)")
         try:
             with open(tmp_path, "w", encoding="utf-8") as out_file:
                 async for chunk in synthesizer.stream(context=context, question=cluster_label):
@@ -344,7 +348,8 @@ async def synthesize_workflow_documents(
             os.rename(tmp_path, output_path_v)
             with open(output_path_v, "r", encoding="utf-8") as f:
                 summary = f.read()[:500]
-            print(f"\n[Phase 4 Pass A] DONE: {output_path_v}")
+            ts = datetime.now().strftime("%H:%M:%S")
+            print(f"\n[Phase 4 Pass A] {ts} [{task_idx}/{total_a}] DONE: {output_path_v}")
             return summary
         except Exception as exc:
             if os.path.exists(tmp_path):
@@ -352,11 +357,11 @@ async def synthesize_workflow_documents(
             print(f"[Phase 4 Pass A] ERROR: {cluster_label}: {exc}")
             return None
 
-    for batch_start in range(0, len(pass_a_tasks), effective_batch):
+    for batch_start in range(0, total_a, effective_batch):
         batch = pass_a_tasks[batch_start : batch_start + effective_batch]
-        results = await asyncio.gather(*[_pass_a_item(*t) for t in batch])
+        results = await asyncio.gather(*[_pass_a_item(*t, task_idx=batch_start + i + 1) for i, t in enumerate(batch)])
         workflow_summaries.extend(r for r in results if r)
-        if batch_start + effective_batch < len(pass_a_tasks):
+        if batch_start + effective_batch < total_a:
             print(f"[Phase 4 Pass A] Sleeping {CLOUD_BATCH_DELAY}s (rate-limit guard)...")
             await asyncio.sleep(CLOUD_BATCH_DELAY)
 
@@ -370,8 +375,9 @@ async def synthesize_workflow_documents(
         target["output_path"] = os.path.join(module_folder, f"{target['flow_name']}_CRITICAL_deep_dive.md")
 
     print(f"[Phase 4 Pass B] {len(pass_b_targets)} critical deep dives...")
+    total_b = len(pass_b_targets)
 
-    async def _pass_b_item(target_v):
+    async def _pass_b_item(target_v, task_idx: int):
         flow_name = target_v["flow_name"]
         file_paths_v = target_v["file_paths"]
         output_path_v = target_v["output_path"]
@@ -379,7 +385,8 @@ async def synthesize_workflow_documents(
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
         if os.path.exists(output_path_v):
-            print(f"[Phase 4 Pass B] SKIP (exists): {output_path_v}")
+            ts = datetime.now().strftime("%H:%M:%S")
+            print(f"[Phase 4 Pass B] {ts} [{task_idx}/{total_b}] SKIP (exists): {output_path_v}")
             return
         context = _load_enriched_docs_concat(file_paths_v, enriched_folder, max_chars=60000)
         if not context:
@@ -387,7 +394,8 @@ async def synthesize_workflow_documents(
             return
         llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
         analyzer = CSharpCriticalWorkflowAnalyzer(llm_model=llm)
-        print(f"[Phase 4 Pass B] Deep diving: {flow_name} ({len(file_paths_v)} files)")
+        ts = datetime.now().strftime("%H:%M:%S")
+        print(f"[Phase 4 Pass B] {ts} [{task_idx}/{total_b}] Deep diving: {flow_name} ({len(file_paths_v)} files)")
         try:
             with open(tmp_path, "w", encoding="utf-8") as out_file:
                 async for chunk in analyzer.stream(context=context, question=flow_name):
@@ -396,16 +404,17 @@ async def synthesize_workflow_documents(
                     out_file.write(chunk)
                     out_file.flush()
             os.rename(tmp_path, output_path_v)
-            print(f"\n[Phase 4 Pass B] DONE: {output_path_v}")
+            ts = datetime.now().strftime("%H:%M:%S")
+            print(f"\n[Phase 4 Pass B] {ts} [{task_idx}/{total_b}] DONE: {output_path_v}")
         except Exception as exc:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
             print(f"[Phase 4 Pass B] ERROR: {flow_name}: {exc}")
 
-    for batch_start in range(0, len(pass_b_targets), effective_batch):
+    for batch_start in range(0, total_b, effective_batch):
         batch = pass_b_targets[batch_start : batch_start + effective_batch]
-        await asyncio.gather(*[_pass_b_item(t) for t in batch])
-        if batch_start + effective_batch < len(pass_b_targets):
+        await asyncio.gather(*[_pass_b_item(t, batch_start + i + 1) for i, t in enumerate(batch)])
+        if batch_start + effective_batch < total_b:
             print(f"[Phase 4 Pass B] Sleeping {CLOUD_BATCH_DELAY}s...")
             await asyncio.sleep(CLOUD_BATCH_DELAY)
 

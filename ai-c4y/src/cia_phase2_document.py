@@ -17,6 +17,7 @@ Idempotent: skips files already at phase="documented".
 import asyncio
 import json
 import os
+from datetime import datetime
 
 from .cia_config import (
     CSHARP_LARGE_FILE_LINE_THRESHOLD,
@@ -111,7 +112,7 @@ async def write_csharp_documents(
         batch = to_process[batch_start : batch_start + effective_batch]
         used_cloud_this_batch = False
 
-        async def _doc_file(rel_path: str):
+        async def _doc_file(rel_path: str, file_idx: int):
             nonlocal used_cloud_this_batch
 
             abs_path = os.path.join(codebase_path, rel_path.replace("/", os.sep))
@@ -132,11 +133,12 @@ async def write_csharp_documents(
             is_critical = entry.get("is_critical", False)
 
             model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_CODE_MODEL) if force_local else _select_doc_writer_model(lines, injected_count, is_critical))
+            ts = datetime.now().strftime("%H:%M:%S")
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
-                print(f"[Phase 2] CLOUD — {rel_path} ({lines} lines)")
+                print(f"[Phase 2] {ts} [{file_idx}/{total}] CLOUD — {rel_path} ({lines} lines)")
             else:
-                print(f"[Phase 2] LOCAL — {rel_path} ({lines} lines)")
+                print(f"[Phase 2] {ts} [{file_idx}/{total}] LOCAL — {rel_path} ({lines} lines)")
 
             writer = CSharpDocumentWriter(llm_model=model)
             index_context = _build_index_context(rel_path, index)
@@ -157,11 +159,12 @@ async def write_csharp_documents(
                         out_file.write(chunk)
                         out_file.flush()
                 manifest.set_phase(rel_path, "documented", {"doc_path": out_path, "lines": lines})
-                print(f"\n[Phase 2] DONE: {rel_path}")
+                ts = datetime.now().strftime("%H:%M:%S")
+                print(f"\n[Phase 2] {ts} [{file_idx}/{total}] DONE: {rel_path}")
             except Exception as exc:
                 print(f"[Phase 2] ERROR: {rel_path} — {exc}")
 
-        await asyncio.gather(*[_doc_file(p) for p in batch])
+        await asyncio.gather(*[_doc_file(p, batch_start + i + 1) for i, p in enumerate(batch)])
         manifest.save()
 
         if used_cloud_this_batch and batch_start + effective_batch < total:

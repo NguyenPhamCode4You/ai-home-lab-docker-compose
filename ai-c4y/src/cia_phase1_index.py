@@ -163,7 +163,8 @@ async def build_codebase_index(
             model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_CODE_MODEL) if force_local else _select_analyzer_model(lines))
             model_name = model.model if hasattr(model, "model") else str(model)
             model_tag = "CLOUD" if isinstance(model, OpenRouter) else "LOCAL"
-            print(f"[Phase 1] [{batch_start + slot + 1}/{total}] {model_tag} ({model_name}) — {rel_path} ({lines} lines)")
+            ts = datetime.datetime.now().strftime("%H:%M:%S")
+            print(f"[Phase 1] {ts} [{batch_start + slot + 1}/{total}] {model_tag} ({model_name}) — {rel_path} ({lines} lines)")
 
             analyzer = CSharpFileAnalyzer(llm_model=model)
             try:
@@ -203,7 +204,8 @@ async def build_codebase_index(
 
         processed_count += len(batch)
         if processed_count % checkpoint_every < effective_batch or processed_count >= total:
-            print(f"[Phase 1] Progress: {processed_count}/{total} files indexed.")
+            ts = datetime.datetime.now().strftime("%H:%M:%S")
+            print(f"[Phase 1] {ts} Progress: {processed_count}/{total} files indexed.")
 
     # --- Build used_by reverse-lookup map ------------------------------------
     print("[Phase 1] Building used_by reverse-lookup map...")

@@ -19,6 +19,7 @@ Idempotent: skips files already at phase="enriched".
 import asyncio
 import json
 import os
+from datetime import datetime
 
 from .cia_config import (
     OPENROUTER_SYNTHESIS_MODEL,
@@ -129,7 +130,7 @@ async def enrich_with_cross_references(
         batch = to_process[batch_start : batch_start + effective_batch]
         used_cloud_this_batch = False
 
-        async def _enrich_file(rel_path: str):
+        async def _enrich_file(rel_path: str, file_idx: int):
             nonlocal used_cloud_this_batch, critical_count
 
             rel_md = os.path.splitext(rel_path)[0] + ".md"
@@ -147,11 +148,12 @@ async def enrich_with_cross_references(
             combined_chars = len(doc_content) + len(caller_context)
 
             model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else (Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else _select_impact_model(combined_chars, is_critical))
+            ts = datetime.now().strftime("%H:%M:%S")
             if isinstance(model, OpenRouter):
                 used_cloud_this_batch = True
-                print(f"[Phase 3] CLOUD — {rel_path} ({combined_chars} chars)")
+                print(f"[Phase 3] {ts} [{file_idx}/{total}] CLOUD — {rel_path} ({combined_chars} chars)")
             else:
-                print(f"[Phase 3] LOCAL — {rel_path} ({combined_chars} chars)")
+                print(f"[Phase 3] {ts} [{file_idx}/{total}] LOCAL — {rel_path} ({combined_chars} chars)")
 
             analyzer = CSharpImpactAnalyzer(llm_model=model)
             try:
@@ -188,9 +190,10 @@ async def enrich_with_cross_references(
                     "is_critical": files_dict.get(rel_path, {}).get("is_critical", False),
                 },
             )
-            print(f"[Phase 3] DONE: {rel_path}")
+            ts = datetime.now().strftime("%H:%M:%S")
+            print(f"[Phase 3] {ts} [{file_idx}/{total}] DONE: {rel_path}")
 
-        await asyncio.gather(*[_enrich_file(p) for p in batch])
+        await asyncio.gather(*[_enrich_file(p, batch_start + i + 1) for i, p in enumerate(batch)])
         manifest.save()
 
         if used_cloud_this_batch and batch_start + effective_batch < total:
