@@ -12414,5 +12414,3037 @@
     "file_type": "Other",
     "architecture_layer": "Other",
     "is_critical": false
+  },
+  "Core/Infrastructure/Setup.cs": {
+    "phase": "indexed",
+    "hash": "2a08ef88f2e6c4f1c59e14950c84974f41b41207be6cc26855500a7ae270070f",
+    "lines": 69,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/BunkerLotMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "6dae5559882c64c8c9d65be3e10a84ccb1aeda06f432b586f5188a85c84a9d98",
+    "lines": 154,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/InvoiceDueDateTermMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "24ccd419d3bffeba219cfff42813ea2fd072e423a9995c57180b36df4db4b5a1",
+    "lines": 13,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/IteneraryActivityMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "89612a3fc9aaf97e59dcbbf3e3dffc81c6d49bc3ae33ab4c36b3034b6b6f70ff",
+    "lines": 43,
+    "file_type": "Configuration",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/LaytimeMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "0b9566fb380b2ac38c72201173d42810c267e56ccc52730463c5418430ce25ce",
+    "lines": 31,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/MappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "42ade1a28331c41a930e9801a0ddbf82b42f619c6524e4d6af50c8eab9bb308e",
+    "lines": 1271,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/Setup.cs": {
+    "phase": "indexed",
+    "hash": "e44e5886863a4897cf90fe4322db6055c56c596829c5eeea044e433bcb626880",
+    "lines": 13,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/TimeCharterClaimMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "8fbaf64fd0be76002308778e3214d768dba574c99f5714760a210ff3acc4bdf0",
+    "lines": 40,
+    "file_type": "Configuration",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/VesselMiscDataMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "c5a8e7d0a2c966d1b2cfbae307a53f615459bccf4a1f31a606ff00831cceb187",
+    "lines": 42,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/VesselReportMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "37f0eb3a26dee097c0fc10541200f2a763755faa421670aaceffaf0073b087cc",
+    "lines": 46,
+    "file_type": "Configuration",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "Core/Infrastructure/AutoMapper/Converters/ResultDtoToResultEntityConverter.cs": {
+    "phase": "indexed",
+    "hash": "424612736720fbaeb8ac965707cb565750aa889fcc9c0f40f5b15a3121724747",
+    "lines": 24,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Cache/SimpleCurrencyCache.cs": {
+    "phase": "indexed",
+    "hash": "c84998324d7f5c804aa67b779d71f3e766cd16f487e2fab67a014bb59d45b520",
+    "lines": 130,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Cache/SimpleCurrencyCacheConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "c5b30ed7056b2d9a41453b63860b9cc686fbc26796ad0b4954ff9da49ccccea9",
+    "lines": 14,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Configuration/ApiControllerBase.cs": {
+    "phase": "indexed",
+    "hash": "3e03508e0f8bd10175df9a72d6c513872e02f9bafe82e03488c0c3d66cc55032",
+    "lines": 168,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Configuration/UtcDateTimeInterceptor.cs": {
+    "phase": "indexed",
+    "hash": "6c4823c1c4d538d25a586eafb33c1c2cb23287e1556c73640718da5b60cb45f4",
+    "lines": 30,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Configuration/UtcDateTimeJsonConverter.cs": {
+    "phase": "indexed",
+    "hash": "ec57f8e57218a89bb2794f179eb3acf6bb05a7097355f85c8b02689277468bb1",
+    "lines": 23,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/ContextAccessor/HttpContextAccessorWrapper .cs": {
+    "phase": "indexed",
+    "hash": "2cd19714377ee438299157c6297e176f3a7a098820bcea9fd3836cbac70bc4e3",
+    "lines": 59,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/ContextAccessor/IContextAccessor.cs": {
+    "phase": "indexed",
+    "hash": "904fba1f2276985406fd85f0bb8006358651449db426a4b8ea41076e552d2dec",
+    "lines": 17,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/ContextAccessor/MessageQueueContextAccessor.cs": {
+    "phase": "indexed",
+    "hash": "578eb86c4cd8298b08c7867df9f34170ffaac6210cff00972de5e021d5de43bf",
+    "lines": 62,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/ContextAccessor/Setup.cs": {
+    "phase": "indexed",
+    "hash": "f3ba61a661134fc07049719cff9b204021004dfff28456be580648b52a6b4e1a",
+    "lines": 25,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/CronService/SimpleCronJobService.cs": {
+    "phase": "indexed",
+    "hash": "942c4ad3a64dbea1830cbb8e635b1a4c17bd5ecf2d32515ee590f1a8a61673f9",
+    "lines": 177,
+    "file_type": "Service",
+    "architecture_layer": "CronJobs",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataDiagnostics/DiagnosticCollection.cs": {
+    "phase": "indexed",
+    "hash": "69aaa147a5ff73ee159556e0191ef500a42b869ff8f7bce756bef588452dcd14",
+    "lines": 88,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataDiagnostics/DiagnosticFailure.cs": {
+    "phase": "indexed",
+    "hash": "0d773ffef2d794a4d5447643027caee3d31a3a0f9105810e641deefb15417049",
+    "lines": 16,
+    "file_type": "Entity",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataDiagnostics/DiagnosticResult.cs": {
+    "phase": "indexed",
+    "hash": "4d859c0ada8b972d82b78e82c5fb66bb5b8df91dc8925b54802c8c37ac361fa8",
+    "lines": 51,
+    "file_type": "Entity",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/ISynchronizationBusinessService.cs": {
+    "phase": "indexed",
+    "hash": "871f49280c85c1104d9bb19a0172b3c8396a01289efd752945515c1404d0aa1d",
+    "lines": 66,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/SynchronizationBusinessBaseService.cs": {
+    "phase": "indexed",
+    "hash": "004286d12f42065bd74dedb78c2ff3879b466241b0be1e0a6ee6e669fee524b7",
+    "lines": 83,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/SynchronizationDataService.cs": {
+    "phase": "indexed",
+    "hash": "cb5a0d6590996b9062768a0023dcff5adc145ba4cfc07177fa4f34470f1c4fa9",
+    "lines": 173,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/SynchronizationException.cs": {
+    "phase": "indexed",
+    "hash": "808db8c004301d9b6dcd91d21b499db5f788db7787d1c2fb29ad73f16c58ea75",
+    "lines": 8,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/SynchronizationLoggingService.cs": {
+    "phase": "indexed",
+    "hash": "8b95db40d8b30eb465fe2bc2133a10591661153316be2ede27cb159884caa277",
+    "lines": 136,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/SynchronizationServiceConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "1f8765c69ae6703eae61af574c68158aa2c5c9b19cc9d4f1fab8f6c70b392660",
+    "lines": 18,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/Mapping/BusinessCentralMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "8297263d3b23c83aa4a05568dedf6b02485d1d8259fb47b677b7f93a2b01e2a8",
+    "lines": 226,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DataSynchronization/Mapping/DaDeskMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "62bc6a27595044f9aa6ca10dcb8cae8a28a02c70a1ebe975afabb92b92fa0945",
+    "lines": 206,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/AuditContext.cs": {
+    "phase": "indexed",
+    "hash": "d81bf1738d9c2980d7ff2c1665f1c20dc782af14a3257ff8f80d6ef68cbd07eb",
+    "lines": 197,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/CommandHelper.cs": {
+    "phase": "indexed",
+    "hash": "6204dfd56727556d3fbc1384f7c3aacf512097219a4ce71e4f31020ad6ee9052",
+    "lines": 258,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/ContextFactory.cs": {
+    "phase": "indexed",
+    "hash": "6880f064a66ea3cc40c81a5ffd135a9aa3c231148a613d10985dc98e0f021f0f",
+    "lines": 33,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DataContext.cs": {
+    "phase": "indexed",
+    "hash": "0282aa886c4aa1f9a4b6e6afb8ea048a2f382af73c62f36609ed0b2269c81781",
+    "lines": 2348,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DynamicQueryHelpers.cs": {
+    "phase": "indexed",
+    "hash": "e34824916d8b4ad3046e1b38f85412ea07c7f06fa603b34cbde77f72b9dda560",
+    "lines": 467,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/QueryHelpers.cs": {
+    "phase": "indexed",
+    "hash": "7d5a34c93b9aa83f05ee9fc2a3bd03697d1a29043855f3c8f55a9e5e712693c8",
+    "lines": 455,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Setup.cs": {
+    "phase": "indexed",
+    "hash": "bc11c096da18a73e8377c3306fdd8bfc1bcc054d4ae44a37b546d1439e91d409",
+    "lines": 171,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/ChangeLogContext.cs": {
+    "phase": "indexed",
+    "hash": "377566ff8c68ecd3e923ec618d1ce2bb3aa19218556be3846ba6be9c6519125b",
+    "lines": 27,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/IAuditBackgroundService.cs": {
+    "phase": "indexed",
+    "hash": "e28db24e55be96cdf6f50226fa9f44325bad7b0d820ed121f273ac79b4b7d9ba",
+    "lines": 11,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/IChangeLogGenerator.cs": {
+    "phase": "indexed",
+    "hash": "4f4ca82cb46188d322e021fb01ef1a8213e33c6ebc3a5c58c26bd6a7ab4f0117",
+    "lines": 9,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/ShipmentChangeLogGenerator.cs": {
+    "phase": "indexed",
+    "hash": "27f6b80b748a724e06042641fb42a3f45ae4183e85b06509966b59abc052dfbe",
+    "lines": 154,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/SnapshotComparisonService.cs": {
+    "phase": "indexed",
+    "hash": "108e671cb451dfab3435f34e13aac9f6a931fb38110306d1f0b38cdc31cb2f37",
+    "lines": 285,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/TcoChangeLogGenerator.cs": {
+    "phase": "indexed",
+    "hash": "abe2578e4366ee774d25f615aee62baf41d496f368e41bbd25e066ce5c7b46e5",
+    "lines": 185,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/Changelog/VoyageChangeLogGenerator.cs": {
+    "phase": "indexed",
+    "hash": "f131b51facfcf1580aadc54219608866f969d3133859aaf589779809bdaf3f16",
+    "lines": 79,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DataContextPartial/DbContextPartialExtensions.cs": {
+    "phase": "indexed",
+    "hash": "f83e43e2f7e703be2b6a31853a49c068f9a1b3ebc0bcd03c59cfa2ffa0f7de59",
+    "lines": 57,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DataContextPartial/ShipmentDataContext.cs": {
+    "phase": "indexed",
+    "hash": "63dc505c124730703cd7cd1af4bc411db7ca3479b7d37a78c6e2acde40bd9c55",
+    "lines": 47,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DataContextPartial/TimeCharterClaimDataContext.cs": {
+    "phase": "indexed",
+    "hash": "1e82efde3f79d1d4e8b00cda1f097b9398b4794a5b1579a1b9fe9c2a90f656e7",
+    "lines": 65,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/DataContextPartial/VesselDataContext.cs": {
+    "phase": "indexed",
+    "hash": "7d719492716517600fddeb944a73322c0a31f957c0e1b67ad15064059f7f8e5d",
+    "lines": 147,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/EntitiesConfigurations/ConfigureIteneraryEntities.cs": {
+    "phase": "indexed",
+    "hash": "6e81bf6641e9a2f60a59d679145014d5ca26ba095a808105494f867faf426fda",
+    "lines": 38,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/EntitiesConfigurations/ConfigureMasterDataEntities.cs": {
+    "phase": "indexed",
+    "hash": "ff2a0a2700ef92597925d6c1ea53fbc94f2887f6eb284e69dc8101607b8e9f96",
+    "lines": 34,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/AdjustShipmentTermSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "9112ce169701a0cbfca724401211bfd04282b6c3c2771b2631330e39f910f50d",
+    "lines": 140,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/ArchetypeSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "16baabb065a977261f0a7ac65fafbf5acca6be0b966ab1948c706cc102cf194c",
+    "lines": 57,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerChainSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "c534f1609c327ed352967d67c04b0c43c965812bd451dbe306a17044be830fc8",
+    "lines": 44,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerDetailSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "ce9dee3060b6d9e3dc0129f636b82a914098cacccc53f38b578e5fa5042bd716",
+    "lines": 294,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerIsoGradeSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "820a4f7f53e29c8bf58b9acfc3f06ea889efbc83100140f364b0c8d9e849e659",
+    "lines": 71,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerOnboardSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "f1666560332ae84b5715c76a23717a0489783877b5b18c8d35a4a9615459c174",
+    "lines": 45,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerOrderItemsSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "8b697da35cf816cad9f89109fab6a2757e59e0d44d17e0d808d7789f997ccdf2",
+    "lines": 294,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerTypeSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "9566b73f3fe758ce759c1937a499f2c290a35b057bee8818e334936b26f0b9da",
+    "lines": 248,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/BunkerTypesIsoGradesSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "abc2dd17b656c4f3fe46123f64552014a8495b1840cb3287fc0bcb9743e9d187",
+    "lines": 136,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/ClassSocietySeedingService.cs": {
+    "phase": "indexed",
+    "hash": "ea454f6b6ebf52ac13d856fb53114d2437518f109415d63975e36e30f193e79e",
+    "lines": 55,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/CurrencySeedingService.cs": {
+    "phase": "indexed",
+    "hash": "a5c7dce9cf8b4d346accf54ded2f52f8707189adf0500b3c92afc37a48f01503",
+    "lines": 216,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/DynamicEnumSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "2a109029e52e58fad16cd03fa7f60cbb1136f0430765ffbc9e4c37073eda862f",
+    "lines": 76,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/EstimateSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "6075ef00b8978e89039d81ac5af9d8f9677b09a10012d0639fa03bf63834b2b5",
+    "lines": 31,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/InvoiceTypeSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "864418cb97983a2f8a93ad447736bf43fab392d3feef0e502a131264839ffadf",
+    "lines": 392,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/OfficeAbbreviationSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "a636181945d747a97388e9e8a6cce76bb155fdc83e48b5a3ba4a3e2af2ad3568",
+    "lines": 70,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/PIClubSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "ef81a20c5308c1917ca85d947c31e5ea53bc512181d16b5ca76feeae590ef0bb",
+    "lines": 57,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/SeedingService.cs": {
+    "phase": "indexed",
+    "hash": "3dbe07e7b2102a4b5b9e51e04233e22e2b1ac0942f1e9a0e9d29ce4d789ac867",
+    "lines": 1038,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/ShipyardSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "3651299650f13ea56bcaa1cd7a0eccbf310d394ecf055486f37c2dbe26440bc7",
+    "lines": 67,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/TradeAreasSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "441424d9a40cf4a39e81e183034402393122b59f22d7bb3920dd9b06d75ff0ae",
+    "lines": 110,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/TradeBookingOfficeSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "a10fdebbc4247887216010b7164ada7b96668ec80922cf84b218b0332f1bda7e",
+    "lines": 135,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/DbContext/SeedingServices/UserManagementSeedingService.cs": {
+    "phase": "indexed",
+    "hash": "0ba8e95256a5b2445767a93ff5add16c24390be8676af7619975109b6c4b0b36",
+    "lines": 291,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EFCore/Converters/DisplayNameEnumConverter.cs": {
+    "phase": "indexed",
+    "hash": "37e1805333f3024b743bf267427d5879ba09e8aa1f45422b28288afee536acd2",
+    "lines": 17,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/EmailClient.cs": {
+    "phase": "indexed",
+    "hash": "f44ffd693a92e2c59d46d59d010746c6bc744b669e606be80a6d32f15f742bd1",
+    "lines": 161,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/EmailClientConfigHelper.cs": {
+    "phase": "indexed",
+    "hash": "8df5080408f7f91bc9bb5d308cc440f007a3a6df727fb0a2e684fec9c15a2678",
+    "lines": 29,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/EmailClientSetting.cs": {
+    "phase": "indexed",
+    "hash": "4a592ab95c8f34be4820e09942c7fdfbc3d7e6924aca39dec6d7fb082560b363",
+    "lines": 13,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/EmailException.cs": {
+    "phase": "indexed",
+    "hash": "d8342bad806fa83a637079253cfd17550887bc6a5590ba0d90c9dfdac329b049",
+    "lines": 8,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/EmailMessage.cs": {
+    "phase": "indexed",
+    "hash": "96248a043b79772a82e093df80e643ce6e02347ed2570d9562193d751663f754",
+    "lines": 32,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/EmailClient/IEmailClient.cs": {
+    "phase": "indexed",
+    "hash": "0db408fa0d23858db24e66be33eba9cbb8e0a6e3511a98785071ea9a3e283020",
+    "lines": 6,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/ApiKeyDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "0f8ce4f4ec84a278546bbba177e042b5b95f93d6ad86d0ba08131901cceeac46",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/DefaultHttpClientHandler.cs": {
+    "phase": "indexed",
+    "hash": "221d59fd5701a90eafda0e78e188f1691418491799202143c01ece1d2dc5863b",
+    "lines": 9,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/HttpClientConfigurationExtension.cs": {
+    "phase": "indexed",
+    "hash": "9bc729ae4cd58bb83824d0cdc1cd44f2494af4013a9db3336f10f81e042875df",
+    "lines": 75,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/HttpClientConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "d400a423c8c94b69a70c34df5ae1723741a8cfd6ada5f4166fda4f0e01463684",
+    "lines": 13,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/HttpClientOptions.cs": {
+    "phase": "indexed",
+    "hash": "f54e92253f0fb842a1a586817ac19657cd2be44c02f4f45fb755b403735ffe9f",
+    "lines": 25,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/OAuth2AuthenticationDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "7869067589b655a4a98d2a96ac6abb25968f9061b3212a5eaf165cc25dcba6d4",
+    "lines": 30,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/HttpClient/UserAgentDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "0c85151bf571d7b998e73fd19dc93312a2ee6ed5dc19e2ec469006bdfeb980f7",
+    "lines": 64,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Middlewares/APIMiddleware.cs": {
+    "phase": "indexed",
+    "hash": "df8740228fc1144757719fced0d3a31df919a14e83a0287300d40b9676c61da3",
+    "lines": 50,
+    "file_type": "Middleware",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Middlewares/HttpRequestMiddleware.cs": {
+    "phase": "indexed",
+    "hash": "176735b5fd30085c977679e6ef75abaee862f8044820b3710d9fd826aaa7717b",
+    "lines": 117,
+    "file_type": "Middleware",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Middlewares/ModelValidationMiddleware.cs": {
+    "phase": "indexed",
+    "hash": "aaec409d3d1ea96d0518d98f409729c02975e2afea4a0d201039e9597a4945ee",
+    "lines": 124,
+    "file_type": "Middleware",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQBaseClient.cs": {
+    "phase": "indexed",
+    "hash": "05762fcde3261a0df6de86408991b6c9dcd5ad31503ccb96451ab98f679915b3",
+    "lines": 465,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQBaseConsumer.cs": {
+    "phase": "indexed",
+    "hash": "7652713c89b2bec61a16f32d4d18b3558bf24b6af61ed7ab158f3ad362cb29ad",
+    "lines": 93,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQConfigureHelper.cs": {
+    "phase": "indexed",
+    "hash": "20194b9d2fbe75616251f298607cfbbc47397fbb8536dbe0545e2848609c1080",
+    "lines": 67,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQPublisher.cs": {
+    "phase": "indexed",
+    "hash": "e65a07b43e98406488af7f79355cb07e70c2a09b9fe0ae37633bac35447c860b",
+    "lines": 71,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQSetting.cs": {
+    "phase": "indexed",
+    "hash": "d5bea985803a583b4a9a75bfae34b5caa750790d74c3728a490b0811a1a8d457",
+    "lines": 73,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/RabbitMessageQueue/RabbitMQSimpleConsumer.cs": {
+    "phase": "indexed",
+    "hash": "3c45dc6e69f61fc1b7f047ab2fb2eb694bb858acaf104607a0d336f82e1640dd",
+    "lines": 25,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/ApiKeyAuthenticationHandler.cs": {
+    "phase": "indexed",
+    "hash": "4f718dc1b621bb74fd5f29606685e597aa5c25dbfb7e20549f197ca6103b11b5",
+    "lines": 86,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/JwtTokenProvider.cs": {
+    "phase": "indexed",
+    "hash": "0e7def06f3d13f1f7e512f59ff62ef71706bf129606842444af2614f490242b8",
+    "lines": 93,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/RateLimiter.cs": {
+    "phase": "indexed",
+    "hash": "4c8a84bf26c8be13f0e0c4e689471b16dbd0819805908e099e6c816a07e3fed6",
+    "lines": 32,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/SecurityKeyGenerator.cs": {
+    "phase": "indexed",
+    "hash": "928a72f1f4f7c6cf53b953b5a5858d02219dc752b224059b0317a1390b103952",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/Setup.cs": {
+    "phase": "indexed",
+    "hash": "e1e3c86e3a940ab456de2cc9fbec470857a964aac01f22bde8d508ea0b12ea0c",
+    "lines": 160,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/UserAccessor.cs": {
+    "phase": "indexed",
+    "hash": "e7d24cb0887bcd64a9edee4e472b67b9a4d9e55f05ac62edf984062fbc71d6f8",
+    "lines": 74,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Security/Helpers/AuthorizationOptionsExtensions.cs": {
+    "phase": "indexed",
+    "hash": "1b61193d2bfb2774d251480cb7a56d61c87cf8d2146d13eeab8455a58b23f076",
+    "lines": 22,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Semaphore/ISemaphoreService.cs": {
+    "phase": "indexed",
+    "hash": "de9be51c261ad84597b62ef6731450d810be655118d6e0c980fa39c70c6dfb1f",
+    "lines": 92,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/IRuleEvaluationEngine.cs": {
+    "phase": "indexed",
+    "hash": "407641287bbbcbbee72a5be01300bc080dc608e6c55266ad21feb8ba50809ad6",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/RuleEvaluationEngine.cs": {
+    "phase": "indexed",
+    "hash": "e9a5072d5d36dc1dc28488d5c65ffa8011007cf947e98474de72aed75eba715c",
+    "lines": 73,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/BooleanCastRule.cs": {
+    "phase": "indexed",
+    "hash": "5eb2a9d249885cd1b87c1d559e44ace11708fc6631e203bd8057c3268ae3aff3",
+    "lines": 100,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateComparisonHelper.cs": {
+    "phase": "indexed",
+    "hash": "f0c81de5b0decd9acce6bc83ef98b40e06869dce92812995555f94d13d750e57",
+    "lines": 60,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateEqualRule.cs": {
+    "phase": "indexed",
+    "hash": "264e868be2b3ff1f74d6319931371dd535457d5d636b1c3e5e4baccd9abecfea",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateGreaterThanOrEqualRule.cs": {
+    "phase": "indexed",
+    "hash": "bd2ee53f25691e0fa7c4bfdd2b80e605b2100548c0bf45dd1a5ad75936001422",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateGreaterThanRule.cs": {
+    "phase": "indexed",
+    "hash": "bf040c41781c55d93e2f9d0d66d1c465cd28e30e216558c389585c887a76c48b",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateLessThanOrEqualRule.cs": {
+    "phase": "indexed",
+    "hash": "c715b37ca4d005a23b746abd6a436763c8df67667d0505a5c1038e9a7612f7b5",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateLessThanRule.cs": {
+    "phase": "indexed",
+    "hash": "b9bcee65ba39822e3e04600007d3329dae01b3db14c37124eac3bf71e4a2a1a1",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/DateNotEqualRule.cs": {
+    "phase": "indexed",
+    "hash": "928a0b0357314910c2aaeb5081354253ab3ba5e42221367c1053dbdceb95e6d3",
+    "lines": 92,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/EndsWithRule.cs": {
+    "phase": "indexed",
+    "hash": "b22ad8ee9e8303dffe783f97bc0b407b0298dbd335eef28925aeb322f1a8acf8",
+    "lines": 122,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/JsonLogicExtensions.cs": {
+    "phase": "indexed",
+    "hash": "0a5882104cfdd2732a24b847d5e4f52be13ee2fa38426f602e93f8be46414d2c",
+    "lines": 51,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TaskAlert/CustomOperators/StartsWithRule.cs": {
+    "phase": "indexed",
+    "hash": "e1380cefe8e584386c4498468660a19431c8e96061f1bb2d235b5a1df0ebc9fc",
+    "lines": 122,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TemplateRenderer/EmlTemplateRenderer.cs": {
+    "phase": "indexed",
+    "hash": "7a1089ae458469bc08c86c5d6485b8b8def71fa70adbfc5450c17c0860329277",
+    "lines": 74,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TemplateRenderer/ITemplateRenderer.cs": {
+    "phase": "indexed",
+    "hash": "a9b69a4a99f2b80be9d4c17c259e1c29e46d3469ebcbbf20bce6357d2147e699",
+    "lines": 46,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TemplateRenderer/RazorTemplateRenderer.cs": {
+    "phase": "indexed",
+    "hash": "d27afd965fe92ce600e44e2855e53950a58618eb10af869fa519f561fcbce433",
+    "lines": 198,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TemplateRenderer/TemplateRendererConfigHelper.cs": {
+    "phase": "indexed",
+    "hash": "7214cb33cc61638a82d0d9cb37e42c97d93efbead6e9aaeea2890cb8f14b27ea",
+    "lines": 29,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/TemplateRenderer/ViewNotFoundException.cs": {
+    "phase": "indexed",
+    "hash": "492e46b3142053c749551968803f3858a7a1f9cc80f589c868f1503f3cf1ce58",
+    "lines": 8,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Validation/ValidationConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "169e6754d7178f8cae123f29a8ba181106078ec2f1d6fb59475140b0a2520bd5",
+    "lines": 13,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Validation/ValidationEngine.cs": {
+    "phase": "indexed",
+    "hash": "7138af4f38bded9c8cb74a1e066a56051e7dfa521468c2388262b894cec8ed26",
+    "lines": 92,
+    "file_type": "Validator",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure/Validation/ValidationVM.cs": {
+    "phase": "indexed",
+    "hash": "bb76565812cd6dd44a45af45ed1ba3b7c4844c234d489c66fc539630707abd45",
+    "lines": 63,
+    "file_type": "Validator",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "Core/Infrastructure.UnitTest/Usings.cs": {
+    "phase": "indexed",
+    "hash": "e8de9b91579ba661cbfebd3912328c2dc917d2a519cc565b717446c7f39e6d33",
+    "lines": 1,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Core/Infrastructure.UnitTest/DbContext/ContextGenerator.cs": {
+    "phase": "indexed",
+    "hash": "77a0be3da2ba7a41007f4ecd009c004484d5ee7fd4da3037a11c98b745597679",
+    "lines": 181,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "APIs/FileStorage/Program.cs": {
+    "phase": "indexed",
+    "hash": "12aac8e0d505c2d9b29382446c507468df264a5586bc64ca3365a00bfad6f1c2",
+    "lines": 125,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "APIs/FileStorage/Controllers/FileStorageController.cs": {
+    "phase": "indexed",
+    "hash": "28da34c2c998abe2adecd0bdd069657235fff83f4ae212d760cd8c038813bebd",
+    "lines": 145,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Program.cs": {
+    "phase": "indexed",
+    "hash": "a5a85eb1cb872432d8ed80e9d154de0a0ae3c488e227761de94018bfef31e12f",
+    "lines": 143,
+    "file_type": "Configuration",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/AppLiveConfigController.cs": {
+    "phase": "indexed",
+    "hash": "48d1c2cb01215ae6e56851719ed286738b66d764a55da927ba39574b106364b9",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/AppSequenceController.cs": {
+    "phase": "indexed",
+    "hash": "75d08c8abee9c66015519754d1e1f44794c0d1464db76dde0d795fd2ea779a96",
+    "lines": 50,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/AppTimeSerialConfigController.cs": {
+    "phase": "indexed",
+    "hash": "c01d7fff95177ccba87d070a96ed2509e73375c7ac4a6ec60da6b6a090076a32",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ArchetypeController.cs": {
+    "phase": "indexed",
+    "hash": "ff3d7c4b71f40ba03094408c1b282f636e1a092fb569e0bcb1a6783ce247971f",
+    "lines": 63,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/BunkerChainProfilesController.cs": {
+    "phase": "indexed",
+    "hash": "5fe5d52adc6495b890c82cccd7258f9af22c07d35ef39f288f12cacf08daa560",
+    "lines": 58,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/BunkerTypesController.cs": {
+    "phase": "indexed",
+    "hash": "68183d0b31b2e4c3b31319d23a4d0610a8d2e4de89f57921021c06f2e8a3dcaf",
+    "lines": 63,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/BusinessLinesController.cs": {
+    "phase": "indexed",
+    "hash": "eb77250af93ed557d5fd6833f167525cb3d7385c45636aed4b15c494fd808f8c",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/BusinessPartnerController.cs": {
+    "phase": "indexed",
+    "hash": "228c41d85d2b6999db46a7abe75a8fced461c4906be05f39cc694428912a54cc",
+    "lines": 61,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/BusinessRulesController.cs": {
+    "phase": "indexed",
+    "hash": "0d6b9273e7ec626a3b9a815c3dd0a58bcb361a84c05245a855ef1f5de1032cec",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/CargoTypesController.cs": {
+    "phase": "indexed",
+    "hash": "f5cece89480dc040c234c235876d2a6a964162f6c4f4a220108e6b6e7d7ab58b",
+    "lines": 71,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ClaimsController.cs": {
+    "phase": "indexed",
+    "hash": "cad4cdfad31e0a22f8fc8de8575a8483920e2a93043313730a5b3c7f90e29e6b",
+    "lines": 32,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ClassSocietiesController.cs": {
+    "phase": "indexed",
+    "hash": "8cb8675768ec2b175a057f22652ddcb992c5d36f99f53081f2e27b0ee56f4e30",
+    "lines": 76,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/CommissionTypesController.cs": {
+    "phase": "indexed",
+    "hash": "b161867d558ee19ff7ed854a4985a5cf4249ca29a8a856af0e60c7d8e69fae4d",
+    "lines": 71,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/CompanyBanksController.cs": {
+    "phase": "indexed",
+    "hash": "042ca487dd518179ad1cf8b38393be3df1cbb8c89c833dde8e8dd6b7f1a3f7a8",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/CompanyTypesController.cs": {
+    "phase": "indexed",
+    "hash": "ad017a7ea751c76b776af894ecc26ac07332271c0789a7ad86645c91b4ca8625",
+    "lines": 49,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ConsumptionRateProfilesController.cs": {
+    "phase": "indexed",
+    "hash": "c4d7e04ba56dad1560e5073a8ed171f218363671af9928f7347d0717f0d80d86",
+    "lines": 74,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ContactController.cs": {
+    "phase": "indexed",
+    "hash": "cd8f88d2e4655fe1d683ea5b965918f240212eba28bd88ea81930631951899cb",
+    "lines": 63,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ContractTypeController.cs": {
+    "phase": "indexed",
+    "hash": "421577ce9a933b8de458feed21fdefeb2e7e3e69f13c49e93bbd7f6a87d518f5",
+    "lines": 60,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/CurrenciesController.cs": {
+    "phase": "indexed",
+    "hash": "a8a298b512c6dd5a8f1dbb429615bd91dc5a7e25186b6e78cc1c89d15bb333e8",
+    "lines": 135,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/DataSyncJobController.cs": {
+    "phase": "indexed",
+    "hash": "84d4aee6a17e3503a2cb1c1e40171106c64ae47c4e51da1a2191fcfd6ca04b57",
+    "lines": 128,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/DynamicEnumsController.cs": {
+    "phase": "indexed",
+    "hash": "fc3372e2430658a9466bbe01aff41b157b2fa086ce1531621f582794ba80b2f2",
+    "lines": 81,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/EntitiesController.cs": {
+    "phase": "indexed",
+    "hash": "1a431ffffac2a43c1865faa96f517f14e7b4d2b5ed2f666e6bb1df237ae8de06",
+    "lines": 37,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/GeneralAccountsController.cs": {
+    "phase": "indexed",
+    "hash": "f25f943ce51e56dc14976152181b4078da04b4be2d644a6193d05857452d4a4d",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/InvoiceDueDateController.cs": {
+    "phase": "indexed",
+    "hash": "e140108b09a3fae7d06d16a9827adc07c4f5461b746c992cf4de0799c36201a3",
+    "lines": 65,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/InvoiceTypeController.cs": {
+    "phase": "indexed",
+    "hash": "3f056d47bc002de99a7676314d7a84bbac637e6216c56a3b357e47e760bb53bf",
+    "lines": 63,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/LaytimeCalculationsController.cs": {
+    "phase": "indexed",
+    "hash": "997b5ea173de4400c04e195adf2a1573bf47117a06d960ffc30beb220ec65a82",
+    "lines": 121,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/MicrosoftGraphController.cs": {
+    "phase": "indexed",
+    "hash": "dd7de774c70784add04010cc5b517ebe72795b832633b99e56c0e72c986fb48d",
+    "lines": 32,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/OfficesController.cs": {
+    "phase": "indexed",
+    "hash": "9adafcd5fb560d350555073069b33a44a305946bcb46ca37951d050b78ad928e",
+    "lines": 71,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/PaymentController.cs": {
+    "phase": "indexed",
+    "hash": "e0af2f1002bf010f6c94c17d4b681449ab7aa376205f98f9dae83bae12cf6ac7",
+    "lines": 76,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/PaymentTermController.cs": {
+    "phase": "indexed",
+    "hash": "6eb435148c3f4ccbae76aa2c5e76d8746224420debf3e75567dc5ec731daaaeb",
+    "lines": 64,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/PIClubsController.cs": {
+    "phase": "indexed",
+    "hash": "3ee0ee6325f6f02b0ada4c210cb7579e0343fd59d61a2310e340b72b7c3159eb",
+    "lines": 77,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/PortCallsController.cs": {
+    "phase": "indexed",
+    "hash": "1d8731ac5302f498bf006fa479ac2323324673a6c42c99ac31ab249d681da57f",
+    "lines": 30,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/PortsController.cs": {
+    "phase": "indexed",
+    "hash": "197c937d55b3e24ceff8ab8e8eb3baaf057890eceb3b1fc3f02077d95b0e8e14",
+    "lines": 97,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ProfitAndLossGroupController.cs": {
+    "phase": "indexed",
+    "hash": "7d422a199e44a5e69fffa8785b7ef2ee00bef3f0f906a607dc9fd5bd17d48ee4",
+    "lines": 23,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ReversalReasonsController.cs": {
+    "phase": "indexed",
+    "hash": "e3083dad3d1a24c5d941c23a3f07842b22713cd5a18fd6179ba214219b98ac7c",
+    "lines": 55,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/RolesController.cs": {
+    "phase": "indexed",
+    "hash": "eb5c9f136b10c9fc764e761494cf2aa58a9dfb9a38d14ca6617282385a2df57d",
+    "lines": 65,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/SeedDataController.cs": {
+    "phase": "indexed",
+    "hash": "ee386a6ac09b22191d0a28e9822e28d3bcd1b110a098e2ac71686b0ba1237a9f",
+    "lines": 401,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/SelectionController.cs": {
+    "phase": "indexed",
+    "hash": "3ad8c6ced560cfc3ec12030975e55c09a4ea80f026a87bb1274e3a8504383aa9",
+    "lines": 617,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/ShipyardsController.cs": {
+    "phase": "indexed",
+    "hash": "647b73d5bfdd5fbffc75a9ba968ff15d21e3e6f8680eccb13b5802d49c523b9a",
+    "lines": 76,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/SsoController.cs": {
+    "phase": "indexed",
+    "hash": "1e63ef1c88f0089aee6707da0d9bbbab244d4563d77e02a3277d1c174bfe2999",
+    "lines": 48,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/TermsController.cs": {
+    "phase": "indexed",
+    "hash": "242f470733c48e9e027a68e8e87abdcf2b8e32c20132a8e11db44fbc5945c26e",
+    "lines": 64,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/TradeAreasController.cs": {
+    "phase": "indexed",
+    "hash": "4e1ae961003571736667056eb99eb70f920bad24be36904e0bc0e0e903a76355",
+    "lines": 38,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/UserFilterController.cs": {
+    "phase": "indexed",
+    "hash": "5bf4bbfa831d8a5e5d2b8c7607269070f7ca083998afda1bdb9a236b139ca773",
+    "lines": 73,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/UsersController.cs": {
+    "phase": "indexed",
+    "hash": "d837097fb88c6848e39543b7f3f49c3c387c4ebc20c1f85572fe603f5e71077d",
+    "lines": 192,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/UserSettingController.cs": {
+    "phase": "indexed",
+    "hash": "f852f0d846b491d6f4667635d7c75685af2462c68715b6649657daa708bc8097",
+    "lines": 66,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/VesselsController.cs": {
+    "phase": "indexed",
+    "hash": "907441ad184ce60514530414264c904572aeae5cbb503217ead3032a52903942",
+    "lines": 156,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Controllers/VesselTypesController.cs": {
+    "phase": "indexed",
+    "hash": "5e24b9535647084818a9d1bcb380f31a60ca789c18134adf32d838882c471a69",
+    "lines": 62,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/BcInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "a3ce631e483b94b783208373f9722b31e44eb41ed938b6b86af505b55245dd62",
+    "lines": 36,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/BunkerInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "3ccf773116545d72ba13aa1f3e8134053918666059a53d1f48cd81a4e53cf246",
+    "lines": 23,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/CommissionInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "240c307e7921e7337e1b15a1c1f14fed2f6db7f9e9d93b1605a9197292eefb1b",
+    "lines": 98,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/DaInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "7f07ae84ad394c9533fdb70d3bee70f1db4e5f9741ba18d1cc91da53a55075af",
+    "lines": 59,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/FreightInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "b5620bf9c2dcf9dd854b7e2e69b793e7affb84daa54da863bf8ef725590eb1fc",
+    "lines": 150,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/InvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "929b8273085c65375f9b6bde0a11407255a33970650f7b403c05a4acd6ed9452",
+    "lines": 194,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/InvoiceTransactionsController.cs": {
+    "phase": "indexed",
+    "hash": "90ab775fc2886acad89691b8e6c3fabd65e0259673c33f17aadcd73ae1fe44f7",
+    "lines": 60,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/LaytimeInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "7e2208acfeb283e944ac0f2c0a3a7b7c481821041aa4754c0f7abedfcb8890e8",
+    "lines": 108,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/NoteInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "5405c342ed73c48a0b76ab0312982c53c8117fa38bb70ca008752ff387c2e2ab",
+    "lines": 224,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/PortDaController.cs": {
+    "phase": "indexed",
+    "hash": "c567bb538267a4304ee27c7c3b670a6dc159afb88fa594f5be3b31c7cae4716f",
+    "lines": 44,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/ReceivablesController.cs": {
+    "phase": "indexed",
+    "hash": "6d9f310c870faa71a73d473b54720217af0b0670e8e9d3a86761c5d46811d869",
+    "lines": 65,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/ReportController.cs": {
+    "phase": "indexed",
+    "hash": "d4d26f5cdfbd40ce0b8aa92bea246c570848e3fd104ddfa537c5a13c7906439b",
+    "lines": 22,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/TcoCommisionInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "5b623d92f3b19cebfdfaa4d865f0a09362a85add5224ba5de92f39e62eb7a637",
+    "lines": 119,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/TcoInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "e0a647a084925e035a9244669c772a7d4d2476a3b6e97243beaf345d4d3dbd9d",
+    "lines": 258,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Finance/VoyageOtherRevenueInvoicesController.cs": {
+    "phase": "indexed",
+    "hash": "2ef15c1775baa5e036b54d6d83a2b04854b4d40df5f36d816e1dc1da8f0e85ee",
+    "lines": 136,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Integration/BcIntegrationController.cs": {
+    "phase": "indexed",
+    "hash": "83d67a1903e6867f7e17adc0e519db926b64977d6966b3ec8b29a7fc6a627cff",
+    "lines": 98,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/Integration/DaIntegrationController.cs": {
+    "phase": "indexed",
+    "hash": "1ee0288af7dbbc7beba31472e15262e0191e1b60359737ceef423124992498d6",
+    "lines": 43,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/TaskAlert/RuleSetsController.cs": {
+    "phase": "indexed",
+    "hash": "da3c307e646e6162a8ba9e7e1554307fd12221fe438279be549bef3fcefb8419",
+    "lines": 65,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/MasterData/TaskAlert/TasksAlertsController.cs": {
+    "phase": "indexed",
+    "hash": "cf1a636b0a6808b2cc4b6b9693e6a62a60036cc47bd5bec47b70ea9c056a43cd",
+    "lines": 135,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Program.cs": {
+    "phase": "indexed",
+    "hash": "e8cf0907a2deed13400459079beac40c99d6877b7ea534e1ef18dc81d48dbf7e",
+    "lines": 153,
+    "file_type": "Configuration",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/AuditController.cs": {
+    "phase": "indexed",
+    "hash": "16f3ffc789f163ba0a5f3c3ba6d39c91c98c0e4ab25b84e3872107381263803b",
+    "lines": 63,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/BioBlendController.cs": {
+    "phase": "indexed",
+    "hash": "a4fd05e79a5b1a485d4746b685b0063e514740c5c9cded1d0d56e3d86297553d",
+    "lines": 32,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/BookmarkController.cs": {
+    "phase": "indexed",
+    "hash": "214fbcab39a2ad7c6459368a0944ee93e42e5f454475859d1477e08567c803cd",
+    "lines": 50,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/BunkerOrderController.cs": {
+    "phase": "indexed",
+    "hash": "297cd026ec234eec553b942a8f125ae1fcbfd4e68afce39d79b1925ee8de6631",
+    "lines": 116,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/CoaController.cs": {
+    "phase": "indexed",
+    "hash": "e8454f9f87fc74ec0948f10440eb63db7497fefe6bc3d2262837bfe242e6ba45",
+    "lines": 67,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/DistanceController.cs": {
+    "phase": "indexed",
+    "hash": "16943b1a4542d471a82761630f5f3e4db3f75f241825f66f1292fa66892607ee",
+    "lines": 34,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/EmailController.cs": {
+    "phase": "indexed",
+    "hash": "08ad95997d6746d24c86d387788bfd0715e0ca628fbe762571cef61171699fcb",
+    "lines": 61,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/EmlEmailController.cs": {
+    "phase": "indexed",
+    "hash": "b0ecd42dcf24f3b90f4715f6c7e58a988e86ca1e4baa9e733876284a3ba1f953",
+    "lines": 41,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/EstimatesController.cs": {
+    "phase": "indexed",
+    "hash": "9bd778ead5f1871fa715c0d7009abce82248e699eb4af26b7a86d1246f0087e4",
+    "lines": 351,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/EstimateShipmentController.cs": {
+    "phase": "indexed",
+    "hash": "5f5be0d0c9631642c430cb3638cc474a0362ab7f4440f90b9c4c90aeb33bef6a",
+    "lines": 32,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/FinanceViewOffhireController.cs": {
+    "phase": "indexed",
+    "hash": "e4ba9cf640a842762081e46b07dd53315abfc1e25987625b3cf2daac5eb86d63",
+    "lines": 49,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/FinanceViewSplitVoyageController.cs": {
+    "phase": "indexed",
+    "hash": "95e2bc06108e795ad8262ef1d7e1c13852e503d8d4e3173a8ecd464951ef118a",
+    "lines": 41,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/IteneraryActivityController.cs": {
+    "phase": "indexed",
+    "hash": "885e24d1ee600bb48160e2704ca0563a564d4a11263ed03e3eb7a1059dbec6d6",
+    "lines": 40,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/OverwriteShipmentController.cs": {
+    "phase": "indexed",
+    "hash": "f23c6bc847b8ed24dae2d1c9b2c164498aec665b99ac94d357d8165995683f9e",
+    "lines": 40,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/PLController.cs": {
+    "phase": "indexed",
+    "hash": "6712b6929c6a64ee1ed0397731ee3349b472b08adaffbe5e926aae8e09d52382",
+    "lines": 73,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/QuotationController.cs": {
+    "phase": "indexed",
+    "hash": "cc19a9f4361270c0b8e50a4dc31b8728bccc05052f22ed48307573487b203011",
+    "lines": 77,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/RequestController.cs": {
+    "phase": "indexed",
+    "hash": "6151665cdd288076db8fbe1a8f4443113a0f2d42ad2606368b4102316516f776",
+    "lines": 53,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/RoutingController.cs": {
+    "phase": "indexed",
+    "hash": "ae467567b56f38e2889ebaa53e7621add021c671a5c562b87bd56d89902cc2a9",
+    "lines": 32,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/ShipmentInVoyageController.cs": {
+    "phase": "indexed",
+    "hash": "67c9995aa70f7409993e9ab5ea059131a55f76c52923f66337db6de5bca9ccde",
+    "lines": 49,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/ShipmentsController.cs": {
+    "phase": "indexed",
+    "hash": "3f051791b9542648b3e9aaa6832ec48edc8a55fdabeec89a175cd01470349042",
+    "lines": 198,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/SnapshotController.cs": {
+    "phase": "indexed",
+    "hash": "49612be534e3f92696342589b13a0f342323863dc336668735d6e94aae293fe5",
+    "lines": 44,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/TciController.cs": {
+    "phase": "indexed",
+    "hash": "1909b24b7f6153f54a5731a8d92601e482392060f4460b0ac858a393235120a4",
+    "lines": 73,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/TcoController.cs": {
+    "phase": "indexed",
+    "hash": "5ac6aa7a8c88b5d120274295174a2e70b33145554319418770f39f83e712ced1",
+    "lines": 110,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/TimeCharterClaimController.cs": {
+    "phase": "indexed",
+    "hash": "4e0bee13ad6454cd379de7127910df3e9c3deee56cd66d8ebe6de4fb945eeb01",
+    "lines": 52,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/VesselReportController.cs": {
+    "phase": "indexed",
+    "hash": "5fea20b258d0becf03c451a6a0a2b78eca91f89242941eb28dfc58cc63caae79",
+    "lines": 168,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/VesselReportFinanceViewController.cs": {
+    "phase": "indexed",
+    "hash": "81263edc010a2347f42433e122cb2b665136c9ad792d97ad3d28bd6c797ce006",
+    "lines": 52,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/VoyageController.cs": {
+    "phase": "indexed",
+    "hash": "6f45ae22ccfa5158b4914e502670a24eeee75c7477638afb84adcfeda686c2f9",
+    "lines": 612,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/WorkSheetController.cs": {
+    "phase": "indexed",
+    "hash": "c052a54e9675923dc9cad2de7fda7f17c1eef89d41e061225e953b7d4b460fde",
+    "lines": 99,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/Common/HistoryController.cs": {
+    "phase": "indexed",
+    "hash": "fd6b142087880568a7e6a24b29a0941bb8b1e194b0a189eb930ecbfd41b9f06e",
+    "lines": 37,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "APIs/OrderRequest/Controllers/Common/StatusEngineController.cs": {
+    "phase": "indexed",
+    "hash": "5345aa870f1415f77d8694f39ed6b8569a11d26439d0ddf59c674c82017082b8",
+    "lines": 69,
+    "file_type": "Controller",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/ApiKeyDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "e737af77bb5961b1aea044144955bbbdf10ba62a0d8cc0d3e58c182fe5229f9a",
+    "lines": 33,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/AzureService/AzureService.cs": {
+    "phase": "indexed",
+    "hash": "1943cf187d908ec65645b660a775e853b54e3c032bef48808990c73d8b78a0e2",
+    "lines": 332,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/AzureService/Setup.cs": {
+    "phase": "indexed",
+    "hash": "4be76c9cfd598310fa1d815f40b3b3b3bc595167325cc22461f97bd65d44e4d4",
+    "lines": 18,
+    "file_type": "Configuration",
+    "architecture_layer": "Configuration",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Setup.cs": {
+    "phase": "indexed",
+    "hash": "6642a77af958220977560c2efe208bc9d76b6e973f662a64c4c343de1432e874",
+    "lines": 40,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Abstract/IQuery.cs": {
+    "phase": "indexed",
+    "hash": "8f95887905d19fff96f931638f7477e57d40e1467d0d0cd6c27f74a1d217fb1c",
+    "lines": 8,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Models/BBCDataContext.cs": {
+    "phase": "indexed",
+    "hash": "3f45c394c5d2abf40ac7e842715d150dd20e0b06c80b70112dd96fd9ab54b5b4",
+    "lines": 19,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Models/Exports/BBCBunkerLot.cs": {
+    "phase": "indexed",
+    "hash": "f54c316dbb860b4b7f5ef6446c3eb4d5a8994194a5b815c053f5c0acac734121",
+    "lines": 16,
+    "file_type": "Entity",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Models/Exports/BBCVesselStatus.cs": {
+    "phase": "indexed",
+    "hash": "eb0c3fe917aae8d077477a3041f5849906ff70f5c399f6366a58bc5849d71002",
+    "lines": 19,
+    "file_type": "Entity",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Models/Imports/ImosEndBunkerEntity.cs": {
+    "phase": "indexed",
+    "hash": "635ef0dbd9b9ac5b5da001856127cce0850545ce0f8b8626b06c2f2fa80b1123",
+    "lines": 41,
+    "file_type": "Entity",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Services/BBCDataService.cs": {
+    "phase": "indexed",
+    "hash": "357392f26b14d467735fbbaf1ec7c78178c92386b5231d281f6faa884c75c511",
+    "lines": 24,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BBCDataService/Services/BBCDataServiceOptions.cs": {
+    "phase": "indexed",
+    "hash": "3516c2a9c38b9b3ed373654c1bc1f1dc62ce8ddba2c0949e78ebe1fc4bf5e288",
+    "lines": 6,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/BusinessCentralClientConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "93061fc0995baf8317964680bb0b13bece88e0a20adaf970af9196d8f6e60910",
+    "lines": 16,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/BusinessCentralClientMappingProfile.cs": {
+    "phase": "indexed",
+    "hash": "a2b36f96b7bcb453f2c158290ace22f87ea469071bd269ab4da7763a0e388f3e",
+    "lines": 18,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Configs/BusinessCentralBaseClientOption.cs": {
+    "phase": "indexed",
+    "hash": "07b073b2414e894f782a8815663fd77b9ea54199aca5405109dc1164d7b9cb36",
+    "lines": 28,
+    "file_type": "Configuration",
+    "architecture_layer": "Configuration",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Configs/HttpBusinessCentralClientConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "c94b961dc4138fc9980a395e03cddb8d17c73dbcdbdd990d8ea8fcc92c33d54b",
+    "lines": 67,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Configs/HttpCurrencyRateClientConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "8b260a72a7249e517157407c574ee65fd1470a70ce1afb826a7558067a96347d",
+    "lines": 88,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Configs/HttpCurrencyRateClientOption.cs": {
+    "phase": "indexed",
+    "hash": "3229c9d7c496b14204a60e598f37b848c160eb5dde9be902551d56da82cb6138",
+    "lines": 12,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/BusinessCentralCurrencyRateClient.cs": {
+    "phase": "indexed",
+    "hash": "0762f041468722dd7847d1f7f17eadb650c85eafd2c63da9bd34befe09e2f782",
+    "lines": 76,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/CurrencyProviderType.cs": {
+    "phase": "indexed",
+    "hash": "634aedf52a8664442b5319bb32ce7411737070bad9c6508592348edb61542555",
+    "lines": 18,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/CurrencyRateClientFactory.cs": {
+    "phase": "indexed",
+    "hash": "b06c28f462e47de2bb1946b0d59ad31eb9361675e4a7bbeb246252cac91bbd0b",
+    "lines": 68,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/ECBCurrencyRateClient.cs": {
+    "phase": "indexed",
+    "hash": "1781b908b12534a0791c78b50e643b5c2473bcbb41848d88078c0ebdbf4d97b9",
+    "lines": 320,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/ICurrencyRateClient.cs": {
+    "phase": "indexed",
+    "hash": "4af026a08047e0dc9543feb8c7bfeebf328edad776b5bad659872ed2ebb021b9",
+    "lines": 12,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/CurrencyClient/ICurrencyRateClientFactory.cs": {
+    "phase": "indexed",
+    "hash": "6d7286e9582e68e203cb1f2fb281d0d38f3b52ad09e8e7269dec7bd985f1b350",
+    "lines": 22,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Converter.cs": {
+    "phase": "indexed",
+    "hash": "be042140118e7b7e12b9b2d313c5f6b33d2d3611051c6b4133429eeceb8bc316",
+    "lines": 17,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/BcInvoiceDto.cs": {
+    "phase": "indexed",
+    "hash": "1197292af974dca1c87bb376a07f8ba216055f67f1e3e0ca6c6e17c3d9c19305",
+    "lines": 229,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/BcOffhireDto.cs": {
+    "phase": "indexed",
+    "hash": "3bfda1806d442cd6fe87612216b015b43a15d057d66974ac91b54e1da9da35cb",
+    "lines": 43,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/BcShipmentDto.cs": {
+    "phase": "indexed",
+    "hash": "5733e6f51d31b202039392e897a4afe4e871330549158b4e6c178eeeef357716",
+    "lines": 293,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/BcVesselDto.cs": {
+    "phase": "indexed",
+    "hash": "f78e16c4f6badfd34271c0e28b7f519df3d6ddc5aed9eb62bc3698acff94c54c",
+    "lines": 149,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/BcVoyageDto.cs": {
+    "phase": "indexed",
+    "hash": "a1f39d94690ade11c0a9fa428cfb8dfffb90a615934877e8f9072a1ba3eaee41",
+    "lines": 224,
+    "file_type": "Dto",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/ExportInvoiceRequestDto.cs": {
+    "phase": "indexed",
+    "hash": "a81f9e22ccf0576a44bbbd08dfd408f8ab5f389dfb375605ec2a39d28fcefa62",
+    "lines": 11,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Export/ExportIOffhireRequestDto.cs": {
+    "phase": "indexed",
+    "hash": "d87d090751d67aa1ca01a6f6dbd6f02332a215a429ab57ac1a8ee6826ddaac89",
+    "lines": 9,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalCompanyContactDeleteDto.cs": {
+    "phase": "indexed",
+    "hash": "d97a6f5784327a76cfce52a94b44beff9db1161dbb32fbb2b31cc3428f4c0bb7",
+    "lines": 11,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalCompanyContactDto.cs": {
+    "phase": "indexed",
+    "hash": "45c6f4dc9586dd0ebfbd0f0622a698ce963deee0f1fa6d798af4e371a7303b0d",
+    "lines": 127,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalCurrencyRateDto.cs": {
+    "phase": "indexed",
+    "hash": "c107b4ba474bd83cb881df9692f92a946e2b69340f12897117966e03a505bbf5",
+    "lines": 32,
+    "file_type": "Dto",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalInvoiceDto.cs": {
+    "phase": "indexed",
+    "hash": "7f312f6df4d72122515b07a28b83828a98c2ea40306afa4aed1af4503759e751",
+    "lines": 427,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalInvoiceReverseDto.cs": {
+    "phase": "indexed",
+    "hash": "1aa6f2ed1e41e04fba0ac58d193eda7785a4514c46ea2699b899b28009f0a29f",
+    "lines": 13,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/Dtos/Import/ExternalPaymentDto.cs": {
+    "phase": "indexed",
+    "hash": "ff04bfaf278ac18bff7ad5e90e7e1a7d17091762953e38bda3cc71a3583a4ed6",
+    "lines": 85,
+    "file_type": "Dto",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/DefaultHttpClientHandler.cs": {
+    "phase": "indexed",
+    "hash": "a1087415096f0f981961a43df2de5283340ed0a70d2b1caa8bbe1aae573df5fc",
+    "lines": 9,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/HttpClientConfigurationExtension.cs": {
+    "phase": "indexed",
+    "hash": "179e764e6cc20663cd87277187284ae4608c706b887b14602bdb2398e11b2d20",
+    "lines": 80,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/HttpClientConfigurationHelper.cs": {
+    "phase": "indexed",
+    "hash": "a13762ea084f30b13d629a3d804644043a7f640084af3181a3e5dde08862f29f",
+    "lines": 19,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/HttpClientOptions.cs": {
+    "phase": "indexed",
+    "hash": "248470da5c53ebdd0e684c5607ce525fb39ccf6cca162a2c976f3b899ce3723d",
+    "lines": 25,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/OAuth2AuthenticationDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "bf8ab9dfe90d65480a85c85a7337d9d004add81b383dde1d53ecafc243767a90",
+    "lines": 30,
+    "file_type": "Handler",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/HttpClient/UserAgentDelegatingHandler.cs": {
+    "phase": "indexed",
+    "hash": "e2501588cab9f465656eaca889f199d91fe9364d688cf857e32009edc57dc974",
+    "lines": 64,
+    "file_type": "Handler",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/InvoiceClient/HttpInvoiceClient.cs": {
+    "phase": "indexed",
+    "hash": "6c5686a16fbf4eb838f8355941081a02cc95bbfda3072d43f36f7b1134c7a02f",
+    "lines": 70,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/InvoiceClient/IInvoiceClient.cs": {
+    "phase": "indexed",
+    "hash": "b0ba45f23431d1b1e79effb7ac3bd503ed1ecf5990ddc0e0f89e3da8cbdcd6b3",
+    "lines": 16,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/InvoiceClient/MockInvoiceClient.cs": {
+    "phase": "indexed",
+    "hash": "94d8631cf4af183ee49d04e09af4c257ffdb47a2f6535ec3dcc7fa25a8b79bd0",
+    "lines": 21,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/OffhireClient/HttpOffhireClient.cs": {
+    "phase": "indexed",
+    "hash": "98e36477c150b750147160534c7f127c246668d939e4a873f564f980147df70b",
+    "lines": 49,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/OffhireClient/IOffhireClient.cs": {
+    "phase": "indexed",
+    "hash": "7e15157b53edc2e0a49c0d8410ed5913630e90262e7b4a549d2a398aac08a025",
+    "lines": 10,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/OffhireClient/MockOffhireClient.cs": {
+    "phase": "indexed",
+    "hash": "05e6a888db9df6b9579ba93754a6121b9f81cf25f095d4609722c75831d41497",
+    "lines": 14,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/ShipmentClient/HttpShipmentClient.cs": {
+    "phase": "indexed",
+    "hash": "e973728e4a5b14355f8a9279c192caa88c3c8ca36d68287e4011e8dd2c5139be",
+    "lines": 80,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/ShipmentClient/IShipmentClient.cs": {
+    "phase": "indexed",
+    "hash": "6e9e293cedc3cfe31eb66d3fcea29a944e069e0124e072df253543e08aeb38b9",
+    "lines": 19,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/ShipmentClient/MockShipmentClient.cs": {
+    "phase": "indexed",
+    "hash": "2211c6dec23a0572d29ed64a47d45eea9364b361a8d16094d2cdc97a108a53f7",
+    "lines": 24,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VesselClient/HttpVesselClient.cs": {
+    "phase": "indexed",
+    "hash": "41dfa172807339a16cde78d0b6835511e8e79555765148dbd064b7c539cee862",
+    "lines": 113,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VesselClient/IVesselClient.cs": {
+    "phase": "indexed",
+    "hash": "77e2187a6676627b4614337af68c557f0ffee62845b085b97b045b1d008f2c16",
+    "lines": 30,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VesselClient/MockVesselCilent.cs": {
+    "phase": "indexed",
+    "hash": "40123975b29287d4d26f05045ea1bdb884051c19abcbdbc6d6fd042f1b01d24d",
+    "lines": 51,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VoyageClient/HttpVoyageClient.cs": {
+    "phase": "indexed",
+    "hash": "54f952775128bac4d2e00eb5e4f2e80e2b5ceaa9b7e15d9d58df1b9e7c515a94",
+    "lines": 98,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VoyageClient/IVoyageClient.cs": {
+    "phase": "indexed",
+    "hash": "5fb1ce8c08273c4155bff16e873ec29f6fd17e457a0e2ced768ec2647242d761",
+    "lines": 29,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BusinessCentralClient/VoyageClient/MockVoyageClient.cs": {
+    "phase": "indexed",
+    "hash": "e27404c0920db82fe8e69eaa5964bdfa1d4c83d04a657b42544f1aa0de7ad557",
+    "lines": 54,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BVMSAzureFunctionsClient/BVMSAzureFunctionsClient.cs": {
+    "phase": "indexed",
+    "hash": "81eafb7781c2a5de266587409ef07b0424797a9125b50885094cc9e6886e5eae",
+    "lines": 109,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/BVMSAzureFunctionsClient/Models.cs": {
+    "phase": "indexed",
+    "hash": "2480db4230548906eb9a90211ebcb1d0d9d024a0c9c38dc6337064a7ba5da091",
+    "lines": 71,
+    "file_type": "Configuration",
+    "architecture_layer": "Configuration",
+    "is_critical": false
+  },
+  "ExternalClients/BVMSAzureFunctionsClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "6a3b95e8637bb31138e3cc3f159f16d4158649d7d52c983b968cb6288b584f3f",
+    "lines": 29,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/DisApiClient.cs": {
+    "phase": "indexed",
+    "hash": "5b0fce9aa215dd526aef6ae52ed51cd8504c2e27bec76040426b0e695f43ec40",
+    "lines": 279,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/IDisApiClients.cs": {
+    "phase": "indexed",
+    "hash": "a58a2bdacc31ac37d4935ad2f90b8e37f413da5fa8baa3fddf43d225d425dfa7",
+    "lines": 18,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "ae356cc76ec7fc043294afbeff620f48b9a801e540b1a14b9c72a54d92355408",
+    "lines": 44,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/SwitchApiClient.cs": {
+    "phase": "indexed",
+    "hash": "97ae97ae61f1d6d6688c12caba4fd3cb06a542cc993b2fbef5f4d585e9d1ab4d",
+    "lines": 225,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Dtos/Import/DaDeskGetInvoiceRequest.cs": {
+    "phase": "indexed",
+    "hash": "527639f9c32356d5d6fc9adbd668102bda9ea4f4df5d2bcbd56a213913a57a21",
+    "lines": 17,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Dtos/Import/DaDeskGetInvoiceRequestDtos.cs": {
+    "phase": "indexed",
+    "hash": "e65cca340fdb1c6e2ad00cb56ffc55330e177cc6e33fe1538af9a3290ddcbb7d",
+    "lines": 17,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Dtos/Import/DaDeskNotificationDto.cs": {
+    "phase": "indexed",
+    "hash": "814c5e1809e6873513cc0bf27fcb42b0ae0f1b1976620e9ba84e3ad3d1e3bcb6",
+    "lines": 48,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DaDeskConfiguration.cs": {
+    "phase": "indexed",
+    "hash": "d3d46cf5a9bceb00f882512a2f31e33e5b59f49f28383ff1fe7a332f4b9b52ba",
+    "lines": 26,
+    "file_type": "Configuration",
+    "architecture_layer": "Configuration",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/CancelPortCallRequest.cs": {
+    "phase": "indexed",
+    "hash": "7ab1dea3b243a3ec4c6fd3d27a411e99e8beef56c16bf76a5fb7e0b0904c350b",
+    "lines": 8,
+    "file_type": "Dto",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/Common.cs": {
+    "phase": "indexed",
+    "hash": "fba5e21354c430b50bb9e45789f44941540355ee69db0224a1078d912a288c94",
+    "lines": 127,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/Constants.cs": {
+    "phase": "indexed",
+    "hash": "21cddef845c5a237e79c57030ffcb2eb30f8213e32a5857956a2b7c641387c4e",
+    "lines": 63,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/CreatePortCallRequest.cs": {
+    "phase": "indexed",
+    "hash": "4ba3b008580c7b8130e06de301787b603653db00f9d83b139d81de09202e4e7a",
+    "lines": 28,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/GetPortCallRequest.cs": {
+    "phase": "indexed",
+    "hash": "10b2575260796d5f8f27bb771295dc465f1c5ba4ce5b85cb052d81acd16a6ab8",
+    "lines": 26,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/UpdatePortCallRequest.cs": {
+    "phase": "indexed",
+    "hash": "f81d0d87aeed1ad7457346df77300d34a5a440e7248ec41b01bc7a947fd0863b",
+    "lines": 26,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/Invoice/BaseDaInvoiceOutput.cs": {
+    "phase": "indexed",
+    "hash": "775015dfd2fa52e1f053ef1831dedebccb3d70796f76616f6d46364ad8385ff3",
+    "lines": 33,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/Invoice/DaInvoiceImportDtos.cs": {
+    "phase": "indexed",
+    "hash": "237dc81c138ce321e2c28c5d031d07e8e87e7d860490cedd0625cf953d852298",
+    "lines": 672,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/DisApi/Invoice/DaPortCallDtos.cs": {
+    "phase": "indexed",
+    "hash": "0db1fba6fa4d13490b4b95b56c394df595fa703560eef99fc1fa0ed099711f02",
+    "lines": 171,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/Common.cs": {
+    "phase": "indexed",
+    "hash": "01c0e3c785a52e47764f35e3d075bafdc047f3d44a6b96b4daa1e7fa33696c8a",
+    "lines": 28,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/DaDeskAuth.cs": {
+    "phase": "indexed",
+    "hash": "0e958768eac6a9e2690ec7db2341ad3b705b084204391d6b814e78b421a97695",
+    "lines": 27,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/DaDetail.cs": {
+    "phase": "indexed",
+    "hash": "aa1fb75b066ddc568d09aaf16b837a34beb56266600cd39696e580b039a66821",
+    "lines": 485,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/DaHistory.cs": {
+    "phase": "indexed",
+    "hash": "a63b8aa8a02872d337eb4ad274af37cec83b314c38c8ed802486db01bb235499",
+    "lines": 55,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/DaPayment.cs": {
+    "phase": "indexed",
+    "hash": "e551dc46650fd38bf068e0acfd7ec86b11c3261269dbbddcb1d5c4921016722c",
+    "lines": 64,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/DaSearch.cs": {
+    "phase": "indexed",
+    "hash": "c5332be7641e4125da40decb304957bf599bc08aa921410f719adc1cff0f2e8c",
+    "lines": 274,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/OperatorsReport.cs": {
+    "phase": "indexed",
+    "hash": "cd0f2740af960493ba2786baa5bfa931ceba6502c6dc3b79a9f2252b3f3c63fd",
+    "lines": 27,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/OperatorsReportColumn.cs": {
+    "phase": "indexed",
+    "hash": "a99bc166963b16423182a3e424bbc6ce617598706ba5a0044420d685c70aac5e",
+    "lines": 22,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/OperatorsReportCriteria.cs": {
+    "phase": "indexed",
+    "hash": "3840785eacc5b25a95d23213591e72dc93afa129a81526ab0ce0c480e9c48acb",
+    "lines": 85,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/OperatorsReportDetail.cs": {
+    "phase": "indexed",
+    "hash": "8f97d81bad5e23ae86b38eb8fac6f997d882afe781dd22acf76b87ed0acf4ffd",
+    "lines": 194,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/DaDeskClient/Models/SwitchApi/PortCallDetail.cs": {
+    "phase": "indexed",
+    "hash": "469eb0d770d0c8875ab5fffc8fbcdc04af07c4c9d19ada71cdb2c51393bf46ab",
+    "lines": 812,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/MicrosoftGraphClient/MicrosoftGraphClient.cs": {
+    "phase": "indexed",
+    "hash": "2836b29982ef8eeda05b5b32dbda60ddf8863f2eaea63fe592137e0a4947cba3",
+    "lines": 169,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/MicrosoftGraphClient/MicrosoftGraphClientConfiguration.cs": {
+    "phase": "indexed",
+    "hash": "7ebb6faf811e9446506a626092661ddd002bd698bd1a4d72257d32331cc4b54e",
+    "lines": 19,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/MicrosoftGraphClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "4c1c895f65392c07ebea538115047e57123e835e9f05d761253b7f3cd457103a",
+    "lines": 28,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/MicrosoftGraphClient.UnitTest/ConfigurationFixture.cs": {
+    "phase": "indexed",
+    "hash": "ce01cacf77227b19bb775fafa861365456e62cb3ba0ab9cabcbd541e58ec08d6",
+    "lines": 28,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/MicrosoftGraphClient.UnitTest/Usings.cs": {
+    "phase": "indexed",
+    "hash": "e8de9b91579ba661cbfebd3912328c2dc917d2a519cc565b717446c7f39e6d33",
+    "lines": 1,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "4f2f1a6c155928fb0d3ff39b0740dc6901d5184b81b0772dea707cc75cd3c722",
+    "lines": 23,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/BunkerReportPdfData.cs": {
+    "phase": "indexed",
+    "hash": "39a69cc728dec7473a8cc1326b27ff63b89152012d41c669578701db5abd40ee",
+    "lines": 49,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/DataFileRequest.cs": {
+    "phase": "indexed",
+    "hash": "b6c2503e9a9bed5d0f17c7e571ce8afae8c9afca2c6c9006025aa7ac2515c1aa",
+    "lines": 52,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/DataFileResults.cs": {
+    "phase": "indexed",
+    "hash": "dc76a8b0baa4e448d32b09f97831a10f4dfc918c237c873f91929d976907c380",
+    "lines": 9,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/EstimatePdfData.cs": {
+    "phase": "indexed",
+    "hash": "07af4588c42b0a69b3a6206e2224a49f82cdcc7547ab77b4b372f6f68d7cf5b6",
+    "lines": 40,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/GenericFileRequest.cs": {
+    "phase": "indexed",
+    "hash": "2a4ea4a05c7e2e3d02a3bd018ed0fa8799003de0bd3959bfcb5290d1cd19fe7a",
+    "lines": 62,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/ProfitAndLossPdfData.cs": {
+    "phase": "indexed",
+    "hash": "cab342e1e8cbdba1a3d0aec2c595b541b4796334de75e7850f8a358b65203665",
+    "lines": 90,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/TcoVoyagePdfData.cs": {
+    "phase": "indexed",
+    "hash": "6dbd6ffa3495240deb12837046ae3ea333d3ba2c1c1dcfbe8a71a7cbd026feac",
+    "lines": 71,
+    "file_type": "Dto",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/VoyageCreationPdfData.cs": {
+    "phase": "indexed",
+    "hash": "6143738911820d729088a8de1ff37461d822eb440c4ea332f66fc3c0a47233cc",
+    "lines": 52,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/DTO/VoyagePdfData.cs": {
+    "phase": "indexed",
+    "hash": "3d5d45404d11309fb1faf778065afa10ea9cab8282a891b20303ca837685d4ab",
+    "lines": 40,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Helper/FontHelper.cs": {
+    "phase": "indexed",
+    "hash": "0ec1765a38be1a1682c4fe2533f2f64ede40f1a9e982de6baa7fe94bb5d53fc6",
+    "lines": 121,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Helper/Helper.cs": {
+    "phase": "indexed",
+    "hash": "8e3ee7b41ae6be9b36d4d0d9fb37a122ef871bc7c143fa00541e7bafaaedc0d1",
+    "lines": 74,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Collection/ServiceCollection.cs": {
+    "phase": "indexed",
+    "hash": "ae18e048abdc656857fdd852900a36f680ab857f7ebe14ab5b6700b665874eb7",
+    "lines": 17,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Interface/IDocxProcessor.cs": {
+    "phase": "indexed",
+    "hash": "95960fcc8b3c577d6f08898db607c8150befe2fdae970fb7497fd1d55dc7a921",
+    "lines": 19,
+    "file_type": "Interface",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Interface/IExcelProcessor.cs": {
+    "phase": "indexed",
+    "hash": "cba74430efe7bba48bf8198d6906d709f21ced44d8846db35d6edd6867db0807",
+    "lines": 10,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Interface/ISyncfusionGen.cs": {
+    "phase": "indexed",
+    "hash": "71eac488fd0f170f700913c23e8250a83216fa18a4bd9b8e3584fc692131cda1",
+    "lines": 13,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Repository/DocxProcessor.cs": {
+    "phase": "indexed",
+    "hash": "6a35eefc39e0c8eaf9a2a1cebb7c1900e6e971291da82bb200a3215e59e4984f",
+    "lines": 452,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Repository/ExcelProcessor.cs": {
+    "phase": "indexed",
+    "hash": "4f36e2bf71608302acaf911d6452bdcd8effd4863fd9d1f5ec0e68230f2ed823",
+    "lines": 216,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Repository/RazorService.cs": {
+    "phase": "indexed",
+    "hash": "0c2f09c4ea37053e8437b388094e23920c242317d657d80a5f120c9f11dbb5cb",
+    "lines": 79,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/PdfExportClient/Service/Repository/SyncfusionGen.cs": {
+    "phase": "indexed",
+    "hash": "7c4549d91cbc936cf4e5f3ff60eedc0b93ecdcc5423275cbe0a7191c52d490b1",
+    "lines": 161,
+    "file_type": "Service",
+    "architecture_layer": "Business",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyDistanceClient.cs": {
+    "phase": "indexed",
+    "hash": "f9ba5f79d0050e0d41ff732ec5fbc67633cbab77f01185a48104ac078cc4aba5",
+    "lines": 129,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyDistanceDtos.cs": {
+    "phase": "indexed",
+    "hash": "d47a3a62e6ef168d79abad2e3758283362e871ef2bec7d148ee2c8fdfd44bb01",
+    "lines": 177,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyDistanceMock.cs": {
+    "phase": "indexed",
+    "hash": "b3dec9d80adaf269a94f023cc3d9629250576c871739e96cc982e4266b75a88a",
+    "lines": 29,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyPortClient.cs": {
+    "phase": "indexed",
+    "hash": "e94c8313382a39d8061fb37efa6f94e38e6209d3c2ed5c60b23fa31ea2e5b550",
+    "lines": 82,
+    "file_type": "ExternalClient",
+    "architecture_layer": "ExternalClient",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyPortDtos.cs": {
+    "phase": "indexed",
+    "hash": "a3d3a978ebfa6bfb4055bd477cca7b5beb8ccfb58d6d97de5512a26516cf49ca",
+    "lines": 14,
+    "file_type": "Dto",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/DataLoyPortXlsx.cs": {
+    "phase": "indexed",
+    "hash": "f4fc3a599da5b0ec6564cec4d17e19c20610fce6c7ca260a1662ec22f5d99450",
+    "lines": 47,
+    "file_type": "Other",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/GeoLocationHelper.cs": {
+    "phase": "indexed",
+    "hash": "2897d438dd32abbb46e956654c3e3063898e7230fe64a39ac3ff4590d16bab85",
+    "lines": 67,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "3696a43450dbfa728012b5045c45bd78bc7a705cefab12c63266ac18975b8382",
+    "lines": 29,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/RoutingEngineClient.UnitTest/ConfigurationFixture.cs": {
+    "phase": "indexed",
+    "hash": "51867cd79e7e4706d9118a07162e42eddc3d6c83b4705f8e54793992f1d09ddf",
+    "lines": 28,
+    "file_type": "Configuration",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient/Helpers.cs": {
+    "phase": "indexed",
+    "hash": "3cdf6b03246a0cd355c7c03287685d72b62fe94159e378ca2fa2c2f15bc1bedc",
+    "lines": 26,
+    "file_type": "Function",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient/Models.cs": {
+    "phase": "indexed",
+    "hash": "19956a34b355c84fbb06bf23a40f54a7183b6d82b56cab6138155965c892fba9",
+    "lines": 163,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient/SednaClient.cs": {
+    "phase": "indexed",
+    "hash": "9bf13e90a4a98b2a36def30433a6697e43bf9d53fa9795a45bb3b110f5046370",
+    "lines": 445,
+    "file_type": "Service",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "5bbae4a95ec7b2d2e40a2399ba8e7bda96d2c85e4b6fb96e036af88136eee22c",
+    "lines": 38,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient/Dtos/MessageCreateDtos.cs": {
+    "phase": "indexed",
+    "hash": "e4c69cb1a1138dab1b4b108d9eef5343862666bef91e9d7bf1f585252efeac84",
+    "lines": 69,
+    "file_type": "Dto",
+    "architecture_layer": "API",
+    "is_critical": false
+  },
+  "ExternalClients/SednaClient.UnitTest/Usings.cs": {
+    "phase": "indexed",
+    "hash": "e8de9b91579ba661cbfebd3912328c2dc917d2a519cc565b717446c7f39e6d33",
+    "lines": 1,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "ExternalClients/WfosClient/Models.cs": {
+    "phase": "indexed",
+    "hash": "5a114a493ee2d8d0cb925485e70aad8343c53a1612562a76dbd32344588d0d3b",
+    "lines": 542,
+    "file_type": "Dto",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/WfosClient/Setup.cs": {
+    "phase": "indexed",
+    "hash": "6bc3abe01f28bf347540b558a72fce221c224b695832f4950ddcc4bd7c57b6e9",
+    "lines": 30,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/WfosClient/WfosClient.cs": {
+    "phase": "indexed",
+    "hash": "69ba0469bee1ebe2f48c50bb238a52e99164a742717b6d4ca693bc6c7ff30403",
+    "lines": 156,
+    "file_type": "ExternalClient",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false
+  },
+  "ExternalClients/WfosClient/Models/Constants.cs": {
+    "phase": "indexed",
+    "hash": "92291e2bd4bb9584c05964203d4e7fb24caffd2b20460625a2d8551d3b2e0b03",
+    "lines": 73,
+    "file_type": "Other",
+    "architecture_layer": "Domain",
+    "is_critical": false
+  },
+  "ExternalClients/WfosClient.UnitTest/ConfigurationFixture.cs": {
+    "phase": "indexed",
+    "hash": "26c1a8e4a2f8e276ad9f4222fa5e005f0a59b77428485b0ed5e566640aae15ce",
+    "lines": 28,
+    "file_type": "Configuration",
+    "architecture_layer": "Other",
+    "is_critical": false
+  },
+  "Functions/Program.cs": {
+    "phase": "indexed",
+    "hash": "4dad1cff454234e8f9ed9cf655785fa083c3d75007de830e4bb9582a09fa6ea9",
+    "lines": 99,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/SafeHttpClientPostConfigure.cs": {
+    "phase": "indexed",
+    "hash": "34eebd676d874f24a07226ba527f2bf945dce9048c380b74edbf62f866f7eae7",
+    "lines": 23,
+    "file_type": "Configuration",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/BunkerInvoiceJobMonitoring/BunkerInvoiceJobMonitoringFunction.cs": {
+    "phase": "indexed",
+    "hash": "e2c8c7d2dd21a46a823da305d1f66692b1b352b5f3bb976043b2183a3d84af29",
+    "lines": 98,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/BunkerInvoiceJobMonitoring/BunkerInvoiceJobMonitoringService.cs": {
+    "phase": "indexed",
+    "hash": "7ad7c0bc4ec6d1030e97ed4d014a0e8015871798d8c9b0494f293a20a30142ce",
+    "lines": 129,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/ConsecutiveVoyages/ConsecutiveVoyagesFunction.cs": {
+    "phase": "indexed",
+    "hash": "5a750bee64734b1abde16c67052a4a1b4b889cd710d8cea952fb43107f4ec3ae",
+    "lines": 123,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/ConsecutiveVoyages/ConsecutiveVoyagesService.cs": {
+    "phase": "indexed",
+    "hash": "7626613816a3d3fbf0cd0cb0e8e5bc9a91c79bb1b92111be68e6200fc56e66e8",
+    "lines": 117,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/ConsecutiveVoyages/NoOpConsecutiveVoyagesClient.cs": {
+    "phase": "indexed",
+    "hash": "a0aee8004c42bfa7449e588a1cdb3771d7ce07f6cb597f577fd2466baf50e6c0",
+    "lines": 21,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/CurrencySync/CurrencySyncFunction.cs": {
+    "phase": "indexed",
+    "hash": "e443aaf5287bc8be71bd509d6601b9ed9907607c22c93b5a38769caa1e7cf324",
+    "lines": 173,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/CurrencySync/CurrencySyncService.cs": {
+    "phase": "indexed",
+    "hash": "4aa95909cdb78cf89dd7686f6c93f0155cd709f904d0acd8eaab290261bb0037",
+    "lines": 156,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/DaDeskJobMonitoring/DaImportFailedJobMonitoringFunction.cs": {
+    "phase": "indexed",
+    "hash": "faeadcb168f2183dd7b4ff9a3a25a73be5bb66b5c1748bd322f6f82c97f2e336",
+    "lines": 109,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/DaDeskJobMonitoring/DaImportFailedJobMonitoringService.cs": {
+    "phase": "indexed",
+    "hash": "93d73a5f519c2ba51fa3ea09264aa7914e555d9f46a201d92e5719c2435c73e8",
+    "lines": 140,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/DiagnoseVoyages/DiagnoseVoyagesFunction.cs": {
+    "phase": "indexed",
+    "hash": "8e4e508bcab7bc04515167d5674ec0412cef98ff2dc86c290721a97bea15fd3f",
+    "lines": 70,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/DiagnoseVoyages/DiagnoseVoyagesService.cs": {
+    "phase": "indexed",
+    "hash": "5329d2b79ed06f6555e6d98ed35279d39e3389c0b932d5c784e0862b9b823481",
+    "lines": 60,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/FailedJobMonitoring/FailedJobMonitoringFunction.cs": {
+    "phase": "indexed",
+    "hash": "49e940b09e4c7021206a671a294c8a720b57cfd51e7bb4a13a1857d9efde7a8d",
+    "lines": 114,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/FailedJobMonitoring/FailedJobMonitoringService.cs": {
+    "phase": "indexed",
+    "hash": "7c291538a56de78b51bd7599dcb9d3de935dc9aa0160ef4c6ad632f51aa80d6b",
+    "lines": 146,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/OffHireSync/OffhireSyncFunction.cs": {
+    "phase": "indexed",
+    "hash": "f39dbf801dee1c0c7d219adec33f8eeae1c0b2dcb247ffb9fe49e3fcb073b87e",
+    "lines": 181,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/WfosSync/WfosSyncFunction.cs": {
+    "phase": "indexed",
+    "hash": "c8a5cd7bff7e6d91c904737188072ad9da3bdb1f33614475c37c4489702b7f75",
+    "lines": 166,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false
+  },
+  "Functions/WfosSync/WfosSyncService.cs": {
+    "phase": "indexed",
+    "hash": "944a6e2f67ad8a6cbe9dae8e83b28976397971fa44f815556b9a46cba6810dac",
+    "lines": 184,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false
   }
 }
