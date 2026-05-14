@@ -124,6 +124,7 @@ async def enrich_with_cross_references(
     print(f"[Phase 3] {total} files to enrich.")
 
     critical_count = 0
+    manifest_lock = asyncio.Lock()
 
     effective_batch = max(1, concurrency) if (force_cloud or force_local) else batch_size
     for batch_start in range(0, total, effective_batch):
@@ -190,6 +191,8 @@ async def enrich_with_cross_references(
                     "is_critical": files_dict.get(rel_path, {}).get("is_critical", False),
                 },
             )
+            async with manifest_lock:
+                manifest.save()
             ts = datetime.now().strftime("%H:%M:%S")
             print(f"[Phase 3] {ts} [{file_idx}/{total}] DONE: {rel_path}")
 

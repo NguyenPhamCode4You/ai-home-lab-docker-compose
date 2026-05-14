@@ -1,6 +1,6 @@
 {
   "Core/Domain/Abstract/ICommission.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4472f1b6d844bf4f9fb43f2a6ec7ba24e5300c7a00eb41dd3814a052606a5234",
     "lines": 17,
     "file_type": "Other",
@@ -9,7 +9,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Abstract/ICommission.md"
   },
   "Core/Domain/BunkerOrder/BunkerOrderCrudDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "df9bdae3fbfa1d47d47a2c80612b6031736bcbc94aeb3521d85281cea6f3f154",
     "lines": 220,
     "file_type": "Dto",
@@ -18,7 +18,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/BunkerOrder/BunkerOrderCrudDto.md"
   },
   "Core/Domain/BunkerOrder/BunkerOverviewDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "25f6219d483b11dab0a7b13d5352d6c55a8ddb340cf637901e672fae5976c3cd",
     "lines": 69,
     "file_type": "Dto",
@@ -27,7 +27,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/BunkerOrder/BunkerOverviewDto.md"
   },
   "Core/Domain/BunkerOrder/BunkerOverviewSummaryDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a95e8ec1a71f3606ab47f0005422905c68d71701f8755b0f37185d428763ad49",
     "lines": 49,
     "file_type": "Dto",
@@ -36,7 +36,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/BunkerOrder/BunkerOverviewSummaryDto.md"
   },
   "Core/Domain/Commons/ActionDetail.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b67948a20dcee394b9ff2cc6a8fdf4b2cfa0333b393fb650129f34990c10c8a1",
     "lines": 33,
     "file_type": "Other",
@@ -45,7 +45,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/ActionDetail.md"
   },
   "Core/Domain/Commons/ApiResponse.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "22cf6120bb257f0de652c121b67940cd94c4d62743e09ca9e109f6584f73874b",
     "lines": 64,
     "file_type": "Dto",
@@ -54,7 +54,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/ApiResponse.md"
   },
   "Core/Domain/Commons/BaseEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "80ef8caa79c398e64d7bd2410d4fb4dca771d110bd2328b68b5964744d66a064",
     "lines": 35,
     "file_type": "Dto",
@@ -63,7 +63,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/BaseEntity.md"
   },
   "Core/Domain/Commons/BaseSearch.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4c5b9f4d92a46f96c674ad3146a73bfa13b914bc640d284c8d2dfbbe44e26636",
     "lines": 18,
     "file_type": "Dto",
@@ -72,7 +72,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/BaseSearch.md"
   },
   "Core/Domain/Commons/CommonEntities.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3654af8eb00a542be66da2841ec5426dd64f5cd29ee2357a28520d9a70328458",
     "lines": 89,
     "file_type": "Other",
@@ -81,7 +81,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/CommonEntities.md"
   },
   "Core/Domain/Commons/Constant.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ed1f8e8593a64901636a03ef7befec48bf5fb9ace70e692eb66807f55b2a5639",
     "lines": 30,
     "file_type": "Other",
@@ -90,7 +90,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Constant.md"
   },
   "Core/Domain/Commons/FileModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4a15a8c99c1ce8675f2c6039c5203d3583ae81b100647db2342455c2551f0f1e",
     "lines": 13,
     "file_type": "Dto",
@@ -99,7 +99,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/FileModel.md"
   },
   "Core/Domain/Commons/HelperFunction.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "54ad5c3a2d8d43b6f99d2b199dec0ea8e436485b2aa0a841fe15680e8471e4c7",
     "lines": 390,
     "file_type": "Other",
@@ -108,7 +108,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/HelperFunction.md"
   },
   "Core/Domain/Commons/LogEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ec878c580a0e4365766e16f6e46d344fdf3d37b47c2180f773d17c3c388d5ce0",
     "lines": 15,
     "file_type": "Entity",
@@ -125,7 +125,7 @@
     "is_critical": false
   },
   "Core/Domain/Commons/RequestUser.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8e0f1418d94a49a55fe253ea707c9f87185b53926e8b110b18d689cbe95b55dc",
     "lines": 20,
     "file_type": "Dto",
@@ -134,7 +134,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/RequestUser.md"
   },
   "Core/Domain/Commons/ResponseData.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9aeac11760d68c8c1ea6721806afc22bbb8e4203f0b86fad51fc9a604116e87a",
     "lines": 354,
     "file_type": "Dto",
@@ -143,7 +143,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/ResponseData.md"
   },
   "Core/Domain/Commons/SystemLogModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f005f489a1c211b4dbefe5131d34c1f1948d955cfe1f921948c9e97661fd92b8",
     "lines": 15,
     "file_type": "Entity",
@@ -152,7 +152,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/SystemLogModel.md"
   },
   "Core/Domain/Commons/TimeZoneHelper.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4cb31d2ec311824b1ee40b2ea989f61c7804d61f5a89b52f4365dcd70f4cf9e8",
     "lines": 201,
     "file_type": "Other",
@@ -161,7 +161,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/TimeZoneHelper.md"
   },
   "Core/Domain/Commons/TraceDataModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7a1ad5d2ae1a9176e73f2294d7cb603b2a8462514c815eef33eb95d963238e7c",
     "lines": 8,
     "file_type": "Entity",
@@ -170,7 +170,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/TraceDataModel.md"
   },
   "Core/Domain/Commons/VersioningExtensions.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "dde1e3434d9450296328ac93fdb89f2c48f06549d4c82f6002e7dd59fba296f0",
     "lines": 29,
     "file_type": "Other",
@@ -179,7 +179,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/VersioningExtensions.md"
   },
   "Core/Domain/Commons/DataAnnotations/DataTypeLimits.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "12e65ee13909812362ec644a5e7d258d5690851aeed0420959a1d27d6ac5ebf3",
     "lines": 88,
     "file_type": "Other",
@@ -188,7 +188,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/DataTypeLimits.md"
   },
   "Core/Domain/Commons/DataAnnotations/DecimalColumnAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b2806334a663f7cc5d37f0986759d4e1fbeae7d63bb24588140c72a6968ef41d",
     "lines": 9,
     "file_type": "Other",
@@ -197,7 +197,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/DecimalColumnAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/DecimalValidationAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fefa57ac277d6b27f635d6370ca0623a4ee68de838adc5e2c54082f5d5aff105",
     "lines": 41,
     "file_type": "Validator",
@@ -206,7 +206,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/DecimalValidationAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/IntegerColumnAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b0eb10f2fbeda8a36ba69ace441796dae95c09ac005e661c3a3c1589e451e521",
     "lines": 17,
     "file_type": "Other",
@@ -215,7 +215,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/IntegerColumnAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/IntegerValidationAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7ebe3e76344414bbc2570f24ec3d10fb06f523b7f88d5b7d54ccb7b0ad079776",
     "lines": 81,
     "file_type": "Validator",
@@ -224,7 +224,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/IntegerValidationAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/RuleBuilderIgnoredAttribute.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "db132946d1fd8d68a65f0886be833189ea998b994187dc5b9f45cc29f2f408c9",
     "lines": 9,
     "file_type": "Other",
@@ -233,7 +233,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/RuleBuilderIgnoredAttribute.md"
   },
   "Core/Domain/Commons/DataAnnotations/StringColumnAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8d5c0b7381e8eec7dc562071b3c737c2ef66b8b4274a4de886c43ea03bd0e658",
     "lines": 34,
     "file_type": "Other",
@@ -242,7 +242,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/StringColumnAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/StringValidationAttributes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e69b3c293f83ec012009294498e58054adfa27bc776593b7c79a6180b6af4e22",
     "lines": 143,
     "file_type": "Validator",
@@ -251,7 +251,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/DataAnnotations/StringValidationAttributes.md"
   },
   "Core/Domain/Commons/DataAnnotations/SystemAuthWithPasswordAttribute.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f8d56141236e402c3dc559c3dc62fd64eb3ddefaf73173ea325181784fc73fb0",
     "lines": 63,
     "file_type": "Other",
@@ -268,7 +268,7 @@
     "is_critical": false
   },
   "Core/Domain/Commons/Dtos/TagDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c1fb7ca604b5aa7526552f41491703d0321020e60e50632200df9eb2fc0719f7",
     "lines": 21,
     "file_type": "Dto",
@@ -277,7 +277,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Dtos/TagDtos.md"
   },
   "Core/Domain/Commons/Entities/EntityTagEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7efa0d0de6784458e47d6ff2fa9e376efe00e028e8f0b6ac4579646e23f0663f",
     "lines": 29,
     "file_type": "Entity",
@@ -286,7 +286,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Entities/EntityTagEntity.md"
   },
   "Core/Domain/Commons/Entities/TagEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "20c02995c4a4ceccddcbe1b4d43eebc168ad9f427b91444012b6f4be6832d62d",
     "lines": 24,
     "file_type": "Entity",
@@ -295,7 +295,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Entities/TagEntity.md"
   },
   "Core/Domain/Commons/Extensions/EstimateCreatedFromVoyageExtensions.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b2f3d160179195094c24ab491413c636e359496e96e2153dccbe31f9b9f9be57",
     "lines": 15,
     "file_type": "Other",
@@ -304,7 +304,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Extensions/EstimateCreatedFromVoyageExtensions.md"
   },
   "Core/Domain/Commons/Extensions/QueryBuilderExtensions.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9d6103284c44dbcafcb3b5666c33f9c46201d51ec0de7a198f8038a88a457075",
     "lines": 445,
     "file_type": "Other",
@@ -313,7 +313,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/Extensions/QueryBuilderExtensions.md"
   },
   "Core/Domain/Commons/QueryBuilder/QueryBuilderFieldConfig.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0523975ed7902e74bbe781f09959b7778aee1f1df9db292dfa8630047a0fe9ed",
     "lines": 28,
     "file_type": "Other",
@@ -322,7 +322,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Commons/QueryBuilder/QueryBuilderFieldConfig.md"
   },
   "Core/Domain/Constants/BunkerOrderResponsibilityEnum.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "01f86395d43e1ccdf719ccfe991e5dee96ee31344350a2397b99a0c68f8a6150",
     "lines": 18,
     "file_type": "Other",
@@ -331,7 +331,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/BunkerOrderResponsibilityEnum.md"
   },
   "Core/Domain/Constants/BunkerOrderStatusEnum.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6afdc1595ed3f1e2a2d0b12f8c70f209a5819b6175e73a4cf9e055731d3c0d88",
     "lines": 30,
     "file_type": "Other",
@@ -340,7 +340,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/BunkerOrderStatusEnum.md"
   },
   "Core/Domain/Constants/BunkerTypeConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "99a39656c0c0959816b1aac9806c44ba2efd1d27c1269879426a4d56a6b4da48",
     "lines": 12,
     "file_type": "Other",
@@ -349,7 +349,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/BunkerTypeConstants.md"
   },
   "Core/Domain/Constants/CargoConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "632ea6617123cf6dfa016e4758cd69bac11c636f38b38a4989ea142afa22dec2",
     "lines": 7,
     "file_type": "Other",
@@ -358,7 +358,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/CargoConstants.md"
   },
   "Core/Domain/Constants/CommonConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6bbe598971c9e50a9b8dcbda6004b90d484874464572d39772afb41ff19d458b",
     "lines": 1107,
     "file_type": "Other",
@@ -367,7 +367,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/CommonConstants.md"
   },
   "Core/Domain/Constants/ConstantsTaskAlert.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "04654da5d2aad5b4f602aabfe4bebd3c2c80f67fc624d682d04c30a5c97dd562",
     "lines": 58,
     "file_type": "Other",
@@ -376,7 +376,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/ConstantsTaskAlert.md"
   },
   "Core/Domain/Constants/ErrorCodes.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "dc6748534b873209c094530d2cff5038309baefd750ce79c61569f30271883e7",
     "lines": 224,
     "file_type": "Other",
@@ -385,7 +385,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/ErrorCodes.md"
   },
   "Core/Domain/Constants/FinanceConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b79b048d46e0e491484748258e205eedeb068045048a69b87fe153a30b3d901b",
     "lines": 448,
     "file_type": "Other",
@@ -394,7 +394,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/FinanceConstants.md"
   },
   "Core/Domain/Constants/ProfitAndLossItemOriginEnum.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "832d1fcead1d673e20e5a222d768ea826d718e8b889c349190e40f3d1c2e04e0",
     "lines": 24,
     "file_type": "Other",
@@ -403,7 +403,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/ProfitAndLossItemOriginEnum.md"
   },
   "Core/Domain/Constants/ShipmentTerm.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fda1b04f4272c845144d0894e62836d7c5fb079bdf925f20c1fb1de86ba8ead0",
     "lines": 31,
     "file_type": "Other",
@@ -412,7 +412,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/ShipmentTerm.md"
   },
   "Core/Domain/Constants/TagConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "41f7fa66db3da032d330d3749d2692894e7e79a89d761dcf27aeabc2a6f0a458",
     "lines": 8,
     "file_type": "Other",
@@ -421,7 +421,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/Constants/TagConstants.md"
   },
   "Core/Domain/DataSync/DataSyncJob.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5f5894433d75c2e64f5d73cfd9005257b9f6c345948c941ba4585f7a8016a2b8",
     "lines": 36,
     "file_type": "Entity",
@@ -430,7 +430,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/DataSync/DataSyncJob.md"
   },
   "Core/Domain/DataSync/DataSyncJobLog.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1b165792476d17ef55036ec38d1e00f8213ec547db7673a8417d497d9cc19434",
     "lines": 29,
     "file_type": "Entity",
@@ -439,7 +439,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/DataSync/DataSyncJobLog.md"
   },
   "Core/Domain/DataSync/SynchronizationTypeEnum.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "38226a817b2bc1f97175bfffaf30d0c8d1f1b143ad34c576f3427278c5f09bb5",
     "lines": 168,
     "file_type": "Configuration",
@@ -448,7 +448,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/DataSync/SynchronizationTypeEnum.md"
   },
   "Core/Domain/DataSync/Dtos/DataMigrationDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "87d35e01abcea37f7363a3c916dd14522c5c43c62eac7b32d637cc4110460f03",
     "lines": 37,
     "file_type": "Dto",
@@ -457,7 +457,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/DataSync/Dtos/DataMigrationDto.md"
   },
   "Core/Domain/DataSync/Dtos/DataSyncJobDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "50849175268b4aa004f3984ceda844eab00ea02837525804c2620a5cdeea51af",
     "lines": 63,
     "file_type": "Dto",
@@ -691,7 +691,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/InvoiceTransactionDto.md"
   },
   "Core/Domain/FinanceData/Dtos/InvoiceTransactionItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f94991e9abd5511bd2656fad4b0897fcd4e6b101ce3f8d7b3906663e03c9f48a",
     "lines": 56,
     "file_type": "Dto",
@@ -700,7 +700,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/InvoiceTransactionItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/InvoiceTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c672e7d7d1037df4acea586abf7f68549779ecb8f1099a641032fac9a4631fd9",
     "lines": 36,
     "file_type": "Dto",
@@ -709,7 +709,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/InvoiceTypeDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/PaymentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5a5d49d78d724c5eb21942c0f561915b495da0a8de35aaff3a8c5ef1b44bd927",
     "lines": 44,
     "file_type": "Dto",
@@ -718,7 +718,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/PaymentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/PaymentItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ac6a7998d0f6ce479a763b5056c194fd82a047be56cd131341e024f0f6e2d6ae",
     "lines": 32,
     "file_type": "Dto",
@@ -727,7 +727,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/PaymentItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/PaymentTermDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1322bab3860a2485c069fcdce9c35c05f0c7c481cc2aed70a2ac2736ce02fcb5",
     "lines": 31,
     "file_type": "Dto",
@@ -736,7 +736,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/PaymentTermDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/PortDaDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "cad0812403081080ed426c2728b8e34caaf881c5ead4f0fa6a520acfa190757d",
     "lines": 124,
     "file_type": "Dto",
@@ -745,7 +745,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/PortDaDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/ProfitAndLossDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "04a28c5dd4d55f9e9e4935b850ad1c041c3fec7a190d75082dd53cc0c908fdfa",
     "lines": 95,
     "file_type": "Dto",
@@ -754,7 +754,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/ProfitAndLossDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/ReceivableListDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0ec36ed2614b8d95d26bee827f6f2b28d3e16ae4cb7338f3250dca4a0d3dd5c0",
     "lines": 127,
     "file_type": "Dto",
@@ -763,7 +763,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/ReceivableListDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/ReversalReasonDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7d83336b6e3dbe8a9c935eaab1bcdc9ad1efec9d993bbb304b3b57a56339be35",
     "lines": 18,
     "file_type": "Dto",
@@ -772,7 +772,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/ReversalReasonDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/CalculateDueDateDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a5a9925a52d677201e723f3ed0670f1b3fd97fbc12e375563b5e61fe07880a18",
     "lines": 23,
     "file_type": "Dto",
@@ -781,7 +781,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/CalculateDueDateDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceBusinessPartnerContactInfoDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0ef5b5ecb1340fca402466dfcd9397cc30ce84ed7c43214bebec43708b9714b4",
     "lines": 14,
     "file_type": "Dto",
@@ -790,7 +790,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceBusinessPartnerContactInfoDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceCommissionItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3176abba8d60c6cf20daef81ba1fa2cf7c8963edb88502f26b41ca30a33125fd",
     "lines": 20,
     "file_type": "Dto",
@@ -799,7 +799,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceCommissionItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "12666bb26bdc4a074497cafb887118c84e0bd5c04f49fd8fbf530160bb4e5105",
     "lines": 129,
     "file_type": "Dto",
@@ -808,7 +808,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceDueDateTermDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3838e728301ec47a5c56d7c01bf09396149b81d0100bf7172f8dcb78a9fb3e57",
     "lines": 12,
     "file_type": "Dto",
@@ -817,7 +817,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceDueDateTermDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceGenericItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b408de7435ef96049a896a4d2529ecfafa159c33ce0d6c3b6a518239466b53fe",
     "lines": 11,
     "file_type": "Dto",
@@ -826,7 +826,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceGenericItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceListItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f3e42ecf3b200ae3640776f3c7de6be81dd39a921435ad228703b0b6b09d9b92",
     "lines": 31,
     "file_type": "Dto",
@@ -835,7 +835,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceListItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceSearchDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "df5a32cbc4f0dd43a1f08285e1deb78622a75b8672d661fc77afc276bb3dded5",
     "lines": 29,
     "file_type": "Dto",
@@ -844,7 +844,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceSearchDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/InvoiceShipmentCommissionDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8a0e6896e0916ca22cc4d309aca9c86fb3a97030a00cf01c6c9e32219eac6cf2",
     "lines": 23,
     "file_type": "Dto",
@@ -853,7 +853,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/InvoiceShipmentCommissionDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/PolymorphicInvoiceCreationResult.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bb70ddfd61b9ee18735403e0a93fd417fb3114b244ee05b0385bb33799e3e97b",
     "lines": 9,
     "file_type": "Dto",
@@ -862,7 +862,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/PolymorphicInvoiceCreationResult.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/RevenueItemCreateInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "085e076b04b70888392cb55910d2ee1d3cba61f3391609862ba0c3d8fc3c343b",
     "lines": 10,
     "file_type": "Dto",
@@ -871,7 +871,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/RevenueItemCreateInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/RevenueItemInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bf070c9560d1d7daec58be19e8119dc1b95539715093981374dc3a00af73ff69",
     "lines": 55,
     "file_type": "Dto",
@@ -880,7 +880,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/RevenueItemInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/UpdateInvoiceFreeItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "68ac715f5ae2c4de2ddaa1646fc129ec28b0a1da9bddfb221d06ce1b9145b589",
     "lines": 18,
     "file_type": "Dto",
@@ -889,7 +889,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/UpdateInvoiceFreeItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/UpdateInvoiceStatusDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "815051fa6d3e36019fcd240f9c77e41bce18923b37918a4855ea87cf8e9c0e3d",
     "lines": 12,
     "file_type": "Dto",
@@ -898,7 +898,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/UpdateInvoiceStatusDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/BcInvoice/BcInvoiceItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "519b7662049c3587d0c26efbdb582e2193246d526950a9633b20c3d493540594",
     "lines": 18,
     "file_type": "Dto",
@@ -907,7 +907,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/BcInvoice/BcInvoiceItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/BcInvoice/BcInvoiceViewDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "41b8fdeb125c182ae133d4b4f530624b1cf481b03748bac331fa9a4ee3728624",
     "lines": 120,
     "file_type": "Dto",
@@ -916,7 +916,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/BcInvoice/BcInvoiceViewDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/BunkerInvoice/BunkerInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "48fe6b007f2434c693e32c9f0bdd89e413e8c6e31f2845caf9be6400bf052e42",
     "lines": 46,
     "file_type": "Dto",
@@ -933,7 +933,7 @@
     "is_critical": false
   },
   "Core/Domain/FinanceData/Dtos/Invoice/CommissionInvoice/UpdateCommissionInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8d31fc8effbddd0628d2ac4ec2d74a11a87318c674170cbbfb928e6bf0bb8169",
     "lines": 10,
     "file_type": "Dto",
@@ -942,7 +942,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/CommissionInvoice/UpdateCommissionInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "94fd6be149f2353cb1e7013dd2d4018af60e6b31b2fd1f47709824ae7bd48fda",
     "lines": 46,
     "file_type": "Dto",
@@ -951,7 +951,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceExportByIdDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "cfe0fe59909e125bb829028f828052939d40b4715ca1463cb0373c860b0e0270",
     "lines": 13,
     "file_type": "Dto",
@@ -960,15 +960,16 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceExportByIdDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "90f1babebde456caa7f91d99314c9f542841974e6e952157587a8c2ff1e50ca9",
     "lines": 45,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/DaInvoiceItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/ExportDaInvoicesDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "905c8d26b3ba9f35cc8f4bfa725dfbb12984b4e4c6176a6037c31eb992ac7eac",
     "lines": 13,
     "file_type": "Dto",
@@ -977,15 +978,16 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/DaInvoice/ExportDaInvoicesDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/AdditionalInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ae17bb19c1ead521329fea8ca64b59befc12af42bde1e5ec4d3dd1cbd07cbfa8",
     "lines": 31,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/AdditionalInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/BVMSInvoiceExportByIdDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "13647ef9ee03c70ef438fdef23b0fba6bc0eb8885286bf2d1b7a730abf8d4931",
     "lines": 7,
     "file_type": "Dto",
@@ -994,7 +996,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/BVMSInvoiceExportByIdDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/BVMSInvoiceReverseExportDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "372583c8d0b49b065d405b17c7f558f4ae9bdff3e2664a520d3a91c1e0ec29c4",
     "lines": 8,
     "file_type": "Dto",
@@ -1003,7 +1005,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/BVMSInvoiceReverseExportDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CalculateFreightInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "830e2c408c39021c98247a3db82f547ddb9c02407a3c7dbf699f7010bb049b4f",
     "lines": 13,
     "file_type": "Dto",
@@ -1012,7 +1014,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CalculateFreightInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CreateFreightInvoiceAdjustmentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ac8770fe2594679101461f22f7a7fb3de4776acaf50c344e75f8ffc4814e0b2d",
     "lines": 17,
     "file_type": "Dto",
@@ -1021,7 +1023,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CreateFreightInvoiceAdjustmentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CreateFreightInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "76fe9175e57c357662bb84d4e4889393976da873936b9dd04d579aefcc8ad16e",
     "lines": 18,
     "file_type": "Dto",
@@ -1030,7 +1032,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/CreateFreightInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceAdjustmentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "384a9831c53cfe3ef1f96251efaa5cd61d8ee1935ed6098baa2cfc2f62624812",
     "lines": 18,
     "file_type": "Dto",
@@ -1039,39 +1041,43 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceAdjustmentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceCargoItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7de2f163c7d30eef8385f659db10776369a0d4b9589fd0d2bf12e4e87c0cbb5a",
     "lines": 33,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceCargoItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceCommissionItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d30911228ab87a60d2eb29414077c764d5366d32cbc46fb86c9f7ca86eee1ca2",
     "lines": 25,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceCommissionItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "de8b2e5114066082313d0b98445487b4aa03802a2be3d00e5e8e34a620542a33",
     "lines": 154,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceFreightAdjustmentItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7087b9e836d4bd19d9068419edd45add85ce858ff899208f753da0063be67337",
     "lines": 17,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceFreightAdjustmentItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceFreightCalculationItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a43df5a6c7e0ccc628a6cd90512de3a39282d93dacc0d76e4256826e0023b734",
     "lines": 9,
     "file_type": "Dto",
@@ -1080,7 +1086,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceFreightCalculationItemDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceReduceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "77d775ac2c1e78b9f0c7bc41c8d5067c7084eeb13fb579ce6ac0e770e5b6cd98",
     "lines": 15,
     "file_type": "Dto",
@@ -1089,7 +1095,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightInvoiceReduceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightShipmentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2224b9001d7aabf01cff25aaa9d93c109182cc53a49daca6a1c3f29985993aa2",
     "lines": 14,
     "file_type": "Dto",
@@ -1098,31 +1104,34 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/FreightShipmentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/InvoiceableShipmetnsDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e927ec9b43879f302e1615b6bd6900b1b387570fd1e8cc860a84c16580ff1347",
     "lines": 97,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/InvoiceableShipmetnsDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateAdditionalInvoicesDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d5ef84377d15d94bd51f5ad1d3743e997aedada6b38d82e86436140e3c1652c1",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateAdditionalInvoicesDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceAdjustmentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4229ec0fd6b46d54874e6343df2f18f9129cb2917bdec3255b6417ba32923006",
     "lines": 12,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceAdjustmentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceCommissionDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "eea76a5214d2e743d394911076f123243c38bda2c7376d03c27be53b13517c61",
     "lines": 12,
     "file_type": "Dto",
@@ -1131,15 +1140,16 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceCommissionDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "facab2923542bb6649e543dd0d989f8cd05143551982046274f0d67a7f38e1df",
     "lines": 47,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceShipmentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "373387ea5d43698e403874929d270e0fab526a3e38951c379be8a9a5edfbb2b8",
     "lines": 12,
     "file_type": "Dto",
@@ -1148,15 +1158,16 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/FreightInvoice/UpdateFreightInvoiceShipmentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/LaytimeInvoice/LaytimeInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f40bcf791eff5293c9f58d738110960e58aacf6d50dee1b56f40bbb692010eca",
     "lines": 29,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/LaytimeInvoice/LaytimeInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/LaytimeInvoice/UpdateLaytimeInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "4291dde02426f45f4b8e9027491552b529d110b000d3fe67ef3c584e47bfa3dc",
     "lines": 10,
     "file_type": "Dto",
@@ -1165,7 +1176,7 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/LaytimeInvoice/UpdateLaytimeInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/CreateNoteInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "31a27fd64f63e35f8a49221051c6945f837e0f3ff92bee781817798ae120ca4b",
     "lines": 8,
     "file_type": "Dto",
@@ -1174,1124 +1185,1264 @@
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/CreateNoteInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/NoteInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "faa8eb5511e6c1171157682bc928450f3b6a494c4f8195d54bc1148acb437bf1",
     "lines": 11,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/NoteInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/UpdateNoteInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d9de66d3c999ac3d0be1ba493ab36799b7d6c60d8fb3a4aabedc6b9b272dac2a",
     "lines": 7,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/NoteInvoice/UpdateNoteInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/TcoCommissionInvoice/TcoCommissionInvoiceDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "68d3dbd0ea487278bed4d3edd1ec7afc0ecf4b51fb8e1784e2492537070fb2fc",
     "lines": 50,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/TcoCommissionInvoice/TcoCommissionInvoiceDtos.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/TcoInvoice/HireStatementAggregateDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d77f5e67dde45b85dba480fd4c7dc0dabcc7ae611a0003c31bd4b05776bc858c",
     "lines": 94,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/TcoInvoice/HireStatementAggregateDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/TcoInvoice/TcoInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6ad912d5c58b2ee83815091181b092ac3df11a95864c5769c43e61f0241f83b4",
     "lines": 286,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/TcoInvoice/TcoInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/VoyageOtherReveneInvoice/UpdateVoyageOtherRevenueInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "cbdd5d0b8c6d9f5fb121d1f21d819202950e66237f86b0989ec2293a6db3cf21",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/VoyageOtherReveneInvoice/UpdateVoyageOtherRevenueInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/Invoice/VoyageOtherReveneInvoice/VoyageOtherRevenueInvoiceDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9c94d63422439830456edb56d5aec4cae8d8f824a5aa3b2c37fefd062b5231fc",
     "lines": 10,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/Invoice/VoyageOtherReveneInvoice/VoyageOtherRevenueInvoiceDto.md"
   },
   "Core/Domain/FinanceData/Dtos/ProfitAndLoss/ProfitAndLossOverviewDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bcf1d44d3cfe16660ad15d1b2b2da8b186ddab772f15812cccc3fd97cacb892f",
     "lines": 98,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Dtos/ProfitAndLoss/ProfitAndLossOverviewDtos.md"
   },
   "Core/Domain/FinanceData/Entities/BusinessLineEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "03537fe4a3c21d37c978c00ddcdb33d9b9b57956c15d32e460e180fc842a9321",
     "lines": 14,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/BusinessLineEntity.md"
   },
   "Core/Domain/FinanceData/Entities/BusinessRuleEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7a22e1ba8e7a680091b12c7c2c449fa7c068ebdb1480d9f8679a3697ab9037b8",
     "lines": 28,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/BusinessRuleEntity.md"
   },
   "Core/Domain/FinanceData/Entities/CompanyBankEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f9736f413ce95d1a69fded27e29ed9197623a7d442bbcd2f87e93ee6ce61e21e",
     "lines": 21,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/CompanyBankEntity.md"
   },
   "Core/Domain/FinanceData/Entities/CurrencyExchangeRateEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c4ab577ea7805a5506b7daa2dd79a9da718e9142f18dbcf30d9af8e596329577",
     "lines": 32,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/CurrencyExchangeRateEntity.md"
   },
   "Core/Domain/FinanceData/Entities/GeneralAccountEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a2de3f0faa69fcbb98b2918e30da84541ac2ff4bec7984b363741adb2dc72d5c",
     "lines": 22,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/GeneralAccountEntity.md"
   },
   "Core/Domain/FinanceData/Entities/InvoiceCollectionNoteEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3f7dd6d2c9c5fcfb0b116ab8d4a0b5c7dd55aae40b12c16893eed4e218989f60",
     "lines": 33,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/InvoiceCollectionNoteEntity.md"
   },
   "Core/Domain/FinanceData/Entities/InvoiceCollectionTrackerEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9f0ac0a4f427dbc2cf228402231ffbccecda471130729b92028e9bd1f85c181b",
     "lines": 45,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/InvoiceCollectionTrackerEntity.md"
   },
   "Core/Domain/FinanceData/Entities/InvoiceTransactionEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "57e7fc3e241e2857f2faa5d49ac9b55a729ba7d8d8ba2aec5b50f93ffcd0eb8e",
     "lines": 124,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/InvoiceTransactionEntity.md"
   },
   "Core/Domain/FinanceData/Entities/InvoiceTransactionItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1b0d0a9f85a5543d8f60092b6ab9f4d1bb9ed10c801ce41bec6cf631af65d80e",
     "lines": 114,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/InvoiceTransactionItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/InvoiceTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ec70a967a84da21cb9e8296eb78d411d0c1bdda02c45a1bbdb382e121379b208",
     "lines": 59,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/InvoiceTypeEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PaymentEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2163dc98ba7041810543e3d611f1696970c3d1a819c209844141268f391d0de6",
     "lines": 84,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PaymentEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PaymentItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7a5bacac4b9e3640867562a7d4c7c92d5c147bec3f03db96f2082b70c6f61077",
     "lines": 83,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PaymentItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PaymentTermEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "12f15d822e73e99bbabc0c93ba27051fa5b5b7adc544579e5943d49dc672dbca",
     "lines": 14,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PaymentTermEntity.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLossItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "189e26f5b5f803bd3ecd35e6388c629b1c3c9bfc393cc227bbdc4deb228095c2",
     "lines": 83,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLossItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/ReversalReasonEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0ec36d20195ec118eb17c1ec85ad230b328142d1878c92b190eaef683853729b",
     "lines": 14,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ReversalReasonEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/CommissionInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "93e94b1b6301db14b9d5af430ebe8a2f4873fbc8b517b32c8446a3cfa7ecd92b",
     "lines": 10,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/CommissionInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/CreditNoteInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d7da7fc4c026ce819867e4b2a6a704d643cc1202f07f029c5f60e550b5b14892",
     "lines": 9,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/CreditNoteInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/DaInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bd5162bea3a039b8de07530e6f77c18b4e9ea2062f7d1ab329cab0ad1017b976",
     "lines": 47,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/DaInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/DaInvoiceItemCommentEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "82bea9c6393f2b6047db62866818e67b8060275b00bca724d24a3af09f122dae",
     "lines": 17,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/DaInvoiceItemCommentEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/DaVoucherEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f000dfbfb4aafd6aee1deb33c3d29ca08ecbe3656190d13e4594bd130fbe5cd2",
     "lines": 30,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/DaVoucherEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/DebitNoteInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "15c3a293635aff47948a541a8001c03c2068e81df26ee16614677ac7ae815891",
     "lines": 9,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/DebitNoteInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/FreightInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0a980616661a80714ffb762a02f2057354c5dda112b5e63a2f797746e85994a9",
     "lines": 10,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/FreightInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/FreightInvoicePercentageEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "99d753b3601d2aea5965daa814eabaf7f3836d8293211d4a6448e18b1406910f",
     "lines": 23,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/FreightInvoicePercentageEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/InvoiceDueDateTermEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "77b14f00efdc0e5d7e4b401c4ee4eaf111241e58dc107e0c4c883c75e82b9fae",
     "lines": 11,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/InvoiceDueDateTermEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/InvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e23f83cb16b60be8e84c73e399c4f06c0b7ef600eb47a64b62a1ea665972234e",
     "lines": 169,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/InvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/InvoiceItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5c11c0d74317fd538d2c491f5681fb3cf41788dcba085c2946028f271d4d0b9e",
     "lines": 196,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/InvoiceItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/LaytimeInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1a64067c88d5ba346714df2f1e00e6404a65e129eae1f4e534530faa486e8ea0",
     "lines": 11,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/LaytimeInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/TCInvoiceItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d4acc4d04acf8610eebee4aa5240e82850580a2c4d6ed53f9189fa8fe3a41cfb",
     "lines": 24,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/TCInvoiceItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/TcoInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5312e5edbb0ad8818f3c7767c9ab4000f0f56f2025f9db56382eac00b491fd9a",
     "lines": 15,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/TcoInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/TimeCharterOtherRevenueEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d41d7556cd74a551ae0be50e19ce829a2cc7784a96740ecb2b730acc5c63bf4b",
     "lines": 71,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/TimeCharterOtherRevenueEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/VoyageOtherRevenueEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2a51bbb4ce7c88f4e0d3938194f5a51a18b9ab01f1dfa903f0a536782a021ce8",
     "lines": 66,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/VoyageOtherRevenueEntity.md"
   },
   "Core/Domain/FinanceData/Entities/Invoice/VoyageOtherRevenueInvoiceEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2993d0555dda8aa77941bfc566747961f046b577dc7f0d8fa026931ba46d56b9",
     "lines": 9,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/Invoice/VoyageOtherRevenueInvoiceEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PortDa/PortDaCostItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "111a8b0428bb91c50c2f61a2b4538b004049851b10ea7d58e496c594bf607d7a",
     "lines": 66,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PortDa/PortDaCostItemEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PortDa/PortDaEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a1b8b493ef808bba4943e6c15eaf5816b232badd4d9058aa27ae45ce18796751",
     "lines": 55,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PortDa/PortDaEntity.md"
   },
   "Core/Domain/FinanceData/Entities/PortDa/PortDaGroupEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d47c97ebabf24dbfbe03c7ca244da60d987c4f2c6a79b866e2c20ca7df2daa45",
     "lines": 22,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/PortDa/PortDaGroupEntity.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLoss/ActualProfitAndLossItem.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bc55cbe5fdb2f14978646f7329a030a9fd6ca5a0c787e1b2fc9021f0aaae577c",
     "lines": 84,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLoss/ActualProfitAndLossItem.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLoss/MasterProfitAndLossGroup.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1f784010f1b1ddb76b55b073bcbda513d51e9c5806e99e8eed90ebeb9a199646",
     "lines": 62,
     "file_type": "Other",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLoss/MasterProfitAndLossGroup.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossIdentifierEnum.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e1fde2e3ad5b1a3977d40adf1aa329a1c9584f19a7ece41ad427e6348469bbf5",
     "lines": 129,
     "file_type": "Other",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossIdentifierEnum.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossValueBase.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "aa19163a75d3b1dccd9aac843bb19beba5f04dd2cd4a9cd5ed6793d8d2322d6b",
     "lines": 66,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossValueBase.md"
   },
   "Core/Domain/MasterData/Dtos/ArchetypeDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bb00c00b0c293beb9638e08ca216684e8764880a878e39c9b48eeedf2676712d",
     "lines": 22,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/ArchetypeDto.md"
   },
   "Core/Domain/MasterData/Dtos/BunkerTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e7da396b40dcfd79cf48e7cf2a2681722e00e06129d06e1cdb43458c0f2aa42f",
     "lines": 96,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/BunkerTypeDtos.md"
   },
   "Core/Domain/MasterData/Dtos/BusinessPartnerDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d9811357f00101251ce1131b89256839a9b64688e3b8175798ff0398d736e3e8",
     "lines": 100,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/BusinessPartnerDtos.md"
   },
   "Core/Domain/MasterData/Dtos/CargoTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fb17281e2913a592a30d662392bd0b7a870bbada35e03ed6523dd383e6587067",
     "lines": 17,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/CargoTypeDtos.md"
   },
   "Core/Domain/MasterData/Dtos/ClassSocietyDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e4b8f4b27b790bcbc1313026c4ede100cab60cdaec20ffc5ea767376e9990b14",
     "lines": 30,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/ClassSocietyDtos.md"
   },
   "Core/Domain/MasterData/Dtos/CommissionTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ddd4004f47f35bae3344c92164ff42191720288dbe24203beecdda375a39fcd9",
     "lines": 27,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/CommissionTypeDtos.md"
   },
   "Core/Domain/MasterData/Dtos/CompanyTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "df98d76dfbeea497a2db3a37c43071b10e3310a2edfd3ec5ff1378cb9647d5d0",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/CompanyTypeDtos.md"
   },
   "Core/Domain/MasterData/Dtos/ConsumptionRateProfileDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bfdad14baeff22ddcfd011dc0802d791c5ebed6528ccb46f69ff6ab5d137bf7d",
     "lines": 12,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/ConsumptionRateProfileDtos.md"
   },
   "Core/Domain/MasterData/Dtos/ContractTypeDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d96f9b943b2db747d64a0f3b330a801575df8d4a9f981ba8cf5ed3818d61a4e8",
     "lines": 33,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/ContractTypeDto.md"
   },
   "Core/Domain/MasterData/Dtos/DynamicEnumDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "22ce1afb7084348842b51516079bcc9d904312e7964fd5f0b21d8379a499112f",
     "lines": 6,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/DynamicEnumDtos.md"
   },
   "Core/Domain/MasterData/Dtos/PIClubDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a6b195952f45dc9d52c7ceeae30af5404056d05c399ace1b10511df0d91f30af",
     "lines": 35,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/PIClubDtos.md"
   },
   "Core/Domain/MasterData/Dtos/PortDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e7f092cbd53f4dcbe1ad348b31e964e8ef17dc3abbee0f536c48ef9e494795ba",
     "lines": 269,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/PortDtos.md"
   },
   "Core/Domain/MasterData/Dtos/ShipyardDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "47d3e82e0dd48d5b029fa8eae04753ea7cd8e238b3eadf36fb3b3539f6d313fb",
     "lines": 38,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/ShipyardDtos.md"
   },
   "Core/Domain/MasterData/Dtos/TermDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "edd7c3a309c90ec5ed012140289f52b0133678ed542c66c84847d628c4cdc68b",
     "lines": 57,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/TermDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselConsumptionRateDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "54eec6b12c7a0edc68e17ad617976733c8398f49bd22370eb83cc2f2445cb42e",
     "lines": 69,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselConsumptionRateDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselContactDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0b140bc2d76d5fda95de1190ddb363929e346fd4408a29c8a29dbb2ce6b68377",
     "lines": 19,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselContactDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselCraneDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6550335f4d2e4c21c374c4a2351c1c5c355c16db6798e148aa3faaad3204747c",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselCraneDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5460c35925e80f5f2d8f2b1f7664437febfe43a2a43e2616a895e0892d930846",
     "lines": 419,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselHistoryDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8afe456d37a86798c63813fe34681cdd7e1c1c7c021501c8220236a041c4f963",
     "lines": 48,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselHistoryDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselSpecificationDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3601ffe2fd55002c2f4f3fa2287146b14cfb8f3579d8f20b1c5a842fc7a34e0b",
     "lines": 84,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselSpecificationDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselTypeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "94bff28a42cb7255f8b024805fafd0ed7e527c4572f1395734b02c69ec4b3123",
     "lines": 149,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselTypeDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselTypePortOverwriteDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3baec903af41dfa4bf05e2106b65b2bcaae3ca05e31d40ac452c20b98bf85ec9",
     "lines": 11,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Dtos/VesselTypePortOverwriteDto.md"
   },
   "Core/Domain/MasterData/Entities/ArchetypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9ad309327327f3153647be01ffc58228baea92c0e2370de6620096ec08bc013f",
     "lines": 21,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ArchetypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/BunkerTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e13c162e73edcd3f672d8be40549c72c58dd184f885feed94ba15811a595fd40",
     "lines": 121,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/BunkerTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/BusinessPartner.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d7319485e471651a319980cb83450dae151d5c607e80a4e8aa762ce102ad072f",
     "lines": 114,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/BusinessPartner.md"
   },
   "Core/Domain/MasterData/Entities/BusinessPartnerBankEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "789180e39ca76c035962ff45793487f5f9db1985cb3763f2b7f81f9e8af47b38",
     "lines": 69,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/BusinessPartnerBankEntity.md"
   },
   "Core/Domain/MasterData/Entities/CanalAlternativeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a36273b1f60381f6ea8f42273de80f7b60d5ae123b64f80ac76e12a1d511f136",
     "lines": 10,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/CanalAlternativeEntity.md"
   },
   "Core/Domain/MasterData/Entities/CargoTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7462b405459abbc4f12dfe14107353dcde1dc8f53172fe2e0fbb8413307c434b",
     "lines": 11,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/CargoTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/ClassSocietyEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a6ac15de5b560738ac383459d71c3496418723970e45220845a2ff4c78b5018c",
     "lines": 19,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ClassSocietyEntity.md"
   },
   "Core/Domain/MasterData/Entities/CommissionTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fd7fe500af56dcb2c2668299fb079f73de78f940c8cbc5bb8dc3aae062581625",
     "lines": 11,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/CommissionTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/CompanyTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "13e97ea9d3e0356a532a06330296ea21d356a03b9c70bd18a2b5771ec50c2400",
     "lines": 15,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/CompanyTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/ConsumptionRateEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "601bff304327db3fa0e3c3a6d7d96c83d74a4acd6a3110366db35907501c9522",
     "lines": 36,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ConsumptionRateEntity.md"
   },
   "Core/Domain/MasterData/Entities/ConsumptionRateProfileEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c0cf365f15f77dbad5f7b999e625272ee1b3b6ce4cb0cad73498fac22752cd8a",
     "lines": 16,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ConsumptionRateProfileEntity.md"
   },
   "Core/Domain/MasterData/Entities/ContractTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1e4b142db186c51c63439da405fb7a438f51dd3ec0b9a580cd2d1c6dac990949",
     "lines": 24,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ContractTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/DynamicEnumEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "39199b981cce3785b3aff55470f978e4991f1d2488b4e4718df1b4aaadab1e72",
     "lines": 17,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/DynamicEnumEntity.md"
   },
   "Core/Domain/MasterData/Entities/PIClubEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "40b1d06ae95dafd3a143c82d57c482edc8a27dd7e9d198c5b18149db312c5b92",
     "lines": 18,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/PIClubEntity.md"
   },
   "Core/Domain/MasterData/Entities/PortEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "31c0790a9f60dfdd34c9722b65f5930d49eddfdad06eeda7a41154769e0b51e8",
     "lines": 89,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/PortEntity.md"
   },
   "Core/Domain/MasterData/Entities/ShipyardEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "be45932e668d3d8356a37a2e7f6e18d374fc3b2ded3d587b7c9487e97fa5e011",
     "lines": 18,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/ShipyardEntity.md"
   },
   "Core/Domain/MasterData/Entities/TermEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "09fcc5ffc0c5df20727665b6107e145a17b50cdf3248384064d86c12200e6264",
     "lines": 24,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/TermEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselBunkerTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "615041017b685f754b60bbc5d0620d78559efe14702507149dad14bacc2b7110",
     "lines": 48,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselBunkerTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselContactEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "74f3aa1fb81d1b8274e6d31f87563bdd871b9e6af40ab87c313046d6dca0f1c8",
     "lines": 28,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselContactEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselCraneEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "911caaa7957fbbb92c190e84a3ba5fd88cdc44fa586e6f8f73ae722471c21753",
     "lines": 19,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselCraneEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bc323e3bd03eb83018a9762b2906089430cd3b496963059743cc2c1f607e4aca",
     "lines": 163,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselHistoryEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "56447eba3f8650571e9634715c3b195f884bcce160238041697b3387a55544c3",
     "lines": 52,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselHistoryEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselSpecificationEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5d1b5023d2c4fd95074b7690c370b242cb00bd2c6ab99e3cb63843b95bef30be",
     "lines": 119,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselSpecificationEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselTypeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "06eccf6800a755b5dc251832566ae94fa6e69df4346a5eff4ce7c11f426bd012",
     "lines": 79,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselTypeEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselTypePortOverwriteEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "75cd18642cca3e29b952b5580f237022041e0ac30afd3461438611abf4a9fa20",
     "lines": 11,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/VesselTypePortOverwriteEntity.md"
   },
   "Core/Domain/OrderRequest/Dtos/EmailDocumentDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1b05baeb19d013546f51b3b3c7f535ad5e2f4035e45277486bc1fb05d4aa2c1d",
     "lines": 15,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Dtos/EmailDocumentDto.md"
   },
   "Core/Domain/OrderRequest/Dtos/EmailDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c3d753a3f6778c6db7c067a02252fcceb30a82e7c428162ec6c0c0aff7da981a",
     "lines": 25,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Dtos/EmailDto.md"
   },
   "Core/Domain/OrderRequest/Dtos/PackingItemsDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c71f3eaa63033726d735e0b83a848b8a22b1e98acfc635502cf365f00e4d87df",
     "lines": 34,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Dtos/PackingItemsDtos.md"
   },
   "Core/Domain/OrderRequest/Dtos/RequestCrudDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "343b8ff24548cf26bbe7508b781fa561c0b87469bd55b71dfe95bf7e79eabdfd",
     "lines": 51,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Dtos/RequestCrudDto.md"
   },
   "Core/Domain/OrderRequest/Dtos/RequestReducedDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b6fea78eb095d93737f67a80cae93343ff76c4ffd2f6f50080b9dfc3ebb17a9e",
     "lines": 62,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Dtos/RequestReducedDtos.md"
   },
   "Core/Domain/OrderRequest/Entities/EmailEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fe632fccf31e013b480b8045201caf265677dd2137af19cf81bbec4e7f271511",
     "lines": 60,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Entities/EmailEntity.md"
   },
   "Core/Domain/OrderRequest/Entities/PackingItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "af7c365f88e7c010ee3ebfe9a5329a2fd8136d1f6ee05335d89de305cfd62b40",
     "lines": 32,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Entities/PackingItemEntity.md"
   },
   "Core/Domain/OrderRequest/Entities/RequestEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d3c39ca6c9eb03f8370b8511024bfeb21ee117ff0b4e78aaa171ce2f4b41eb72",
     "lines": 122,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/OrderRequest/Entities/RequestEntity.md"
   },
   "Core/Domain/SednaEmail/EmailDownloadMessage.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "be876534b3af72ad6836e80c5cd586876f069bc5e3f57a0f18f79b4c19706efb",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/SednaEmail/EmailDownloadMessage.md"
   },
   "Core/Domain/SednaEmail/SednaAddCategoryTagModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c2be8008ca7213921d58e857edc244ec7d04c6f67ac1edd63aeae2806e47e8f7",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/SednaEmail/SednaAddCategoryTagModel.md"
   },
   "Core/Domain/SednaEmail/SednaAddJobReferenceModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d7514b89b22c9f5c75f4807f78da73a67a46beb3b71e6a9955da712c140cca04",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/SednaEmail/SednaAddJobReferenceModel.md"
   },
   "Core/Domain/SednaEmail/SednaClientModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7fa45c1c2e7bb0575243ec2454d515c9b89c4805388a17c3bfe7a7ba6e1f2ec5",
     "lines": 260,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/SednaEmail/SednaClientModel.md"
   },
   "Core/Domain/SednaEmail/SednaEmailModel.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c0a0dd5176c0bbcaa2baffb094cb9e40668c916ac7ecd9baee05b60a632a2929",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/SednaEmail/SednaEmailModel.md"
   },
   "Core/Domain/TaskAlert/Dtos/AlertCreateDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9bb986db07d02064333ea03f3ef19fbfc4eed02bd4986ef51c4e45280ac873d1",
     "lines": 30,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/AlertCreateDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/AlertDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "79d85c91ca1b3f42128b3642e8a72ba78b4ca02982b9b860e50df411867cb240",
     "lines": 45,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/AlertDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/AlertSearchDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a54a84602bd33c4cf475c1dc5d580d16f9dd59c8ebc6b30c00ce809d09854c6a",
     "lines": 16,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/AlertSearchDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/ResultDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8fd6602ba76cca77c8388990d40c9c971b9859aaa9269bffb00c88df51428291",
     "lines": 33,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/ResultDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/RuleDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a81ea10e7924585bd98fd329d4199ec5607b4aeb0025e32ce38a36aa8158a1c2",
     "lines": 21,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/RuleDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/RuleSetDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "69c2d02b52693e0c1ca505db910435638c0a005940a91ae62b810f21c8a9c413",
     "lines": 38,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/RuleSetDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/TaskCreateDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "cecfd352aa5d0b03e3a77d8af072aad61bf9817dae404cf3b7b41ed2b1826dcf",
     "lines": 30,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/TaskCreateDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/TaskDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7c173d9602c97aea8a2a25186cefb09371a77de3bb550dfca943681a598885eb",
     "lines": 45,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/TaskDto.md"
   },
   "Core/Domain/TaskAlert/Dtos/TaskSearchDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0f43c12dd99cb93b6b985e36949912d94a7200a2ab91ba08f35dd95976ed201a",
     "lines": 16,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Dtos/TaskSearchDto.md"
   },
   "Core/Domain/TaskAlert/Entities/AlertEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2797667703467bf2bf552063d18d4600cb1a8991fb9bd007d800268b4c794626",
     "lines": 61,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/AlertEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/AlertTemplateEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "42db7435b9a85ee18c53df59e943d301010de77706ed98a90b6258145548c06d",
     "lines": 7,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/AlertTemplateEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/ResultEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fabde2312fe9e46f190c22fa429ad76c319667a9e41c255fb504e754b7b31959",
     "lines": 45,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/ResultEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/RuleEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9b866b30fd5e69b19cd269707b010b9e21da8e534af4cdd5eeaf4d7844ac1bd7",
     "lines": 22,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/RuleEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/RuleSetEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e83459dcdb1078e21f39ca9464b3ab964d9a57333af756e9701c9e72175ec40f",
     "lines": 37,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/RuleSetEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/TaskEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7736261911e67a9232740e1e4238dedaa60ae4fab700d58de050b699d7e054d9",
     "lines": 62,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/TaskEntity.md"
   },
   "Core/Domain/TaskAlert/Entities/TaskTemplateEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "dccfa90828dba6cdfcb4c01a15abb3dfa7362248b1ff0642fece93281fed199a",
     "lines": 7,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Entities/TaskTemplateEntity.md"
   },
   "Core/Domain/TaskAlert/Models/Link.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "ec646ae404c173bc4969661e260998e9d981c2bf8ffd9259853e5efb270a80f1",
     "lines": 9,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TaskAlert/Models/Link.md"
   },
   "Core/Domain/TimeCharterClaim/Dtos/OffhireTypeDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bf409a5e579b87a978f59fd520615c61965e4b9a06becf9a85788a79ea2b26a5",
     "lines": 7,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Dtos/OffhireTypeDto.md"
   },
   "Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimBunkerDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9c920c0823f1edd3d02c60bd41f9f74196e08ba14769620335a8a4a550dd00d1",
     "lines": 12,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimBunkerDto.md"
   },
   "Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b93e42eb1b6556f6f6fa1d350649d36f7acdbbd9a280cc2caf94a59b496afc43",
     "lines": 51,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimDto.md"
   },
   "Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimItemDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6addf817f96d8d2c52d4ca4ede275e99f789a68507144968db692b3fd583c70c",
     "lines": 24,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Dtos/TimeCharterClaimItemDto.md"
   },
   "Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimBunkerEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "b42400f755d1635a24e40ba5abe3316d824043941c1a8453f01697fa19295d7a",
     "lines": 20,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimBunkerEntity.md"
   },
   "Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "73af8fc6d8f98ae6304494b8b4370631962b6b61c599ca77afc2a0dc87bee728",
     "lines": 32,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimEntity.md"
   },
   "Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimItemEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "99d07583ca730c32fa9b13ec4fdbf7ba07c274b0d626a3ef762af318b3b96919",
     "lines": 24,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/TimeCharterClaim/Entities/TimeCharterClaimItemEntity.md"
   },
   "Core/Domain/UserManagement/Claim/BVMSClaimCategoryConstants.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "27716e0b7fcc0c475b0710818643d928bed9cbeaf6191518d15be25d0b934392",
     "lines": 558,
     "file_type": "Other",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Claim/BVMSClaimCategoryConstants.md"
   },
   "Core/Domain/UserManagement/Claim/Policies.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "3842a114b50789bd342c1839ed3bcbe86fc3cbd9014a0368c7f0d7f12a4fa391",
     "lines": 567,
     "file_type": "Configuration",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Claim/Policies.md"
   },
   "Core/Domain/UserManagement/Dtos/ClaimCategoryDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f96cfdaea5e5db04db93aea84dd2cd3c90cc4871d47f26b6346fb598a21cbe10",
     "lines": 23,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/ClaimCategoryDto.md"
   },
   "Core/Domain/UserManagement/Dtos/FeatureBaseDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6ef0d0549301042c8f2bd82ed1b33c0046faf78f50bf1daacfb176d98cb63151",
     "lines": 8,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/FeatureBaseDto.md"
   },
   "Core/Domain/UserManagement/Dtos/OfficeDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7a6734bfbfc32b29ef384ef823e332eb53c5538b01d27c40c3d56013e340cb14",
     "lines": 76,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/OfficeDtos.md"
   },
   "Core/Domain/UserManagement/Dtos/RoleDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "586a487927c9b336a82e302fa96d3373da5e6c4990e0195b4f295268a0c4f004",
     "lines": 37,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/RoleDtos.md"
   },
   "Core/Domain/UserManagement/Dtos/TradeAreaDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "fd0adb0f32d7cc014ba0d0aedc7547763187aff862c6c2abb44efd586d468db1",
     "lines": 26,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/TradeAreaDto.md"
   },
   "Core/Domain/UserManagement/Dtos/UpdateUserStatusRequest.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "5ca9bffbf46602aa4aa3732d1b1d3024d6e11ac6fd1c1980056a6dfcd4471003",
     "lines": 7,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/UpdateUserStatusRequest.md"
   },
   "Core/Domain/UserManagement/Dtos/UserAppSettingDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e88ceb69a567ea5688acda4019942058f362561d305e08289d7119132efceb75",
     "lines": 44,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/UserAppSettingDtos.md"
   },
   "Core/Domain/UserManagement/Dtos/UserDtos.cs": {
     "phase": "indexed",
@@ -2302,220 +2453,247 @@
     "is_critical": false
   },
   "Core/Domain/UserManagement/Dtos/UserFilterDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "cf49b7700ea89f61d54b175103593aadfe9817efdaa5d12bce0ae03e5e640f0e",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/UserFilterDto.md"
   },
   "Core/Domain/UserManagement/Dtos/UserSettingDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "92a765fa87fcd69b014bc3232c042d31803ce79042504a77742e8cf582e80f3d",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Dtos/UserSettingDto.md"
   },
   "Core/Domain/UserManagement/Entities/OfficeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "480a01fdcb21e50fe57ce68a11f8c017a0d10609fc65af41c04e698bb00fff01",
     "lines": 56,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/OfficeEntity.md"
   },
   "Core/Domain/UserManagement/Entities/RefreshTokenEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "27ddc20def2251f6e7fd67b0ad8788b7cfbeb1973417213905097cf0d0039f6d",
     "lines": 17,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/RefreshTokenEntity.md"
   },
   "Core/Domain/UserManagement/Entities/RoleEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "f557be699284c9c2da6dfe0c1598f9ecf954f1e2d88fd2025cc1149ac2c71e5b",
     "lines": 8,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/RoleEntity.md"
   },
   "Core/Domain/UserManagement/Entities/TradeAreaEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7bebf054c64fe39e3aa8d5866da7ef175666d9f11d87fe354c1557a9c7e97f68",
     "lines": 30,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/TradeAreaEntity.md"
   },
   "Core/Domain/UserManagement/Entities/UserEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "9f2a7f0405c3f6e9597236a1d2611b634c5b785a66560e2e9c49f58c618c9bc0",
     "lines": 44,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/UserEntity.md"
   },
   "Core/Domain/UserManagement/Entities/UserFilterEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1d8eec9dd58eb8e4c518eb5d42680475052b05e6ba373ebeb7edbdd5e2e6dcc8",
     "lines": 17,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/UserFilterEntity.md"
   },
   "Core/Domain/UserManagement/Entities/UserOfficeEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "df016006b63e10d1ab6237cb52e087230d6effc9a8fd32f4709b34b24bd23c5d",
     "lines": 16,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/UserOfficeEntity.md"
   },
   "Core/Domain/UserManagement/Entities/UserSettingEntity.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c38c36233b54c002808e0daf2576864fe598b5c24bb55412601edfb8bd8faa3f",
     "lines": 17,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/UserManagement/Entities/UserSettingEntity.md"
   },
   "Core/Domain/VoyageManagement/Dtos/BookmarkDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "6b25f2c92d603c9e6624d467d8dac1933f576c4ede6a9d913d1f4ba62dc5d94e",
     "lines": 14,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/BookmarkDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/BunkerOwnershipChangeLogDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "c0ebbe43c34a294578cec9d280dc81fe8b6739f270c9ee57f047b75db5f91b3e",
     "lines": 17,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/BunkerOwnershipChangeLogDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/BunkerRobDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "e53fb6ea27abd5208129f8e042667c4f3d7b2c67ba7041dfebb9e73b33a11409",
     "lines": 60,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/BunkerRobDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/CoaDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "906267a101829332711d44f6178ee2fa987c8510655218d145ca10d67cae3805",
     "lines": 125,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/CoaDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/DistanceDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "a2e49d095f0adc369b2023b4d2650007a92cbd4e951091c452467124cd0c72e6",
     "lines": 8,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/DistanceDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateCommissionDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "379bac8be1f71132c17ce54df00e742e31fcd7a3a1156bc490b2fcbacea9a5b2",
     "lines": 60,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateCommissionDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateCrudDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "91ab4f3317844306e1ab7678c9deda29ae7e32909dcc5cc98822817c5d406194",
     "lines": 171,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateCrudDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateEagerDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "2bc3b5900b060f5b44a2e42054c89b4e1ce1675ebd320b1b546c0e0b4649417d",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateEagerDto.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateIteneraryDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "507b7a83c1e92d139861039595ef5bcbde7b20937790ea083697dbd3aa561190",
     "lines": 19,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateIteneraryDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateOverwriteDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "04d0d0c91b3f2d5030f20d519bdc853a4f09a7b923c9e6f1cb7a95b1b01540ce",
     "lines": 25,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateOverwriteDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateReducedDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "bc42ab6dc4cbb647d55795ca7dfd8c2b5a3b1a1e545f36ed5bd07b1f95b9bb1a",
     "lines": 68,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateReducedDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateSearchDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1d24b321953b9a3b597f1ca6c93f00e60162d05ad251ffccd86ea14b2f5dcd50",
     "lines": 33,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateSearchDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateShipmentDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "8424db6d89f2e78b749a6f6fbf2c1aa5c7a14af531b929dd702311c8ef01e2a5",
     "lines": 170,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateShipmentDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/IteneraryActivitiesDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "1096aae72d065ddd34b73028640f20b937fa7d7b83f83581517d003c9b6512dc",
     "lines": 22,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/IteneraryActivitiesDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/ItineraryDetailDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "7e55af044af89cbfc478411e3862a5baf2d06cb2f8585aced3250e33921bf2d6",
     "lines": 53,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/ItineraryDetailDto.md"
   },
   "Core/Domain/VoyageManagement/Dtos/OffHireDto.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "32922e0f75aeb07bc57e58e5683aa92cde6ef481244ad46256f9e5c401beba2f",
     "lines": 62,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/OffHireDto.md"
   },
   "Core/Domain/VoyageManagement/Dtos/OverwriteShipmentDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "962fab0531bdf0adc4cb0358ced34c74639b063129b89f1e6b4f14bfc38acdba",
     "lines": 9,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/OverwriteShipmentDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/PLResultDtos.cs": {
     "phase": "indexed",
@@ -2526,20 +2704,22 @@
     "is_critical": false
   },
   "Core/Domain/VoyageManagement/Dtos/QuotationDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "d19b7d6921c72d89f5c99db106417830eb2b32f8862bbbc7bd80a8d077431aa8",
     "lines": 54,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/QuotationDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/RoutingResponseDtos.cs": {
-    "phase": "indexed",
+    "phase": "documented",
     "hash": "0a0340dc6d117ead05f148d76b5c726a344ad9f49a9283e94ba9b6429089f09c",
     "lines": 67,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": false
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/RoutingResponseDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/ShipmentDtos.cs": {
     "phase": "indexed",
