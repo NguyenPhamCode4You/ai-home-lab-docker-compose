@@ -541,8 +541,9 @@ async def build_codebase_index(
 
         lines = file_content.count("\n") + 1
         model = OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL) if force_cloud else _select_analyzer_model(lines)
+        model_name = model.model if hasattr(model, "model") else str(model)
         model_tag = "CLOUD" if isinstance(model, OpenRouter) else "LOCAL"
-        print(f"[Phase 1] {model_tag} — {rel_path} ({lines} lines)")
+        print(f"[Phase 1] [{processed_count + 1}/{len(to_process)}] {model_tag} ({model_name}) — {rel_path} ({lines} lines)")
 
         analyzer = CSharpFileAnalyzer(llm_model=model)
         try:
