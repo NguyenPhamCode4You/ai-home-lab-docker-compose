@@ -18,6 +18,8 @@ skipped to preserve code block formatting and paragraph structure.
 
 import os
 
+from tqdm import tqdm
+
 from .cia_config import (
     DEFAULT_ENRICHED_FOLDER,
     DEFAULT_WORKFLOWS_FOLDER,
@@ -89,9 +91,27 @@ async def chunk_for_rag(
         (workflows_folder, "workflows"),
     ]
 
+    # Collect all source files upfront for an accurate total count
+    all_files = []
     for src_folder, sub_folder in source_configs:
         if not os.path.exists(src_folder):
-            print(f"[Phase 5] Folder not found, skipping: {src_folder}")
+            continue
+        for root, _, files in os.walk(src_folder):
+            for file in sorted(files):
+                if file.endswith(".md"):
+                    all_files.append((src_folder, sub_folder, root, file))
+
+    progress = tqdm(
+        total=len(all_files),
+        desc="[Phase 5] Chunking",
+        unit="file",
+        dynamic_ncols=True,
+        bar_format="{desc}: {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {bar}",
+    )
+
+    for src_folder, sub_folder in source_configs:
+        if not os.path.exists(src_folder):
+            tqdm.write(f"[Phase 5] Folder not found, skipping: {src_folder}")
             continue
 
         for root, _, files in os.walk(src_folder):
@@ -105,6 +125,8 @@ async def chunk_for_rag(
 
                 if os.path.exists(out_path):
                     total_skipped += 1
+                    progress.update(1)
+                    progress.set_postfix(chunked=total_chunked, skipped=total_skipped, empty=total_empty, refresh=False)
                     continue
 
                 with open(src_path, "r", encoding="utf-8") as f:
@@ -114,11 +136,13 @@ async def chunk_for_rag(
 
                 if chunks_written > 0:
                     total_chunked += 1
-                    print(f"[Phase 5] Chunked ({chunks_written} chunks): {sub_folder}/{rel_path}")
                 else:
                     total_empty += 1
-                    print(f"[Phase 5] SKIP (no content): {sub_folder}/{rel_path}")
 
+                progress.update(1)
+                progress.set_postfix(chunked=total_chunked, skipped=total_skipped, empty=total_empty, refresh=False)
+
+    progress.close()
     print(
         f"[Phase 5] Complete. "
         f"{total_chunked} files chunked, "
