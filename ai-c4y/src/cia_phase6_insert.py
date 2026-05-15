@@ -25,6 +25,8 @@ Table name is read from CIA_RAG_TABLE_NAME env var (default: n8n_documents_cshar
 import asyncio
 import os
 
+from tqdm import tqdm
+
 from .cia_config import (
     DEFAULT_RAG_CHUNKS_FOLDER,
     DEFAULT_RAG_DONE_FOLDER,
@@ -143,6 +145,14 @@ async def insert_rag_chunks(
     results = {"done": 0, "error": 0}
     results_lock = asyncio.Lock()
 
+    progress = tqdm(
+        total=total_chunks,
+        desc="[Phase 6] Inserting",
+        unit="chunk",
+        dynamic_ncols=True,
+        bar_format="{desc}: {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {bar}",
+    )
+
     # ── Step 4: per-chunk worker ──────────────────────────────────────────────
     async def _process_chunk(
         file_name: str,
@@ -164,17 +174,18 @@ async def insert_rag_chunks(
                     metadata=metadata,
                     summarize=summarize,
                 )
-                # Only write done marker after successful DB insert
                 open(done_marker, "w").close()
                 async with results_lock:
                     results["done"] += 1
-                    if results["done"] % 10 == 0:
-                        print(f"[Phase 6] {results['done']}/{total_chunks} chunks inserted ...")
+                    progress.update(1)
+                    progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
                 return "done"
             except Exception as e:
-                print(f"[Phase 6] ERROR in {file_name} / {header}: {e}")
                 async with results_lock:
                     results["error"] += 1
+                    progress.update(1)
+                    progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
+                tqdm.write(f"[Phase 6] ERROR in {file_name} / {header}: {e}")
                 return "error"
 
     # ── Step 5: run all chunks concurrently under semaphore ───────────────────
@@ -183,6 +194,7 @@ async def insert_rag_chunks(
         for i, (file_name, chunk_idx, header, sentence, done_marker) in enumerate(all_chunks)
     ]
     await asyncio.gather(*tasks)
+    progress.close()
 
     print(
         f"[Phase 6] Complete. "
