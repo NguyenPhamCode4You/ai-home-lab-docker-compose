@@ -84,7 +84,12 @@ async def chunk_for_rag(
     total_skipped = 0
     total_empty = 0
 
-    for src_folder in [enriched_folder, workflows_folder]:
+    source_configs = [
+        (enriched_folder,  "enriched"),
+        (workflows_folder, "workflows"),
+    ]
+
+    for src_folder, sub_folder in source_configs:
         if not os.path.exists(src_folder):
             print(f"[Phase 5] Folder not found, skipping: {src_folder}")
             continue
@@ -96,7 +101,7 @@ async def chunk_for_rag(
 
                 src_path = os.path.join(root, file)
                 rel_path = os.path.relpath(src_path, src_folder)
-                out_path = os.path.join(rag_chunks_folder, rel_path)
+                out_path = os.path.join(rag_chunks_folder, sub_folder, rel_path)
 
                 if os.path.exists(out_path):
                     total_skipped += 1
@@ -109,10 +114,10 @@ async def chunk_for_rag(
 
                 if chunks_written > 0:
                     total_chunked += 1
-                    print(f"[Phase 5] Chunked ({chunks_written} chunks): {rel_path}")
+                    print(f"[Phase 5] Chunked ({chunks_written} chunks): {sub_folder}/{rel_path}")
                 else:
                     total_empty += 1
-                    print(f"[Phase 5] SKIP (no content): {rel_path}")
+                    print(f"[Phase 5] SKIP (no content): {sub_folder}/{rel_path}")
 
     print(
         f"[Phase 5] Complete. "
