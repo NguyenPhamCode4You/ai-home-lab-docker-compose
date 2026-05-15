@@ -38,7 +38,7 @@ from .agents.tools.SupabaseVectorStore import SupabaseVectorStore
 from .agents.tools.Embedding import Embedding
 from .agents.models.Ollama import Ollama
 from .agents.models.OpenRouter import OpenRouter
-from .agents.constants import OLLAMA_GENERAL_MODEL
+from .agents.constants import OLLAMA_CODE_MODEL
 
 OPENROUTER_PHASE6_MODEL = os.getenv("CIA_OPENROUTER_MODEL", "qwen/qwen3-32b")
 
@@ -48,7 +48,7 @@ def _make_agents(force_cloud: bool, force_local: bool, keyword_count: int, summa
     if force_cloud:
         model = OpenRouter(model=OPENROUTER_PHASE6_MODEL)
     else:
-        model = Ollama(model=OLLAMA_GENERAL_MODEL)
+        model = Ollama(model=OLLAMA_CODE_MODEL)
 
     return (
         KeywordExtractor(count=keyword_count, llm_model=model),
@@ -123,8 +123,10 @@ async def insert_rag_chunks(
     total_chunks = len(all_chunks)
 
     if force_cloud:
+        # Set OpenRouter concurrency to match worker count so each worker gets
+        # its own request slot (no cross-worker throttling).
         OpenRouter.set_concurrency(concurrency)
-        print(f"[Phase 6] Cloud mode (OpenRouter), concurrency={concurrency} chunks, table='{table_name}'")
+        print(f"[Phase 6] Cloud mode (OpenRouter), {concurrency} parallel workers, table='{table_name}'")
     elif force_local:
         print(f"[Phase 6] Local mode (Ollama), concurrency={concurrency} chunks, table='{table_name}'")
     else:
@@ -136,14 +138,9 @@ async def insert_rag_chunks(
         print("[Phase 6] Nothing to do — all chunks already inserted.")
         return
 
-    # ── Step 3: shared resources (created once, not per-chunk) ───────────────
-    keyword_extractor, knowledge_compressor = _make_agents(
-        force_cloud, force_local, keyword_count, summary_max_char
-    )
+    # ── Step 3: shared resources ──────────────────────────────────────────────
     vector_store = SupabaseVectorStore(embedding=Embedding())
-    sem = asyncio.Semaphore(max(1, concurrency))
     results = {"done": 0, "error": 0}
-    results_lock = asyncio.Lock()
 
     progress = tqdm(
         total=total_chunks,
@@ -153,49 +150,78 @@ async def insert_rag_chunks(
         bar_format="{desc}: {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {bar}",
     )
 
-    # ── Step 4: per-chunk worker ──────────────────────────────────────────────
-    async def _process_chunk(
-        file_name: str,
-        chunk_idx: int,
-        header: str,
-        sentence: str,
-        done_marker: str,
-        global_idx: int,
-    ):
-        async with sem:
+    # ── Step 4: queue + N isolated workers (each has its own agent instances) ─
+    # Each worker owns its agents — Task.state is mutable so sharing across
+    # concurrent workers causes data corruption.
+
+    queue: asyncio.Queue = asyncio.Queue()
+    for chunk_data in all_chunks:
+        queue.put_nowait(chunk_data)
+
+    # Signals workers to stop picking up new chunks (set on Ctrl+C).
+    # In-flight chunks are allowed to finish so their .done markers are written.
+    shutdown_event = asyncio.Event()
+
+    async def _worker(_worker_id: int):
+        keyword_extractor, knowledge_compressor = _make_agents(
+            force_cloud, force_local, keyword_count, summary_max_char
+        )
+        while not shutdown_event.is_set():
+            try:
+                file_name, chunk_idx, header, sentence, done_marker = queue.get_nowait()
+            except asyncio.QueueEmpty:
+                break
+
+            inserted = False
             try:
                 knowledge = f"# {header}: {sentence}"
                 keywords = await keyword_extractor.run(context=knowledge)
                 summarize = await knowledge_compressor.run(context=knowledge)
-                metadata = {"file_name": file_name, "section": header, "keywords": keywords}
                 vector_store.insert(
                     table_name=table_name,
                     content=knowledge,
-                    metadata=metadata,
+                    metadata={"file_name": file_name, "section": header, "keywords": keywords},
                     summarize=summarize,
                 )
+                inserted = True
                 open(done_marker, "w").close()
-                async with results_lock:
-                    results["done"] += 1
-                    progress.update(1)
-                    progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
-                return "done"
+                results["done"] += 1
+            except asyncio.CancelledError:
+                # If the DB insert already completed, write the marker so we
+                # don't re-insert this chunk on the next run.
+                if inserted:
+                    try:
+                        open(done_marker, "w").close()
+                        results["done"] += 1
+                    except Exception:
+                        pass
+                raise
             except Exception as e:
-                async with results_lock:
-                    results["error"] += 1
-                    progress.update(1)
-                    progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
+                results["error"] += 1
                 tqdm.write(f"[Phase 6] ERROR in {file_name} / {header}: {e}")
-                return "error"
+            finally:
+                progress.update(1)
+                progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
 
-    # ── Step 5: run all chunks concurrently under semaphore ───────────────────
-    tasks = [
-        _process_chunk(file_name, chunk_idx, header, sentence, done_marker, i + 1)
-        for i, (file_name, chunk_idx, header, sentence, done_marker) in enumerate(all_chunks)
-    ]
-    await asyncio.gather(*tasks)
+    # ── Step 5: launch N workers and wait for all to drain the queue ──────────
+    n_workers = max(1, concurrency)
+    workers = [asyncio.create_task(_worker(i)) for i in range(n_workers)]
+    try:
+        await asyncio.gather(*workers)
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        shutdown_event.set()
+        tqdm.write("\n[Phase 6] Interrupt received — waiting for in-flight chunks to finish...")
+        await asyncio.gather(*workers, return_exceptions=True)
+        progress.close()
+        remaining = queue.qsize()
+        print(
+            f"[Phase 6] Stopped safely. "
+            f"{results['done']} inserted, {results['error']} errors, "
+            f"{remaining} remaining. Re-run the same command to resume."
+        )
+        return
+
     progress.close()
-
     print(
         f"[Phase 6] Complete. "
         f"{results['done']} inserted, "
