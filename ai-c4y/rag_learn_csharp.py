@@ -189,7 +189,7 @@ async def main():
         await chunk_for_rag()
 
     if run_insert:
-        await insert_rag_chunks()
+        await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     print("\n[Pipeline] Done.")
 

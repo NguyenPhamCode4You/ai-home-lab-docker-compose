@@ -15,7 +15,7 @@ Add the following keys to `ai-c4y/.env` and `ai-c4y/.env.example`:
 ```env
 # C# Codebase RAG — Code Knowledge Agent
 CSHARP_CODEBASE_PATH     = C:\Gitlab\bbc-bvms-net-back-end-modular
-BVMS_CODE_TABLE_NAME     = n8n_documents_bvms_code
+BVMS_CODE_TABLE_NAME     = n8n_documents_bvms_code_be
 
 # --- File Filtering (optional) ---
 # Comma-separated glob patterns. If set, ONLY files matching these patterns are processed.
@@ -42,7 +42,7 @@ Create a new table in Supabase (self-hosted or cloud) using the **same schema** 
 
 ```sql
 -- Table
-CREATE TABLE n8n_documents_bvms_code (
+CREATE TABLE n8n_documents_bvms_code_be (
   id          bigserial PRIMARY KEY,
   content     text,
   metadata    jsonb,
@@ -52,7 +52,7 @@ CREATE TABLE n8n_documents_bvms_code (
 );
 
 -- Vector search RPC (mirrors match_n8n_documents_bvms_neo)
-CREATE OR REPLACE FUNCTION match_n8n_documents_bvms_code(
+CREATE OR REPLACE FUNCTION match_n8n_documents_bvms_code_be(
   query_embedding  vector(768),
   match_count      int DEFAULT 200,
   filter           jsonb DEFAULT '{}'
@@ -69,13 +69,13 @@ AS $$
 BEGIN
   RETURN QUERY
   SELECT
-    n8n_documents_bvms_code.id,
-    n8n_documents_bvms_code.content,
-    n8n_documents_bvms_code.metadata,
-    n8n_documents_bvms_code.summarize,
-    1 - (n8n_documents_bvms_code.embedding <=> query_embedding) AS similarity
-  FROM n8n_documents_bvms_code
-  ORDER BY n8n_documents_bvms_code.embedding <=> query_embedding
+    n8n_documents_bvms_code_be.id,
+    n8n_documents_bvms_code_be.content,
+    n8n_documents_bvms_code_be.metadata,
+    n8n_documents_bvms_code_be.summarize,
+    1 - (n8n_documents_bvms_code_be.embedding <=> query_embedding) AS similarity
+  FROM n8n_documents_bvms_code_be
+  ORDER BY n8n_documents_bvms_code_be.embedding <=> query_embedding
   LIMIT match_count;
 END;
 $$;
@@ -130,8 +130,8 @@ Valid phase values in order of progression:
 ## Done Checklist
 
 - [ ] `.env` vars added
-- [ ] Supabase table `n8n_documents_bvms_code` created
-- [ ] Supabase RPC `match_n8n_documents_bvms_code` created
+- [ ] Supabase table `n8n_documents_bvms_code_be` created
+- [ ] Supabase RPC `match_n8n_documents_bvms_code_be` created
 - [ ] Output folders created under `ai-c4y/csharp-docs/`
 - [ ] `CSHARP_CODEBASE_PATH` verified to point at the correct repo root
 
