@@ -9,6 +9,7 @@ load_dotenv()
 _CONCURRENCY    = int(os.getenv("OPENROUTER_CONCURRENCY", "1"))
 _MAX_TOKENS     = int(os.getenv("OPENROUTER_MAX_TOKENS",   "8192"))
 _PROVIDER_ORDER = [p.strip() for p in os.getenv("OPENROUTER_PROVIDER_ORDER", "").split(",") if p.strip()]
+_NO_THINK       = os.getenv("OPENROUTER_NO_THINK", "false").lower() in ("1", "true", "yes")
 
 class OpenRouter:
     # Global semaphore shared across all instances — limits concurrent requests to OpenRouter
@@ -49,6 +50,8 @@ class OpenRouter:
         }
         if _PROVIDER_ORDER:
             payload["provider"] = {"order": _PROVIDER_ORDER, "allow_fallbacks": True}
+        if _NO_THINK:
+            payload["include_reasoning"] = False
 
         for attempt in range(self.max_retries):
             try:
