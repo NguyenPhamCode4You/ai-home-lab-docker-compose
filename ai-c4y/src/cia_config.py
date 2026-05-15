@@ -36,6 +36,7 @@ DEFAULT_ENRICHED_FOLDER   = os.getenv("CIA_ENRICHED_DOCS_FOLDER", "wip/csharp-do
 DEFAULT_WORKFLOWS_FOLDER  = os.getenv("CIA_WORKFLOWS_FOLDER",     "wip/csharp-docs/workflows")
 DEFAULT_RAG_CHUNKS_FOLDER = os.getenv("CIA_RAG_CHUNKS_FOLDER",    "wip/csharp-docs/rag-chunks")
 DEFAULT_RAG_DONE_FOLDER   = os.getenv("CIA_RAG_DONE_FOLDER",      "wip/csharp-docs/rag-done")
+DEFAULT_RAG_DONE_QUICK_FOLDER = os.getenv("CIA_RAG_DONE_QUICK_FOLDER", "wip/csharp-docs/rag-done-quick")
 
 # -------------------------------------------------------------------
 # Constants
