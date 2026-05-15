@@ -121,7 +121,6 @@ async def insert_rag_chunks_quick(
         return
 
     # ── Queue + N workers ─────────────────────────────────────────────────────
-    vector_store = SupabaseVectorStore(embedding=Embedding())
     results = {"done": 0, "error": 0}
 
     queue: asyncio.Queue = asyncio.Queue()
@@ -136,39 +135,59 @@ async def insert_rag_chunks_quick(
         bar_format="{desc}: {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {bar}",
     )
 
+    # Each worker owns its own SupabaseVectorStore so a connection reset on one
+    # worker doesn't affect the others. Retries also get a fresh instance.
+    _MAX_RETRIES = 4
+    _RETRY_BASE_DELAY = 2.0  # seconds, doubles on each attempt
+
     async def _worker():
+        worker_store = SupabaseVectorStore(embedding=Embedding())
         while True:
             try:
                 file_name, chunk_idx, header, sentence, done_marker, folder_path = queue.get_nowait()
             except asyncio.QueueEmpty:
                 break
-            try:
-                manifest_entry = manifest_lookup.get(file_name)
-                metadata = {
-                    "file_name": file_name,
-                    "section": header,
-                    "folder_path": folder_path,
-                    "keywords": header,
-                }
-                if manifest_entry:
-                    metadata["file_type"] = manifest_entry.get("file_type", "")
-                    metadata["architecture_layer"] = manifest_entry.get("architecture_layer", "")
 
-                await asyncio.to_thread(
-                    vector_store.insert,
-                    table_name=table_name,
-                    content=f"# {header}: {sentence}",
-                    metadata=metadata,
-                    summarize=_build_quick_summary(file_name, header, folder_path, manifest_entry, sentence),
-                )
+            manifest_entry = manifest_lookup.get(file_name)
+            metadata = {
+                "file_name": file_name,
+                "section": header,
+                "folder_path": folder_path,
+                "keywords": header,
+            }
+            if manifest_entry:
+                metadata["file_type"] = manifest_entry.get("file_type", "")
+                metadata["architecture_layer"] = manifest_entry.get("architecture_layer", "")
+            summarize = _build_quick_summary(file_name, header, folder_path, manifest_entry, sentence)
+
+            last_exc = None
+            for attempt in range(_MAX_RETRIES):
+                try:
+                    await asyncio.to_thread(
+                        worker_store.insert,
+                        table_name=table_name,
+                        content=f"# {header}: {sentence}",
+                        metadata=metadata,
+                        summarize=summarize,
+                    )
+                    last_exc = None
+                    break  # success
+                except Exception as e:
+                    last_exc = e
+                    delay = _RETRY_BASE_DELAY * (2 ** attempt)
+                    tqdm.write(f"[Phase 6Q] Retry {attempt + 1}/{_MAX_RETRIES} for {file_name}/{header} in {delay:.0f}s — {e}")
+                    await asyncio.sleep(delay)
+                    worker_store = SupabaseVectorStore(embedding=Embedding())  # fresh connection
+
+            if last_exc is None:
                 open(done_marker, "w").close()
                 results["done"] += 1
-            except Exception as e:
+            else:
                 results["error"] += 1
-                tqdm.write(f"[Phase 6Q] ERROR {file_name} / {header}: {e}")
-            finally:
-                progress.update(1)
-                progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
+                tqdm.write(f"[Phase 6Q] FAILED {file_name} / {header}: {last_exc}")
+
+            progress.update(1)
+            progress.set_postfix(ok=results["done"], err=results["error"], refresh=False)
 
     workers = [asyncio.create_task(_worker()) for _ in range(max(1, concurrency))]
     await asyncio.gather(*workers)
