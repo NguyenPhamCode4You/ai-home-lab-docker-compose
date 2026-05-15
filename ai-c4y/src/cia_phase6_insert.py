@@ -42,6 +42,37 @@ from .agents.constants import OLLAMA_CODE_MODEL
 
 OPENROUTER_PHASE6_MODEL = os.getenv("CIA_OPENROUTER_MODEL", "qwen/qwen3-32b")
 
+_PHASE6_SUMMARIZE_TEMPLATE = """
+You are a technical documentation writer for a C# enterprise backend codebase (BVMS).
+Your task is to write a detailed technical summary of the following code/documentation section.
+
+SECTION:
+{context}
+
+REQUIREMENTS — you MUST follow all of these:
+1. Length: write between 150 and 350 characters. Do NOT write less than 150 characters.
+2. Always name the specific class, method, controller, or service being described.
+3. Quickly and Concisely Explain WHAT it does, HOW it works (key logic, conditions, dependencies), and WHY it matters.
+4. Write in plain technical English — no bullet points, no headings, no markdown.
+5. Return ONLY the summary text. No preamble, no labels, no explanation.
+"""
+
+_PHASE6_KEYWORD_TEMPLATE = """
+Extract the most important technical keywords from the following C# codebase section.
+
+SECTION:
+{context}
+
+RULES:
+1. Return EXACTLY a comma-separated list of keywords — nothing else.
+2. Include: class names, method names, interface names, controller names, HTTP verbs/routes.
+3. Include: key concepts, design patterns, BVMS domain terms (voyage, bunker, port, cargo, etc.).
+4. Include: important parameter names, return types, or exception types if present.
+5. Ordered by importance (most important first).
+6. No more than {count} keywords.
+7. No explanations, no numbering, no extra text — only the comma-separated keywords.
+"""
+
 
 def _make_agents(force_cloud: bool, force_local: bool, keyword_count: int, summary_max_char: int):
     """Return (keyword_extractor, knowledge_compressor) wired to the correct model."""
@@ -50,9 +81,11 @@ def _make_agents(force_cloud: bool, force_local: bool, keyword_count: int, summa
     else:
         model = Ollama(model=OLLAMA_CODE_MODEL)
 
+    keyword_template = _PHASE6_KEYWORD_TEMPLATE.replace("{count}", str(keyword_count))
+
     return (
-        KeywordExtractor(count=keyword_count, llm_model=model),
-        KnowledgeCompression(max_char=summary_max_char, llm_model=model),
+        KeywordExtractor(count=keyword_count, llm_model=model, instruction_template=keyword_template),
+        KnowledgeCompression(max_char=summary_max_char, llm_model=model, instruction_template=_PHASE6_SUMMARIZE_TEMPLATE),
     )
 
 
