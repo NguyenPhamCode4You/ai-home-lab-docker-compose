@@ -11,7 +11,7 @@ load_dotenv()
 default_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
 
 bvms_code_rag_assistant = RagAssistant(
-    query_function_name="n8n_documents_bvms_code_be",
+    query_function_name="match_n8n_documents_bvms_code_be_quick",
     llm_document_ranking=DocumentRanking(
         llm_model=Ollama(model="gemma3:4b"),
     ),
