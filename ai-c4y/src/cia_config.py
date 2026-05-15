@@ -30,10 +30,12 @@ OPENROUTER_CRITICAL_MODEL        = os.getenv("CIA_OPENROUTER_CRITICAL_MODEL", "g
 CLOUD_BATCH_DELAY                = float(os.getenv("CIA_CLOUD_BATCH_DELAY", "2.0"))
 BATCH_SIZE                       = int(os.getenv("CIA_BATCH_SIZE", "10"))
 
-DEFAULT_INDEX_PATH       = os.getenv("CIA_INDEX_PATH",           "wip/csharp-index.json")
-DEFAULT_RAW_DOCS_FOLDER  = os.getenv("CIA_RAW_DOCS_FOLDER",      "wip/csharp-docs/raw")
-DEFAULT_ENRICHED_FOLDER  = os.getenv("CIA_ENRICHED_DOCS_FOLDER", "wip/csharp-docs/enriched")
-DEFAULT_WORKFLOWS_FOLDER = os.getenv("CIA_WORKFLOWS_FOLDER",     "wip/csharp-docs/workflows")
+DEFAULT_INDEX_PATH        = os.getenv("CIA_INDEX_PATH",           "wip/csharp-index.json")
+DEFAULT_RAW_DOCS_FOLDER   = os.getenv("CIA_RAW_DOCS_FOLDER",      "wip/csharp-docs/raw")
+DEFAULT_ENRICHED_FOLDER   = os.getenv("CIA_ENRICHED_DOCS_FOLDER", "wip/csharp-docs/enriched")
+DEFAULT_WORKFLOWS_FOLDER  = os.getenv("CIA_WORKFLOWS_FOLDER",     "wip/csharp-docs/workflows")
+DEFAULT_RAG_CHUNKS_FOLDER = os.getenv("CIA_RAG_CHUNKS_FOLDER",    "wip/csharp-docs/rag-chunks")
+DEFAULT_RAG_DONE_FOLDER   = os.getenv("CIA_RAG_DONE_FOLDER",      "wip/csharp-docs/rag-done")
 
 # -------------------------------------------------------------------
 # Constants

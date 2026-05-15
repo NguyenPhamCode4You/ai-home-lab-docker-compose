@@ -13,6 +13,8 @@ Usage examples:
   python rag_learn_csharp.py --phase all --cloud 3
   python rag_learn_csharp.py --phase index --local
   python rag_learn_csharp.py --phase index --local 3
+  python rag_learn_csharp.py --phase chunk
+  python rag_learn_csharp.py --phase insert
 """
 
 import argparse
@@ -32,7 +34,7 @@ def parse_args():
     )
     parser.add_argument(
         "--phase",
-        choices=["index", "document", "enrich", "synthesize", "all"],
+        choices=["index", "document", "enrich", "synthesize", "chunk", "insert", "all"],
         default="all",
         help="Phase(s) to run (default: all)",
     )
@@ -88,6 +90,8 @@ async def main():
         write_csharp_documents,
         enrich_with_cross_references,
         synthesize_workflow_documents,
+        chunk_for_rag,
+        insert_rag_chunks,
         CSHARP_CODEBASE_PATH,
         DEFAULT_INDEX_PATH,
     )
@@ -160,6 +164,8 @@ async def main():
     run_document  = args.phase in ("document", "all")
     run_enrich    = args.phase in ("enrich", "all")
     run_synthesize = args.phase in ("synthesize", "all")
+    run_chunk     = args.phase in ("chunk", "all")
+    run_insert    = args.phase in ("insert", "all")
 
     if run_index:
         if not codebase_path:
@@ -178,6 +184,12 @@ async def main():
 
     if run_synthesize:
         await synthesize_workflow_documents(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
+
+    if run_chunk:
+        await chunk_for_rag()
+
+    if run_insert:
+        await insert_rag_chunks()
 
     print("\n[Pipeline] Done.")
 
