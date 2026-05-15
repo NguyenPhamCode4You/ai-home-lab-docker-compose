@@ -15,6 +15,9 @@ Usage examples:
   python rag_learn_csharp.py --phase index --local 3
   python rag_learn_csharp.py --phase chunk
   python rag_learn_csharp.py --phase insert
+  python rag_learn_csharp.py --phase insert-quick
+  python rag_learn_csharp.py --phase insert-quick --cloud 20
+  python rag_learn_csharp.py --phase insert-quick --local 5 --table bvms-backend-v2
 """
 
 import argparse
@@ -34,7 +37,7 @@ def parse_args():
     )
     parser.add_argument(
         "--phase",
-        choices=["index", "document", "enrich", "synthesize", "chunk", "insert", "all"],
+        choices=["index", "document", "enrich", "synthesize", "chunk", "insert", "insert-quick", "all"],
         default="all",
         help="Phase(s) to run (default: all)",
     )
@@ -77,6 +80,12 @@ def parse_args():
         metavar="N",
         help="Force all LLM calls through local Ollama. Optional N sets concurrency (default: 1). Example: --local 3",
     )
+    parser.add_argument(
+        "--table",
+        default=None,
+        metavar="TABLE_NAME",
+        help="Override the target Supabase table for insert / insert-quick (default: CIA_RAG_TABLE_NAME env var).",
+    )
     return parser.parse_args()
 
 
@@ -92,6 +101,7 @@ async def main():
         synthesize_workflow_documents,
         chunk_for_rag,
         insert_rag_chunks,
+        insert_rag_chunks_quick,
         CSHARP_CODEBASE_PATH,
         DEFAULT_INDEX_PATH,
     )
@@ -166,6 +176,7 @@ async def main():
     run_synthesize = args.phase in ("synthesize", "all")
     run_chunk     = args.phase in ("chunk", "all")
     run_insert    = args.phase in ("insert", "all")
+    run_insert_quick = args.phase in ("insert-quick",)
 
     if run_index:
         if not codebase_path:
@@ -189,7 +200,10 @@ async def main():
         await chunk_for_rag()
 
     if run_insert:
-        await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
+        await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency, table_name=args.table)
+
+    if run_insert_quick:
+        await insert_rag_chunks_quick(concurrency=concurrency, table_name=args.table)
 
     print("\n[Pipeline] Done.")
 
