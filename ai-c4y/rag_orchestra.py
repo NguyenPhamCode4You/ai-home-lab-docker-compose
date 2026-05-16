@@ -19,14 +19,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 default_model = Ollama()
-# default_model = OpenRouter()
 
 assistant = AssistantOrchestra(
     llm_question_forwarder=QuestionForwarder(
         llm_model=default_model,
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=default_model,
+        llm_model=OpenRouter(model='deepseek/deepseek-v4-flash:free'),
     ),
     llm_answer_evaluator=AnswerEvaluator(
         llm_model=default_model,
@@ -37,7 +36,7 @@ assistant = AssistantOrchestra(
     max_iterations=3,
 )
 assistant.agents = {
-    "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about general information about a software named BVMS (BBC Voyager Management System), and also provide good understanding about it business domain."},
+    "BVMS-General Assistant": {"agent": bvms_rag_assistant, "context_awareness": True, "description": "This agent can generate detailed responses about business workflow, domain knowledge, and information about a software named BVMS (BBC Voyager Management System), and also provide good understanding about its business domain."},
     "BVMS-Code Assistant": {"agent": bvms_code_rag_assistant, "context_awareness": True, "description": "This agent is expert in answering code / features / deep technical aspect of the software named BVMS (BBC Voyager Management System), and can provide detailed code snippets, technical explanations, and insights about the codebase."},
 }
 
