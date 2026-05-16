@@ -43,6 +43,7 @@ services:
       OLLAMA_GENERAL_MODEL: qwen2.5-coder:7b
       OLLAMA_CODE_MODEL: qwen2.5-coder:7b
       OPENROUTER_MAX_TOKENS: 120000
+      OPENROUTER_NO_THINK: true
     networks:
       - ai-agentic-chat
     restart: unless-stopped
