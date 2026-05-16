@@ -9,8 +9,9 @@ Re-running will re-insert everything (useful for table rebuilds).
 
 Each chunk preserves full context:
   content  = "# {header}: {sentence}"
-  metadata = file_name, section, folder_path, file_type, architecture_layer
-  summarize = compact JSON from csharp-manifest.json, or first 600 chars of content
+  metadata = file_name, section, folder_path, file_type, architecture_layer,
+             manifest_summary (compact JSON from csharp-manifest.json)
+  summarize = real chunk content text → embedding2 is semantically rich
 
 Concurrency: N workers each run embedding + DB insert via asyncio.to_thread
 so blocking HTTP calls are genuinely parallel.
@@ -45,7 +46,8 @@ def _load_manifest_lookup(manifest_path: str) -> dict:
     return lookup
 
 
-def _build_quick_summary(file_name: str, header: str, folder_path: str, manifest_entry: dict | None, sentence: str) -> str:
+def _build_quick_summary(file_name: str, header: str, folder_path: str, manifest_entry: dict | None) -> str:
+    """Build a compact JSON summary from the manifest entry for the metadata field."""
     if manifest_entry:
         parts = {
             "file": file_name,
@@ -57,7 +59,7 @@ def _build_quick_summary(file_name: str, header: str, folder_path: str, manifest
         }
         parts = {k: v for k, v in parts.items() if v not in ("", None)}
         return json.dumps(parts, ensure_ascii=False)
-    return sentence[:600]
+    return ""
 
 
 async def insert_rag_chunks_quick(
@@ -158,7 +160,12 @@ async def insert_rag_chunks_quick(
             if manifest_entry:
                 metadata["file_type"] = manifest_entry.get("file_type", "")
                 metadata["architecture_layer"] = manifest_entry.get("architecture_layer", "")
-            summarize = _build_quick_summary(file_name, header, folder_path, manifest_entry, sentence)
+            # Always include the manifest summary JSON so every row has structured context for filtering/display
+            metadata["summary_json"] = _build_quick_summary(file_name, header, folder_path, manifest_entry)
+
+            # summarize = actual chunk text so embedding2 indexes rich semantic content,
+            # not just a compact JSON blob — both embeddings now cover meaningful text
+            summarize = sentence
 
             last_exc = None
             for attempt in range(_MAX_RETRIES):

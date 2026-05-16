@@ -42,19 +42,36 @@ def _chunk_file(file_name: str, content: str, out_path: str, chunk_size: int) ->
         if not header:
             continue
 
-        # Keep code block structure by NOT collapsing \n\n — just strip edges
+        # Keep code block structure — only strip leading/trailing whitespace,
+        # never collapse internal \n\n so code fences and bullet groups stay intact
         section_content = section_content.strip()
-        if len(section_content) < 10:
+        if len(section_content) < 80:
             continue
 
-        # Prefer paragraph breaks (\n\n) as primary split so code fences stay intact
-        chunks = recursive_split_chunks(section_content, char="\n\n", limit=chunk_size)
+        # Primary split on paragraph breaks so code fences and grouped
+        # bullet points stay together. Falls back to \n then words.
+        raw_chunks = recursive_split_chunks(section_content, char="\n\n", limit=chunk_size)
 
-        for chunk in chunks:
-            chunk = chunk.strip()
-            if not chunk:
+        # Merge consecutive short chunks so every emitted chunk is at least
+        # 30% of chunk_size — avoids tiny orphan lines that embed poorly.
+        min_chunk = max(80, chunk_size // 3)
+        buffer = ""
+        for raw in raw_chunks:
+            raw = raw.strip()
+            if not raw:
                 continue
-            output_parts.append(f"# {file_name} - {header}\n{chunk}\n\n")
+            if buffer:
+                candidate = buffer + "\n\n" + raw
+                if len(candidate) <= chunk_size:
+                    buffer = candidate
+                    continue
+                if len(buffer) >= min_chunk:
+                    output_parts.append(f"# {file_name} - {header}\n{buffer}\n\n")
+                buffer = raw
+            else:
+                buffer = raw
+        if buffer and len(buffer) >= min_chunk:
+            output_parts.append(f"# {file_name} - {header}\n{buffer}\n\n")
 
     if not output_parts:
         return 0
@@ -70,7 +87,7 @@ async def chunk_for_rag(
     enriched_folder: str = DEFAULT_ENRICHED_FOLDER,
     workflows_folder: str = DEFAULT_WORKFLOWS_FOLDER,
     rag_chunks_folder: str = DEFAULT_RAG_CHUNKS_FOLDER,
-    chunk_size: int = 800,
+    chunk_size: int = 2000,
 ):
     """
     Phase 5: Chunk enriched per-file docs and workflow synthesis docs for RAG insertion.
