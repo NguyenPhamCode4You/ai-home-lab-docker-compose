@@ -38,7 +38,8 @@ class SupabaseVectorStore:
         response = requests.post(
             rpc_endpoint,
             headers=self.headers,
-            json=payload
+            json=payload,
+            timeout=120
         )
         if response.status_code != 200:
             raise Exception(f"Failed to execute RPC: {response.status_code}, {response.text}")

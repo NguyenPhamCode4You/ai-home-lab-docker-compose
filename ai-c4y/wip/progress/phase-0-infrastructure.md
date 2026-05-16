@@ -42,40 +42,41 @@ Create a new table in Supabase (self-hosted or cloud) using the **same schema** 
 
 ```sql
 -- Table
-CREATE TABLE n8n_documents_bvms_code_be (
-  id          bigserial PRIMARY KEY,
-  content     text,
-  metadata    jsonb,
-  summarize   text,
-  embedding   vector(768),   -- nomic-embed-text dimension
-  embedding2  vector(768)
+create table n8n_documents_bvms_code_be_quick (
+  id bigserial primary key,
+  content text,
+  summarize text,
+  metadata jsonb,
+  embedding vector(768),
+  embedding2 vector(768)
 );
 
 -- Vector search RPC (mirrors match_n8n_documents_bvms_neo)
-CREATE OR REPLACE FUNCTION match_n8n_documents_bvms_code_be(
-  query_embedding  vector(768),
-  match_count      int DEFAULT 200,
-  filter           jsonb DEFAULT '{}'
-)
-RETURNS TABLE (
-  id        bigint,
-  content   text,
-  metadata  jsonb,
-  summarize text,
-  similarity float
+CREATE OR REPLACE FUNCTION match_n8n_documents_bvms_code_be_quick (
+  query_embedding VECTOR(768),
+  match_count INT DEFAULT NULL,
+  filter JSONB DEFAULT '{}'
+) RETURNS TABLE (
+  id BIGINT,
+  content TEXT,
+  summarize TEXT,
+  metadata JSONB,
+  similarity FLOAT
 )
 LANGUAGE plpgsql
 AS $$
+#variable_conflict use_column
 BEGIN
   RETURN QUERY
   SELECT
-    n8n_documents_bvms_code_be.id,
-    n8n_documents_bvms_code_be.content,
-    n8n_documents_bvms_code_be.metadata,
-    n8n_documents_bvms_code_be.summarize,
-    1 - (n8n_documents_bvms_code_be.embedding <=> query_embedding) AS similarity
-  FROM n8n_documents_bvms_code_be
-  ORDER BY n8n_documents_bvms_code_be.embedding <=> query_embedding
+    id,
+    content,
+    summarize,
+    metadata,
+    2 - ((n8n_documents_bvms_code_be_quick.embedding <=> query_embedding) + (n8n_documents_bvms_code_be_quick.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_bvms_code_be_quick
+  WHERE metadata @> filter
+  ORDER BY similarity DESC
   LIMIT match_count;
 END;
 $$;
