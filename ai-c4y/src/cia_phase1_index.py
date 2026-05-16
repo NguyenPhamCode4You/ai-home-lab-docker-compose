@@ -210,10 +210,10 @@ async def build_codebase_index(
     # --- Build used_by reverse-lookup map (SKIPPED for speed) ----------------
     # NOTE: used_by reverse-scan is disabled. Re-enable if incremental dependent
     #       expansion is needed.
-    used_by: dict[str, list[str]] = {}
     index["used_by"] = {}
 
     # --- Stats ---------------------------------------------------------------
+    files_dict = index["files"]
     by_layer: dict[str, int] = {}
     by_type: dict[str, int] = {}
     for entry in files_dict.values():
