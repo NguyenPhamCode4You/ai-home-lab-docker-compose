@@ -88,6 +88,7 @@ async def chunk_for_rag(
     workflows_folder: str = DEFAULT_WORKFLOWS_FOLDER,
     rag_chunks_folder: str = DEFAULT_RAG_CHUNKS_FOLDER,
     chunk_size: int = 2000,
+    force_files: set[str] | None = None,
 ):
     """
     Phase 5: Chunk enriched per-file docs and workflow synthesis docs for RAG insertion.
@@ -98,6 +99,9 @@ async def chunk_for_rag(
 
     Output: rag_chunks_folder, preserving sub-folder hierarchy from each source.
     Existing chunk files are skipped (resumable).
+
+    force_files: optional set of relative path stems (e.g. "Core/Business/Foo") whose
+    existing chunk output will be deleted and re-chunked. Used by incremental mode.
     """
     total_chunked = 0
     total_skipped = 0
@@ -140,11 +144,19 @@ async def chunk_for_rag(
                 rel_path = os.path.relpath(src_path, src_folder)
                 out_path = os.path.join(rag_chunks_folder, sub_folder, rel_path)
 
+                # Skip only when the chunk output is up-to-date:
+                # - exists AND is at least as new as the source file
+                # - OR the stem is not in force_files (incremental override)
+                rel_stem = os.path.splitext(rel_path)[0].replace("\\", "/")
                 if os.path.exists(out_path):
-                    total_skipped += 1
-                    progress.update(1)
-                    progress.set_postfix(chunked=total_chunked, skipped=total_skipped, empty=total_empty, refresh=False)
-                    continue
+                    if force_files and rel_stem in force_files:
+                        os.remove(out_path)   # force re-chunk (incremental mode)
+                    elif os.path.getmtime(out_path) >= os.path.getmtime(src_path):
+                        total_skipped += 1    # chunk is fresh — skip
+                        progress.update(1)
+                        progress.set_postfix(chunked=total_chunked, skipped=total_skipped, empty=total_empty, refresh=False)
+                        continue
+                    # else: source is newer than chunk → fall through and re-chunk
 
                 with open(src_path, "r", encoding="utf-8") as f:
                     content = f.read()

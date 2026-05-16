@@ -206,7 +206,8 @@ async def main():
         await synthesize_workflow_documents(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_chunk:
-        await chunk_for_rag()
+        force_chunk = {os.path.splitext(fp)[0].replace("\\", "/") for fp in incremental_files} if incremental_files else None
+        await chunk_for_rag(force_files=force_chunk)
 
     if run_insert:
         await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency, table_name=args.table)
