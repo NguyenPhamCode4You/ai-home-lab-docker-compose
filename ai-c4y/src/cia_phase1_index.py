@@ -207,33 +207,11 @@ async def build_codebase_index(
             ts = datetime.datetime.now().strftime("%H:%M:%S")
             print(f"[Phase 1] {ts} Progress: {processed_count}/{total} files indexed.")
 
-    # --- Build used_by reverse-lookup map ------------------------------------
-    print("[Phase 1] Building used_by reverse-lookup map...")
+    # --- Build used_by reverse-lookup map (SKIPPED for speed) ----------------
+    # NOTE: used_by reverse-scan is disabled. Re-enable if incremental dependent
+    #       expansion is needed.
     used_by: dict[str, list[str]] = {}
-    files_dict = index["files"]
-
-    class_names = {
-        entry.get("class_name"): rel_path
-        for rel_path, entry in files_dict.items()
-        if entry.get("class_name")
-    }
-
-    for scan_path in all_cs_files:
-        abs_scan = os.path.join(codebase_path, scan_path.replace("/", os.sep))
-        try:
-            with open(abs_scan, "r", encoding="utf-8", errors="replace") as f:
-                content = f.read()
-        except Exception:
-            continue
-        for class_name, source_path in class_names.items():
-            if source_path == scan_path:
-                continue
-            if re.search(rf"\b{re.escape(class_name)}\b", content):
-                bucket = used_by.setdefault(class_name, [])
-                if scan_path not in bucket:
-                    bucket.append(scan_path)
-
-    index["used_by"] = used_by
+    index["used_by"] = {}
 
     # --- Stats ---------------------------------------------------------------
     by_layer: dict[str, int] = {}
@@ -252,6 +230,5 @@ async def build_codebase_index(
     _save_index(index, index_path)
     manifest.save()
 
-    total_used_by = sum(len(v) for v in used_by.values())
-    print(f"[Phase 1] Complete. {len(files_dict)} files indexed, {total_used_by} used_by relationships found.")
+    print(f"[Phase 1] Complete. {len(files_dict)} files indexed (used_by scan skipped).")
     manifest.print_summary()
