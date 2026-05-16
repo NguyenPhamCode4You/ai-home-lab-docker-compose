@@ -12,10 +12,10 @@ default_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
 
 bvms_code_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_code_be_quick",
-    document_match_count=200,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
-    # llm_document_ranking=DocumentRanking(
-    #     llm_model=Ollama(model="qwen2.5-coder:7b"),
-    # ),
+    document_match_count=100,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
+    llm_document_ranking=DocumentRanking(
+        llm_model=Ollama(model="qwen2.5-coder:7b"),
+    ),
     llm_rag_answer=GeneralRagAnswer(
         llm_model=default_model,
         instruction_template="""
