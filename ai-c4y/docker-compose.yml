@@ -37,6 +37,12 @@ services:
       dockerfile: Dockerfile.bvms_code
     env_file:
       - .env
+    environment:
+      TOKENS_LENGTH: 80000
+      CHARS_PER_TOKEN: 10
+      OLLAMA_GENERAL_MODEL: qwen2.5-coder:7b
+      OLLAMA_CODE_MODEL: qwen2.5-coder:7b
+      OPENROUTER_MAX_TOKENS: 120000
     networks:
       - ai-agentic-chat
     restart: unless-stopped
