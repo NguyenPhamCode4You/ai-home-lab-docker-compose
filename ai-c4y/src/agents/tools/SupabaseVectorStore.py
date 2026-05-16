@@ -55,7 +55,8 @@ class SupabaseVectorStore:
                 "summarize": summarize or "",
                 "embedding": self.embedding.run(metadata) if metadata else [],
                 "embedding2": self.embedding.run(summarize) if summarize else []
-            }
+            },
+            timeout=120
         )
         # Check if the insertion was successful
         if response.status_code != 201:
