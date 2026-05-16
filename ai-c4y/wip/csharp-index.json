@@ -7575,7 +7575,7 @@
         "TCOVoyageEmailDto"
       ],
       "external_clients_used": [],
-      "is_critical": false
+      "is_critical": true
     },
     "Core/Domain/VoyageManagement/Dtos/VoyageEagerDto.cs": {
       "class_name": "VoyageEagerDto",
@@ -57234,7 +57234,7 @@
       "external_clients_used": [
         "IBBCDataService"
       ],
-      "is_critical": false
+      "is_critical": true
     },
     "Core/Business/VoyageManagement/Estimate/CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetails.cs": {
       "class_name": "CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetails",

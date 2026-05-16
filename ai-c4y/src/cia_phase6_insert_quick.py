@@ -107,7 +107,10 @@ async def insert_rag_chunks_quick(
 
                 done_marker = os.path.join(rag_done_folder, f"{file_name}_c{chunk_idx}.done")
                 if os.path.exists(done_marker):
-                    continue
+                    if os.path.getmtime(done_marker) >= os.path.getmtime(file_path):
+                        continue  # marker is fresh — skip
+                    else:
+                        os.remove(done_marker)  # chunk file was re-chunked — re-insert
 
                 all_chunks.append((file_name, chunk_idx, header, sentence, done_marker, folder_path))
 
