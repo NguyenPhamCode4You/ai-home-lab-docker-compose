@@ -63,7 +63,7 @@ ollama push nichealpham/lora-8b
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create a table to store your documents
-create table n8n_documents_bvms_neo (
+create table n8n_documents_bvms_code_quick (
   id bigserial primary key,
   content text,
   summarize text,
@@ -73,7 +73,7 @@ create table n8n_documents_bvms_neo (
 );
 
 -- Create a function to search for documents
-CREATE FUNCTION match_n8n_documents_bvms_neo (
+CREATE FUNCTION match_n8n_documents_bvms_code_quick (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
   filter JSONB DEFAULT '{}'
@@ -94,11 +94,33 @@ BEGIN
     content,
     summarize,
     metadata,
-    2 - ((n8n_documents_bvms_neo.embedding <=> query_embedding) + (n8n_documents_bvms_neo.embedding2 <=> query_embedding)) AS similarity
-  FROM n8n_documents_bvms_neo
+    2 - ((n8n_documents_bvms_code_quick.embedding <=> query_embedding) + (n8n_documents_bvms_code_quick.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_bvms_code_quick
   WHERE metadata @> filter
   ORDER BY similarity DESC
   LIMIT match_count;
 END;
 $$;
+```
+
+THEN, after inserting documents with their embeddings into the `n8n_documents_bvms_code_quick` table, it is good practice to create an index on the embedding columns to speed up similarity searches: (Rows count >= 10000)
+
+```sql
+-- Drop the existing ones for re-recreate
+DROP INDEX IF EXISTS n8n_bvms_code_be_quick_emb_idx;
+DROP INDEX IF EXISTS n8n_bvms_code_be_quick_emb2_idx;
+
+-- Then recreate — do both in one session, don't cancel this time:
+SET maintenance_work_mem = '512MB';
+SET max_parallel_maintenance_workers = 0;
+
+CREATE INDEX CONCURRENTLY n8n_bvms_code_be_quick_emb_idx
+ON n8n_documents_bvms_code_be_quick
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
+
+CREATE INDEX CONCURRENTLY n8n_bvms_code_be_quick_emb2_idx
+ON n8n_documents_bvms_code_be_quick
+USING hnsw (embedding2 vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
 ```
