@@ -2,7 +2,13 @@
 rag_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 
 Usage examples:
-  python rag_learn_csharp.py --phase index
+  python rag_learn_csharp.py --phase index --cloud 25
+  python rag_learn_csharp.py --phase document --cloud 25
+  python rag_learn_csharp.py --phase enrich --cloud 25
+  python rag_learn_csharp.py --phase synthesize --cloud 25
+  python rag_learn_csharp.py --phase chunk
+  python rag_learn_csharp.py --phase insert-quick --local 10 --table n8n_documents_bvms_code_be_quick
+
   python rag_learn_csharp.py --phase all
   python rag_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
   python rag_learn_csharp.py --phase all --mode incremental
@@ -126,6 +132,7 @@ async def main():
 
     codebase_path = os.getenv("CIA_CODEBASE_PATH", CSHARP_CODEBASE_PATH)
     manifest = CSharpManifest()
+    incremental_files: list[str] | None = None  # None = full mode (no restriction)
 
     # ------------------------------------------------------------------
     # Incremental mode: reset changed files (+ dependents) in manifest
@@ -163,6 +170,7 @@ async def main():
             for fp in expanded:
                 manifest.reset_file(fp)
             manifest.save()
+            incremental_files = list(expanded)
         else:
             print("[Incremental] No changed .cs files detected. Nothing to do.")
             return
@@ -182,7 +190,7 @@ async def main():
         if not codebase_path:
             print("ERROR: CIA_CODEBASE_PATH is not set. Cannot run Phase 1.")
             sys.exit(1)
-        await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
+        await build_codebase_index(codebase_path=codebase_path, manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency, focus_patterns=incremental_files)
 
     if run_document:
         if not codebase_path:
@@ -197,7 +205,8 @@ async def main():
         await synthesize_workflow_documents(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_chunk:
-        await chunk_for_rag()
+        force_chunk = {os.path.splitext(fp)[0].replace("\\", "/") for fp in incremental_files} if incremental_files else None
+        await chunk_for_rag(force_files=force_chunk)
 
     if run_insert:
         await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency, table_name=args.table)

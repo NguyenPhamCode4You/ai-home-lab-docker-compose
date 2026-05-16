@@ -107,7 +107,10 @@ async def insert_rag_chunks_quick(
 
                 done_marker = os.path.join(rag_done_folder, f"{file_name}_c{chunk_idx}.done")
                 if os.path.exists(done_marker):
-                    continue
+                    if os.path.getmtime(done_marker) >= os.path.getmtime(file_path):
+                        continue  # marker is fresh — skip
+                    else:
+                        os.remove(done_marker)  # chunk file was re-chunked — re-insert
 
                 all_chunks.append((file_name, chunk_idx, header, sentence, done_marker, folder_path))
 
@@ -121,6 +124,52 @@ async def insert_rag_chunks_quick(
     if total == 0:
         print("[Phase 6Q] Nothing to do — all chunks already inserted.")
         return
+
+    # ── Delete old DB rows for every file that has pending chunks ─────────────
+    # Ensures re-runs on changed files don't accumulate duplicate records.
+    # Track (file_name, folder_path) pairs to avoid deleting rows from a
+    # different file that happens to share the same stem name in another folder.
+    pending_files = {(c[0], c[5]) for c in all_chunks}  # (file_name, folder_path)
+    pending_file_names = {c[0] for c in all_chunks}
+    print(f"[Phase 6Q] Deleting old DB rows for {len(pending_files)} file(s) before insert...")
+    _cleanup_store = SupabaseVectorStore(embedding=Embedding())
+    total_deleted = 0
+    for fn, fp in pending_files:
+        try:
+            n = _cleanup_store.delete_by_file_name(table_name, fn, folder_path=fp)
+            total_deleted += n
+            # Also wipe any stale .done markers for this file so the worker re-inserts all its chunks
+            for root, _, files in os.walk(rag_done_folder):
+                for df in files:
+                    if df.startswith(f"{fn}_c") and df.endswith(".done"):
+                        os.remove(os.path.join(root, df))
+        except Exception as exc:
+            print(f"[Phase 6Q] WARNING: could not delete rows for '{fp}/{fn}': {exc}")
+    print(f"[Phase 6Q] Deleted {total_deleted} old row(s) from '{table_name}'.")
+
+    # Re-collect chunks now that .done markers have been cleared
+    all_chunks = []
+    for root, _, files in os.walk(rag_chunks_folder):
+        for f in sorted(files):
+            if not f.endswith(".md"):
+                continue
+            file_name = os.path.splitext(f)[0]
+            if file_name not in pending_file_names:
+                continue  # not a pending file — skip
+            file_path = os.path.join(root, f)
+            rel_dir = os.path.relpath(root, rag_chunks_folder).replace("\\", "/")
+            folder_path = rel_dir if rel_dir != "." else ""
+            with open(file_path, "r", encoding="utf-8") as fh:
+                content = fh.read()
+            for chunk_idx, (header, section_content) in enumerate(split_markdown_header_and_content(content)):
+                header = header.strip().replace(":", "")
+                sentence = remove_excessive_spacing(section_content)
+                if not sentence or len(sentence) < 5:
+                    continue
+                done_marker = os.path.join(rag_done_folder, f"{file_name}_c{chunk_idx}.done")
+                all_chunks.append((file_name, chunk_idx, header, sentence, done_marker, folder_path))
+    total = len(all_chunks)
+    print(f"[Phase 6Q] {total} chunk(s) will be (re-)inserted.")
 
     # ── Queue + N workers ─────────────────────────────────────────────────────
     results = {"done": 0, "error": 0}
