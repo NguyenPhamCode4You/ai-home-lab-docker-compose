@@ -800,7 +800,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/FinanceData/Dtos/PaymentDto.md"
   },
   "Core/Domain/FinanceData/Dtos/PaymentItemDto.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "ac6a7998d0f6ce479a763b5056c194fd82a047be56cd131341e024f0f6e2d6ae",
     "lines": 32,
     "file_type": "Dto",
@@ -1960,9 +1960,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Dtos/VesselCraneDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselDtos.cs": {
-    "phase": "synthesized",
-    "hash": "5460c35925e80f5f2d8f2b1f7664437febfe43a2a43e2616a895e0892d930846",
-    "lines": 419,
+    "phase": "enriched",
+    "hash": "c23caaef1978e62881a2fec5b993f412457e4c42ecb8433add8aee7fea9d96cd",
+    "lines": 423,
     "file_type": "Dto",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -2180,9 +2180,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Entities/TermEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselBunkerTypeEntity.cs": {
-    "phase": "synthesized",
-    "hash": "615041017b685f754b60bbc5d0620d78559efe14702507149dad14bacc2b7110",
-    "lines": 48,
+    "phase": "enriched",
+    "hash": "ef2c290960c2599c46b12dd7291fb16b81b69c29aab09c2fb5f177c537624b8c",
+    "lines": 62,
     "file_type": "Entity",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -2210,7 +2210,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Entities/VesselCraneEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselEntity.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "bc323e3bd03eb83018a9762b2906089430cd3b496963059743cc2c1f607e4aca",
     "lines": 163,
     "file_type": "Entity",
@@ -3030,12 +3030,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/RoutingResponseDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/ShipmentDtos.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "af4f933358cbadc53a6e13b70bccfd49c3b7aeb6bddb207b48093ec394db2c8f",
     "lines": 663,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/ShipmentDtos.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/ShipmentDtos.md"
   },
@@ -3110,7 +3110,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VoyageCrudDto.md"
   },
   "Core/Domain/VoyageManagement/Dtos/VoyageDtos.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "adf42e657ce2c3442a00b39c322a4d937937cb37c6e85b485b496b695e886cd9",
     "lines": 183,
     "file_type": "Dto",
@@ -3140,12 +3140,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VoyageEstimateLinkDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/VoyageProfitAndLossDtos.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "74555fc0c07e4280513cc5b2749eee7c9d59e96493e0937790b35275eb6b677d",
     "lines": 60,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/VoyageProfitAndLossDtos.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VoyageProfitAndLossDtos.md"
   },
@@ -4140,7 +4140,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/BunkerOrder/CorrectReceivedQuantityForOldReportedBunkertOrderItems.md"
   },
   "Core/Business/BunkerOrder/CreateUpdateBunkerOrderDetail.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "3273400c7e5b183286e99d69f3dc3d38242ef57dd254f185ae55ec5a52fbc04b",
     "lines": 384,
     "file_type": "Handler",
@@ -8730,7 +8730,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/UserSetting/UpdateUserSetting.md"
   },
   "Core/Business/MasterData/Vessel/CreateDuplicateVessels.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "abf8d732c2d8e0ba15d454f302e3133a44f50af729ee0eebcc5f877362426d99",
     "lines": 85,
     "file_type": "Handler",
@@ -8740,11 +8740,11 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/Vessel/CreateDuplicateVessels.md"
   },
   "Core/Business/MasterData/Vessel/CreateVessel.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "09569b8c91746344a296df2eb30a0db3ad3a7feca1d1fcde96777089bdd37446",
     "lines": 92,
-    "file_type": "Handler",
-    "architecture_layer": "Business",
+    "file_type": "Other",
+    "architecture_layer": "Other",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Business/MasterData/Vessel/CreateVessel.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/Vessel/CreateVessel.md"
@@ -8760,7 +8760,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/Vessel/DeleteVessel.md"
   },
   "Core/Business/MasterData/Vessel/GetVesselById.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "da4e6644852e66b8cdf91a8ba0570d900ac1ffe76ef28c9f9d28f2e1b574d76c",
     "lines": 59,
     "file_type": "Handler",
@@ -8810,7 +8810,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/Vessel/SearchVesselSchedule.md"
   },
   "Core/Business/MasterData/Vessel/UpdateVesselById.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "65bcdf1ba1d523501f34f4120844e5d8c6fabfad57d133ee6ebdd9912be08f36",
     "lines": 119,
     "file_type": "Handler",
@@ -8820,7 +8820,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/MasterData/Vessel/UpdateVesselById.md"
   },
   "Core/Business/MasterData/Vessel/UpdateVesselSpecification.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "f00b79be26748dfa7ca48d09a336da50cb038274f9505d5589d927325f409055",
     "lines": 77,
     "file_type": "Handler",
@@ -10610,9 +10610,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/BunkerLot/UpdateVoyageBunkerLots.md"
   },
   "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerIteneraryCalculator.cs": {
-    "phase": "synthesized",
-    "hash": "c067c89886849cecfa46604ae67a394eebdcd102fd9d96b6e2604284bcf5bcf1",
-    "lines": 240,
+    "phase": "enriched",
+    "hash": "03a5d23ecaad8d4ec3c3cb9733e20c4c688caae5f23646f1c5df5cdf0aea3464",
+    "lines": 242,
     "file_type": "Service",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -10630,10 +10630,10 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerLotCodeHelper.md"
   },
   "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerOnboardCalculator.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "f1172eb36730ffa2715e61e70540a7cfa8c6c0924fdae4b1a6131211214460e0",
     "lines": 269,
-    "file_type": "Service",
+    "file_type": "Other",
     "architecture_layer": "Business",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerOnboardCalculator.md",
@@ -10870,7 +10870,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/CalculateEstimateFromTotalPL.md"
   },
   "Core/Business/VoyageManagement/Estimate/CalculateEstimateWithNewVessel.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "2705e9cb6b86ae915d1a28fd2c79855cafa99d52ac0fc4ff26d75df99ddff7c4",
     "lines": 379,
     "file_type": "Handler",
@@ -11150,10 +11150,10 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/GenerateEstimateShipmentCommission.md"
   },
   "Core/Business/VoyageManagement/Estimate/GeneratePreCalculatedEstimateBunkerEvents.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "2a5d52b7733ce1b3a91abb2fae06192d5e15c1d4eb9c470cefa0a786af735b14",
     "lines": 167,
-    "file_type": "Service",
+    "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Business/VoyageManagement/Estimate/GeneratePreCalculatedEstimateBunkerEvents.md",
@@ -11410,10 +11410,10 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/GenerateMiscRevCommissionPlItemsHelper.md"
   },
   "Core/Business/VoyageManagement/Helpers/BunkerConsumptionEventHelper.cs": {
-    "phase": "synthesized",
-    "hash": "cec92027bc207c9f8d00de28818161d7687c9cde49c938476eb4bd436c83c5b7",
-    "lines": 457,
-    "file_type": "Service",
+    "phase": "enriched",
+    "hash": "6e7b0054bd8e8bc0ef4a08836ce3df2a52e335c0aa2b8be2ecf1a9217a7d28cd",
+    "lines": 459,
+    "file_type": "Other",
     "architecture_layer": "Business",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Business/VoyageManagement/Helpers/BunkerConsumptionEventHelper.md",
@@ -12250,7 +12250,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Shipment/GetShipmentByEmailId.md"
   },
   "Core/Business/VoyageManagement/Shipment/GetShipmentById.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "af83842a04576bdc89f3d7e11b20fe664469638123650ab680e82e79d092d4aa",
     "lines": 150,
     "file_type": "Handler",
@@ -13850,9 +13850,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Voyage/CompleteVoyage.md"
   },
   "Core/Business/VoyageManagement/Voyage/CreateAndGetFuelItineraryItemId.cs": {
-    "phase": "synthesized",
-    "hash": "52cac3ca6a423290b7d0c3faad222291808a764087bff5349548724aa6dc52c5",
-    "lines": 146,
+    "phase": "enriched",
+    "hash": "a58526a19ff27f3fe17abf420e90b39999df48618897fbf171235851876665ea",
+    "lines": 166,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -13990,7 +13990,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Voyage/GetMinimalVoyageById.md"
   },
   "Core/Business/VoyageManagement/Voyage/GetProfitAndLoss.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "d4695f99c8364088fb052f461ad25c6098e7fcbbb6a118df1884b66248e3e32a",
     "lines": 1257,
     "file_type": "Handler",
@@ -15570,11 +15570,11 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Infrastructure/AutoMapper/LaytimeMappingProfile.md"
   },
   "Core/Infrastructure/AutoMapper/MappingProfile.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "42ade1a28331c41a930e9801a0ddbf82b42f619c6524e4d6af50c8eab9bb308e",
     "lines": 1271,
-    "file_type": "Other",
-    "architecture_layer": "Other",
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Infrastructure/AutoMapper/MappingProfile.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Infrastructure/AutoMapper/MappingProfile.md"
@@ -15870,12 +15870,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Infrastructure/DbContext/ContextFactory.md"
   },
   "Core/Infrastructure/DbContext/DataContext.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "0282aa886c4aa1f9a4b6e6afb8ea048a2f382af73c62f36609ed0b2269c81781",
     "lines": 2348,
-    "file_type": "Other",
-    "architecture_layer": "Other",
-    "is_critical": true,
+    "file_type": "Configuration",
+    "architecture_layer": "Infrastructure",
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Infrastructure/DbContext/DataContext.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Infrastructure/DbContext/DataContext.md"
   },
@@ -16060,7 +16060,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Infrastructure/DbContext/SeedingServices/ArchetypeSeedingService.md"
   },
   "Core/Infrastructure/DbContext/SeedingServices/BunkerChainSeedingService.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "c534f1609c327ed352967d67c04b0c43c965812bd451dbe306a17044be830fc8",
     "lines": 44,
     "file_type": "Service",
@@ -17190,11 +17190,11 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\APIs/MasterData/Controllers/SeedDataController.md"
   },
   "APIs/MasterData/Controllers/SelectionController.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "3ad8c6ced560cfc3ec12030975e55c09a4ea80f026a87bb1274e3a8504383aa9",
     "lines": 617,
-    "file_type": "Controller",
-    "architecture_layer": "API",
+    "file_type": "Other",
+    "architecture_layer": "Other",
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\APIs/MasterData/Controllers/SelectionController.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\APIs/MasterData/Controllers/SelectionController.md"
@@ -17270,7 +17270,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\APIs/MasterData/Controllers/UserSettingController.md"
   },
   "APIs/MasterData/Controllers/VesselsController.cs": {
-    "phase": "synthesized",
+    "phase": "documented",
     "hash": "907441ad184ce60514530414264c904572aeae5cbb503217ead3032a52903942",
     "lines": 156,
     "file_type": "Controller",
@@ -19308,5 +19308,23 @@
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Functions/WfosSync/WfosSyncService.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Functions/WfosSync/WfosSyncService.md"
+  },
+  "Functions/DataSyncJob/DataSyncJobFailedService.cs": {
+    "phase": "documented",
+    "hash": "5f4a80ffff06668ccecac0c5636f7c0a2b70a3375a2909cca228a4f6b31c8227",
+    "lines": 49,
+    "file_type": "Service",
+    "architecture_layer": "Functions",
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Functions/DataSyncJob/DataSyncJobFailedService.md"
+  },
+  "Functions/DataSyncJob/DataSyncJobFailedServiceFunction.cs": {
+    "phase": "documented",
+    "hash": "cd74444479a8bc222b57b2498c4f8f515c85529bae9c7adc68ed01ade66e1c1c",
+    "lines": 104,
+    "file_type": "Function",
+    "architecture_layer": "Functions",
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Functions/DataSyncJob/DataSyncJobFailedServiceFunction.md"
   }
 }

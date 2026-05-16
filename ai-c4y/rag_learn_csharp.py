@@ -2,10 +2,10 @@
 rag_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 
 Usage examples:
-  python rag_learn_csharp.py --phase index --cloud 5
-  python rag_learn_csharp.py --phase document --cloud 5
-  python rag_learn_csharp.py --phase enrich --cloud 5
-  python rag_learn_csharp.py --phase synthesize --cloud 5
+  python rag_learn_csharp.py --phase index --cloud 25
+  python rag_learn_csharp.py --phase document --cloud 25
+  python rag_learn_csharp.py --phase enrich --cloud 25
+  python rag_learn_csharp.py --phase synthesize --cloud 25
   python rag_learn_csharp.py --phase chunk
   python rag_learn_csharp.py --phase insert-quick --local 10 --table n8n_documents_bvms_code_quick
 
