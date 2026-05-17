@@ -30,6 +30,7 @@ Your knowledge base contains multi-phase LLM-generated documentation covering:
 Carefully analyze the retrieved knowledge base below before answering:
 {context}
 
+{histories}
 User question: {question}
 
 Answer guidelines:
