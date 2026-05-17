@@ -106,7 +106,6 @@ async def main():
         enrich_with_cross_references,
         synthesize_workflow_documents,
         chunk_for_rag,
-        insert_rag_chunks,
         insert_rag_chunks_quick,
         CSHARP_CODEBASE_PATH,
         DEFAULT_INDEX_PATH,
@@ -183,8 +182,7 @@ async def main():
     run_enrich    = args.phase in ("enrich", "all")
     run_synthesize = args.phase in ("synthesize", "all")
     run_chunk     = args.phase in ("chunk", "all")
-    run_insert    = args.phase in ("insert", "all")
-    run_insert_quick = args.phase in ("insert-quick",)
+    run_insert_quick = args.phase in ("insert", "insert-quick", "all")
 
     if run_index:
         if not codebase_path:
@@ -207,9 +205,6 @@ async def main():
     if run_chunk:
         force_chunk = {os.path.splitext(fp)[0].replace("\\", "/") for fp in incremental_files} if incremental_files else None
         await chunk_for_rag(force_files=force_chunk)
-
-    if run_insert:
-        await insert_rag_chunks(force_cloud=force_cloud, force_local=force_local, concurrency=concurrency, table_name=args.table)
 
     if run_insert_quick:
         await insert_rag_chunks_quick(concurrency=concurrency, table_name=args.table)
