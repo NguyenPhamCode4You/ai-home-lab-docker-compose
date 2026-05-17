@@ -1,4 +1,6 @@
 """
+NORMAL USAGE:
+
 rag_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 
 Usage examples:
@@ -15,6 +17,19 @@ Usage examples:
   python rag_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python rag_learn_csharp.py --phase all --mode incremental --from-stdin
 """
+
+"""
+CRITICAL WORKFLOW DISCOVERY:
+
+# Step 1: run once after indexing + enriching to populate discovered-workflows.json
+python rag_learn_csharp.py --phase workflow-identify --cloud 1
+
+# Step 2: synthesize now auto-picks up discovered flows in Pass B deep dives
+python rag_learn_csharp.py --phase synthesize --cloud 25
+
+# As the codebase grows, re-run workflow-identify to discover new flows incrementally
+# (it deduplicates against previously discovered ones automatically)
+# """
 
 import argparse
 import asyncio
@@ -33,7 +48,7 @@ def parse_args():
     )
     parser.add_argument(
         "--phase",
-        choices=["index", "document", "enrich", "synthesize", "chunk", "insert", "insert-quick", "all"],
+        choices=["index", "document", "enrich", "synthesize", "chunk", "insert", "insert-quick", "workflow-identify", "all"],
         default="all",
         help="Phase(s) to run (default: all)",
     )
@@ -95,6 +110,7 @@ async def main():
         write_csharp_documents,
         enrich_with_cross_references,
         synthesize_workflow_documents,
+        identify_critical_workflows,
         chunk_for_rag,
         insert_rag_chunks_quick,
         CSHARP_CODEBASE_PATH,
@@ -167,11 +183,12 @@ async def main():
     # ------------------------------------------------------------------
     # Phase execution
     # ------------------------------------------------------------------
-    run_index     = args.phase in ("index", "all")
-    run_document  = args.phase in ("document", "all")
-    run_enrich    = args.phase in ("enrich", "all")
-    run_synthesize = args.phase in ("synthesize", "all")
-    run_chunk     = args.phase in ("chunk", "all")
+    run_index        = args.phase in ("index", "all")
+    run_document     = args.phase in ("document", "all")
+    run_enrich       = args.phase in ("enrich", "all")
+    run_synthesize   = args.phase in ("synthesize", "all")
+    run_workflow_id  = args.phase in ("workflow-identify",)  # standalone only; not part of "all"
+    run_chunk        = args.phase in ("chunk", "all")
     run_insert_quick = args.phase in ("insert", "insert-quick", "all")
 
     if run_index:
@@ -191,6 +208,9 @@ async def main():
 
     if run_synthesize:
         await synthesize_workflow_documents(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
+
+    if run_workflow_id:
+        await identify_critical_workflows(manifest=manifest, force_cloud=force_cloud, force_local=force_local, concurrency=concurrency)
 
     if run_chunk:
         force_chunk = {os.path.splitext(fp)[0].replace("\\", "/") for fp in incremental_files} if incremental_files else None

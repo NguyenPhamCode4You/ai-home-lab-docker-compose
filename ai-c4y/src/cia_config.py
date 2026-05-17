@@ -30,13 +30,14 @@ OPENROUTER_CRITICAL_MODEL        = os.getenv("CIA_OPENROUTER_CRITICAL_MODEL", "g
 CLOUD_BATCH_DELAY                = float(os.getenv("CIA_CLOUD_BATCH_DELAY", "2.0"))
 BATCH_SIZE                       = int(os.getenv("CIA_BATCH_SIZE", "10"))
 
-DEFAULT_INDEX_PATH        = os.getenv("CIA_INDEX_PATH",           "wip/csharp-index.json")
-DEFAULT_RAW_DOCS_FOLDER   = os.getenv("CIA_RAW_DOCS_FOLDER",      "wip/csharp-docs/raw")
-DEFAULT_ENRICHED_FOLDER   = os.getenv("CIA_ENRICHED_DOCS_FOLDER", "wip/csharp-docs/enriched")
-DEFAULT_WORKFLOWS_FOLDER  = os.getenv("CIA_WORKFLOWS_FOLDER",     "wip/csharp-docs/workflows")
-DEFAULT_RAG_CHUNKS_FOLDER = os.getenv("CIA_RAG_CHUNKS_FOLDER",    "wip/csharp-docs/rag-chunks")
-DEFAULT_RAG_DONE_FOLDER   = os.getenv("CIA_RAG_DONE_FOLDER",      "wip/csharp-docs/rag-done")
-DEFAULT_RAG_DONE_QUICK_FOLDER = os.getenv("CIA_RAG_DONE_QUICK_FOLDER", "wip/csharp-docs/rag-done-quick")
+DEFAULT_INDEX_PATH                  = os.getenv("CIA_INDEX_PATH",                   "wip/csharp-index.json")
+DEFAULT_RAW_DOCS_FOLDER             = os.getenv("CIA_RAW_DOCS_FOLDER",              "wip/csharp-docs/raw")
+DEFAULT_ENRICHED_FOLDER             = os.getenv("CIA_ENRICHED_DOCS_FOLDER",         "wip/csharp-docs/enriched")
+DEFAULT_WORKFLOWS_FOLDER            = os.getenv("CIA_WORKFLOWS_FOLDER",             "wip/csharp-docs/workflows")
+DEFAULT_RAG_CHUNKS_FOLDER           = os.getenv("CIA_RAG_CHUNKS_FOLDER",            "wip/csharp-docs/rag-chunks")
+DEFAULT_RAG_DONE_FOLDER             = os.getenv("CIA_RAG_DONE_FOLDER",              "wip/csharp-docs/rag-done")
+DEFAULT_RAG_DONE_QUICK_FOLDER       = os.getenv("CIA_RAG_DONE_QUICK_FOLDER",        "wip/csharp-docs/rag-done-quick")
+DEFAULT_DISCOVERED_WORKFLOWS_PATH   = os.getenv("CIA_DISCOVERED_WORKFLOWS_PATH",    "wip/csharp-docs/discovered-workflows.json")
 
 # -------------------------------------------------------------------
 # Constants
@@ -110,6 +111,25 @@ PRIORITY_CRITICAL_FLOWS = [
 # -------------------------------------------------------------------
 # Index I/O utilities (used by all phases)
 # -------------------------------------------------------------------
+
+
+def _load_discovered_flows(path: str = None) -> list[dict]:
+    """Load dynamically discovered workflows from wip/discovered-workflows.json.
+
+    Returns an empty list if the file does not exist yet (first run before
+    workflow-identify has been executed).  The caller is responsible for
+    merging these with the static PRIORITY_CRITICAL_FLOWS list.
+    """
+    if path is None:
+        path = DEFAULT_DISCOVERED_WORKFLOWS_PATH
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return [d for d in data if isinstance(d, dict)]
+    except Exception:
+        return []
 
 
 def _load_index(index_path: str) -> dict:

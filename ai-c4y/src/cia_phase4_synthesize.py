@@ -28,6 +28,7 @@ from .cia_config import (
     VERB_CLUSTERS,
     PRIORITY_CRITICAL_FLOWS,
     _load_index,
+    _load_discovered_flows,
 )
 from .agents.CSharpWorkflowSynthesizer import CSharpWorkflowSynthesizer
 from .agents.CSharpCriticalWorkflowAnalyzer import CSharpCriticalWorkflowAnalyzer
@@ -124,13 +125,23 @@ def _collect_pass_b_targets(
 ) -> list[dict]:
     """
     Build the list of Pass B deep-dive targets:
-      1. Hard-coded priority flows (always included)
-      2. Any critical cluster not already covered by a priority flow
+      1. Hard-coded priority flows (PRIORITY_CRITICAL_FLOWS) — always included first
+      2. Dynamically discovered flows from wip/discovered-workflows.json
+         (written by --phase workflow-identify)
+      3. Any critical cluster not already covered by a priority flow
     """
+    # Merge static config with dynamically discovered flows (deduplicated by name)
+    discovered = _load_discovered_flows()
+    seen_names_lower = {f["name"].lower() for f in PRIORITY_CRITICAL_FLOWS}
+    extra_flows = [d for d in discovered if d.get("name", "").lower() not in seen_names_lower]
+    all_flow_defs = list(PRIORITY_CRITICAL_FLOWS) + extra_flows
+    if extra_flows:
+        print(f"[Phase 4 Pass B] Merging {len(extra_flows)} discovered workflow(s) from wip/discovered-workflows.json")
+
     targets = []
     seen_flow_names: set[str] = set()
 
-    for flow_def in PRIORITY_CRITICAL_FLOWS:
+    for flow_def in all_flow_defs:
         flow_name = flow_def["name"]
         module = flow_def["module"]
         required = flow_def.get("required_tokens", [])
