@@ -63,7 +63,7 @@ ollama push nichealpham/lora-8b
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create a table to store your documents
-create table n8n_documents_bvms_code_quick (
+create table n8n_documents_bvms_code_be_quick (
   id bigserial primary key,
   content text,
   summarize text,
@@ -73,7 +73,7 @@ create table n8n_documents_bvms_code_quick (
 );
 
 -- Create a function to search for documents
-CREATE FUNCTION match_n8n_documents_bvms_code_quick (
+CREATE FUNCTION match_n8n_documents_bvms_code_be_quick (
   query_embedding VECTOR(768),
   match_count INT DEFAULT NULL,
   filter JSONB DEFAULT '{}'
@@ -94,8 +94,8 @@ BEGIN
     content,
     summarize,
     metadata,
-    2 - ((n8n_documents_bvms_code_quick.embedding <=> query_embedding) + (n8n_documents_bvms_code_quick.embedding2 <=> query_embedding)) AS similarity
-  FROM n8n_documents_bvms_code_quick
+    2 - ((n8n_documents_bvms_code_be_quick.embedding <=> query_embedding) + (n8n_documents_bvms_code_be_quick.embedding2 <=> query_embedding)) AS similarity
+  FROM n8n_documents_bvms_code_be_quick
   WHERE metadata @> filter
   ORDER BY similarity DESC
   LIMIT match_count;
@@ -103,7 +103,7 @@ END;
 $$;
 ```
 
-THEN, after inserting documents with their embeddings into the `n8n_documents_bvms_code_quick` table, it is good practice to create an index on the embedding columns to speed up similarity searches: (Rows count >= 10000)
+THEN, after inserting documents with their embeddings into the `n8n_documents_bvms_code_be_quick` table, it is good practice to create an index on the embedding columns to speed up similarity searches: (Rows count >= 10000)
 
 ```sql
 -- Drop the existing ones for re-recreate

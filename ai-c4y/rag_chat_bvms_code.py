@@ -5,21 +5,26 @@ from src.ChatBackend import create_chat_backend
 from src.agents.DocumentRanking import DocumentRanking
 from dotenv import load_dotenv
 from src.agents.models.OpenRouter import OpenRouter
+from src.AssistantOrchestra import AssistantOrchestra
+from src.agents.QuestionForwarder import QuestionForwarder
+from src.agents.AnswerEvaluator import AnswerEvaluator
 
 load_dotenv()
 
-# default_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
-# default_model = OpenRouter(model='anthropic/claude-opus-4.7')
-default_model = OpenRouter(model='anthropic/claude-sonnet-4.6')
+# code_answer_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
+# code_answer_model = OpenRouter(model='anthropic/claude-opus-4.7')
+simple_task_model           = Ollama(model="qwen2.5-coder:7b", num_ctx=30000)
+code_answer_model           = OpenRouter(model='anthropic/claude-sonnet-4.6')
+evaluation_model            = OpenRouter(model='google/gemma-4-26b-a4b-it')
 
 bvms_code_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_code_be_quick",
-    document_match_count=200,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
+    document_match_count=300,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
     llm_document_ranking=DocumentRanking(
-        llm_model=Ollama(model="qwen2.5-coder:7b"),
+        llm_model=simple_task_model,
     ),
     llm_rag_answer=GeneralRagAnswer(
-        llm_model=default_model,
+        llm_model=code_answer_model,
         instruction_template="""
 You are a senior software engineer with deep expertise in the BVMS (BBC Voyage Management System) C# backend codebase.
 Your knowledge base contains multi-phase LLM-generated documentation covering:
@@ -42,10 +47,26 @@ Answer guidelines:
 - If the knowledge base does not contain enough information to answer confidently, say so clearly and describe what is known.
 - Use precise BVMS terminology (e.g. TCO, BDN, voyage reconciliation, ownership change log) as found in the knowledge base — do not paraphrase into generic terms.
 - Do not invent class names, method names, or business rules that are not present in the knowledge base.
+- Use markdown digram syntax to illustrate workflows, state machines, or class relationships when relevant.
         """
     ))
+
+assistant = AssistantOrchestra(
+    llm_question_forwarder=QuestionForwarder(
+        llm_model=simple_task_model,
+    ),
+    also_include_original_question_from_user=True,
+    llm_answer_evaluator=AnswerEvaluator(
+        llm_model=evaluation_model,
+    ),
+    max_iterations=3,
+)
+assistant.agents = {
+    "BVMS-Code Assistant": {"agent": bvms_code_rag_assistant, "context_awareness": True, "description": "This agent is expert in answering code / features / deep technical aspect of the software named BVMS (BBC Voyager Management System), and can provide detailed code snippets, technical explanations, and insights about the codebase as well as its business logic and workflows. However, calling this agent is costly, so make sure to enrich the question with comprehensive details before forwarding to it."},
+}
 
 if __name__ == "__main__":
     import uvicorn
     app = create_chat_backend(bvms_code_rag_assistant)
+    # app = create_chat_backend(assistant)
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
