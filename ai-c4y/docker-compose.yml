@@ -39,7 +39,7 @@ services:
       - .env
     environment:
       TOKENS_LENGTH: 80000
-      CHARS_PER_TOKEN: 10
+      CHARS_PER_TOKEN: 39
       OLLAMA_GENERAL_MODEL: qwen2.5-coder:7b
       OLLAMA_CODE_MODEL: qwen2.5-coder:7b
       OPENROUTER_MAX_TOKENS: 120000
