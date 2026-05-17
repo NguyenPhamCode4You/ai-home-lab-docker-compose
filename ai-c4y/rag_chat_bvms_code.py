@@ -62,11 +62,38 @@ assistant = AssistantOrchestra(
     max_iterations=3,
 )
 assistant.agents = {
-    "BVMS-Code Assistant": {"agent": bvms_code_rag_assistant, "context_awareness": True, "description": "This agent is expert in answering code / features / deep technical aspect of the software named BVMS (BBC Voyager Management System), and can provide detailed code snippets, technical explanations, and insights about the codebase as well as its business logic and workflows. However, calling this agent is costly, so make sure to enrich the question with comprehensive details before forwarding to it."},
+    "BVMS-Code Assistant": {
+        "agent": bvms_code_rag_assistant,
+        "context_awareness": True,
+        "description": (
+            "ALWAYS forward user question to this agent, but using only one agent call, after applying the enrichment rules below.\n\n"
+
+            "This Agent has Deep-expertise for the BVMS (BBC Voyage Management System) C# backend — "
+            "covering class/method internals, cross-module dependencies, business workflows, and BVMS-specific processes.\n\n"
+
+            "MANDATORY ENRICHMENT RULES — apply before every forwarded question:\n\n"
+
+            "Rule 1 — Vague or under-specified question: "
+            "Rewrite it with structural context. Identify the relevant BVMS module, domain entity, "
+            "or workflow; state what is already known about current behavior; and express the gap clearly "
+            "(e.g. 'where is X calculated?', 'what triggers Y?', 'which class owns Z?').\n\n"
+
+            "Rule 2 — Detailed workflow or deep technical question: "
+            "Construct a comprehensive multi-part question that forces reasoning at two levels — "
+            "(a) HIGH LEVEL: overall flow, module ownership, business purpose, state transitions; "
+            "(b) LOW LEVEL: exact class names, method signatures, execution order, edge cases, "
+            "caller/dependency chain, known limitations. "
+            "Format as: [Context recap] → [High-level question] → [Specific technical sub-questions]. "
+            "Always preserve the user's original question verbatim inside the enriched question.\n\n"
+
+            "Calling this agent is expensive — never forward a bare, vague, or one-line question. "
+            "Invest in enrichment in a single agent call to maximise answer quality."
+        ),
+    },
 }
 
 if __name__ == "__main__":
     import uvicorn
-    app = create_chat_backend(bvms_code_rag_assistant)
-    # app = create_chat_backend(assistant)
+    # app = create_chat_backend(bvms_code_rag_assistant)
+    app = create_chat_backend(assistant)
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)

@@ -167,7 +167,7 @@ class AssistantOrchestra:
                     additional_context = all_agent_responses or routing_output
 
                 if self.also_include_original_question_from_user:
-                    agent_question += f"\n\nOriginal user question: {question}"
+                    agent_question += f"\n\n**Original user question:** {question}"
 
                 if not is_silent:
                     yield f"\n\n### Hey 🤖 {agent_name} ({agent_idx}/{total_agents}), {agent_question.strip().rstrip('?')}?\n\n"
