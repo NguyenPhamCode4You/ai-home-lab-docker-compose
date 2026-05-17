@@ -7,23 +7,13 @@ Usage examples:
   python rag_learn_csharp.py --phase enrich --cloud 25
   python rag_learn_csharp.py --phase synthesize --cloud 25
   python rag_learn_csharp.py --phase chunk
-  python rag_learn_csharp.py --phase insert-quick --local 10 --table n8n_documents_bvms_code_be_quick
+  python rag_learn_csharp.py --phase insert --local 10 --table n8n_documents_bvms_code_be_quick
 
   python rag_learn_csharp.py --phase all
   python rag_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
   python rag_learn_csharp.py --phase all --mode incremental
   python rag_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python rag_learn_csharp.py --phase all --mode incremental --from-stdin
-  python rag_learn_csharp.py --phase index --cloud
-  python rag_learn_csharp.py --phase index --cloud 5
-  python rag_learn_csharp.py --phase all --cloud 3
-  python rag_learn_csharp.py --phase index --local
-  python rag_learn_csharp.py --phase index --local 3
-  python rag_learn_csharp.py --phase chunk
-  python rag_learn_csharp.py --phase insert
-  python rag_learn_csharp.py --phase insert-quick
-  python rag_learn_csharp.py --phase insert-quick --cloud 20
-  python rag_learn_csharp.py --phase insert-quick --local 5 --table bvms-backend-v2
 """
 
 import argparse
