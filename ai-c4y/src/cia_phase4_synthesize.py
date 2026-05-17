@@ -345,7 +345,10 @@ async def synthesize_workflow_documents(
         if not context:
             print(f"[Phase 4 Pass A] SKIP (no enriched docs): {cluster_label}")
             return None
-        llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_SYNTHESIS_MODEL)
+        # Workflow synthesis is complex — use the critical model (CIA_OPENROUTER_CRITICAL_MODEL)
+        # for richer, more accurate module-level workflow docs.
+        # The architecture overview (final step) stays on the cheaper synthesis model.
+        llm = Ollama(model=OLLAMA_GENERAL_MODEL) if force_local else OpenRouter(model=OPENROUTER_CRITICAL_MODEL)
         synthesizer = CSharpWorkflowSynthesizer(llm_model=llm)
         ts = datetime.now().strftime("%H:%M:%S")
         print(f"[Phase 4 Pass A] {ts} [{task_idx}/{total_a}] Synthesizing: {cluster_label} ({len(file_paths_v)} files)")
