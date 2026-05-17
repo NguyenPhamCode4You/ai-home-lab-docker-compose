@@ -22,7 +22,7 @@ FALLBACK_RESULT = {
 
 _STRICT_SUFFIX = (
     "\n\nIMPORTANT: Output ONLY the raw JSON object. "
-    "No markdown code fences. No explanation. Start your response with { and end with }."
+    "No markdown code fences. No explanation. Start your response with {{ and end with }}."
 )
 
 
