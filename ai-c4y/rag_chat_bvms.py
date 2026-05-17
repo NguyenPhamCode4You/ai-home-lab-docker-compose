@@ -8,8 +8,8 @@ from src.agents.models.OpenRouter import OpenRouter
 
 load_dotenv()
 
-default_model = Ollama()
-# default_model = OpenRouter()
+# default_model = Ollama()
+default_model = OpenRouter(model='google/gemma-4-26b-a4b-it')
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",
@@ -17,7 +17,6 @@ bvms_rag_assistant = RagAssistant(
         llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
-        # llm_model=Ollama(),
         llm_model=default_model,
         instruction_template="""
         You are an intelligent assistant that can provide detailed answers about a software named BVMS (BBC Voyager Management System).

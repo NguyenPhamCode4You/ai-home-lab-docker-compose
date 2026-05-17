@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 8001
 
 # Run the application
-CMD ["python", "rag_chat_imos.py"]
+CMD ["python", "rag_chat_bvms_code.py"]

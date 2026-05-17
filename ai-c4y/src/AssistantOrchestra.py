@@ -79,6 +79,7 @@ class AssistantOrchestra:
         agents: dict = None,
         max_iterations: int = 3,
         compact_threshold_tokens: int = 24000,
+        also_include_original_question_from_user: bool = False,
     ):
         self.agents = agents or {}
         self.question_forwarder = llm_question_forwarder or QuestionForwarder()
@@ -87,6 +88,7 @@ class AssistantOrchestra:
         self.iteration_summarizer = llm_iteration_summarizer or IterationSummarizer()
         self.max_iterations = max_iterations
         self.compact_threshold_tokens = compact_threshold_tokens
+        self.also_include_original_question_from_user = also_include_original_question_from_user
 
     async def stream(self, context: str = None, question: str = None, conversation_history: list = None):
         is_silent = "--silent" in question
@@ -163,6 +165,9 @@ class AssistantOrchestra:
                 additional_context = ""
                 if agent_details.get("context_awareness", True):
                     additional_context = all_agent_responses or routing_output
+
+                if self.also_include_original_question_from_user:
+                    agent_question += f"\n\nOriginal user question: {question}"
 
                 if not is_silent:
                     yield f"\n\n### Hey 🤖 {agent_name} ({agent_idx}/{total_agents}), {agent_question.strip().rstrip('?')}?\n\n"
