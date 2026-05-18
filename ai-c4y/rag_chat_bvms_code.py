@@ -19,7 +19,7 @@ evaluation_model            = OpenRouter(model='google/gemma-4-26b-a4b-it')
 
 bvms_code_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_code_be_quick",
-    document_match_count=300,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
+    document_match_count=250,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
     llm_document_ranking=DocumentRanking(
         llm_model=simple_task_model,
     ),
@@ -94,6 +94,6 @@ assistant.agents = {
 
 if __name__ == "__main__":
     import uvicorn
-    # app = create_chat_backend(bvms_code_rag_assistant)
-    app = create_chat_backend(assistant)
+    app = create_chat_backend(bvms_code_rag_assistant)
+    # app = create_chat_backend(assistant)
     uvicorn.run(app, host="0.0.0.0", port=8001, timeout_keep_alive=300)
