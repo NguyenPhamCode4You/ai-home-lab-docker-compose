@@ -400,9 +400,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/Constants/CargoConstants.md"
   },
   "Core/Domain/Constants/CommonConstants.cs": {
-    "phase": "synthesized",
-    "hash": "6bbe598971c9e50a9b8dcbda6004b90d484874464572d39772afb41ff19d458b",
-    "lines": 1107,
+    "phase": "enriched",
+    "hash": "188673f7f02c1932a8d0ee8bf35a21a6dcd6909990085d070ecde3fd4df445d9",
+    "lines": 1108,
     "file_type": "Other",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -1770,12 +1770,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/FinanceData/Entities/ProfitAndLoss/MasterProfitAndLossGroup.md"
   },
   "Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossIdentifierEnum.cs": {
-    "phase": "synthesized",
-    "hash": "e1fde2e3ad5b1a3977d40adf1aa329a1c9584f19a7ece41ad427e6348469bbf5",
-    "lines": 129,
+    "phase": "enriched",
+    "hash": "02cb308b3626ff53c35f1890ad91aec5357a1053ee5da399c0c6a5253618b1cd",
+    "lines": 132,
     "file_type": "Other",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossIdentifierEnum.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossIdentifierEnum.md"
   },
@@ -1900,9 +1900,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Dtos/PIClubDtos.md"
   },
   "Core/Domain/MasterData/Dtos/PortDtos.cs": {
-    "phase": "synthesized",
-    "hash": "e7f092cbd53f4dcbe1ad348b31e964e8ef17dc3abbee0f536c48ef9e494795ba",
-    "lines": 269,
+    "phase": "enriched",
+    "hash": "7c20d428ea7512ddb7571a67b01aba7503949e0d4d45d474746269ed59e1cc7f",
+    "lines": 273,
     "file_type": "Dto",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -1960,7 +1960,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Dtos/VesselCraneDtos.md"
   },
   "Core/Domain/MasterData/Dtos/VesselDtos.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "c23caaef1978e62881a2fec5b993f412457e4c42ecb8433add8aee7fea9d96cd",
     "lines": 423,
     "file_type": "Dto",
@@ -2150,12 +2150,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Entities/PIClubEntity.md"
   },
   "Core/Domain/MasterData/Entities/PortEntity.cs": {
-    "phase": "synthesized",
-    "hash": "31c0790a9f60dfdd34c9722b65f5930d49eddfdad06eeda7a41154769e0b51e8",
-    "lines": 89,
+    "phase": "enriched",
+    "hash": "036312c048bf2038cb51e271d23378def4a6c75eacf3af8a5a51746d5fa1d665",
+    "lines": 91,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/MasterData/Entities/PortEntity.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Entities/PortEntity.md"
   },
@@ -2180,7 +2180,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/MasterData/Entities/TermEntity.md"
   },
   "Core/Domain/MasterData/Entities/VesselBunkerTypeEntity.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "ef2c290960c2599c46b12dd7291fb16b81b69c29aab09c2fb5f177c537624b8c",
     "lines": 62,
     "file_type": "Entity",
@@ -2890,12 +2890,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/EstimateCommissionDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateCrudDtos.cs": {
-    "phase": "synthesized",
-    "hash": "91ab4f3317844306e1ab7678c9deda29ae7e32909dcc5cc98822817c5d406194",
-    "lines": 171,
+    "phase": "enriched",
+    "hash": "e7fd3aa87a2a3ca45fabdbb0d675bf7df8e01d0bca4aa3c0baec64d99bf147d1",
+    "lines": 174,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateCrudDtos.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/EstimateCrudDtos.md"
   },
@@ -2950,12 +2950,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/EstimateSearchDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/EstimateShipmentDtos.cs": {
-    "phase": "synthesized",
-    "hash": "8424db6d89f2e78b749a6f6fbf2c1aa5c7a14af531b929dd702311c8ef01e2a5",
-    "lines": 170,
+    "phase": "enriched",
+    "hash": "72021877d06d2fac3b373ada97fec74c26395596d69889197c997f41137ba5d2",
+    "lines": 171,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/EstimateShipmentDtos.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/EstimateShipmentDtos.md"
   },
@@ -3000,9 +3000,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/OverwriteShipmentDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/PLResultDtos.cs": {
-    "phase": "synthesized",
-    "hash": "e58a547eef08d70b12244a5c9d8db6499d87557d21c929af0d666fd963e1e3ac",
-    "lines": 169,
+    "phase": "enriched",
+    "hash": "b590d45133fa55ce2b3c40c2682725503147f45426ab233153d1fb1fdd44a8bb",
+    "lines": 172,
     "file_type": "Dto",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -3090,22 +3090,22 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VesselReportDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/VoyageBunkerLotDtos.cs": {
-    "phase": "synthesized",
-    "hash": "6c14aa71973cfe9cdccdf77de5b5fcf516f692b769bef2effe6b2ae5ef5224f4",
-    "lines": 129,
+    "phase": "enriched",
+    "hash": "5346bce8a5fa6d8f5767f98b759ecdd4a06505279d598a0c7f865324f890bf48",
+    "lines": 137,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/VoyageBunkerLotDtos.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VoyageBunkerLotDtos.md"
   },
   "Core/Domain/VoyageManagement/Dtos/VoyageCrudDto.cs": {
-    "phase": "synthesized",
-    "hash": "724c87d32f8f6162c42e8f29cb395092880a5cfff9691fb96ee86d547fe42cad",
-    "lines": 545,
+    "phase": "enriched",
+    "hash": "58b7d75f7c27818eebf565891cd773123c2ef589f8d513705c7760cdd79e52ca",
+    "lines": 556,
     "file_type": "Dto",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Dtos/VoyageCrudDto.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Dtos/VoyageCrudDto.md"
   },
@@ -3370,9 +3370,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/BunkerConsumtionDetailEntity.md"
   },
   "Core/Domain/VoyageManagement/Entities/BunkerEventEntities.cs": {
-    "phase": "synthesized",
-    "hash": "5769d60a3b71d7be6a79421f9f6fda9e93f371da64900d83404930ddea7238f0",
-    "lines": 220,
+    "phase": "enriched",
+    "hash": "bda179db7b37f29a29d251e0aa3759c1ed26eb201de60f28a09db9d9c1684cdd",
+    "lines": 236,
     "file_type": "Entity",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -3450,12 +3450,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/EstimateCommissionEntity.md"
   },
   "Core/Domain/VoyageManagement/Entities/EstimateEntity.cs": {
-    "phase": "synthesized",
-    "hash": "4622b194805731a424031809a5edffe7d61796bea0c9b8b339f3d543c2290b05",
-    "lines": 142,
+    "phase": "enriched",
+    "hash": "2462fab36d173d20bcebe5deec5bb482443f5bf0d7fcd8d3d6f3477de918e30e",
+    "lines": 145,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Entities/EstimateEntity.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/EstimateEntity.md"
   },
@@ -3540,9 +3540,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/IteneraryItemEntities.md"
   },
   "Core/Domain/VoyageManagement/Entities/ProfitAndLossEntities.cs": {
-    "phase": "synthesized",
-    "hash": "6a000829b7aff2a4c417166c6516cd83960211734af5977fc5d80240f166a2ef",
-    "lines": 185,
+    "phase": "enriched",
+    "hash": "88970813ec8e4137bce732be57d3c71126e8d8ced0fca7814b121c364c75d9fd",
+    "lines": 188,
     "file_type": "Entity",
     "architecture_layer": "Domain",
     "is_critical": false,
@@ -3610,12 +3610,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/ShipmentInstructionEntity.md"
   },
   "Core/Domain/VoyageManagement/Entities/ShipmentPortEntity.cs": {
-    "phase": "synthesized",
-    "hash": "c9e13729706af3551192dd703d302f77a0069b4b7c75b814de45b06945c90050",
-    "lines": 116,
+    "phase": "enriched",
+    "hash": "84908032bc96c847ec7d4466c5c81e4dd6378af9238cccd660386c8683f2954a",
+    "lines": 117,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Entities/ShipmentPortEntity.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/ShipmentPortEntity.md"
   },
@@ -3740,19 +3740,19 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/VesselReportEntity.md"
   },
   "Core/Domain/VoyageManagement/Entities/VoyageBunkerLotEntities.cs": {
-    "phase": "synthesized",
-    "hash": "2eff092bbf685e37ec17a124f69a027374414ea312678785d5a2de33ba899222",
-    "lines": 274,
+    "phase": "enriched",
+    "hash": "0e6ce0ddca8bd90c88b501c5a568ed282cbd1885554e16ff43160d09d854e8fc",
+    "lines": 287,
     "file_type": "Entity",
     "architecture_layer": "Domain",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Domain/VoyageManagement/Entities/VoyageBunkerLotEntities.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Domain/VoyageManagement/Entities/VoyageBunkerLotEntities.md"
   },
   "Core/Domain/VoyageManagement/Entities/VoyageEntity.cs": {
-    "phase": "synthesized",
-    "hash": "81555370bb92a679bd26dba6b85429b7f3eca1abb1d0508280b0ff0b5f759055",
-    "lines": 157,
+    "phase": "enriched",
+    "hash": "460b8bc2e8272240cbdddbbefa3baa268ba52a3237f90981bec2e4725d21c556",
+    "lines": 160,
     "file_type": "Entity",
     "architecture_layer": "Domain",
     "is_critical": true,
@@ -4140,9 +4140,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/BunkerOrder/CorrectReceivedQuantityForOldReportedBunkertOrderItems.md"
   },
   "Core/Business/BunkerOrder/CreateUpdateBunkerOrderDetail.cs": {
-    "phase": "synthesized",
-    "hash": "3273400c7e5b183286e99d69f3dc3d38242ef57dd254f185ae55ec5a52fbc04b",
-    "lines": 384,
+    "phase": "enriched",
+    "hash": "ae8dacb99609284abb6e29c4ef6b2063181f44caa066445a63e5566415913263",
+    "lines": 391,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -10610,7 +10610,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/BunkerLot/UpdateVoyageBunkerLots.md"
   },
   "Core/Business/VoyageManagement/BunkerLot/Helpers/BunkerIteneraryCalculator.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "03a5d23ecaad8d4ec3c3cb9733e20c4c688caae5f23646f1c5df5cdf0aea3464",
     "lines": 242,
     "file_type": "Service",
@@ -10880,9 +10880,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/CalculateEstimateWithNewVessel.md"
   },
   "Core/Business/VoyageManagement/Estimate/CalculateFuelEuAndEtsAndExpensesForEachBunkerLotConsumptionDetails.cs": {
-    "phase": "synthesized",
-    "hash": "a0e1ddd31b9f6e7f1a929371c45daff5219f2372655182e12ee5bf9a3602da87",
-    "lines": 469,
+    "phase": "enriched",
+    "hash": "ef93906568fb8555b5d1df4260e99e3f2cdd975738e5bba4ce50c54bd8b1dcca",
+    "lines": 533,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -11060,9 +11060,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/EnsureOpeningPort.md"
   },
   "Core/Business/VoyageManagement/Estimate/EnsurePortDataForIteneraryItem.cs": {
-    "phase": "synthesized",
-    "hash": "c65da88694bb3baba04ee018e178997c24f7e605885b0a7b1d72db58afba0fd1",
-    "lines": 108,
+    "phase": "enriched",
+    "hash": "a6f4a1696dd97b9a058698c6c7e8da33feb9e6bb4486fa73863e651d3e81610e",
+    "lines": 111,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -11310,9 +11310,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/SearchEstimates.md"
   },
   "Core/Business/VoyageManagement/Estimate/SummarizeFuelEuAndEtsAndExpensesFromBunkerLotsIntoBunkerEventsAndEtsEvents.cs": {
-    "phase": "synthesized",
-    "hash": "59838b97f29c5d80dbed785b53a6107072abcda66b3d2ad8adb1bf1c046f2dcf",
-    "lines": 127,
+    "phase": "enriched",
+    "hash": "8e7339ff045f5c18358258bb54f077e6b0c005ddab7b913fbdfe73b7c85bb237",
+    "lines": 143,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -11320,9 +11320,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/SummarizeFuelEuAndEtsAndExpensesFromBunkerLotsIntoBunkerEventsAndEtsEvents.md"
   },
   "Core/Business/VoyageManagement/Estimate/ValidateEstimatePLItems.cs": {
-    "phase": "synthesized",
-    "hash": "61ced254eafd14b9afa9fc87913d62c2c920d4238f729ab578e9df6481bee661",
-    "lines": 987,
+    "phase": "enriched",
+    "hash": "b02849e559618045e92f1456c51999502a78b5abc79d07b48beb2b6ebb102c25",
+    "lines": 1028,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -11410,7 +11410,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Estimate/EstimateShipmentCommissionPL/GenerateMiscRevCommissionPlItemsHelper.md"
   },
   "Core/Business/VoyageManagement/Helpers/BunkerConsumptionEventHelper.cs": {
-    "phase": "synthesized",
+    "phase": "enriched",
     "hash": "6e7b0054bd8e8bc0ef4a08836ce3df2a52e335c0aa2b8be2ecf1a9217a7d28cd",
     "lines": 459,
     "file_type": "Other",
@@ -11630,9 +11630,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Helpers/OptimalRouteHelper.md"
   },
   "Core/Business/VoyageManagement/Helpers/ProfitAndLossItemHelper.cs": {
-    "phase": "synthesized",
-    "hash": "38343ee9136bd62f043816558723c68ca8fcd5b0b0389f787cef1f5dee2aba46",
-    "lines": 303,
+    "phase": "enriched",
+    "hash": "de8f7eeabe04e107a94e9cc13b851c809daed8234b841468bea4dd72a0de2137",
+    "lines": 304,
     "file_type": "Other",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -11900,9 +11900,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/PL/GetPLByEstimateId.md"
   },
   "Core/Business/VoyageManagement/PL/PLCaculate.cs": {
-    "phase": "synthesized",
-    "hash": "9cf362bf14c47e2f882097f256095ccfdf748f8f82a837e3dc8af7302b940ba0",
-    "lines": 134,
+    "phase": "enriched",
+    "hash": "3e2ecb09d15753b67548cf1af6a48da7345ceb881bd5992aa15cd3d34a790a06",
+    "lines": 137,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -13230,12 +13230,12 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/TimeCharterClaim/CalculateOffHireDaysByVoyageId.md"
   },
   "Core/Business/VoyageManagement/TimeCharterClaim/CalculateTimeCharterClaim.cs": {
-    "phase": "synthesized",
-    "hash": "dc50bee5b6386cbe5ad16525a4fa11c4ec4b3e262f673687dc3008d949b9c051",
-    "lines": 122,
+    "phase": "enriched",
+    "hash": "f936566d20e42301f2782a58dfb93c6d6b484bd5e2427f16db7b39c518e261b9",
+    "lines": 124,
     "file_type": "Handler",
     "architecture_layer": "Business",
-    "is_critical": true,
+    "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Core/Business/VoyageManagement/TimeCharterClaim/CalculateTimeCharterClaim.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/TimeCharterClaim/CalculateTimeCharterClaim.md"
   },
@@ -13280,9 +13280,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimHelper.md"
   },
   "Core/Business/VoyageManagement/TimeCharterClaim/TimeCharterClaimPLCalculator.cs": {
-    "phase": "synthesized",
-    "hash": "95f89f4e6df930e050b3790d3d35e32e6167f178074f269da48d1cde59088310",
-    "lines": 270,
+    "phase": "enriched",
+    "hash": "6787629d1312762b5b587cee6cc1e3561807b22e326315724e7492b4320a4d67",
+    "lines": 308,
     "file_type": "Service",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -13360,9 +13360,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Cve.md"
   },
   "Core/Business/VoyageManagement/TimeCharterClaim/PLGenerator/Partial/Ets.cs": {
-    "phase": "synthesized",
-    "hash": "d7612f8530da7c16d893233c4e76472c5f08b3ab4d386aeaf8548f463847a566",
-    "lines": 152,
+    "phase": "enriched",
+    "hash": "582f94897b3167d052d2c31e87440ef46451b3b80c44ccd2fdb1747d9fd72cc9",
+    "lines": 273,
     "file_type": "Service",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -13850,9 +13850,9 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Voyage/CompleteVoyage.md"
   },
   "Core/Business/VoyageManagement/Voyage/CreateAndGetFuelItineraryItemId.cs": {
-    "phase": "synthesized",
-    "hash": "a58526a19ff27f3fe17abf420e90b39999df48618897fbf171235851876665ea",
-    "lines": 166,
+    "phase": "enriched",
+    "hash": "ee595ad0de6dda0b50930254695f58336e2d5dd78b7e958d5874e2e99f4ee524",
+    "lines": 197,
     "file_type": "Handler",
     "architecture_layer": "Business",
     "is_critical": false,
@@ -15320,7 +15320,7 @@
     "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business.UnitTest/VoyageManagement/Bunker/BunkerCalculator.Test.md"
   },
   "Core/Business.UnitTest/VoyageManagement/Bunker/CreateAndGetFuelItineraryItemIdTests.cs": {
-    "phase": "synthesized",
+    "phase": "unprocessed",
     "hash": "f6b44f3c69d537ff831d6d2ca7db941a74d92f0fc496fdceed576a20680dd549",
     "lines": 470,
     "file_type": "Other",
@@ -19328,5 +19328,25 @@
     "is_critical": false,
     "doc_path": "wip/csharp-docs/raw\\Functions/DataSyncJob/DataSyncJobFailedServiceFunction.md",
     "enriched_doc_path": "wip/csharp-docs/enriched\\Functions/DataSyncJob/DataSyncJobFailedServiceFunction.md"
+  },
+  "Core/Business/VoyageManagement/Helpers/UkEtsIteneraryHelper.cs": {
+    "phase": "enriched",
+    "hash": "6c06d23aede9bdaad04a0fc69886fc6772419a3f2dfb48ea82f7259b8ed722ec",
+    "lines": 125,
+    "file_type": "Other",
+    "architecture_layer": "Business",
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Business/VoyageManagement/Helpers/UkEtsIteneraryHelper.md",
+    "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business/VoyageManagement/Helpers/UkEtsIteneraryHelper.md"
+  },
+  "Core/Business.UnitTest/VoyageManagement/UkEts/Helpers/UkEtsDataHelper.cs": {
+    "phase": "enriched",
+    "hash": "0751f2c1ad5db3b7f47cdbd32744f0bbf60635766a5a18ba86939f58e00f2c0c",
+    "lines": 141,
+    "file_type": "Other",
+    "architecture_layer": "Other",
+    "is_critical": false,
+    "doc_path": "wip/csharp-docs/raw\\Core/Business.UnitTest/VoyageManagement/UkEts/Helpers/UkEtsDataHelper.md",
+    "enriched_doc_path": "wip/csharp-docs/enriched\\Core/Business.UnitTest/VoyageManagement/UkEts/Helpers/UkEtsDataHelper.md"
   }
 }

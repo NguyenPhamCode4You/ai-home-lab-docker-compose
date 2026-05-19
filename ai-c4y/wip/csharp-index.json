@@ -1579,7 +1579,7 @@
       "is_critical": true
     },
     "Core/Domain/Constants/CommonConstants.cs": {
-      "class_name": "",
+      "class_name": "CargoQuantityUnitEnumExtensions",
       "namespace": "Core.Domain.Constants",
       "file_type": "Other",
       "architecture_layer": "Domain",
@@ -1590,31 +1590,10 @@
           "return_type": "string",
           "is_public": true,
           "parameters": [
-            "CargoQuantityUnit"
-          ],
-          "calls": []
-        },
-        {
-          "name": "getReasonForVisitCode",
-          "return_type": "string",
-          "is_public": true,
-          "parameters": [
-            "reason"
-          ],
-          "calls": []
-        },
-        {
-          "name": "GetValueFromDescription",
-          "return_type": "ReasonForVisitPortEnum?",
-          "is_public": true,
-          "parameters": [
-            "description"
+            "string CargoQuantityUnit"
           ],
           "calls": [
-            "GetFields",
-            "GetCustomAttribute",
-            "GetValue",
-            "string.Equals"
+            "string.Format"
           ]
         }
       ],
@@ -1624,12 +1603,7 @@
         "System.Reflection"
       ],
       "injected_services": [],
-      "entities_referenced": [
-        "EstimateIteneraryItemFuelConsumptionAtSeaEntity",
-        "EstimateIteneraryItemFuelConsumptionAtPortEntity",
-        "EstimateShipmentPortCallEntity",
-        "ShipmentEntity"
-      ],
+      "entities_referenced": [],
       "external_clients_used": [],
       "is_critical": false
     },
@@ -4310,7 +4284,7 @@
       "injected_services": [],
       "entities_referenced": [],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/FinanceData/Entities/ProfitAndLoss/ProfitAndLossValueBase.cs": {
       "class_name": "ProfitAndLossValueBase",
@@ -4629,9 +4603,14 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "BaseDto",
+        "BaseSearch",
         "BusinessPartnerDto",
         "TradeAreaDto",
-        "SpecialPassingPointItemDto",
+        "PortCreateDto",
+        "PortUpdateDto",
+        "PortDto",
+        "MinimalPortDto",
         "PortCargoHistoryItemDto",
         "PortCallItemDto",
         "PortSearchDto",
@@ -4640,8 +4619,7 @@
         "ItineraryScheduleItemDto",
         "PortItineraryScheduleSearchDto",
         "PortItineraryScheduleFilterBy",
-        "BaseDto",
-        "BaseSearch"
+        "SpecialPassingPointItemDto"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -4747,7 +4725,7 @@
       "is_critical": false
     },
     "Core/Domain/MasterData/Dtos/VesselDtos.cs": {
-      "class_name": "VesselDto",
+      "class_name": "VesselBunkerTypeDto",
       "namespace": "Core.Domain.MasterData.Dtos",
       "file_type": "Dto",
       "architecture_layer": "Domain",
@@ -4762,28 +4740,6 @@
       ],
       "injected_services": [],
       "entities_referenced": [
-        "BaseDto",
-        "BaseSearch",
-        "ForceExportableDto",
-        "VesselContactDto",
-        "ConsumptionRateDto",
-        "VesselSpecificationDto",
-        "PortDto",
-        "ShipyardDto",
-        "ClassSocietyDto",
-        "VesselTypeDto",
-        "BusinessPartnerDto",
-        "VesselNameHistoryDto",
-        "VesselFlagHistoryDto",
-        "VesselOwnerHistoryDto",
-        "VesselTechnicalManagerHistoryDto",
-        "VesselScheduleDto",
-        "VoyageScheduleDto",
-        "TciScheduleDto",
-        "TcoScheduleDto",
-        "GapScheduleDto",
-        "BunkerChainProfileDto",
-        "BunkerChainProfileItemDto",
         "VesselBunkerTypeDto",
         "VesselBunkerOnboardDto",
         "VesselCreateDto",
@@ -4797,7 +4753,26 @@
         "VesselExportByIdDto",
         "VesselScheduleSearchDto",
         "VesselScheduleFilterBy",
-        "VesselScheduleBaseDto"
+        "VesselScheduleDto",
+        "VesselScheduleBaseDto",
+        "VoyageScheduleDto",
+        "TciScheduleDto",
+        "TcoScheduleDto",
+        "GapScheduleDto",
+        "BunkerChainProfileDto",
+        "BunkerChainProfileItemDto",
+        "PortDto",
+        "ShipyardDto",
+        "ClassSocietyDto",
+        "VesselTypeDto",
+        "VesselContactDto",
+        "ConsumptionRateDto",
+        "VesselSpecificationDto",
+        "BusinessPartnerDto",
+        "VesselNameHistoryDto",
+        "VesselFlagHistoryDto",
+        "VesselOwnerHistoryDto",
+        "VesselTechnicalManagerHistoryDto"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -5229,13 +5204,16 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "BaseEntity",
+        "PortEntity",
         "BusinessPartnerEntity",
         "TradeAreaEntity",
         "VoyageOtherRevenueEntity",
-        "SpecialPassingPointEntity"
+        "SpecialPassingPointEntity",
+        "TrackedEntity"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/MasterData/Entities/ShipyardEntity.cs": {
       "class_name": "ShipyardEntity",
@@ -5294,8 +5272,7 @@
         "VesselEntity",
         "BunkerTypeEntity",
         "BaseEntity",
-        "BunkerChainProfileItemEntity",
-        "BunkerChainProfileEntity"
+        "BunkerChainProfileItemEntity"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -6851,25 +6828,34 @@
         "Core.Domain.Commons",
         "Core.Domain.Commons.ValidationAttributes",
         "Core.Domain.Constants",
-        "Core.Domain.Constants.RouteSettingConstants",
         "Core.Domain.FinanceData.Dtos"
       ],
       "injected_services": [],
       "entities_referenced": [
+        "BaseDto",
+        "IdBasedDto",
         "EstimateShipmentDto",
         "EstimateProfitAndLossItemOverwriteDto",
         "EstimateTcoDto",
         "EstimateProfitAndLostDto",
+        "EstimatePurposeEnum",
+        "EstimateTypeEnum",
         "BunkerLotBaseDto",
         "BunkerSummaryAtIteneraryItem",
         "EstimateVesselConsumptionRateDto",
         "EstimateIteneraryItemDto",
         "RoutingResponseDto",
         "ProfitAndLossItemDto",
-        "VoyageReduceDto"
+        "PLDtoOverWriteValue",
+        "SpeedWithTceValue",
+        "BunkerRob",
+        "VoyageReduceDto",
+        "FuelEuCalculationMethodEnum",
+        "ConsumptionScenarioEnum",
+        "SpeedModeEnum"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Dtos/EstimateEagerDto.cs": {
       "class_name": "EstimateEagerDto",
@@ -6985,15 +6971,17 @@
       ],
       "injected_services": [],
       "entities_referenced": [
-        "IdBasedDto",
+        "EstimateShipmentDto",
         "EstimateShipmentPortCallDto",
+        "EstimateShipmentBelongsToQuotationDto",
+        "IdBasedDto",
+        "BaseDto",
         "ProfitAndLossItemDto",
-        "EstimateShipmentCommissionDto",
         "EstimateShipmentRestrictionDto",
-        "BaseDto"
+        "EstimateShipmentCommissionDto"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Dtos/IteneraryActivitiesDtos.cs": {
       "class_name": "IteneraryActivityDto",
@@ -7244,9 +7232,16 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "BaseDto",
         "EstimateEntity",
         "ShipmentEntity",
-        "BusinessPartnerEntity"
+        "BusinessPartnerEntity",
+        "ProfitAndLossIdentifierEnum",
+        "BaseSearch",
+        "IdBasedDto",
+        "BaseProfitAndLostDto",
+        "PaymentBasisEnum",
+        "UnitEnum"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -7495,11 +7490,13 @@
       "entities_referenced": [
         "BaseDto",
         "BunkerLotConsumptionBaseDto",
-        "VoyageBunkerLotEntity",
+        "BunkerLotEndingDto",
+        "BioBlendOptionDataStruct",
+        "BunkerOwnershipChangeLog",
         "BunkerOrderResponsibilityEnum"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Dtos/VoyageCrudDto.cs": {
       "class_name": "VoyageCrudDto",
@@ -7521,30 +7518,39 @@
       ],
       "injected_services": [],
       "entities_referenced": [
-        "VoyageProfitAndLossDto",
-        "EstimateProfitAndLostDto",
-        "ShipmentDto",
-        "VoyageIteneraryItemDto",
-        "ProfitAndLossItemDto",
-        "TcoDto",
+        "MinimalVoyageDto",
+        "ConsecutiveVoyageInfoDto",
+        "VoyageCrudDto",
+        "BaseDto",
+        "BunkerSummaryAtIteneraryItem",
+        "BunkerTypeSummaryAtIteneraryItemDto",
+        "BunkerLotSummaryAtIteneraryItemDto",
         "VoyagePersonInChargeDto",
         "BaseEntity",
         "UserDto",
+        "VoyageProfitAndLossDto",
+        "BaseProfitAndLostDto",
+        "VoyageIteneraryItemSearchDto",
+        "VoyageIteneraryItemDto",
+        "BaseIteneraryItemDto",
+        "VoyageBunkerEventDto",
+        "BaseBunkerEventDto",
+        "VoyageEtsEventDto",
+        "BaseEtsEventDto",
+        "PortDaInformationDto",
+        "EstimateProfitAndLostDto",
+        "TcoDto",
+        "ShipmentDto",
+        "ProfitAndLossItemDto",
+        "EstimateIteneraryItemDto",
         "BunkerLotBaseDto",
         "BunkerRob",
-        "BunkerSummaryAtIteneraryItem",
         "ShipmentPortPlanningDto",
-        "VoyageIteneraryItemSearchDto",
-        "VoyageBunkerEventDto",
-        "VoyageEtsEventDto",
-        "BaseIteneraryItemDto",
-        "PortDaInformationDto",
-        "BaseBunkerEventDto",
-        "BaseEtsEventDto",
-        "VoyageRoleDto"
+        "BunkerOrderReducedDto",
+        "BunkerOrder"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Dtos/VoyageDtos.cs": {
       "class_name": "VoyageDto",
@@ -8063,7 +8069,7 @@
       "is_critical": true
     },
     "Core/Domain/VoyageManagement/Entities/BunkerEventEntities.cs": {
-      "class_name": "BaseBunkerEventEntity",
+      "class_name": "VoyageBunkerEventEntity",
       "namespace": "Core.Domain.VoyageManagement.Entities",
       "file_type": "Entity",
       "architecture_layer": "Domain",
@@ -8080,11 +8086,16 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "TrackedEntity",
+        "BunkerEventTypeEnum",
         "VoyageIteneraryItemEntity",
-        "BunkerTypeEntity",
         "VoyageEtsEventEntity",
         "EstimateIteneraryItemEntity",
-        "EstimateEtsEventEntity"
+        "EstimateEtsEventEntity",
+        "BunkerTypeEntity",
+        "BioBlendOptionDataStruct",
+        "BunkerOrderResponsibilityEnum",
+        "BunkerOwnershipChangeLog"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -8269,7 +8280,19 @@
       "file_type": "Entity",
       "architecture_layer": "Domain",
       "handler_verb": "",
-      "methods": [],
+      "methods": [
+        {
+          "name": "BunkerSummariesJson",
+          "return_type": "string?",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "JsonSerializer.Serialize",
+            "JsonSerializer.Deserialize",
+            "string.IsNullOrWhiteSpace"
+          ]
+        }
+      ],
       "using_imports": [
         "System.ComponentModel",
         "System.ComponentModel.DataAnnotations",
@@ -8278,6 +8301,7 @@
         "Core.Domain.Commons",
         "Core.Domain.Commons.ColumnAttributes",
         "Core.Domain.Constants",
+        "Core.Domain.Constants.RouteSettingConstants",
         "Core.Domain.FinanceData.Entities",
         "Core.Domain.MasterData.Entities",
         "Core.Domain.VoyageManagement.Dtos",
@@ -8285,22 +8309,26 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "EstimateProfitAndLossItemOverwriteEntity",
+        "TrackedEntity",
+        "EstimateEntity",
+        "TenantedEntity",
         "VoyageEntity",
+        "EstimateProfitAndLostEntity",
         "VesselEntity",
         "VesselTypeEntity",
-        "EstimateProfitAndLostEntity",
         "EstimateBunkerPriceEntity",
         "EstimateVesselConsumptionRateEntity",
         "EstimateShipmentEntity",
         "EstimateIteneraryItemEntity",
         "WorkSheetEstimateEntity",
         "EstimateProfitAndLossItemEntity",
-        "EstimateProfitAndLossItemOverwriteEntity",
         "VoyageEstimateLinkEntity",
-        "EstimateTcoEntity"
+        "EstimateTcoEntity",
+        "BunkerSummaryAtIteneraryItem"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Entities/EstimateShipmentEntity.cs": {
       "class_name": "EstimateShipmentEntity",
@@ -8501,11 +8529,11 @@
       ],
       "injected_services": [],
       "entities_referenced": [
-        "EstimateProfitAndLostEntity",
+        "ProfitAndLossEntity",
         "EstimateEntity",
         "EstimateProfitAndLostBunkerConsumptionEntity",
-        "VoyageProfitAndLossEntity",
         "VoyageEntity",
+        "VoyageProfitAndLossStageEnum",
         "TrackedEntity"
       ],
       "external_clients_used": [],
@@ -8689,12 +8717,14 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "ShipmentPortBase",
+        "TrackedEntity",
         "ShipmentEntity",
         "PortEntity",
         "TermEntity"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Entities/ShipmentPortOptionEntity.cs": {
       "class_name": "ShipmentPortOptionEntity",
@@ -9005,8 +9035,8 @@
       "handler_verb": "",
       "methods": [
         {
-          "name": "BioBlendOptionsJson",
-          "return_type": "string",
+          "name": "get_BioBlendOptionsJson",
+          "return_type": "string?",
           "is_public": true,
           "parameters": [],
           "calls": [
@@ -9014,34 +9044,15 @@
           ]
         },
         {
-          "name": "BioBlendOptionsJson",
+          "name": "set_BioBlendOptionsJson",
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "value"
+            "string? value"
           ],
           "calls": [
-            "JsonSerializer.Deserialize<List<BioBlendOptionDataStruct>>"
-          ]
-        },
-        {
-          "name": "OwnershipChangeLogsJson",
-          "return_type": "string",
-          "is_public": true,
-          "parameters": [],
-          "calls": [
-            "JsonSerializer.Serialize"
-          ]
-        },
-        {
-          "name": "OwnershipChangeLogsJson",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "value"
-          ],
-          "calls": [
-            "JsonSerializer.Deserialize<List<BunkerOwnershipChangeLog>>"
+            "string.IsNullOrWhiteSpace",
+            "JsonSerializer.Deserialize"
           ]
         }
       ],
@@ -9057,22 +9068,20 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "VoyageBunkerLotEntity",
+        "BunkerLotBase",
         "VoyageEntity",
         "VesselEntity",
         "BunkerTypeEntity",
         "VoyageBunkerLotConsumptionDetailEntity",
-        "BunkerLotBase",
+        "BioBlendOptionDataStruct",
         "BunkerLotConsumptionBaseEntity",
-        "BunkerOrderEntity",
-        "BunkerOrderItemEntity",
-        "IteneraryItemEntity",
-        "PortEntity",
-        "VesselReportEntity",
-        "BunkerOrderVoyageEntity",
+        "TrackedEntity",
+        "BaseEntity",
         "BunkerOwnershipChangeLog"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Domain/VoyageManagement/Entities/VoyageEntity.cs": {
       "class_name": "VoyageEntity",
@@ -9086,8 +9095,17 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [],
+          "calls": []
+        },
+        {
+          "name": "BunkerSummariesJson",
+          "return_type": "string?",
+          "is_public": true,
+          "parameters": [],
           "calls": [
-            "VersionNumber++"
+            "JsonSerializer.Serialize",
+            "string.IsNullOrWhiteSpace",
+            "JsonSerializer.Deserialize"
           ]
         }
       ],
@@ -9108,6 +9126,8 @@
       ],
       "injected_services": [],
       "entities_referenced": [
+        "TenantedEntity",
+        "IVersionedEntity",
         "VoyageRemarkEntity",
         "VoyageProfitAndLossEntity",
         "EstimateEntity",
@@ -9120,10 +9140,12 @@
         "VoyageIteneraryItemEntity",
         "VoyageProfitAndLossItemEntity",
         "VoyageEstimateLinkEntity",
-        "UserEntity",
+        "VoyagePersonInChargeEntity",
         "VoyageOtherRevenueEntity",
         "InvoiceItemEntity",
-        "BunkerSummaryAtIteneraryItem"
+        "BaseEntity",
+        "UserEntity",
+        "VoyageSummaryAtIteneraryItem"
       ],
       "external_clients_used": [],
       "is_critical": true
@@ -10951,15 +10973,15 @@
           "calls": [
             "LinkToLastItineraryIfSamePort",
             "ThrowErrorIfBunkerOrderPricePerMetricTonIsInValid",
-            "_mediator.Send",
+            "mediator.Send",
             "FetchVoyageItineraryItemById",
             "FetchBunkerOrderEntityById",
             "CreateNewOrder",
+            "context.SaveChangesAsync",
             "OverwriteBasicFields",
             "OverwriteBunkerOrderItems",
             "OverwriteBunkerOrderAdditionalCosts",
-            "_context.SaveChangesAsync",
-            "_notificationService.NotifyEntityUpdated"
+            "notificationService.NotifyEntityUpdated"
           ]
         },
         {
@@ -10982,6 +11004,7 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
+            "context.VoyageIteneraryItems",
             "FirstOrDefaultAsync"
           ]
         },
@@ -10994,9 +11017,8 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "Where",
+            "context.VoyageIteneraryItems",
             "Include",
-            "ThenInclude",
             "FirstAsync"
           ]
         },
@@ -11009,7 +11031,7 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "Where",
+            "context.BunkerOrders",
             "Include",
             "FirstAsync"
           ]
@@ -11023,6 +11045,7 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
+            "context.BunkerOrders",
             "Select",
             "ToListAsync"
           ]
@@ -11036,6 +11059,7 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
+            "context.Voyages",
             "Select",
             "FirstAsync"
           ]
@@ -11045,14 +11069,14 @@
           "return_type": "Task<BunkerOrderEntity>",
           "is_public": false,
           "parameters": [
-            "BunkerOrderEntity bunkerOrder",
+            "BunkerOrderCrudDto bunkerOrder",
             "VoyageIteneraryItemEntity voyageItem"
           ],
           "calls": [
             "FetchVoyageNumberById",
             "GetExistingVoyageBunkerOrderCodes",
-            "GenerateBunkerOrderCode",
-            "Contains"
+            "BunkerOrderCodeHelper.GenerateBunkerOrderCode",
+            "new BunkerOrderEntity"
           ]
         },
         {
@@ -11064,7 +11088,8 @@
             "string? currentStatus = null"
           ],
           "calls": [
-            "ApiException"
+            "ApiException",
+            "Enum.TryParse"
           ]
         },
         {
@@ -11077,7 +11102,7 @@
             "VoyageIteneraryItemEntity voyageItenerayItem"
           ],
           "calls": [
-            "OverwriteChanges",
+            "context.OverwriteChanges",
             "HandleBunkerOrderStatusTransition"
           ]
         },
@@ -11090,8 +11115,9 @@
             "BunkerOrderEntity orderEntity"
           ],
           "calls": [
-            "OverwriteChanges",
-            "GenerateBunkerOrderItemCode"
+            "context.OverwriteChanges",
+            "BunkerOrderCodeHelper.GenerateBunkerOrderItemCode",
+            "Enum.TryParse"
           ]
         },
         {
@@ -11103,7 +11129,7 @@
             "BunkerOrderEntity orderEntity"
           ],
           "calls": [
-            "OverwriteChanges"
+            "context.OverwriteChanges"
           ]
         }
       ],
@@ -11124,10 +11150,15 @@
       ],
       "entities_referenced": [
         "BunkerOrderCrudDto",
-        "BunkerOrderEntity",
+        "DataContext",
         "VoyageIteneraryItemEntity",
-        "VoyageEntity",
-        "VesselEntity"
+        "BunkerOrderEntity",
+        "ApiException",
+        "ErrorCode",
+        "BunkerOrderResponsibilityEnum",
+        "ReasonForVisitPortEnum",
+        "BunkerOrderStatusEnum",
+        "BunkerOrderCodeHelper"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -54882,9 +54913,9 @@
           "parameters": [],
           "calls": [
             "Select",
+            "All",
             "Contains",
-            "ToString",
-            "All"
+            "ToString"
           ]
         },
         {
@@ -54911,6 +54942,7 @@
             "List<EstimateIteneraryItemDto> iteneraryItems"
           ],
           "calls": [
+            "ToString",
             "Where",
             "FirstOrDefault",
             "GetDailyConsumption",
@@ -54932,14 +54964,19 @@
             "ForEach",
             "Any",
             "FirstOrDefault",
+            "FindIndex",
             "GetIsBallast",
             "GetConsumptionScenarioName",
             "GetChainOfBunkerEvents",
             "GetMixedBunkers",
+            "GetDailyConsumption",
             "Map",
-            "FindIndex",
+            "Add",
             "RemoveAt",
-            "InsertRange"
+            "InsertRange",
+            "Distinct",
+            "Count",
+            "ToList"
           ]
         },
         {
@@ -54977,14 +55014,10 @@
       "entities_referenced": [
         "ConsumptionRateEntity",
         "VesselBunkerTypeEntity",
-        "EstimateCrudDto",
-        "EstimateIteneraryItemDto",
         "EstimateIteneraryItemBunkerEventDto",
-        "LotConsumptionInfo",
-        "BunkerOnboardCalculator",
-        "ConsumptionRateCalculator",
-        "BunkerConsumptionEventHelper",
-        "ApiException"
+        "EstimateIteneraryItemDto",
+        "EstimateCrudDto",
+        "LotConsumptionInfo"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -57248,8 +57281,8 @@
           "return_type": "Task<string>",
           "is_public": true,
           "parameters": [
-            "request",
-            "cancellationToken"
+            "Request request",
+            "CancellationToken cancellationToken"
           ],
           "calls": [
             "BunkerOwnershipHelper.EnsureOwnershipChangeLogsForEstimate",
@@ -57258,6 +57291,7 @@
             "ApplyEtsAndFuelEuFactorsToBunkerLotConsumptions",
             "CalculateBunkerExpenseForBunkerLotConsumption",
             "CalculateEtsValuesForBunkerLotConsumption",
+            "CalculateUkEtsValuesForBunkerLotConsumption",
             "CalculateFuelEuValuesForBunkerLotConsumption"
           ]
         },
@@ -57266,10 +57300,11 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
           "calls": [
-            "CalculateBioBlendOptions.Response.Handle"
+            "CalculateBioBlendOptions.Response.Handle",
+            "FirstOrDefault"
           ]
         },
         {
@@ -57277,10 +57312,12 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
           "calls": [
-            "_context.BunkerTypes.AsNoTracking().ToListAsync"
+            "BunkerTypes.AsNoTracking().ToListAsync",
+            "FirstOrDefault",
+            "OverwriteNullOrZeroWithDefault"
           ]
         },
         {
@@ -57288,12 +57325,14 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.GetLastVoyageIteneraryItem",
+            "FindPenaltyItemIndices",
+            "GetLastVoyageIteneraryItem",
             "ApplyFactorsToNonPenaltyItem",
-            "ApplyFactorsToPenaltyItem"
+            "ApplyFactorsToPenaltyItem",
+            "NotBelongToArray"
           ]
         },
         {
@@ -57301,13 +57340,16 @@
           "return_type": "void",
           "is_public": false,
           "parameters": [
-            "estimate",
-            "currentItem",
-            "previousPenaltyItem",
-            "nextPenaltyItem"
+            "EstimateCrudDto estimate",
+            "EstimateIteneraryItemDto currentItem",
+            "EstimateIteneraryItemDto? previousPenaltyItem",
+            "EstimateIteneraryItemDto? nextPenaltyItem"
           ],
           "calls": [
-            "estimate.BunkerPrices?.ForEachLotConsumptionDetails"
+            "CalculateFuelEuFactors",
+            "CalculateEtsFactors",
+            "CalculateUkEtsFactors",
+            "ForEachLotConsumptionDetails"
           ]
         },
         {
@@ -57315,13 +57357,30 @@
           "return_type": "void",
           "is_public": false,
           "parameters": [
-            "estimate",
-            "currentItem",
-            "previousPenaltyItem",
-            "nextPenaltyItem"
+            "EstimateCrudDto estimate",
+            "EstimateIteneraryItemDto currentItem",
+            "EstimateIteneraryItemDto? previousPenaltyItem",
+            "EstimateIteneraryItemDto? nextPenaltyItem"
           ],
           "calls": [
-            "estimate.BunkerPrices?.ForEachLotConsumptionDetails"
+            "CalculateFuelEuFactors",
+            "CalculateEtsFactors",
+            "CalculateUkEtsFactors",
+            "ForEachLotConsumptionDetails",
+            "IsAtPort",
+            "IsUkPenaltyPort",
+            "IsEstimated"
+          ]
+        },
+        {
+          "name": "IsSeaReportConsumption",
+          "return_type": "bool",
+          "is_public": false,
+          "parameters": [
+            "BunkerLotConsumptionBaseDto consumption"
+          ],
+          "calls": [
+            "BunkerEventTypeEnum"
           ]
         },
         {
@@ -57329,11 +57388,16 @@
           "return_type": "decimal",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.BunkerPrices?.ForEachLotConsumptionDetails",
-            "IsSeaReportConsumption"
+            "Select",
+            "ToList",
+            "ForEachLotConsumptionDetails",
+            "IsSeaReportConsumption",
+            "Where",
+            "OrderByDescending",
+            "FirstOrDefault"
           ]
         },
         {
@@ -57341,51 +57405,56 @@
           "return_type": "decimal",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
-          "calls": []
+          "calls": [
+            "FirstOrDefault"
+          ]
+        },
+        {
+          "name": "GetUkEtsPriceInUsdsByPriority",
+          "return_type": "decimal",
+          "is_public": false,
+          "parameters": [
+            "EstimateCrudDto estimate"
+          ],
+          "calls": [
+            "FirstOrDefault"
+          ]
         },
         {
           "name": "GetFuelEuPriceInUsdsByPriority",
           "return_type": "decimal",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
-          "calls": []
+          "calls": [
+            "FirstOrDefault"
+          ]
         },
         {
           "name": "CalculateNewEtsCo2EmissionFactorForBunkerLot",
           "return_type": "decimal",
           "is_public": false,
           "parameters": [
-            "bunkerLot"
+            "BunkerLotBaseDto bunkerLot"
           ],
-          "calls": []
+          "calls": [
+            "FirstOrDefault"
+          ]
         },
         {
           "name": "CalculateEtsValuesForBunkerLotConsumption",
           "return_type": "decimal",
           "is_public": false,
           "parameters": [
-            "estimate"
+            "EstimateCrudDto estimate"
           ],
           "calls": [
-            "GetEtsPriceInUsdsByPriority",
-            "estimate.BunkerPrices?.ForEachLotConsumptionDetails"
-          ]
-        },
-        {
-          "name": "CalculateFuelEuValuesForBunkerLotConsumption",
-          "return_type": "decimal",
-          "is_public": false,
-          "parameters": [
-            "estimate"
-          ],
-          "calls": [
-            "GetFuelEuPriceInUsdsByPriority",
-            "_context.GetMostRecentRatesToUsdAsync",
-            "estimate.BunkerPrices?.ForEachLotConsumptionDetails"
+            "ForEachLotConsumptionDetails",
+            "GetEtsPhaseInFactor",
+            "CalculateNewEtsCo2EmissionFactorForBunkerLot"
           ]
         }
       ],
@@ -57404,13 +57473,12 @@
       ],
       "entities_referenced": [
         "EstimateCrudDto",
-        "BunkerLotBaseDto",
+        "CalculateBioBlendOptions.Request",
+        "CalculateBioBlendOptions.Response",
         "BunkerLotConsumptionBaseDto",
-        "BunkerEventTypeEnum",
-        "ProfitAndLossItemOverwriteDto",
-        "BunkerLotConsumptionDetails",
-        "BunkerType",
-        "IteneraryItem"
+        "EstimateIteneraryItemDto",
+        "BunkerLotBaseDto",
+        "BunkerType"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -58376,7 +58444,7 @@
       "namespace": "Core.Business",
       "file_type": "Handler",
       "architecture_layer": "Business",
-      "handler_verb": "",
+      "handler_verb": "Ensure",
       "methods": [
         {
           "name": "Handle",
@@ -58387,15 +58455,29 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "_context.Ports.Where(x => portIds.Contains(x.Id)).ToListAsync(cancellationToken: cancellationToken)",
-            "portCall.Lattitude = port.Lattitude",
-            "portCall.Longtitude = port.Longtitude",
-            "portCall.PortName = port.PortName",
-            "TimeZoneHelper.GetTimeZoneByLatLong((double)port.Lattitude, (double)port.Longtitude)",
-            "port.Lattitude",
-            "port.Longtitude",
-            "port.PortName",
-            "TimeZoneHelper.GetTimeZoneByLatLong((double)port.Lattitude, (double)port.Longtitude)"
+            "_context.Ports",
+            "Where",
+            "ToListAsync",
+            "Select",
+            "AddRange",
+            "SelectMany",
+            "TimeZoneHelper.GetTimeZoneByLatLong"
+          ]
+        },
+        {
+          "name": "Handle",
+          "return_type": "Task<bool>",
+          "is_public": true,
+          "parameters": [
+            "Request request",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "_context.Ports",
+            "Where",
+            "ToListAsync",
+            "Select",
+            "TimeZoneHelper.GetTimeZoneByLatLong"
           ]
         }
       ],
@@ -58411,13 +58493,13 @@
         "DataContext"
       ],
       "entities_referenced": [
-        "Ports",
         "EstimateCrudDto",
-        "EstimateIteneraryItemDto"
+        "EstimateIteneraryItemDto",
+        "Port",
+        "Estimate",
+        "PortCall"
       ],
-      "external_clients_used": [
-        "TimeZoneHelper"
-      ],
+      "external_clients_used": [],
       "is_critical": false
     },
     "Core/Business/VoyageManagement/Estimate/ExchangeCurrencyIntoUsds.cs": {
@@ -60348,7 +60430,7 @@
       "namespace": "Core.Business",
       "file_type": "Handler",
       "architecture_layer": "Business",
-      "handler_verb": "",
+      "handler_verb": "Summarize",
       "methods": [
         {
           "name": "Handle",
@@ -60359,9 +60441,11 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "estimate.ForEachBunkerEventsAndTheirBunkerLotConsumptions",
+            "ForEachBunkerEventsAndTheirBunkerLotConsumptions",
+            "IsReceivalEvent",
             "SummarizeAndMapConsumptionExpense",
             "SummarizeAndMapEtsExpense",
+            "SummarizeAndMapUkEtsExpense",
             "SummarizeAndMapFuelEuPenalty"
           ]
         },
@@ -60374,10 +60458,7 @@
             "List<BunkerLotConsumptionBaseDto> lotConsumptions"
           ],
           "calls": [
-            "lotConsumptions.Sum",
-            "bunkerEvent.ConsumptionAmountInMetricTons",
-            "bunkerEvent.PricePerMetricTonInUsds",
-            "bunkerEvent.TotalBunkerExpenseInUsds"
+            "Sum"
           ]
         },
         {
@@ -60390,13 +60471,22 @@
             "List<BunkerLotBaseDto> bunkerLots"
           ],
           "calls": [
-            "lotConsumptions.Sum",
-            "lotConsumptions.CalculateAverage",
-            "bunkerEvent.EtsFactor",
-            "bunkerEvent.EtsPhaseInFactor",
-            "bunkerEvent.EtsPricePerMetricTonInUsds",
-            "bunkerEvent.EtsTotalExpenseInUsds",
-            "bunkerEvent.EtsEvents.FirstOrDefault"
+            "Sum",
+            "CalculateAverage",
+            "FirstOrDefault"
+          ]
+        },
+        {
+          "name": "SummarizeAndMapUkEtsExpense",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [
+            "BaseBunkerEventDto bunkerEvent",
+            "List<BunkerLotConsumptionBaseDto> lotConsumptions"
+          ],
+          "calls": [
+            "CalculateAverage",
+            "Sum"
           ]
         },
         {
@@ -60409,24 +60499,8 @@
             "List<BunkerLotBaseDto> bunkerLots"
           ],
           "calls": [
-            "lotConsumptions.CalculateAverage",
-            "bunkerLots.CalculateAverage",
-            "bunkerEvent.FuelEuFactor",
-            "bunkerEvent.FuelEuGhgIntensityReductionValue",
-            "bunkerEvent.FuelEuCo2EmissionFactor",
-            "bunkerEvent.FuelEuCh4EmissionFactor",
-            "bunkerEvent.FuelEuN2oEmissionFactor",
-            "bunkerEvent.FuelEuLowerCalorificValue",
-            "bunkerEvent.FuelEuRelativeWeightingDensity",
-            "bunkerEvent.FuelEuCo2eqWellToTankFactor",
-            "bunkerEvent.FuelEuGhgWellToTankEmissionValue",
-            "bunkerEvent.FuelEuGhgTankToWakeEmissionValue",
-            "bunkerEvent.FuelEuWindAssistanceFactor",
-            "bunkerEvent.FuelEuGhgIntensityValue",
-            "bunkerEvent.FuelEuComplianceBalanceValue",
-            "bunkerEvent.FuelEuTotalEnergyInMegaJoules",
-            "bunkerEvent.FuelEuVesselPenaltyValue",
-            "bunkerEvent.FuelEuTotalExpenseInUsds"
+            "CalculateAverage",
+            "Sum"
           ]
         },
         {
@@ -60436,9 +60510,7 @@
           "parameters": [
             "BaseBunkerEventDto bunkerEvent"
           ],
-          "calls": [
-            "bunkerEvent.BunkerEventType"
-          ]
+          "calls": []
         }
       ],
       "using_imports": [
@@ -60450,9 +60522,10 @@
       "entities_referenced": [
         "EstimateCrudDto",
         "BaseBunkerEventDto",
-        "EstimateIteneraryItemBunkerEventDto",
         "BunkerLotConsumptionBaseDto",
-        "BunkerLotBaseDto"
+        "EstimateIteneraryItemBunkerEventDto",
+        "BunkerLotBaseDto",
+        "BunkerEventTypeEnum"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -60469,19 +60542,33 @@
           "return_type": "Task<bool>",
           "is_public": true,
           "parameters": [
-            "request",
-            "cancellationToken"
+            "Request request",
+            "CancellationToken cancellationToken"
           ],
           "calls": [
-            "request.Estimate.SetHasDAInvoiceForItineraryItems(context)",
-            "request.Estimate.ValidateCanalTollItems(_context)",
-            "request.Estimate.ValidatePassingPointExpenseItems(_context)",
-            "request.Estimate.ValidateShipmentFreightItems()",
-            "request.Estimate.ValidateInternalCommissionItems()",
-            "request.Estimate.ValidateVesselHireItem(_context, _mediator)",
-            "request.Estimate.ValidateEmissionItem()",
-            "request.Estimate.ValidateBunkerConsumptionItems()",
-            "request.Estimate.ValidateFuelEuItem(_context)"
+            "SetHasDAInvoiceForItineraryItems",
+            "ValidateCanalTollItems",
+            "ValidatePassingPointExpenseItems",
+            "ValidatePortQuantityPaymentBasisItems",
+            "ValidateShipmentFreightItems",
+            "ValidateVesselHireItem",
+            "ValidateEmissionItem",
+            "ValidateUkEtsItem",
+            "ValidateFuelEuItem"
+          ]
+        },
+        {
+          "name": "ApplyPLItemOverwrite",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [
+            "this ProfitAndLossItemDto item",
+            "EstimateProfitAndLossItemOverwriteDto? overwrite"
+          ],
+          "calls": [
+            "AmountOfUnits",
+            "ValuePerUnit",
+            "TotalValue"
           ]
         },
         {
@@ -60489,13 +60576,19 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate"
+            "this EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.IteneraryItems.SelectMany(...)",
-            "estimate.ProfitAndLossItemOverwrites.FirstOrDefault(...)",
-            "estimate.ProfitAndLossItems.Add(item)"
+            "ProfitAndLossItems",
+            "RemoveAll",
+            "SelectMany",
+            "Where",
+            "GroupBy",
+            "Sum",
+            "FirstOrDefault",
+            "BunkerTypeId",
+            "ApplyPLItemOverwrite",
+            "Add"
           ]
         },
         {
@@ -60503,16 +60596,79 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate",
-            "context"
+            "this EstimateCrudDto estimate",
+            "DataContext context"
           ],
           "calls": [
-            "estimate.BunkerPrices.SelectMany(...)",
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "CreateBaseFuelEuItem(...)",
-            "ApplyExcludeFuelEuCalculationLogic(...)",
-            "ApplyPenaltyFuelEuCalculationLogic(...)",
-            "ApplyPoolingFuelEuCalculationLogic(...)"
+            "SelectMany",
+            "Sum",
+            "RemoveAll",
+            "CreateBaseFuelEuItem",
+            "FuelEuCalculationMethod",
+            "ApplyExcludeFuelEuCalculationLogic",
+            "ApplyPenaltyFuelEuCalculationLogic",
+            "ApplyPoolingFuelEuCalculationLogic",
+            "Add"
+          ]
+        },
+        {
+          "name": "CreateBaseFuelEuItem",
+          "return_type": "ProfitAndLossItemDto",
+          "is_public": false,
+          "parameters": [
+            "decimal complianceBalance",
+            "decimal totalPenalty"
+          ],
+          "calls": []
+        },
+        {
+          "name": "ApplyExcludeFuelEuCalculationLogic",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [
+            "ProfitAndLossItemDto item"
+          ],
+          "calls": [
+            "TotalValue",
+            "AmountOfUnits",
+            "ValuePerUnit"
+          ]
+        },
+        {
+          "name": "ApplyPenaltyFuelEuCalculationLogic",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [
+            "ProfitAndLossItemDto item",
+            "decimal complianceBalance",
+            "DataContext context"
+          ],
+          "calls": [
+            "GetMostRecentRatesToUsdAsync",
+            "FirstOrDefault",
+            "SourceCurrency",
+            "Rate",
+            "TotalValue",
+            "ValuePerUnit",
+            "AmountOfUnits"
+          ]
+        },
+        {
+          "name": "ApplyPoolingFuelEuCalculationLogic",
+          "return_type": "void",
+          "is_public": false,
+          "parameters": [
+            "ProfitAndLossItemDto item",
+            "decimal complianceBalance",
+            "EstimateCrudDto estimate"
+          ],
+          "calls": [
+            "ProfitAndLossItemOverwrites",
+            "FirstOrDefault",
+            "Type",
+            "ValuePerUnit",
+            "ValuePerUnit",
+            "TotalValue"
           ]
         },
         {
@@ -60520,13 +60676,42 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate"
+            "this EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.BunkerPrices.SelectMany(...)",
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.ProfitAndLossItemOverwrites.FirstOrDefault(...)",
-            "estimate.ProfitAndLossItems.Add(item)"
+            "SelectMany",
+            "Sum",
+            "CalculateAverage",
+            "RemoveAll",
+            "FirstOrDefault",
+            "DescriptionBuilder",
+            "ApplyPLItemOverwrite",
+            "Add"
+          ]
+        },
+        {
+          "name": "ValidateUkEtsItem",
+          "return_type": "void",
+          "is_public": true,
+          "parameters": [
+            "this EstimateCrudDto estimate",
+            "DataContext context"
+          ],
+          "calls": [
+            "RemoveAll",
+            "VesselSpecifications",
+            "Where",
+            "Select",
+            "FirstOrDefault",
+            "IteneraryItems",
+            "Any",
+            "IsUkPenaltyPort",
+            "SelectMany",
+            "Sum",
+            "CalculateAverage",
+            "FirstOrDefault",
+            "ApplyPLItemOverwrite",
+            "Add"
           ]
         },
         {
@@ -60534,16 +60719,20 @@
           "return_type": "Task",
           "is_public": true,
           "parameters": [
-            "estimate",
-            "_context",
-            "mediator"
+            "this EstimateCrudDto estimate",
+            "DataContext _context",
+            "IMediator mediator"
           ],
           "calls": [
-            "mediator.Send(...)",
-            "estimate.IteneraryItems.Where(...).ToList()",
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.ProfitAndLossItemOverwrites.FirstOrDefault(...)",
-            "estimate.ProfitAndLossItems.Add(item)"
+            "OrderBy",
+            "LastOrDefault",
+            "Send",
+            "Where",
+            "Sum",
+            "RemoveAll",
+            "FirstOrDefault",
+            "ApplyPLItemOverwrite",
+            "Add"
           ]
         },
         {
@@ -60551,12 +60740,12 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate"
+            "this EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.Shipments.ForEach(...)",
-            "estimate.ProfitAndLossItems.Add(freightPlItem)"
+            "RemoveAll",
+            "GetDescriptionForShipmentFreight",
+            "Add"
           ]
         },
         {
@@ -60564,12 +60753,11 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate"
+            "this EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.Shipments.ForEach(...)",
-            "estimate.ProfitAndLossItems.Add(...)"
+            "RemoveAll",
+            "Add"
           ]
         },
         {
@@ -60577,190 +60765,12 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "estimate"
+            "this EstimateCrudDto estimate"
           ],
           "calls": [
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.Shipments.SelectMany(...).ToList()",
-            "estimate.ProfitAndLossItems.Where(...).ToList()",
-            "portCalls.FirstOrDefault(...)"
+            "RemoveAll",
+            "Contains"
           ]
-        },
-        {
-          "name": "ValidateCanalTollItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "estimate.IteneraryItems.Where(...).ToList()",
-            "context.Ports.AsNoTracking().Where(...).ToList()",
-            "context.VesselTypePortOverwrites.AsNoTracking().Where(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "ValidatePassingPointExpenseItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "estimate.IteneraryItems.Where(...).ToList()",
-            "context.Ports.AsNoTracking().Where(...).ToList()",
-            "context.VesselTypePortOverwrites.AsNoTracking().Where(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "IsAtSeaForDelivery",
-          "return_type": "bool",
-          "is_public": true,
-          "parameters": [
-            "bunkerEvent"
-          ],
-          "calls": []
-        },
-        {
-          "name": "ValidateTcoBunkerConsumptionItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate"
-          ],
-          "calls": [
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.IteneraryItems.GetItineraryItemIdsBetweenYAndZ()",
-            "estimate.IteneraryItems.Where(...).SelectMany(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(item)"
-          ]
-        },
-        {
-          "name": "ValidateTcoEmissionItem",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate"
-          ],
-          "calls": [
-            "estimate.BunkerPrices.SelectMany(...).Where(...).ToList()",
-            "estimate.ProfitAndLossItems.RemoveAll(...)",
-            "estimate.ProfitAndLossItemOverwrites.FirstOrDefault(...)",
-            "DescriptionBuilder.Create(...).Build()",
-            "estimate.ProfitAndLossItems.Add(item)"
-          ]
-        },
-        {
-          "name": "SetHasDAInvoiceForItineraryItems",
-          "return_type": "Task",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "DADeskInvoiceHelper.GetItineraryItemsWithDAInvoice(...)",
-            "estimate.IteneraryItems.ForEach(...)"
-          ]
-        },
-        {
-          "name": "ValidateTcoCanalTollItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "_context"
-          ],
-          "calls": [
-            "estimate.IteneraryItems.GetItineraryItemIdsBetweenYAndZ()",
-            "estimate.IteneraryItems.Where(...).ToList()",
-            "_context.Ports.AsNoTracking().Where(...).ToList()",
-            "_context.VesselTypePortOverwrites.AsNoTracking().Where(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "ValidateTcoPassingPointExpenseItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "estimate.IteneraryItems.GetItineraryItemIdsBetweenYAndZ()",
-            "estimate.IteneraryItems.Where(...).ToList()",
-            "context.Ports.AsNoTracking().Where(...).ToList()",
-            "context.VesselTypePortOverwrites.AsNoTracking().Where(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "ValidateTcoHireItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate"
-          ],
-          "calls": [
-            "TimeCharterHireRateCalculatorHelper.Calculate(...)",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "ValidateTcoBunkerAdjustmentItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "estimate.GetGroupingBunkerAdjustmentPrice(context)",
-            "context.BunkerTypes.AsNoTracking().Where(...).ToList()",
-            "estimate.ProfitAndLossItems.Add(...)"
-          ]
-        },
-        {
-          "name": "ValidateTCOCommissionItems",
-          "return_type": "Task",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "TimeCharterHireRateCalculatorHelper.Calculate(...)",
-            "TcoCommissionProcessor.GenerateEstimateProfitAndLossItemsFromCommissions(...)"
-          ]
-        },
-        {
-          "name": "ValidateInvoiceTypeForPLItems",
-          "return_type": "void",
-          "is_public": true,
-          "parameters": [
-            "estimate",
-            "context"
-          ],
-          "calls": [
-            "context.InvoiceTypes.AsNoTracking().Where(...).ToList()",
-            "GetMatchingInvoiceType(...)"
-          ]
-        },
-        {
-          "name": "GetMatchingInvoiceType",
-          "return_type": "InvoiceTypeEntity?",
-          "is_public": true,
-          "parameters": [
-            "invoiceTypes",
-            "PLItemType",
-            "PLItemName"
-          ],
-          "calls": []
         }
       ],
       "using_imports": [
@@ -60776,7 +60786,6 @@
         "Core.Business.Finance.Currency",
         "System.Linq.Dynamic.Core",
         "Core.Domain.MasterData.Entities",
-        "AutoMapper",
         "Business.Common",
         "Business.VoyageManagement.Helpers",
         "Core.Domain.VoyageManagement.Entities",
@@ -60789,23 +60798,9 @@
       "entities_referenced": [
         "EstimateCrudDto",
         "ProfitAndLossItemDto",
-        "ProfitAndLossIdentifierEnum",
-        "PaymentBasisEnum",
-        "UnitEnum",
-        "CurrencyCodeEnum",
-        "BunkerPriceConstants",
         "EstimateProfitAndLossItemOverwriteDto",
-        "IteneraryItem",
-        "BunkerEvent",
-        "BunkerTypeEntity",
-        "VesselTypePortOverwrite",
-        "Port",
-        "EstimateIteneraryItemBunkerEventDto",
-        "BunkerLotBaseDto",
-        "ConsumptionDetail",
-        "TimeCharterHireRateCalculatorHelper",
-        "TcoCommissionProcessor",
-        "InvoiceTypeEntity"
+        "DataContext",
+        "GetTciHireRateForPeriod"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -61273,20 +61268,15 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemDto iteneraryItem"
+            "EstimateIteneraryItemDto iteneraryItem"
           ],
           "calls": [
-            "BunkerEvents.FirstOrDefault",
-            "BunkerEvents.RemoveAll",
-            "BunkerEvents.Add",
-            "IsValidConsumptionEvent",
+            "BunkerEventNamesToRegenerate",
+            "iteneraryItem.BunkerEvents.FirstOrDefault",
+            "iteneraryItem.BunkerEvents.RemoveAll",
             "Guid.NewGuid",
-            "UseShoreCranes",
-            "BunkerEventType",
-            "BunkerTypeId",
-            "BunkerTypeCode",
-            "WeatherFactorInPercents",
-            "IsMixDisabled"
+            "IsValidConsumptionEvent",
+            "iteneraryItem.BunkerEvents.Add"
           ]
         },
         {
@@ -61298,22 +61288,22 @@
             "string eventName"
           ],
           "calls": [
-            "RemainingDistanceInSeaMiles",
-            "TotalDistanceFromPreviousItemInSeaMilesInSeaMiles",
-            "RemainingEcaInSeaMiles",
-            "EcaDistanceInSeaMiles",
-            "IntraCanalDistanceInSeaMiles",
-            "WaitTimeAtPortInDays",
-            "RemainingWaitTimeAtPortInDays",
-            "RemainingCargoOperationTimeInDays",
-            "CargoOperationTimeInDays",
-            "RemainingIntraTimeAtPortInDays",
-            "IntraTimeAtPortInDays",
-            "RemainingIntraInInDays",
-            "RemainingIntraOutInDays",
-            "IsBallast",
-            "IsEca",
-            "IsCanal"
+            "iteneraryItem.RemainingDistanceInSeaMiles",
+            "iteneraryItem.TotalDistanceFromPreviousItemInSeaMiles",
+            "iteneraryItem.RemainingEcaInSeaMiles",
+            "iteneraryItem.EcaDistanceInSeaMiles",
+            "iteneraryItem.IntraCanalDistanceInSeaMiles",
+            "iteneraryItem.RemainingWaitTimeAtPortInDays",
+            "iteneraryItem.WaitTimeAtPortInDays",
+            "iteneraryItem.RemainingCargoOperationTimeInDays",
+            "iteneraryItem.CargoOperationTimeInDays",
+            "iteneraryItem.RemainingIntraTimeAtPortInDays",
+            "iteneraryItem.IntraTimeAtPortInDays",
+            "iteneraryItem.RemainingIntraInInDays",
+            "iteneraryItem.RemainingIntraOutInDays",
+            "iteneraryItem.IsBallast",
+            "iteneraryItem.IsEca",
+            "iteneraryItem.IsCanal"
           ]
         },
         {
@@ -61324,7 +61314,7 @@
             "string? bunkerEventName"
           ],
           "calls": [
-            "nameof"
+            "BunkerEventTypeEnum"
           ]
         },
         {
@@ -61335,8 +61325,8 @@
             "string? bunkerEventName"
           ],
           "calls": [
-            "BunkerEventCategoryEnum.ToString",
-            "nameof"
+            "BunkerEventTypeEnum",
+            "BunkerEventCategoryEnum.ToString"
           ]
         },
         {
@@ -61344,25 +61334,16 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemDto iteneraryItem",
+            "EstimateIteneraryItemDto iteneraryItem",
             "List<VesselBunkerTypeEntity> bunkerChains"
           ],
           "calls": [
-            "bunkerChains.OrderBy",
-            "bunkerChains.ThenBy",
-            "BunkerEvents",
-            "IsReportedByVessel",
-            "BunkerTypeId",
             "GetBunkerChainTypeName",
-            "bunkerChains.Where",
             "IsEcaRequired",
-            "bunkerTypeQuery.Where",
+            "bunkerChains.OrderBy",
+            "bunkerChains.Where",
             "bunkerTypeQuery.FirstOrDefault",
-            "BunkerTypeCode",
-            "Id",
-            "GetConsumptionScenarioName",
-            "ApiException",
-            "ErrorCode.INSUFFICENT_BUNKER_CHAINS_DATA"
+            "ApiException"
           ]
         },
         {
@@ -61370,24 +61351,16 @@
           "return_type": "List<ConsumptionRateEntity>",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemBunkerEventDto bunkerEvent",
+            "EstimateIteneraryItemBunkerEventDto bunkerEvent",
             "List<ConsumptionRateEntity> consumptionRates"
           ],
           "calls": [
-            "BunkerTypeId",
-            "UseShoreCranes",
-            "GetIsBallast",
-            "GetConsumptionScenarioName",
             "consumptionRates.Where",
             "consumptionRates.Select",
+            "consumptionRates.Distinct",
             "consumptionRates.ToList",
-            "Distinct",
-            "ForEach",
-            "mixedBunkers.OrderBy",
-            "mixedBunkers.AddRange",
-            "SpeedInKnots",
-            "GroupName",
-            "ConsumptionScenario"
+            "mixedBunkers.ForEach",
+            "mixedBunkers.OrderBy"
           ]
         },
         {
@@ -61395,17 +61368,10 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemDto iteneraryItem"
+            "EstimateIteneraryItemDto iteneraryItem"
           ],
           "calls": [
-            "BunkerEvents",
-            "IsReportedByVessel",
-            "BunkerEventType",
-            "VesselSpeedInKnots",
-            "IntraCanalDistanceInSeaMiles",
-            "IntraTimeAtPortInDays",
-            "RemainingSpeedInKnots",
-            "VesselSpeedInKnots"
+            "bunkerEvent.VesselSpeedInKnots"
           ]
         },
         {
@@ -61416,7 +61382,7 @@
             "string? bunkerEventName"
           ],
           "calls": [
-            "nameof"
+            "BunkerEventTypeEnum"
           ]
         },
         {
@@ -61429,6 +61395,7 @@
             "bool? useShoreCranes"
           ],
           "calls": [
+            "BunkerEventTypeEnum",
             "ConsumptionScenarioEnum.ToString"
           ]
         },
@@ -61437,19 +61404,12 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemDto iteneraryItem",
+            "EstimateIteneraryItemDto iteneraryItem",
             "ConsumptionRateCalculator consumptionRateCalculator"
           ],
           "calls": [
-            "BunkerEvents",
-            "IsReportedByVessel",
-            "BunkerEventType",
-            "UseShoreCranes",
-            "IsBallast",
             "GetConsumptionScenarioName",
-            "consumptionRateCalculator.GetDailyConsumption",
-            "ConsumptionPerDayInMetricTons",
-            "VesselSpeedInKnots"
+            "consumptionRateCalculator.GetDailyConsumption"
           ]
         },
         {
@@ -61457,31 +61417,10 @@
           "return_type": "void",
           "is_public": true,
           "parameters": [
-            "this EstimateIteneraryItemDto iteneraryItem"
+            "EstimateIteneraryItemDto iteneraryItem"
           ],
           "calls": [
-            "BunkerEvents",
-            "IsReportedByVessel",
-            "BunkerEventType",
-            "ConsumptionPerDayInMetricTons",
-            "VesselSpeedInKnots",
-            "RemainingSpeedInKnots",
-            "VesselSpeedInKnots",
-            "RemainingEcaInSeaMiles",
-            "EcaDistanceInSeaMilesInSeaMiles",
-            "RemainingDistanceInSeaMilesInSeaMiles",
-            "TotalDistanceFromPreviousItemInSeaMilesInSeaMiles",
-            "IntraCanalDistanceInSeaMiles",
-            "RemainingWaitTimeAtPortInDays",
-            "WaitTimeAtPortInDays",
-            "RemainingCargoOperationTimeInDays",
-            "CargoOperationTimeInDays",
-            "RemainingIntraTimeAtPortInDays",
-            "IntraTimeAtPortInDays",
-            "RemainingIntraInInDays",
-            "RemainingIntraOutInDays",
-            "WeatherFactorInPercents",
-            "CalculateConsumptionFactors"
+            "bunkerEvent.CalculateConsumptionFactors"
           ]
         }
       ],
@@ -61494,15 +61433,12 @@
       "injected_services": [],
       "entities_referenced": [
         "EstimateIteneraryItemDto",
-        "BunkerEventTypeEnum",
         "EstimateIteneraryItemBunkerEventDto",
         "VesselBunkerTypeEntity",
-        "ApiException",
-        "ErrorCode",
         "ConsumptionRateEntity",
         "ConsumptionRateCalculator",
-        "ConsumptionScenarioEnum",
-        "BunkerEventCategoryEnum"
+        "ApiException",
+        "ErrorCode"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -64309,10 +64245,10 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains"
+            "RevenueTypes.Contains"
           ]
         },
         {
@@ -64320,46 +64256,58 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "item.PaymentBasis",
+            "PaymentBasisEnum.Percentage.ToString"
+          ]
         },
         {
           "name": "IsFreight",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "item.Type",
+            "ProfitAndLossIdentifierEnum.Freight.ToString"
+          ]
         },
         {
           "name": "IsInternalCommission",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "item.Type",
+            "ProfitAndLossIdentifierEnum.InternalCommission.ToString"
+          ]
         },
         {
           "name": "IsPercent",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "item.PaymentBasis",
+            "PaymentBasisEnum.Percentage.ToString"
+          ]
         },
         {
           "name": "IsExpense",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains"
+            "ExpenseTypes.Contains"
           ]
         },
         {
@@ -64367,10 +64315,10 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains"
+            "PortCallTypes.Contains"
           ]
         },
         {
@@ -64378,14 +64326,15 @@
           "return_type": "decimal",
           "is_public": true,
           "parameters": [
-            "estimate",
-            "estimateShipmentId"
+            "EstimateCrudDto estimate",
+            "Guid estimateShipmentId"
           ],
           "calls": [
-            "GetEstimateShipmentPlItems",
-            "Where",
-            "Sum",
-            "Contains"
+            "estimate.GetEstimateShipmentPlItems",
+            "shipmentPlItems.Where",
+            "x.IsRevenue",
+            "x.TotalValueInUsds",
+            "x.IsExpense"
           ]
         },
         {
@@ -64393,15 +64342,15 @@
           "return_type": "List<ProfitAndLossItemDto>",
           "is_public": true,
           "parameters": [
-            "estimate",
-            "estimateShipmentId"
+            "EstimateCrudDto estimate",
+            "Guid estimateShipmentId"
           ],
           "calls": [
-            "Where",
-            "ToList",
-            "FirstOrDefault",
-            "Select",
-            "Contains"
+            "estimate.ProfitAndLossItems.Where",
+            "estimate.Shipments.FirstOrDefault",
+            "estimateShipment.PortCalls.Select",
+            "plItem.Id",
+            "result.Any"
           ]
         },
         {
@@ -64409,11 +64358,14 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "MiscRevenueTypes.Select",
+            "ProfitAndLossIdentifierEnum.TCOBallastBonus.ToString",
+            "ProfitAndLossIdentifierEnum.TCOOtherRevenues.ToString",
+            "ProfitAndLossIdentifierEnum.TCOOwnerExpense.ToString"
           ]
         },
         {
@@ -64421,11 +64373,13 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "EmissionRevenueTypes.Select",
+            "nameof(ProfitAndLossIdentifierEnum.TCOEmissionETS)",
+            "nameof(ProfitAndLossIdentifierEnum.TCOEmissionFUELEU)"
           ]
         },
         {
@@ -64433,11 +64387,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "MiscExpenseTypes.Select",
+            "ProfitAndLossIdentifierEnum.MiscellaneousExpense.ToString"
           ]
         },
         {
@@ -64445,11 +64400,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "InternalTCOCommissionTypes.Select",
+            "ProfitAndLossIdentifierEnum.InternalTCOCommission.ToString"
           ]
         },
         {
@@ -64457,11 +64413,13 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "ExternalCommissionTypes.Select",
+            "ProfitAndLossIdentifierEnum.TCOHireBrokerComm.ToString",
+            "ProfitAndLossIdentifierEnum.TCOHireAddComm.ToString"
           ]
         },
         {
@@ -64469,11 +64427,13 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "MiscRevenueTypes.Select",
+            "ProfitAndLossIdentifierEnum.MiscellaneousRevenue.ToString",
+            "ProfitAndLossIdentifierEnum.FreightAdjustment.ToString"
           ]
         },
         {
@@ -64481,11 +64441,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "MiscExpenseTypes.Select",
+            "ProfitAndLossIdentifierEnum.MiscellaneousExpense.ToString"
           ]
         },
         {
@@ -64493,11 +64454,15 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "OtherExpenseTypes.Select",
+            "nameof(ProfitAndLossIdentifierEnum.TCIBallastBonus)",
+            "nameof(ProfitAndLossIdentifierEnum.TCIAdminFee)",
+            "nameof(ProfitAndLossIdentifierEnum.TCIPICharterLiability)",
+            "nameof(ProfitAndLossIdentifierEnum.TCIOtherExpense)"
           ]
         },
         {
@@ -64505,11 +64470,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "CanalTollTypes.Select",
+            "ProfitAndLossIdentifierEnum.CanalExpense.ToString"
           ]
         },
         {
@@ -64517,11 +64483,17 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "ExternalCommissionTypes.Select",
+            "ProfitAndLossIdentifierEnum.BrokerCommission.ToString",
+            "ProfitAndLossIdentifierEnum.AddressCommission.ToString",
+            "ProfitAndLossIdentifierEnum.BrokerCommForLaytime.ToString",
+            "ProfitAndLossIdentifierEnum.AddressCommForLaytime.ToString",
+            "ProfitAndLossIdentifierEnum.BrokerCommForMiscRev.ToString",
+            "ProfitAndLossIdentifierEnum.AddressCommForMiscRev.ToString"
           ]
         },
         {
@@ -64529,11 +64501,15 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "VesselCommissionTypes.Select",
+            "ProfitAndLossIdentifierEnum.TCIBrokerComm.ToString",
+            "ProfitAndLossIdentifierEnum.TCIAddComm.ToString",
+            "ProfitAndLossIdentifierEnum.TCIOffhireBrokerComm.ToString",
+            "ProfitAndLossIdentifierEnum.TCIOffhireAddComm.ToString"
           ]
         },
         {
@@ -64541,11 +64517,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "CargoExpenseTypes.Select",
+            "ProfitAndLossIdentifierEnum.CargoExpense.ToString"
           ]
         },
         {
@@ -64553,11 +64530,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "Contains",
-            "ToLower"
+            "item.Type.ToLower",
+            "PortExpenseTypes.Select",
+            "ProfitAndLossIdentifierEnum.PortExpense.ToString"
           ]
         },
         {
@@ -64565,12 +64543,12 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
           "calls": [
-            "IsTciOffhireHire",
-            "IsTciOffhireBunker",
-            "IsTciOffhireEmissionEts"
+            "item.IsTciOffhireHire",
+            "item.IsTciOffhireBunker",
+            "item.IsTciOffhireEmissionEts"
           ]
         },
         {
@@ -64578,51 +64556,69 @@
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "nameof(ProfitAndLossIdentifierEnum.TCIOffhire)",
+            "nameof(PaymentBasisEnum.CustomQuantity)",
+            "nameof(UnitEnum.Day)"
+          ]
         },
         {
           "name": "IsTciOffhireBunker",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "nameof(ProfitAndLossIdentifierEnum.TCIOffhireBunker)",
+            "nameof(PaymentBasisEnum.CustomQuantity)",
+            "nameof(UnitEnum.MetricTon)"
+          ]
         },
         {
           "name": "IsTcoOffhireBunker",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "nameof(ProfitAndLossIdentifierEnum.TCOOffHireBunker)",
+            "nameof(PaymentBasisEnum.CustomQuantity)",
+            "nameof(UnitEnum.MetricTon)"
+          ]
         },
         {
           "name": "IsTciOffhireEmissionEts",
           "return_type": "bool",
           "is_public": true,
           "parameters": [
-            "item"
+            "ProfitAndLossItemDto item"
           ],
-          "calls": []
+          "calls": [
+            "nameof(ProfitAndLossIdentifierEnum.TCIOffhireEmissionETS)",
+            "nameof(PaymentBasisEnum.CustomQuantity)",
+            "nameof(UnitEnum.EUA)"
+          ]
         },
         {
           "name": "TakeApplicableMiscRevItemsForShipmentCommission",
           "return_type": "IEnumerable<ProfitAndLossItemDto>",
           "is_public": true,
           "parameters": [
-            "currentPlItems",
-            "shipment",
-            "isVoyageCalculation"
+            "IEnumerable<ProfitAndLossItemDto> currentPlItems",
+            "EstimateShipmentDto shipment",
+            "bool isVoyageCalculation"
           ],
           "calls": [
-            "Where",
-            "Contains",
-            "Length",
-            "ToLower"
+            "item.Type",
+            "item.IsCommissionable",
+            "item.ShipmentId",
+            "item.EstimateShipmentId",
+            "shipment.ShipmentId",
+            "shipment.Id"
           ]
         }
       ],
@@ -67041,7 +67037,7 @@
       "namespace": "Core.Business",
       "file_type": "Handler",
       "architecture_layer": "Business",
-      "handler_verb": "",
+      "handler_verb": "Calculate",
       "methods": [
         {
           "name": "Handle",
@@ -67052,29 +67048,13 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "Sum",
-            "RoundToNearestSeconds",
-            "IsPLMiscRevenues",
-            "IsPLMiscExpenses",
-            "IsPLOthersExpenses",
-            "IsPLCanalTolls",
-            "IsExternalCommissions",
-            "IsPortExpense",
-            "IsCargoExpense",
-            "IsFreight",
-            "IsInternalCommission",
-            "IsTciOffhireHire",
-            "IsTciOffhire",
-            "IsVesselCommissions",
-            "FirstOrDefault",
-            "ToList",
-            "Where",
-            "Select",
-            "AddRange",
-            "RemoveAll",
-            "Contains",
-            "Any",
-            "AddDays"
+            "request.BodyData",
+            "EstimateProfitAndLostDto",
+            "IteneraryItems",
+            "ProfitAndLossItems",
+            "DateTime.Now",
+            "CommenceDate.AddDays",
+            "RoundToNearestSeconds"
           ]
         }
       ],
@@ -67091,11 +67071,8 @@
       "entities_referenced": [
         "EstimateProfitAndLostDto",
         "EstimateCrudDto",
-        "IteneraryItem",
-        "Shipment",
-        "PortCall",
         "ProfitAndLossIdentifierEnum",
-        "ProfitAndLossItem"
+        "DataContext"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -77813,14 +77790,14 @@
           "return_type": "Task<List<TimeCharterClaimDto>>",
           "is_public": true,
           "parameters": [
-            "Request",
-            "CancellationToken"
+            "Request request",
+            "CancellationToken cancellationToken"
           ],
           "calls": [
             "TimeCharterClaimHelper.SanitizeClaims",
             "TimeCharterClaimPLDataSource.CreateAsync",
-            "CalculateTcoOffhirePLItems",
             "CalculateTciOffhirePLItems",
+            "CalculateTcoOffhirePLItems",
             "SanitizePLItem"
           ]
         },
@@ -77829,15 +77806,16 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "TimeCharterClaimPLDataSource",
-            "TimeCharterClaimDto"
+            "TimeCharterClaimPLDataSource generatorContext",
+            "TimeCharterClaimDto claim"
           ],
           "calls": [
-            "new TimeCharterClaimPLCalculator",
+            "TimeCharterClaimPLCalculator",
             "CalculateTcoOffhireSpeedClaim",
             "CalculateTcoOffhire",
             "CalculateTcoOffhireBunker",
             "CalculateTcoOffhireEts",
+            "CalculateTcoOffhireUkEts",
             "CalculateTcoOffhireFuelEU"
           ]
         },
@@ -77846,15 +77824,16 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "TimeCharterClaimPLDataSource",
-            "TimeCharterClaimDto"
+            "TimeCharterClaimPLDataSource generatorContext",
+            "TimeCharterClaimDto claim"
           ],
           "calls": [
-            "new TimeCharterClaimPLCalculator",
+            "TimeCharterClaimPLCalculator",
             "CalculateTciOffhireSpeedClaim",
             "CalculateTciOffhire",
             "CalculateTciOffhireBunker",
             "CalculateTciOffhireEts",
+            "CalculateTciOffhireUkEts",
             "CalculateTciOffhireFuelEU"
           ]
         },
@@ -77863,14 +77842,17 @@
           "return_type": "Task",
           "is_public": false,
           "parameters": [
-            "TimeCharterClaimDto"
+            "TimeCharterClaimDto claim"
           ],
           "calls": [
-            "context.BunkerTypes.AsNoTracking().ToListAsync",
+            "context.BunkerTypes",
+            "AsNoTracking",
+            "ToListAsync",
             "TimeCharterClaimPLSanitizer.Create",
-            "sanitizer.Sanitize",
+            "Sanitize",
             "TimeCharterClaimPLGenerator.IsSystemCreated",
-            "InvoiceTypeHelper.ExtractBunkerTypeCodeFromInvoiceTypeName"
+            "InvoiceTypeHelper.ExtractBunkerTypeCodeFromInvoiceTypeName",
+            "FirstOrDefault"
           ]
         }
       ],
@@ -77891,10 +77873,16 @@
       "entities_referenced": [
         "TimeCharterClaimDto",
         "VoyageCrudDto",
-        "BunkerType"
+        "TimeCharterClaimPLDataSource",
+        "TimeCharterClaimPLCalculator",
+        "TimeCharterClaimPLSanitizer",
+        "TimeCharterClaimHelper",
+        "OffHireTypeEnum",
+        "VoyageOperationTypeEnum",
+        "InvoiceTypeHelper"
       ],
       "external_clients_used": [],
-      "is_critical": true
+      "is_critical": false
     },
     "Core/Business/VoyageManagement/TimeCharterClaim/EstimatePriceForBunkerPlItem.cs": {
       "class_name": "EstimatePriceForBunkerPlItem",
@@ -78277,7 +78265,7 @@
       "namespace": "Business.VoyageManagement.TimeCharterClaim",
       "file_type": "Service",
       "architecture_layer": "Business",
-      "handler_verb": "",
+      "handler_verb": "Calculate",
       "methods": [
         {
           "name": "CalculateTciOffhireFuelEU",
@@ -78285,10 +78273,10 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTciFuelEuPLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.Add(etsItem)"
+            "generator.GenerateTciFuelEuPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
           ]
         },
         {
@@ -78297,10 +78285,10 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTcoFuelEuPLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.Add(etsItem)"
+            "generator.GenerateTcoFuelEuPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
           ]
         },
         {
@@ -78309,10 +78297,10 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTciEtsPLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.Add(etsItem)"
+            "generator.GenerateTciEtsPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
           ]
         },
         {
@@ -78321,10 +78309,34 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTcoEtsPLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.Add(etsItem)"
+            "generator.GenerateTcoEtsPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
+          ]
+        },
+        {
+          "name": "CalculateTciOffhireUkEts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "generator.GenerateTciUkEtsPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
+          ]
+        },
+        {
+          "name": "CalculateTcoOffhireUkEts",
+          "return_type": "Task",
+          "is_public": true,
+          "parameters": [],
+          "calls": [
+            "generator.GenerateTcoUkEtsPLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.Add"
           ]
         },
         {
@@ -78333,10 +78345,10 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateBunkerPLItemsAsync(claim, generator.TcoBunkerPLItemGenerator)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateBunkerPLItemsAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         },
         {
@@ -78345,10 +78357,10 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateBunkerPLItemsAsync(claim, generator.TciBunkerPLItemGenerator)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateBunkerPLItemsAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         },
         {
@@ -78357,12 +78369,12 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTciHirePLItemAsync(claim)",
-            "generator.GenerateTciAdditionalCommissionPLItemAsync(claim)",
-            "generator.GenerateTciCvePLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateTciHirePLItemAsync",
+            "generator.GenerateTciAdditionalCommissionPLItemAsync",
+            "generator.GenerateTciCvePLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         },
         {
@@ -78371,12 +78383,12 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTcoHirePLItemAsync(claim)",
-            "generator.GenerateTcoAdditionalCommissionPLItemAsync(claim)",
-            "generator.GenerateTcoCvePLItemAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateTcoHirePLItemAsync",
+            "generator.GenerateTcoAdditionalCommissionPLItemAsync",
+            "generator.GenerateTcoCvePLItemAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         },
         {
@@ -78385,12 +78397,12 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTciHirePLItemForSpeedClaimAsync(claim)",
-            "generator.GenerateTciAdditionalCommissionPLItemForSpeedClaimAsync(claim)",
-            "generator.GenerateTciCvePLItemForSpeedClaimAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateTciHirePLItemForSpeedClaimAsync",
+            "generator.GenerateTciAdditionalCommissionPLItemForSpeedClaimAsync",
+            "generator.GenerateTciCvePLItemForSpeedClaimAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         },
         {
@@ -78399,12 +78411,12 @@
           "is_public": true,
           "parameters": [],
           "calls": [
-            "new TimeCharterClaimPLGenerator(generatorContext)",
-            "generator.GenerateTcoHirePLItemForSpeedClaimAsync(claim)",
-            "generator.GenerateTcoAdditionalCommissionPLItemForSpeedClaimAsync(claim)",
-            "generator.GenerateTcoCvePLItemForSpeedClaimAsync(claim)",
-            "claim.ProfitAndLossItems.RemoveAll(...)",
-            "claim.ProfitAndLossItems.AddRange(generatedItems)"
+            "generator.GenerateTcoHirePLItemForSpeedClaimAsync",
+            "generator.GenerateTcoAdditionalCommissionPLItemForSpeedClaimAsync",
+            "generator.GenerateTcoCvePLItemForSpeedClaimAsync",
+            "TimeCharterClaimPLGenerator.IsSystemCreated",
+            "claim.ProfitAndLossItems.RemoveAll",
+            "claim.ProfitAndLossItems.AddRange"
           ]
         }
       ],
@@ -78417,12 +78429,14 @@
         "Business.VoyageManagement.TimeCharterClaim.PLGenerator"
       ],
       "injected_services": [
-        "TimeCharterClaimPLDataSource"
+        "TimeCharterClaimPLDataSource",
+        "TimeCharterClaimDto"
       ],
       "entities_referenced": [
+        "TimeCharterClaimPLDataSource",
         "TimeCharterClaimDto",
-        "ProfitAndLossItemDto",
         "ProfitAndLossIdentifierEnum",
+        "ProfitAndLossItemDto",
         "TimeCharterClaimPLGenerator"
       ],
       "external_clients_used": [],
@@ -79049,10 +79063,10 @@
           "is_public": true,
           "parameters": [
             "TimeCharterClaimDto claim",
-            "CancellationToken cancellationToken = default"
+            "CancellationToken cancellationToken"
           ],
           "calls": [
-            "FindInvoiceType",
+            "dataSource.FindInvoiceType",
             "GenerateOffhireEtsPLItemAsync"
           ]
         },
@@ -79062,10 +79076,10 @@
           "is_public": true,
           "parameters": [
             "TimeCharterClaimDto claim",
-            "CancellationToken cancellationToken = default"
+            "CancellationToken cancellationToken"
           ],
           "calls": [
-            "FindInvoiceType",
+            "dataSource.FindInvoiceType",
             "GenerateOffhireEtsPLItemAsync"
           ]
         },
@@ -79077,12 +79091,14 @@
             "TimeCharterClaimDto claim",
             "decimal factor",
             "InvoiceTypeEntity invoiceType",
-            "CancellationToken cancellationToken = default"
+            "CancellationToken cancellationToken"
           ],
           "calls": [
             "FindEtsDefaultPriceFromItineraryItems",
             "FindExistingPLItemByInvoiceType",
-            "CalculateEtsInEuaAsync"
+            "mapper.Map",
+            "CalculateEtsInEuaAsync",
+            "DescriptionBuilder.Create"
           ]
         },
         {
@@ -79091,8 +79107,16 @@
           "is_public": false,
           "parameters": [],
           "calls": [
-            "GetVoyage",
-            "CalculateBunkerConsumptionOfItem"
+            "dataSource.GetVoyage"
+          ]
+        },
+        {
+          "name": "FindUkEtsDefaultPriceFromItineraryItems",
+          "return_type": "decimal",
+          "is_public": false,
+          "parameters": [],
+          "calls": [
+            "dataSource.GetVoyage"
           ]
         },
         {
@@ -79101,11 +79125,73 @@
           "is_public": false,
           "parameters": [
             "TimeCharterClaimDto claim",
-            "CancellationToken cancellationToken = default"
+            "CancellationToken cancellationToken"
           ],
           "calls": [
-            "FetchOrGetBunkerTypeIdToCo2EmissionFactorAsync",
-            "CalculateBunkerConsumptionOfItem"
+            "dataSource.GetVoyage",
+            "dataSource.FetchOrGetBunkerTypeIdToCo2EmissionFactorAsync",
+            "dataSource.CalculateBunkerConsumptionOfItem",
+            "voyage.GetAllBunkerTypes"
+          ]
+        },
+        {
+          "name": "GenerateTciUkEtsPLItemAsync",
+          "return_type": "Task<ProfitAndLossItemDto?>",
+          "is_public": true,
+          "parameters": [
+            "TimeCharterClaimDto claim",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "dataSource.FindInvoiceType",
+            "GenerateOffhireUkEtsPLItemAsync"
+          ]
+        },
+        {
+          "name": "GenerateTcoUkEtsPLItemAsync",
+          "return_type": "Task<ProfitAndLossItemDto?>",
+          "is_public": true,
+          "parameters": [
+            "TimeCharterClaimDto claim",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "dataSource.FindInvoiceType",
+            "GenerateOffhireUkEtsPLItemAsync"
+          ]
+        },
+        {
+          "name": "GenerateOffhireUkEtsPLItemAsync",
+          "return_type": "Task<ProfitAndLossItemDto?>",
+          "is_public": false,
+          "parameters": [
+            "TimeCharterClaimDto claim",
+            "decimal factor",
+            "InvoiceTypeEntity invoiceType",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "FindUkEtsDefaultPriceFromItineraryItems",
+            "FindExistingPLItemByInvoiceType",
+            "mapper.Map",
+            "CalculateUkEtsInUkaAsync",
+            "DescriptionBuilder.Create"
+          ]
+        },
+        {
+          "name": "CalculateUkEtsInUkaAsync",
+          "return_type": "Task<decimal>",
+          "is_public": false,
+          "parameters": [
+            "TimeCharterClaimDto claim",
+            "CancellationToken cancellationToken"
+          ],
+          "calls": [
+            "dataSource.GetVoyage",
+            "dataSource.FetchOrGetBunkerTypeIdToCo2EmissionFactorAsync",
+            "dataSource.CalculateBunkerConsumptionOfItem",
+            "voyage.GetAllBunkerTypes",
+            "itineraryItem.BunkerEvents.CalculateAverage"
           ]
         }
       ],
@@ -79118,18 +79204,11 @@
         "Core.Domain.FinanceData.Entities",
         "Core.Domain.TimeCharterClaim.Dtos"
       ],
-      "injected_services": [
-        "dataSource",
-        "mapper"
-      ],
+      "injected_services": [],
       "entities_referenced": [
-        "TimeCharagerClaimDto",
         "ProfitAndLossItemDto",
-        "InvoiceTypeEntity",
-        "ProfitAndLossIdentifierEnum",
-        "PaymentBasisEnum",
-        "UnitEnum",
-        "CurrencyCodeEnum"
+        "TimeCharterClaimDto",
+        "InvoiceTypeEntity"
       ],
       "external_clients_used": [],
       "is_critical": false
@@ -83271,15 +83350,21 @@
             "CancellationToken cancellationToken"
           ],
           "calls": [
-            "Where",
-            "Select",
             "FirstOrDefaultAsync",
             "ToListAsync",
-            "TransformIntoFuelingInCaseItineraryIsPassingPoint",
             "Update",
             "SaveChangesAsync",
             "UpdateRange",
-            "Add"
+            "Add",
+            "IsCOrYOrTOrZ",
+            "TransformIntoFuelingInCaseItineraryIsPassingPoint",
+            "Where",
+            "OrderBy",
+            "Select",
+            "FirstOrDefault",
+            "LastOrDefault",
+            "MaxBy",
+            "ToString"
           ]
         }
       ],
@@ -83298,9 +83383,9 @@
       ],
       "entities_referenced": [
         "BunkerOrderItemDto",
-        "Voyage",
         "VoyageIteneraryItemEntity",
         "VoyageBunkerEventEntity",
+        "Voyage",
         "Port"
       ],
       "external_clients_used": [],
@@ -126292,24 +126377,168 @@
       ],
       "external_clients_used": [],
       "is_critical": false
+    },
+    "Core/Business/VoyageManagement/Helpers/UkEtsIteneraryHelper.cs": {
+      "class_name": "UkEtsIteneraryHelper",
+      "namespace": "Core.Business",
+      "file_type": "Other",
+      "architecture_layer": "Business",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "IsUkPenaltyPort",
+          "return_type": "bool",
+          "is_public": true,
+          "parameters": [
+            "EstimateIteneraryItemDto? port"
+          ],
+          "calls": []
+        },
+        {
+          "name": "IsUkNorthernIrelandPort",
+          "return_type": "bool",
+          "is_public": true,
+          "parameters": [
+            "EstimateIteneraryItemDto? port"
+          ],
+          "calls": []
+        },
+        {
+          "name": "GetUkEtsPhaseInFactor",
+          "return_type": "decimal",
+          "is_public": true,
+          "parameters": [
+            "DateTime? timeStart",
+            "DateTime? timeEnd"
+          ],
+          "calls": [
+            "GetUkEtsPhaseInFactor"
+          ]
+        },
+        {
+          "name": "GetUkEtsPhaseInFactor",
+          "return_type": "decimal",
+          "is_public": true,
+          "parameters": [
+            "DateTime date"
+          ],
+          "calls": []
+        },
+        {
+          "name": "GetUkEtsPhaseInFactor",
+          "return_type": "decimal",
+          "is_public": false,
+          "parameters": [
+            "DateTime timeStart",
+            "DateTime timeEnd"
+          ],
+          "calls": []
+        },
+        {
+          "name": "CalculateUkEtsFactors",
+          "return_type": "FactorResult",
+          "is_public": true,
+          "parameters": [
+            "EstimateIteneraryItemDto? fromItem",
+            "EstimateIteneraryItemDto? toItem"
+          ],
+          "calls": [
+            "IsUkPenaltyPort",
+            "IsUkNorthernIrelandPort"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.VoyageManagement.Dtos"
+      ],
+      "injected_services": [],
+      "entities_referenced": [
+        "EstimateIteneraryItemDto",
+        "FactorResult"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
+    },
+    "Core/Business.UnitTest/VoyageManagement/UkEts/Helpers/UkEtsDataHelper.cs": {
+      "class_name": "UkEtsDataHelper",
+      "namespace": "Core.Business.UnitTest.VoyageManagement.UkEts",
+      "file_type": "Other",
+      "architecture_layer": "Other",
+      "handler_verb": "",
+      "methods": [
+        {
+          "name": "CreateBunkerTypeWithCoefficients",
+          "return_type": "Task<Guid>",
+          "is_public": true,
+          "parameters": [
+            "string code"
+          ],
+          "calls": [
+            "AddAsync",
+            "SaveChangesAsync"
+          ]
+        },
+        {
+          "name": "CreateUkDomesticEstimate",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [
+            "DateTime dateOfConsumption",
+            "decimal? defaultUkEtsPrice"
+          ],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients",
+            "Guid.NewGuid"
+          ]
+        },
+        {
+          "name": "CreateInternationalInboundEstimate",
+          "return_type": "Task<EstimateCrudDto>",
+          "is_public": true,
+          "parameters": [
+            "DateTime dateOfConsumption"
+          ],
+          "calls": [
+            "CreateBunkerTypeWithCoefficients",
+            "Guid.NewGuid"
+          ]
+        }
+      ],
+      "using_imports": [
+        "Core.Domain.MasterData.Entities",
+        "Core.Domain.VoyageManagement.Dtos",
+        "Core.Infrastructure.DbContext"
+      ],
+      "injected_services": [
+        "DataContext"
+      ],
+      "entities_referenced": [
+        "BunkerTypeEntity",
+        "EstimateCrudDto",
+        "BunkerLotBaseDto",
+        "BunkerLotConsumptionBaseDto",
+        "EstimateIteneraryItemDto"
+      ],
+      "external_clients_used": [],
+      "is_critical": false
     }
   },
   "used_by": {},
   "stats": {
-    "total_files": 1933,
+    "total_files": 1935,
     "by_layer": {
       "Domain": 412,
       "Infrastructure": 159,
-      "Other": 114,
+      "Other": 115,
       "API": 132,
-      "Business": 1071,
+      "Business": 1072,
       "CronJobs": 1,
       "Configuration": 4,
       "ExternalClient": 20,
       "Functions": 20
     },
     "by_type": {
-      "Other": 363,
+      "Other": 365,
       "Dto": 253,
       "Entity": 152,
       "Validator": 72,
@@ -126324,6 +126553,6 @@
       "Interface": 1,
       "Function": 12
     },
-    "generated_at": "2026-05-16T09:34:16.525788Z"
+    "generated_at": "2026-05-19T04:32:33.828695Z"
   }
 }
