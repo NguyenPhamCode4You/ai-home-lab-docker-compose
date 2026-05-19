@@ -134,6 +134,13 @@ async def insert_rag_chunks_quick(
     print(f"[Phase 6Q] Deleting old DB rows for {len(pending_files)} file(s) before insert...")
     _cleanup_store = SupabaseVectorStore(embedding=Embedding())
     total_deleted = 0
+    delete_progress = tqdm(
+        total=len(pending_files),
+        desc="[Phase 6Q] Deleting",
+        unit="file",
+        dynamic_ncols=True,
+        bar_format="{desc}: {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}] {bar}",
+    )
     for fn, fp in pending_files:
         try:
             n = _cleanup_store.delete_by_file_name(table_name, fn, folder_path=fp)
@@ -144,7 +151,10 @@ async def insert_rag_chunks_quick(
                     if df.startswith(f"{fn}_c") and df.endswith(".done"):
                         os.remove(os.path.join(root, df))
         except Exception as exc:
-            print(f"[Phase 6Q] WARNING: could not delete rows for '{fp}/{fn}': {exc}")
+            tqdm.write(f"[Phase 6Q] WARNING: could not delete rows for '{fp}/{fn}': {exc}")
+        delete_progress.update(1)
+        delete_progress.set_postfix(deleted=total_deleted, refresh=False)
+    delete_progress.close()
     print(f"[Phase 6Q] Deleted {total_deleted} old row(s) from '{table_name}'.")
 
     # Re-collect chunks now that .done markers have been cleared
