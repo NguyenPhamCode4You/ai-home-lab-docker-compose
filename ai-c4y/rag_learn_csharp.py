@@ -4,7 +4,7 @@ NORMAL USAGE:
 rag_learn_csharp.py — Entry point for the BVMS C# Codebase RAG Pipeline.
 
 Usage examples:
-  python rag_learn_csharp.py --phase index --cloud 25
+  python rag_learn_csharp.py --phase index --against dev --cloud 25
   python rag_learn_csharp.py --phase document --cloud 25
   python rag_learn_csharp.py --phase enrich --cloud 25
   python rag_learn_csharp.py --phase synthesize --cloud 25
@@ -13,6 +13,7 @@ Usage examples:
 
   python rag_learn_csharp.py --phase all
   python rag_learn_csharp.py --phase index --focus "**/VoyageManagement/**"
+  python rag_learn_csharp.py --phase index --against dev --cloud 25
   python rag_learn_csharp.py --phase all --mode incremental
   python rag_learn_csharp.py --phase all --mode incremental --changed-files "Core/Business/Foo.cs,Core/Domain/Bar.cs"
   git diff --name-only origin/main HEAD | python rag_learn_csharp.py --phase all --mode incremental --from-stdin
@@ -72,6 +73,16 @@ def parse_args():
         "--from-stdin",
         action="store_true",
         help="Read changed file paths from stdin (one per line) — use with git diff output",
+    )
+    parser.add_argument(
+        "--against",
+        default=None,
+        metavar="BRANCH",
+        help=(
+            "Re-index only .cs files changed between HEAD and BRANCH. "
+            "Resets those files in the manifest, then runs the selected phase(s) on them only. "
+            "Example: --against dev"
+        ),
     )
     parser.add_argument(
         "--cloud",
@@ -179,6 +190,83 @@ async def main():
         else:
             print("[Incremental] No changed .cs files detected. Nothing to do.")
             return
+
+    # ------------------------------------------------------------------
+    # --against: diff HEAD vs branch, reset changed files, re-index only them
+    # ------------------------------------------------------------------
+    if args.against:
+        import subprocess
+        branch = args.against
+        git_cwd = codebase_path
+        print(f"[Against] Detecting .cs changes between HEAD and '{branch}' (repo: {git_cwd})...")
+        try:
+            # Fetch the branch from origin inside the target source repo.
+            bare = branch.removeprefix("origin/")
+            fetch = subprocess.run(
+                ["git", "fetch", "origin", bare, "--quiet"],
+                capture_output=True, text=True, check=False, cwd=git_cwd,
+            )
+            if fetch.returncode != 0:
+                print(f"[Against] fetch warning: {fetch.stderr.strip()} (continuing anyway)")
+
+            # Try the user-supplied ref first, then origin/<branch> as fallback.
+            refs_to_try = [branch] if branch.startswith("origin/") else [branch, f"origin/{branch}"]
+            result = None
+            for ref in refs_to_try:
+                r = subprocess.run(
+                    ["git", "diff", "--name-only", f"{ref}...HEAD"],
+                    capture_output=True, text=True, check=False, cwd=git_cwd,
+                )
+                if r.returncode == 0:
+                    result = r
+                    print(f"[Against] Resolved ref: {ref}")
+                    break
+
+            if result is None:
+                print(f"[Against] git error: {r.stderr.strip()}")
+                print(f"[Against] Tried refs: {refs_to_try}")
+                sys.exit(1)
+
+            changed_against = [ln.strip() for ln in result.stdout.splitlines() if ln.strip().endswith(".cs")]
+        except FileNotFoundError:
+            print("[Against] ERROR: git not found in PATH.")
+            sys.exit(1)
+
+        # Filter out files matching the same ignore patterns used by Phase 1
+        # (migrations, designer files, test projects, obj/bin, etc.)
+        from src.cia_config import CSHARP_IGNORE_FILES as _CIA_IGNORE
+        import re as _re
+
+        def _ignored(rel_path: str, patterns: list[str]) -> bool:
+            p = rel_path.replace("\\", "/")
+            for pat in patterns:
+                pat = pat.strip().replace("\\", "/")
+                regex = _re.escape(pat).replace(r"\*\*", ".*").replace(r"\*", "[^/]*").replace(r"\?", "[^/]")
+                if _re.search(regex, p):
+                    return True
+            return False
+
+        ignore_pats = [p.strip() for p in _CIA_IGNORE.split(",") if p.strip()]
+        before = len(changed_against)
+        changed_against = [fp for fp in changed_against if not _ignored(fp, ignore_pats)]
+        skipped = before - len(changed_against)
+        if skipped:
+            print(f"[Against] Skipped {skipped} file(s) matching ignore patterns (migrations, designer, tests, obj/bin).")
+
+        if not changed_against:
+            print(f"[Against] No .cs files changed against '{branch}'. Nothing to re-index.")
+            return
+
+        print(f"[Against] {len(changed_against)} changed .cs file(s) vs '{branch}':")
+        for fp in changed_against:
+            print(f"          {fp}")
+
+        print(f"[Against] Resetting manifest for {len(changed_against)} file(s)...")
+        for fp in changed_against:
+            manifest.reset_file(fp)
+        manifest.save()
+        incremental_files = changed_against
+        print(f"[Against] Manifest reset. Running phase '{args.phase}' on changed files only.")
 
     # ------------------------------------------------------------------
     # Phase execution
