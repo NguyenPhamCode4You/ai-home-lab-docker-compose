@@ -52,3 +52,20 @@ services:
     networks:
       - ai-agentic-chat
     restart: unless-stopped
+
+  csharp-explorer:
+    ports:
+      - 9003:8001
+    build:
+      context: .
+      dockerfile: Dockerfile.explore_csharp
+    env_file:
+      - .env
+    environment:
+      CIA_CODEBASE_PATH: /codebase
+      OPENROUTER_MAX_TOKENS: 120000
+    volumes:
+      - ${CIA_CODEBASE_PATH}:/codebase:ro
+    networks:
+      - ai-agentic-chat
+    restart: unless-stopped
