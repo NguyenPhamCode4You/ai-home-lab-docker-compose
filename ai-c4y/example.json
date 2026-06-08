@@ -1,0 +1,105 @@
+{
+  "agent_id": "bvms-assistant",
+  "description": "Top orchestrator. Answers BVMS questions by combining domain knowledge, code analysis, and diagrams, delegating to specialist sub-agents when needed.",
+
+  "context_window": {
+    "conversation_awareness_tokens": 800,
+    "cognitive_tokens": 7200,
+    "context_tokens": 24000,
+    "answering_tokens": 9200
+  },
+
+  "max_iterations_untill_give_up": 5,
+
+  "models": [
+    {
+      "platform": "ollama",
+      "name": "gpt-oss:20b",
+      "url": "http://localhost:11434",
+      "max_tokens": 62000
+    },
+    {
+      "platform": "open_router",
+      "name": "anthropic/claude-3.5-sonnet",
+      "max_tokens": "auto"
+    }
+  ],
+
+  "reasoning": [
+    {
+      "id": "deep_think",
+      "when": "The question is complex or spans multiple topics.",
+      "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering."
+    },
+    {
+      "id": "double_check",
+      "when": "All delegates and tools for this iteration have returned their results.",
+      "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them."
+    },
+    {
+      "id": "visualize_diagram",
+      "when": "The answer involves a workflow, an architecture, or relationships between components.",
+      "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text."
+    },
+    {
+      "id": "say_no",
+      "when": "No clear answer can be found after exhausting the relevant delegates and tools.",
+      "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer."
+    }
+  ],
+
+  "tools": [
+    {
+      "type": "ReadFileTool",
+      "when": "The user references a specific local file whose contents are needed to answer."
+    },
+    {
+      "type": "GenerateDiagramTool",
+      "when": "A visual diagram would make a workflow or architecture clearer (see the visualize_diagram policy)."
+    }
+  ],
+
+  "delegates": [
+    {
+      "agent_id": "bvms-general-knowledge",
+      "description": "Business workflow & domain knowledge about BVMS — architecture, components, features, typical use cases. Ask this delegate 'how does BVMS work / what does it do' questions.",
+      "context_window": {
+        "conversation_awareness_tokens": 1500,
+        "cognitive_tokens": 4000,
+        "context_tokens": 28000,
+        "answering_tokens": 10000
+      },
+      "tools": [
+        {
+          "type": "Supabase",
+          "function_name": "match_n8n_documents_bvms_neo",
+          "ranking": true,
+          "when": "Primary source for how BVMS works: architecture, components, business workflows, and features."
+        }
+      ]
+    },
+    {
+      "agent_id": "bvms-code-knowledge",
+      "description": "Deep technical & code aspects of BVMS — internal workings, code structure, APIs, implementation details. Ask this delegate 'how is it built / where in the code' questions.",
+      "context_window": {
+        "conversation_awareness_tokens": 1500,
+        "cognitive_tokens": 6000,
+        "context_tokens": 34000,
+        "answering_tokens": 18000
+      },
+      "tools": [
+        {
+          "type": "Supabase",
+          "function_name": "match_n8n_code_bvms_neo",
+          "ranking": true,
+          "when": "Primary source for code-level questions: internals, code structure, APIs, and implementation details."
+        },
+        {
+          "type": "RunPythonTool",
+          "approval": false,
+          "when": "A quick calculation or code snippet must be executed to verify behavior."
+        }
+      ]
+    }
+  ]
+}
