@@ -1,5 +1,7 @@
 ## Git Clone
 
+08.06.2026
+
 ```sh
 git clone --recurse-submodules https://github.com/NguyenPhamCode4You/ai-home-lab-docker-compose.git
 ```
