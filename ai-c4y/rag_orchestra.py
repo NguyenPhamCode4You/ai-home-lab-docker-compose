@@ -25,7 +25,7 @@ assistant = AssistantOrchestra(
         llm_model=default_model,
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=OpenRouter(model='google/gemma-4-26b-a4b-it'),
+        llm_model=default_model,
     ),
     llm_answer_evaluator=AnswerEvaluator(
         llm_model=default_model,

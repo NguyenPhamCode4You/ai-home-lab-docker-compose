@@ -26,7 +26,7 @@ services:
     env_file:
       - .env
     environment:
-      TOKENS_LENGTH: 30000
+      TOKENS_LENGTH: 36000
       CHARS_PER_TOKEN: 10
       OPENROUTER_MAX_TOKENS: 120000
       OPENROUTER_NO_THINK: true
@@ -43,10 +43,10 @@ services:
     env_file:
       - .env
     environment:
-      TOKENS_LENGTH: 80000
+      TOKENS_LENGTH: 60000
       CHARS_PER_TOKEN: 10
-      OLLAMA_GENERAL_MODEL: qwen2.5-coder:7b
-      OLLAMA_CODE_MODEL: qwen2.5-coder:7b
+      OLLAMA_GENERAL_MODEL: qwen3.6:27b
+      OLLAMA_CODE_MODEL: qwen3.6:27b
       OPENROUTER_MAX_TOKENS: 120000
       OPENROUTER_NO_THINK: true
     networks:
