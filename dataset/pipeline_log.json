@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-06-27 15:08:29",
+  "total_time_seconds": 30.057631492614746,
+  "total_time_minutes": 0.5009605248769124,
+  "steps": {
+    "01_download_fineweb.py": false
+  },
+  "summary": {
+    "total_steps": 1,
+    "completed": 0,
+    "failed": 1
+  }
+}

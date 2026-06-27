@@ -1,4 +1,6 @@
-# Dataset Generation Dependencies
+# Dataset Generation Dependencies Only
+# Training dependencies (Unsloth, PEFT, TRL) are in a separate environment
+
 # Core
 datasets>=2.14.0
 numpy>=1.24.0
@@ -6,18 +8,7 @@ pandas>=2.0.0
 
 # HuggingFace
 transformers>=4.35.0
-accelerate>=0.24.0
 huggingface_hub>=0.19.0
-
-# Unsloth (for training later)
-unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git@v2024.6
-
-# PEFT & bitsandbytes for LoRA/QLoRA
-peft>=0.7.0
-bitsandbytes>=0.42.0
-
-# TRL for instruction tuning
-trl>=0.7.0
 
 # Utilities
 tqdm>=4.66.0
