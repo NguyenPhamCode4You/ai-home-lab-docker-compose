@@ -9,6 +9,7 @@ import json
 import logging
 from pathlib import Path
 from datasets import load_dataset
+from config import DATA_SOURCES
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -16,8 +17,11 @@ logger = logging.getLogger(__name__)
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Read limits from config
+MAX_SWE_BENCH = DATA_SOURCES["swe_bench"]["max_examples"]
 
-def download_swe_bench(max_examples: int = 5000) -> str:
+
+def download_swe_bench(max_examples: int = MAX_SWE_BENCH) -> str:
     """
     Download SWE-bench dataset and extract reasoning patterns.
     
