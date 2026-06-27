@@ -18,25 +18,23 @@ OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def download_fineweb(output_file: str = "fineweb_raw.jsonl", max_samples: int = 500000) -> str:
+def download_fineweb(output_file: str = "fineweb_raw.jsonl", max_samples: int = 100000) -> str:
     """
     Download FineWeb dataset and convert to our reasoning format.
     
     FineWeb is used for general language quality adaptation.
     We don't train reasoning here - just language foundation.
     """
-    logger.info(f"Loading FineWeb from HuggingFace (subset: sample-10bt)...")
+    logger.info(f"Loading FineWeb from HuggingFace (subset: sample-10BT)...")
     
     # Load a manageable subset of FineWeb
-    dataset = load_dataset("HuggingFaceFW/fineweb", "sample-10bt", split="train", streaming=True)
+    dataset = load_dataset("HuggingFaceFW/fineweb", "sample-10BT", split="train", streaming=True)
     
     count = 0
     written = 0
     with open(OUTPUT_DIR / output_file, "w", encoding="utf-8") as f:
         for item in dataset:
             count += 1
-            if count > max_samples:
-                break
             
             # Extract text content
             text = item.get("text", "")
@@ -56,7 +54,10 @@ def download_fineweb(output_file: str = "fineweb_raw.jsonl", max_samples: int = 
             written += 1
             
             if written % 10000 == 0:
-                logger.info(f"  Written {written} samples ({count} seen)...")
+                logger.info(f"  Written {written} samples ({count} seen).")
+            
+            if written >= max_samples:
+                break
     
     logger.info(f"FineWeb download complete: {written} samples written to {output_file}")
     return str(OUTPUT_DIR / output_file)
