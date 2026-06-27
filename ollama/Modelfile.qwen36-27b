@@ -1,0 +1,13 @@
+FROM qwen3.6:27b
+
+PARAMETER num_ctx 172032
+PARAMETER stop "</s>"
+PARAMETER stop "<|im_end|>"
+
+TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
+
+{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>
+
+{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>
+
+{{ .Response }}<|eot_id|>"""
