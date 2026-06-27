@@ -9,6 +9,7 @@ import json
 import logging
 from pathlib import Path
 from datasets import load_dataset
+from config import DATA_SOURCES
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -16,8 +17,13 @@ logger = logging.getLogger(__name__)
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Read limits from config
+MAX_STACK = DATA_SOURCES["the_stack"]["max_examples"]
+MAX_SEARCHNET = DATA_SOURCES["codesearchnet"]["max_examples"]
+MAX_APPS = DATA_SOURCES["apps"]["max_examples"]
 
-def extract_code_reasoning_from_stack(max_samples: int = 20000) -> str:
+
+def extract_code_reasoning_from_stack(max_samples: int = MAX_STACK) -> str:
     """
     Extract problem → reasoning from The Stack v2.
     We want the reasoning path, not the final code answer.
@@ -79,7 +85,7 @@ def extract_code_reasoning_from_stack(max_samples: int = 20000) -> str:
     return str(output_file)
 
 
-def extract_code_search_net(max_samples: int = 10000) -> str:
+def extract_code_search_net(max_samples: int = MAX_SEARCHNET) -> str:
     """
     Extract problem → reasoning from CodeSearchNet.
     Code search pairs are great for reasoning about code intent.
@@ -89,7 +95,7 @@ def extract_code_search_net(max_samples: int = 10000) -> str:
     output_file = OUTPUT_DIR / "code_searchnet_reasoning.jsonl"
     written = 0
     
-    dataset = load_dataset("code_search_net", split="test", streaming=True)
+    dataset = load_dataset("code-search-net/code_search_net", split="test", streaming=True)
     
     with open(output_file, "w", encoding="utf-8") as f:
         for item in dataset:
@@ -120,7 +126,7 @@ def extract_code_search_net(max_samples: int = 10000) -> str:
     return str(output_file)
 
 
-def extract_apps_reasoning(max_samples: int = 10000) -> str:
+def extract_apps_reasoning(max_samples: int = MAX_APPS) -> str:
     """
     Extract problem → reasoning from APPS dataset.
     Programming problems with test cases - extract the reasoning path.
@@ -130,7 +136,7 @@ def extract_apps_reasoning(max_samples: int = 10000) -> str:
     output_file = OUTPUT_DIR / "apps_reasoning.jsonl"
     written = 0
     
-    dataset = load_dataset("hendrycks/apps", split="train", streaming=True)
+    dataset = load_dataset("codeparrots", split="train", streaming=True)
     
     with open(output_file, "w", encoding="utf-8") as f:
         for item in dataset:
@@ -173,7 +179,7 @@ def main():
     files = []
     files.append(extract_code_reasoning_from_stack())
     files.append(extract_code_search_net())
-    files.append(extract_apps_reasoning())
+    # files.append(extract_apps_reasoning())
     
     total = sum(1 for f in files for _ in open(f))
     logger.info(f"\nTotal code reasoning samples: {total}")
