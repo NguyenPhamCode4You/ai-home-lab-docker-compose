@@ -13,15 +13,15 @@ load_dotenv()
 
 # code_answer_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
 # code_answer_model = OpenRouter(model='anthropic/claude-opus-4.7')
-simple_task_model           = Ollama(model="qwen2.5-coder:7b", num_ctx=30000)
-code_answer_model           = OpenRouter(model='anthropic/claude-sonnet-4.6')
-evaluation_model            = OpenRouter(model='google/gemma-4-26b-a4b-it')
+simple_task_model           = Ollama(model="qwen3.6:27b", think=False)
+code_answer_model           = Ollama(model="qwen3.6:27b", think=False)
+evaluation_model            = Ollama(model="qwen3.6:27b", think=False)
 
 bvms_code_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_code_be_quick",
     document_match_count=250,  # lower than default 200 — large table needs an index; reduce scan cost until index is created
     llm_document_ranking=DocumentRanking(
-        llm_model=simple_task_model,
+        llm_model=Ollama(model="gemma3:4b"),
     ),
     llm_rag_answer=GeneralRagAnswer(
         llm_model=code_answer_model,

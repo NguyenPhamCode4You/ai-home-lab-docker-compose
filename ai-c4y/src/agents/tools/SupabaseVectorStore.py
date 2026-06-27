@@ -1,6 +1,8 @@
+import asyncio
 import os
 from typing import List
 import requests
+import httpx
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -98,3 +100,34 @@ class SupabaseVectorStore:
             context = "\n".join(docs)
             sections.append({"title": title, "counts": counts, "context": context})
         return sections
+
+    # ── Async methods (httpx) ──────────────────────────────────────────────
+    # Existing sync methods are unchanged for backward compatibility.
+    # New framework code should use these async variants.
+
+    async def async_query(self, function_name: str, question: str, match_count: int = 200) -> List[dict]:
+        """Async version of query() — uses httpx.AsyncClient.
+        The embedding call is still sync (requests); it runs in a thread pool
+        so it does not block the event loop.
+        """
+        loop = asyncio.get_event_loop()
+        embedding = await loop.run_in_executor(None, self.embedding.run, question)
+        rpc_endpoint = f"{self.url}/rest/v1/rpc/{function_name}"
+        payload = {"query_embedding": embedding, "match_count": match_count, "filter": {}}
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0)) as client:
+            response = await client.post(rpc_endpoint, headers=self.headers, json=payload)
+        if response.status_code != 200:
+            raise Exception(f"Failed to execute RPC: {response.status_code}, {response.text}")
+        return response.json()
+
+    async def async_get_documents_string(self, function_name: str, question: str, match_count: int = 200) -> str:
+        """Async version of get_documents_string()."""
+        documents = await self.async_query(function_name, question, match_count)
+        sections = self.organize_documents(documents)
+        context_result = ""
+        for section in sections:
+            title = section["title"]
+            if "#" not in title:
+                title = f"# {title}"
+            context_result += f"{title}\n\n{section['context']}\n\n"
+        return context_result

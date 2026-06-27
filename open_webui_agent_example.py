@@ -8,7 +8,7 @@ class Pipe:
     class Valves(BaseModel):
         bvms_rag_url: str = Field(
             # default="http://10.13.13.12:8001/api/answer/stream",
-            default="https://yoga-bvms-rag.sandrasoft.app/api/answer/stream",
+            default="https://agi-bvms-rag-orchestra.sandrasoft.app/api/answer/stream",
         )
 
     def __init__(self):
