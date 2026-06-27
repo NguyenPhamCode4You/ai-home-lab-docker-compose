@@ -141,18 +141,21 @@ DATA_SOURCES = {
         "url": "https://huggingface.co/datasets/bigcode/the-stack",
         "languages": ["python", "javascript", "typescript", "go", "rust", "java", "csharp"],
         "output_file": "code_reasoning.jsonl",
+        "max_examples": 20000,
     },
     "codesearchnet": {
         "name": "CodeSearchNet",
         "description": "Code search pairs for reasoning extraction",
         "url": "https://huggingface.co/datasets/code_search_net",
         "output_file": "code_searchnet_reasoning.jsonl",
+        "max_examples": 10000,
     },
     "apps": {
         "name": "APPS",
         "description": "Programming problems with reasoning paths",
         "url": "https://huggingface.co/datasets/hendrycks/apps",
         "output_file": "apps_reasoning.jsonl",
+        "max_examples": 10000,
     },
     "swe_bench": {
         "name": "SWE-bench",
