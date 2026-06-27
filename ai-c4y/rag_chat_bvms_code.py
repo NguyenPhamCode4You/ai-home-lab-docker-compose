@@ -13,9 +13,9 @@ load_dotenv()
 
 # code_answer_model = OpenRouter(model='qwen/qwen3.6-35b-a3b')
 # code_answer_model = OpenRouter(model='anthropic/claude-opus-4.7')
-simple_task_model           = Ollama(model="qwen3.6:27b", think=False)
-code_answer_model           = Ollama(model="qwen3.6:27b", think=False)
-evaluation_model            = Ollama(model="qwen3.6:27b", think=False)
+simple_task_model           = Ollama(model="qwen3.6:27b", num_ctx=100000)
+code_answer_model           = Ollama(model="qwen3.6:27b", num_ctx=100000)
+evaluation_model            = Ollama(model="qwen3.6:27b", num_ctx=100000)
 
 bvms_code_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_code_be_quick",
