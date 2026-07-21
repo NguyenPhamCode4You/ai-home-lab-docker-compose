@@ -2,6 +2,10 @@
   "agent_id": "bvms-assistant",
   "description": "Top orchestrator. Answers BVMS questions by combining domain knowledge, code analysis, and diagrams, delegating to specialist sub-agents when needed.",
 
+  "when": "Answer directly only when the question is simple/general and needs no knowledge-base lookup, code analysis, or diagram; otherwise decompose and delegate.",
+
+  "wip": "wip/bvms-assistant",
+
   "context_window": {
     "conversation_awareness_tokens": 800,
     "cognitive_tokens": 7200,
@@ -9,7 +13,9 @@
     "answering_tokens": 9200
   },
 
-  "max_iterations_untill_give_up": 5,
+  "max_iterations_untill_give_up": 50,
+  "max_iterations_untill_give_up_and_switch_model": 5,
+  "max_infra_retries_per_model": 3,
 
   "models": [
     {
@@ -51,7 +57,36 @@
   "tools": [
     {
       "type": "ReadFileTool",
+      "root": "wip/bvms-assistant",
       "when": "The user references a specific local file whose contents are needed to answer."
+    },
+    {
+      "type": "SearchFileTool",
+      "root": "wip/bvms-assistant",
+      "kind": "content",
+      "when": "You need to locate a file by name/glob or find where a term/symbol appears before reading it."
+    },
+    {
+      "type": "WriteFileTool",
+      "root": "wip/bvms-assistant",
+      "mode": "overwrite",
+      "approval": false,
+      "when": "You must persist an artifact (notes, generated code, a report) to disk inside the sandbox root."
+    },
+    {
+      "type": "TodoTool",
+      "when": "At the start of a multi-step task, and whenever the plan changes: write/refresh the run's checklist so the agent stays on task across iterations."
+    },
+    {
+      "type": "VectorMemoryTool",
+      "function_name": "match_agent_memory",
+      "write_function_name": "insert_agent_memory",
+      "when": "Recall durable facts learned in previous runs, or remember a new durable fact worth reusing later."
+    },
+    {
+      "type": "SkillTool",
+      "skills_dir": "skills",
+      "when": "A recurring, well-defined procedure applies (e.g. 'extract-business-rules'); load the matching skill's steps on demand."
     },
     {
       "type": "GenerateDiagramTool",
@@ -63,6 +98,7 @@
     {
       "agent_id": "bvms-general-knowledge",
       "description": "Business workflow & domain knowledge about BVMS — architecture, components, features, typical use cases. Ask this delegate 'how does BVMS work / what does it do' questions.",
+      "when": "The question concerns how BVMS behaves for the business: architecture, components, features, workflows, or use cases (not code internals).",
       "context_window": {
         "conversation_awareness_tokens": 1500,
         "cognitive_tokens": 4000,
@@ -81,6 +117,7 @@
     {
       "agent_id": "bvms-code-knowledge",
       "description": "Deep technical & code aspects of BVMS — internal workings, code structure, APIs, implementation details. Ask this delegate 'how is it built / where in the code' questions.",
+      "when": "The question needs code-level ground truth: internals, code structure, APIs, or implementation details.",
       "context_window": {
         "conversation_awareness_tokens": 1500,
         "cognitive_tokens": 6000,
