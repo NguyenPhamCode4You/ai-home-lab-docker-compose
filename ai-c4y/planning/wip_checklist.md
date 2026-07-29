@@ -15,17 +15,17 @@
 **Global validation gates (must stay green after every phase):**
 
 - `pytest -q` passes for everything built so far.
-- No request ever exceeds the selected model's `max_tokens` (four-tier sum + system overhead).
+- No request ever exceeds the selected model's `max_tokens` (tiers are fractions of it that sum to < 1).
 - `raw_worklog.log` is **only ever appended to** (never rewritten); every `cognitive_index` pointer still resolves to a valid line range.
 
 ---
 
 ## Phase 0 — Foundation primitives 🟡
 
-_Goal: the budget, model-ladder, and four-file `wip` logging primitives everything else stands on._
+_Goal: the budget, model-ladder, and four-file `worklog` logging primitives everything else stands on._
 
 - [ ] **1. Orient on the model.**
-  - _Read:_ §1–§3 (four-tier budget), §4 (ladder), §8 + §17 (four-file `wip`), §11 (layout), §12 Phase 0.
+  - _Read:_ §1–§3 (four-tier budget), §4 (ladder), §8 + §17 (four-file `worklog`), §11 (layout), §12 Phase 0.
   - _Do:_ Sketch the data flow `raw_worklog → cognitive_index → context_window → response_window` on paper; list which primitives are **new** vs. **rework**.
   - _Validate:_ You can state, in one sentence each, what each of the four files holds and who writes it.
 - [ ] **2. Inventory existing code.**
@@ -37,17 +37,17 @@ _Goal: the budget, model-ladder, and four-file `wip` logging primitives everythi
   - _Do:_ Create `src/framework/tokens.py` with `count_tokens(text) -> int` (char-approx now, pluggable tokenizer seam for P2).
   - _Validate:_ `count_tokens("abc"*100)` ≈ `len/CHARS_PER_TOKEN`; unit test asserts monotonicity.
 - [ ] **4. `ContextWindow` skeleton.**
-  - _Read:_ §2 (`context_window` field), §3 (tier table + defaults).
-  - _Do:_ Create `src/framework/ContextWindow.py` — a class holding the four tier budgets (`conversation_awareness_tokens` default **800**, others required).
-  - _Validate:_ Construct from the §13a parent dict (800/7200/24000/9200); attributes read back exactly.
+  - _Read:_ §2 (`context_window_breakdown` field), §3 (tier table + defaults).
+  - _Do:_ Create `src/framework/ContextWindow.py` — a class holding the three tier fractions (`conversation_history_awareness` default **0.025**, `cognitive_reflection_behavior`, `current_working_attention`; the remainder is the answer).
+  - _Validate:_ Construct from the §13a parent dict (0.025 / 0.325 / 0.525); attributes read back exactly.
 - [ ] **5. Cascade-on-zero donation.**
-  - _Read:_ §3 (the `conversation_awareness_tokens = 0` rule).
-  - _Do:_ Implement: when a tier's budget is `0`, donate it to the next tier ("stop listening to chat, think harder").
-  - _Validate:_ Set `conversation_awareness_tokens=0`; assert its budget rolls into `cognitive`/`context`.
-- [ ] **6. Required-token auto-inference.**
-  - _Read:_ §3 (prompt-assembly block), §4 (`max_tokens: "auto"`).
-  - _Do:_ `ContextWindow.required_tokens()` = sum of the four in-prompt tiers + a system-overhead constant.
-  - _Validate:_ For the parent budget, `required_tokens()` ≈ 41,200 + overhead; asserted in a test.
+  - _Read:_ §3 (the `conversation_history_awareness = 0` rule).
+  - _Do:_ Implement: when a tier's fraction is `0`, donate it to the next tier ("stop listening to chat, think harder").
+  - _Validate:_ Set `conversation_history_awareness=0`; assert its budget rolls into `cognitive_reflection_behavior`/`current_working_attention`.
+- [ ] **6. Resolve tier budgets from fractions.**
+  - _Read:_ §3 (fractions × `max_tokens`), §4 (`max_tokens: "auto"`).
+  - _Do:_ `ContextWindow.resolve(max_tokens)` → each tier's token budget = its fraction × `max_tokens`; the leftover (1 − Σfractions) is the answer budget.
+  - _Validate:_ For gpt-oss (62,000) the parent's 0.025 / 0.325 / 0.525 resolve to ≈ 1,550 / 20,150 / 32,550 (≈ 7,750 to answer); asserted in a test.
 - [ ] **7. Per-tier trim.**
   - _Read:_ §3 (budget/compaction column), §12 Phase 2 budget-enforcement note.
   - _Do:_ `trim(tier, text)` truncates a tier's text to its budget using `count_tokens`.
@@ -55,7 +55,7 @@ _Goal: the budget, model-ladder, and four-file `wip` logging primitives everythi
 - [ ] **8. Compaction signals.**
   - _Read:_ §3 core-loop invariant, §8 (progressive reflection).
   - _Do:_ Expose `size()` and `needs_compaction()` on `ContextWindow` (actual 50% compaction lives in `Reflector`, Phase 1).
-  - _Validate:_ `needs_compaction()` flips true once `context + cognitive` exceed their budgets.
+  - _Validate:_ `needs_compaction()` flips true once `current_working_attention + cognitive_reflection_behavior` exceed their budgets.
 - [ ] **9. `ContextWindow` unit tests.**
   - _Read:_ §15.1 (unit list).
   - _Do:_ `tests/framework/test_context_window.py` covering budgets, cascade, auto-infer, trim, compaction signal.
@@ -64,25 +64,25 @@ _Goal: the budget, model-ladder, and four-file `wip` logging primitives everythi
   - _Read:_ §4 (models table), §11 (`ModelChain.py`), the existing `Ollama` / `OpenRouter` clients.
   - _Do:_ Create `src/framework/ModelChain.py`: parse `models[]`; factory `ollama→Ollama`, `open_router→OpenRouter`.
   - _Validate:_ Build the §13a two-model ladder; `chain[0]` is the Ollama client, `chain[1]` the OpenRouter one.
-- [ ] **11. Budget-aware selection + `"auto"`.**
-  - _Read:_ §4 ("Selection & the ladder"), §3 (`required_tokens`).
-  - _Do:_ Select the first reachable model whose `max_tokens ≥ required_tokens()`; `"auto"`/omitted sizes to the budget.
-  - _Validate:_ With required=41,200 the 62,000 Ollama wins; raise required above it and the `"auto"` cloud model is chosen.
-- [ ] **12. Quality budget + switch.**
-  - _Read:_ §2 (`max_iterations_untill_give_up_and_switch_model`, default **5**), §4 (quality budget), §16 #3.
-  - _Do:_ Track quality failures per model; on reaching the budget, advance the ladder pointer and reset the per-model counter.
+- [ ] **11. Reachability selection + `"auto"`.**
+  - _Read:_ §4 ("Selection & the ladder"), §3 (fractions apply to any model).
+  - _Do:_ Select the first **reachable** model on the ladder (health/ping); `"auto"`/omitted `max_tokens` sizes to the platform default before fractions apply.
+  - _Validate:_ With the top model reachable it wins; mark it unreachable and the next model is chosen.
+- [ ] **12. Retry budget + switch.**
+  - _Read:_ §2 (`max_retries_untill_switching_models`, default **5**), §4 (retry budget), §16 #3.
+  - _Do:_ Track retries per model (quality self-eval + infra combined); on reaching the budget, advance the ladder pointer and reset the per-model counter.
   - _Validate:_ Feed 5 "not good enough" verdicts; assert the active model advances to index 1.
-- [ ] **13. Separate infra budget.**
-  - _Read:_ §2 (`max_infra_retries_per_model`, default **3**), §4 (infra budget), §16 #3.
-  - _Do:_ Track infra failures (timeout/HTTP/unreachable) on a **separate** counter; exhausting it falls through **without** consuming the quality budget.
-  - _Validate:_ Inject 3 timeouts; assert model advances and the quality counter is untouched.
+- [ ] **13. Infra failures share the budget.**
+  - _Read:_ §2 (`max_retries_untill_switching_models`), §4 (one budget for quality + infra), §16 #3.
+  - _Do:_ Count infra failures (timeout/HTTP/unreachable) against the **same** counter as quality failures; exhausting it advances the ladder.
+  - _Validate:_ Mix 3 timeouts + 2 bad verdicts (= 5); assert the model advances after the 5th.
 - [ ] **14. Success resets the ladder.**
   - _Read:_ §4 ("Success resets the ladder").
   - _Do:_ After a successful iteration, reset the ladder pointer to the **top** model for the next iteration.
   - _Validate:_ Advance to model 1, then a success; next selection starts again at model 0.
 - [ ] **15. `ModelChain` unit tests.**
   - _Read:_ §15.1.
-  - _Do:_ `tests/framework/test_model_chain.py` with stub clients: selection-by-budget, quality switch (5), infra switch (3), success-reset, ladder exhaustion.
+  - _Do:_ `tests/framework/test_model_chain.py` with stub clients: reachability selection, retry switch (5, quality + infra combined), success-reset, ladder exhaustion.
   - _Validate:_ `pytest tests/framework/test_model_chain.py` green.
 - [ ] **16. `RawWorklog` (append-only).**
   - _Read:_ §8 (`raw_worklog.log` row), §17 (block delimiters + line ranges).
@@ -96,10 +96,10 @@ _Goal: the budget, model-ladder, and four-file `wip` logging primitives everythi
   - _Read:_ §8 (`context_window.log` / `response_window.log`, "one serialized writer").
   - _Do:_ Create `ContextWindowLog.py`, `ResponseWindow.py`, and `Worklog.py` coordinating all four behind **one** serialized writer (`asyncio.Lock`/queue).
   - _Validate:_ Two concurrent `append` calls never interleave (blocks stay whole in `raw_worklog`).
-- [ ] **19. `RunLogger` owns `wip/<run_id>/`.**
+- [ ] **19. `RunLogger` owns `<worklog_folder>/<run_id>/`.**
   - _Read:_ §8 (folder tree), §17.
-  - _Do:_ Rework `logging/RunLogger.py` to create `wip/<run_id>/` and emit terminal + per-block events through the `Worklog` writer.
-  - _Validate:_ After a fake run, `wip/<run_id>/` contains `raw_worklog.log`, `cognitive_index.jsonl`, `context_window.log`, `response_window.log`.
+  - _Do:_ Rework `logging/RunLogger.py` to create `<worklog_folder>/<run_id>/` and emit terminal + per-block events through the `Worklog` writer.
+  - _Validate:_ After a fake run, `<worklog_folder>/<run_id>/` contains `raw_worklog.log`, `cognitive_index.jsonl`, `context_window.log`, `response_window.log`.
 - [ ] **20. Progressive reflection (50%) — integrity.**
   - _Read:_ §3 (compaction), §8 ("Progressive reflection").
   - _Do:_ Implement `CognitiveIndex.compact(0.5)` + `ContextWindowLog.compact(0.5)` (merge pointers / drop stale blocks); `raw_worklog` untouched.
@@ -112,7 +112,7 @@ _Goal: the budget, model-ladder, and four-file `wip` logging primitives everythi
 _Goal: a single `ProgressiveAgentSLM` that retrieves, routes, calls a tool, delegates once, and streams an answer through `create_chat_backend`._
 
 - [ ] **1. Orient on the object + loop.**
-  - _Read:_ §2 (object table), §5 (reasoning), §6 (tools), §7 (delegates), §10 (control flow), §12 Phase 1, §14 (reuse map).
+  - _Read:_ §2 (object table), §5 (cognitive_behavior), §6 (tools), §7 (delegates), §10 (control flow), §12 Phase 1, §14 (reuse map).
   - _Do:_ List the per-step loop stages (retrieve → assemble → select model → route/act → answer → flush → self-eval).
   - _Validate:_ You can name, for each stage, the primitive from Phase 0 it uses.
 - [ ] **2. Read the code to rework.**
@@ -120,17 +120,17 @@ _Goal: a single `ProgressiveAgentSLM` that retrieves, routes, calls a tool, dele
   - _Do:_ Mark exactly what to keep vs. rewrite for recursion.
   - _Validate:_ Notes reference concrete method names you will reuse.
 - [ ] **3. `AgentConfig` fields.**
-  - _Read:_ §2 (all fields incl. `when`, `wip`, the three iteration budgets).
-  - _Do:_ Rework `AgentConfig.py` to parse every §2 field with the documented defaults (50 / 5 / 3).
+  - _Read:_ §2 (all fields incl. `system_prompt`, `worklog_folder`, `max_retries_untill_switching_models`).
+  - _Do:_ Rework `AgentConfig.py` to parse every §2 field with the documented default (retry budget **5**).
   - _Validate:_ Loading the §13a parent dict yields all fields; missing optionals fall back to defaults.
 - [ ] **4. Delegate inheritance.**
   - _Read:_ §2 inheritance note, §7, §13a ("omit `models`… inherit").
-  - _Do:_ In `AgentConfig`, inherit `models` + the three iteration budgets + shared `wip` from parent; keep `context_window`/`reasoning`/`tools`/`when` per-agent.
-  - _Validate:_ A delegate omitting `models` reports the parent's ladder but its **own** `context_window`.
+  - _Do:_ In `AgentConfig`, inherit `models` + `max_retries_untill_switching_models` + shared `worklog_folder` from parent; keep `context_window_breakdown`/`system_prompt`/`cognitive_behavior`/`tools` per-agent.
+  - _Validate:_ A delegate omitting `models` reports the parent's ladder but its **own** `context_window_breakdown`.
 - [ ] **5. Config unit test.**
   - _Read:_ §15.1.
   - _Do:_ `tests/framework/test_agent_config.py`: defaults, inheritance, per-agent isolation.
-  - _Validate:_ `pytest` green; asserts delegate keeps own budget, shares `wip`.
+  - _Validate:_ `pytest` green; asserts delegate keeps own budget, shares `worklog_folder`.
 - [ ] **6. `ToolRegistry` + base.**
   - _Read:_ §6 (each tool carries `when`), §11 (`ToolRegistry.py`).
   - _Do:_ Ensure `Tool` base has `name`, `description`, `when`, async `run`/`stream`; registry dispatches by `type`.
@@ -139,21 +139,21 @@ _Goal: a single `ProgressiveAgentSLM` that retrieves, routes, calls a tool, dele
   - _Read:_ §6 (Supabase row), §14 (`SupabaseVectorStore.async_query`).
   - _Do:_ Create `tools/SupabaseTool.py`: pgvector RPC via `async_query`; take `function_name`; leave `ranking` as a flag (path in Phase 2).
   - _Validate:_ Against a stub store, calling with `match_n8n_documents_bvms_neo` invokes `async_query` with that function name.
-- [ ] **8. `ReadFileTool` (sandboxed).**
+- [ ] **8. `ReadFileTool` (traversal-safe).**
   - _Read:_ §6 (`ReadFileTool` row), §10 (tool safety).
-  - _Do:_ Rework `tools/ReadFileTool.py`: sandbox to `root` (default the `wip` folder); reject path traversal / absolute escapes.
-  - _Validate:_ Read inside `root` works; `../` and absolute paths raise (OWASP A01/A03).
+  - _Do:_ Rework `tools/ReadFileTool.py`: resolve paths under the run's `worklog_folder`; reject path traversal / absolute escapes.
+  - _Validate:_ Read inside `worklog_folder` works; `../` and absolute paths raise (OWASP A01/A03).
 - [ ] **9. `TodoTool`.**
   - _Read:_ §6 (`TodoTool` row), §5 (todo checklist).
-  - _Do:_ Create `tools/TodoTool.py`: model **rewrites the whole list** `[{id, content, status: pending|in_progress|completed}]` into `wip/todo.md`.
+  - _Do:_ Create `tools/TodoTool.py`: model **rewrites the whole list** `[{id, content, status: pending|in_progress|completed}]` into `<worklog_folder>/todo.md`.
   - _Validate:_ Writing a list then reading returns it verbatim; malformed status rejected.
-- [ ] **10. `Router` (when-prune + route).**
-  - _Read:_ §7 (prune-then-route), §14 (`_parse_agent_routing`).
-  - _Do:_ Create `agents/Router.py`: prune the delegate/tool menu to `when`-matches, then pick via generalized `_parse_agent_routing` (`delegate:<agent_id>`); parent's own `when` gates direct-answer.
-  - _Validate:_ Given a code question, only the code delegate survives pruning and is selected.
+- [ ] **10. `Router` (route by description).**
+  - _Read:_ §7 (route by description), §14 (`_parse_agent_routing`).
+  - _Do:_ Create `agents/Router.py`: choose delegate(s) by `description` via generalized `_parse_agent_routing` (`delegate:<agent_id>`); prune the **tool** menu by each tool's `when`.
+  - _Validate:_ Given a code question, the code delegate is selected by its `description`.
 - [ ] **11. `Reflector` (50% compaction).**
   - _Read:_ §8 (reflection), §14 (`KnowledgeCompression`, `IterationSummarizer`).
-  - _Do:_ Rework `agents/Reflector.py` to compact `context_window` + `cognitive_index` to 50% (reusing the compression primitives).
+  - _Do:_ Rework `agents/Reflector.py` to compact `context_window.log` + `cognitive_index` to 50% (reusing the compression primitives).
   - _Validate:_ Over-budget input returns ~half-size output; `raw_worklog` untouched; pointers still resolve.
 - [ ] **12. `ProgressiveAgentSLM` skeleton.**
   - _Read:_ §2, §11 (class responsibilities).
@@ -164,56 +164,56 @@ _Goal: a single `ProgressiveAgentSLM` that retrieves, routes, calls a tool, dele
   - _Do:_ Implement per-step retrieval: `cognitive_index.search(question)` → pull matching line ranges from `raw_worklog` into `context_window`.
   - _Validate:_ With seeded blocks, only relevant blocks enter `context_window` (irrelevant ones excluded).
 - [ ] **14. Prompt assembly.**
-  - _Read:_ §3 (prompt-assembly block), §5 (reasoning render), §6/§7 (when-gated menu).
-  - _Do:_ Build the four-tier prompt: system (description + `when→then` + pruned tool/delegate menu) + awareness + retrieved context + question.
-  - _Validate:_ Rendered prompt contains the reasoning rules and only the pruned menu; total ≤ `required_tokens()`.
+  - _Read:_ §3 (prompt-assembly block), §5 (cognitive_behavior render), §6/§7 (description-routed delegates + when-pruned tools).
+  - _Do:_ Build the four-tier prompt: system (`system_prompt` + `cognitive_behavior` `when→then` + delegate descriptions + pruned tool menu) + awareness + retrieved context + question.
+  - _Validate:_ Rendered prompt contains the `cognitive_behavior` rules and only the pruned tool menu; each tier ≤ its fraction of `max_tokens`.
 - [ ] **15. Model call + streaming answer.**
   - _Read:_ §4 (selection), §14 (`AssistantOrchestra.stream`, `create_chat_backend`).
-  - _Do:_ Call the `ModelChain`-selected model; stream chunks as an async generator of `str`; cap output at `answering_tokens` into `response_window`.
-  - _Validate:_ A stub model yields chunks that stream out; output never exceeds `answering_tokens`.
+  - _Do:_ Call the `ModelChain`-selected model; stream chunks as an async generator of `str`; cap output at the answer-remainder budget into `response_window`.
+  - _Validate:_ A stub model yields chunks that stream out; output never exceeds the answer-remainder budget.
 - [ ] **16. Block flush.**
   - _Read:_ §8 ("write path, per block").
   - _Do:_ On completion, flush `response_window` → `raw_worklog` (get line range) + `cognitive_index` (pointer), then **clear** `response_window`.
   - _Validate:_ After a step, the answer is in `raw_worklog`, indexed, and `response_window` is empty.
 - [ ] **17. Quick self-eval → switch signal.**
-  - _Read:_ §4 (quality budget), §14 (`AnswerEvaluator`), §16 #3.
-  - _Do:_ After each iteration, run a quick self-eval; a "not good enough" verdict increments the `ModelChain` quality counter.
+  - _Read:_ §4 (retry budget), §14 (`AnswerEvaluator`), §16 #3.
+  - _Do:_ After each iteration, run a quick self-eval; a "not good enough" verdict increments the `ModelChain` retry counter.
   - _Validate:_ Repeated bad verdicts trigger a model switch via Phase 0 item 12.
 - [ ] **18. Recursion into delegates.**
   - _Read:_ §7 (hands-down / delivers), §2 inheritance.
   - _Do:_ Run a chosen delegate's own full loop; it writes finished blocks to the **shared** `raw_worklog` under its `agent_id` but returns only its **final** answer to the parent.
   - _Validate:_ Parent receives one final block; `raw_worklog` shows the delegate's full work under its `agent_id`.
 - [ ] **19. Stop conditions.**
-  - _Read:_ §4 (stopping), §7 (depth), §2 (`max_iterations_untill_give_up` = 50).
-  - _Do:_ Enforce global iteration cap + ladder-exhaustion + a recursion-depth cap.
-  - _Validate:_ A never-satisfied stub stops at exactly 50 iterations; deep nesting stops at the recursion cap.
+  - _Read:_ §4 (stopping / ladder exhaustion), §7 (depth).
+  - _Do:_ Enforce ladder-exhaustion (per-model retry budget spent) + a recursion-depth cap.
+  - _Validate:_ A never-satisfied stub stops once the last model's retry budget is spent; deep nesting stops at the recursion cap.
 - [ ] **20. Wire the demo (vertical slice).**
   - _Read:_ §11 (`progressive_agent_slm_demo.py`), §13b, §14 (`create_chat_backend`).
   - _Do:_ Build `progressive_agent_slm_demo.py`: construct the §13b agent → `create_chat_backend` → `uvicorn` on **8001**.
-  - _Validate:_ Boot it, ask one multi-step question; observe streamed think/route/delegate/answer and a populated `wip/<run_id>/`.
+  - _Validate:_ Boot it, ask one multi-step question; observe streamed think/route/delegate/answer and a populated `<worklog_folder>/<run_id>/`.
 
 ---
 
-## Phase 2 — Full tools, reasoning policies, model routing ⬜
+## Phase 2 — Full tools, cognitive_behavior policies, model routing ⬜
 
-_Goal: the complete tool catalog, declarative reasoning, ranking, live budget enforcement, and full-text log search._
+_Goal: the complete tool catalog, declarative cognitive_behavior, ranking, live budget enforcement, and full-text log search._
 
 - [ ] **1. Orient.**
-  - _Read:_ §5 (reasoning), §6 (full tool catalog), §3 (budgets), §8 (read/compaction), §12 Phase 2.
+  - _Read:_ §5 (cognitive_behavior), §6 (full tool catalog), §3 (budgets), §8 (read/compaction), §12 Phase 2.
   - _Do:_ List the seven remaining tools + the policy engine + ranking + budget + search deliverables.
   - _Validate:_ Each maps to a target file in §11.
 - [ ] **2. `SearchFileTool`.**
   - _Read:_ §6 (`SearchFileTool` row), §14 (`FileHanlder`).
-  - _Do:_ Create `tools/SearchFileTool.py`: `kind: name|content` (+ optional `glob`), ripgrep-style; return `path + line + snippet`; sandbox to `root`.
+  - _Do:_ Create `tools/SearchFileTool.py`: search by name or content (+ optional `glob`), ripgrep-style; return `path + line + snippet`; resolve under `worklog_folder`.
   - _Validate:_ Seeded tree returns correct name/content hits; snippet + line number accurate.
-- [ ] **3. Validate `SearchFileTool` sandbox.**
+- [ ] **3. Validate `SearchFileTool` traversal safety.**
   - _Read:_ §10 (tool safety).
   - _Do:_ Add traversal/absolute-escape rejection.
-  - _Validate:_ Searching outside `root` raises (OWASP A01/A03).
+  - _Validate:_ Searching outside `worklog_folder` raises (OWASP A01/A03).
 - [ ] **4. `WriteFileTool`.**
   - _Read:_ §6 (`WriteFileTool` row), §10 (safety), §14 (`FileHanlder`).
-  - _Do:_ Create `tools/WriteFileTool.py`: `mode: overwrite|append`, `root` sandbox, path-traversal rejection, optional approval hook (default allow).
-  - _Validate:_ Overwrite vs. append both work inside `root`; escape rejected; approval=deny blocks the write.
+  - _Do:_ Create `tools/WriteFileTool.py`: overwrite-or-append write, resolve under `worklog_folder`, path-traversal rejection, optional `require_approval` (default false).
+  - _Validate:_ Overwrite vs. append both work inside `worklog_folder`; escape rejected; `require_approval: true` gates the write.
 - [ ] **5. `VectorMemoryTool`.**
   - _Read:_ §6 (`VectorMemoryTool` row), §14 (`SupabaseVectorStore` + `Embedding`), §16 #9.
   - _Do:_ Create `tools/VectorMemoryTool.py`: `recall(query, k)` (`function_name`) + `remember(text, tags?)` (`write_function_name`) over a Supabase memory table.
@@ -228,8 +228,8 @@ _Goal: the complete tool catalog, declarative reasoning, ranking, live budget en
   - _Validate:_ Output parses as a valid ```mermaid block.
 - [ ] **8. `RunPythonTool`.**
   - _Read:_ §6 row, §10 (autonomous-exec warning), §14 (`PythonCodeExecute`).
-  - _Do:_ Create `tools/RunPythonTool.py` wrapping `PythonCodeExecute`; optional approval (default allow); capture stdout/stderr.
-  - _Validate:_ A snippet returns its stdout; approval=deny blocks execution.
+  - _Do:_ Create `tools/RunPythonTool.py` wrapping `PythonCodeExecute`; optional `require_approval` (default false); capture stdout/stderr.
+  - _Validate:_ A snippet returns its stdout; `require_approval: true` gates execution.
 - [ ] **9. `FileKnowledgeTool`.**
   - _Read:_ §9 (knowledge sources), §6.
   - _Do:_ Create `tools/FileKnowledgeTool.py` as a files-type knowledge source.
@@ -238,9 +238,9 @@ _Goal: the complete tool catalog, declarative reasoning, ranking, live budget en
   - _Read:_ §6 (menu pruning), §7.
   - _Do:_ Register every tool in `ToolRegistry`; confirm each exposes a `when` used by the `Router` pruner.
   - _Validate:_ For a given step, only `when`-matching tools appear in the assembled menu.
-- [ ] **11. `ReasoningPolicy` engine.**
-  - _Read:_ §5 (render each iteration + todo), §11 (`ReasoningPolicy.py`).
-  - _Do:_ Create `ReasoningPolicy.py`: render `when → then` rules into the system prompt every iteration; also surface them as the todo checklist.
+- [ ] **11. `CognitiveBehavior` engine.**
+  - _Read:_ §5 (render each iteration + todo), §11 (`CognitiveBehavior.py`).
+  - _Do:_ Create `CognitiveBehavior.py`: render `cognitive_behavior` `when → then` rules into the system prompt every iteration; also surface them as the todo checklist.
   - _Validate:_ The prompt contains each rule as "When …, then …".
 - [ ] **12. Baseline policies.**
   - _Read:_ §5 (recommended set).
@@ -260,10 +260,10 @@ _Goal: the complete tool catalog, declarative reasoning, ranking, live budget en
   - _Validate:_ Assert every assembled request ≤ selected model `max_tokens` across a multi-iteration run.
 - [ ] **16. Compaction under load.**
   - _Read:_ §8 (progressive reflection).
-  - _Do:_ Trigger real 50% compaction mid-run when `context + cognitive` exceed budgets.
+  - _Do:_ Trigger real 50% compaction mid-run when `current_working_attention + cognitive_reflection_behavior` exceed budgets.
   - _Validate:_ Working windows shrink ~50%; answers still cite detail recovered from `raw_worklog`.
 - [ ] **17. `LogSearch` (FTS5).**
-  - _Read:_ §8 (`wip/index.db`), §17, §11 (`LogSearch.py`).
+  - _Read:_ §8 (`<worklog_folder>/index.db`), §17, §11 (`LogSearch.py`).
   - _Do:_ Create `logging/LogSearch.py`: SQLite FTS5 over `raw_worklog` + `cognitive_index`; `search()` + CLI over all runs.
   - _Validate:_ CLI query returns the run and correct line ranges for a known term.
 - [ ] **18. Native + prompted tool-calling.**
@@ -295,7 +295,7 @@ _Goal: build the whole agent tree from `example.json` (or a Python dict) with sc
   - _Validate:_ `example.json` diff against §13a is empty.
 - [ ] **3. Schema — core fields.**
   - _Read:_ §2 (types + required), §11 (`schema.json`).
-  - _Do:_ Write `config/schema.json`: required `agent_id`, `description`, ≥1 `model`; type each field (`when` str|null, `wip` str, budgets int, etc.).
+  - _Do:_ Write `config/schema.json`: required `agent_id`, `description`, ≥1 `model`; type each field (`system_prompt` str, `worklog_folder` str, `max_retries_untill_switching_models` int, `context_window_breakdown` fractions, etc.).
   - _Validate:_ Schema lints as valid JSON Schema.
 - [ ] **4. Schema — recursion.**
   - _Read:_ §7 (delegate = full agent).
@@ -319,8 +319,8 @@ _Goal: build the whole agent tree from `example.json` (or a Python dict) with sc
   - _Validate:_ Loading `example.json` returns a 3-node tree (parent + 2 delegates).
 - [ ] **9. `load.py` — inheritance.**
   - _Read:_ §2 inheritance note, §13a.
-  - _Do:_ Apply parent→delegate inheritance of `models` + the three iteration budgets + shared `wip`; keep per-agent fields isolated.
-  - _Validate:_ Delegates report the parent ladder + budgets but their own `context_window`/`tools`/`when`.
+  - _Do:_ Apply parent→delegate inheritance of `models` + `max_retries_untill_switching_models` + shared `worklog_folder`; keep per-agent fields isolated.
+  - _Validate:_ Delegates report the parent ladder + retry budget but their own `context_window_breakdown`/`system_prompt`/`tools`.
 - [ ] **10. `load.py` — build objects.**
   - _Read:_ §11, Phase 1 (`ProgressiveAgentSLM`, `ToolRegistry`).
   - _Do:_ Instantiate `ProgressiveAgentSLM` from each `AgentConfig`, wiring tools via `ToolRegistry` and nesting delegates.
@@ -345,22 +345,22 @@ _Goal: build the whole agent tree from `example.json` (or a Python dict) with sc
   - _Read:_ §13b.
   - _Do:_ Build Option B in code; assert equivalence to the JSON tree.
   - _Validate:_ Equality assertion passes.
-- [ ] **16. Budget-ceiling guard.**
-  - _Read:_ §13a (41,200 / 43,500 / 59,500 ≤ 62,000), §4.
-  - _Do:_ Add a load-time check that each agent's four-tier sum ≤ its top model `max_tokens`.
-  - _Validate:_ Canonical config passes; bumping a budget over 62,000 fails the guard.
+- [ ] **16. Fraction-sum guard.**
+  - _Read:_ §3 (fractions sum < 1), §13a.
+  - _Do:_ Add a load-time check that each agent's `context_window_breakdown` fractions sum **< 1** (leaving room for the answer).
+  - _Validate:_ Canonical config (0.025 + 0.325 + 0.525 = 0.875) passes; fractions summing ≥ 1 fail the guard.
 - [ ] **17. Wire loader into the demo.**
   - _Read:_ §13b (Option A).
   - _Do:_ Switch `progressive_agent_slm_demo.py` to `load_agent("src/framework/example.json")`.
   - _Validate:_ Demo boots on 8001 from the JSON alone.
 - [ ] **18. Authoring README.**
   - _Read:_ §2, §5, §6, §7 (author-facing behavior).
-  - _Do:_ Document every field, defaults, inheritance, `when`-gating, and each tool shape.
+  - _Do:_ Document every field, defaults, inheritance, description-based routing, and each tool shape.
   - _Validate:_ A newcomer can add a third delegate by editing only JSON.
 - [ ] **19. Defaults-only example.**
   - _Read:_ §2 (defaults), §12 Phase 3.
   - _Do:_ Add a minimal single-agent config (no delegates, no optional budgets) to exercise the default path.
-  - _Validate:_ It loads and runs using all defaults (50 / 5 / 3, awareness 800).
+  - _Validate:_ It loads and runs using all defaults (retry budget 5, awareness 0.025).
 - [ ] **20. Phase-3 acceptance.**
   - _Read:_ §15.2.
   - _Do:_ From a fresh checkout, load `example.json`, boot the demo, ask a question; then add a delegate via JSON only.
@@ -382,7 +382,7 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Validate:_ Stub can emit chunks, a "bad" verdict, and a timeout on demand.
 - [ ] **3. Config/inheritance tests.**
   - _Read:_ §2 inheritance, §15.1.
-  - _Do:_ Assert delegate omitting `models`/budgets inherits them, shares `wip`, keeps own `context_window`/`response_window`.
+  - _Do:_ Assert delegate omitting `models`/retry budget inherits them, shares `worklog_folder`, keeps own `context_window_breakdown`/`response_window`.
   - _Validate:_ `pytest` green.
 - [ ] **4. Budgeting tests.**
   - _Read:_ §3, §15.1.
@@ -394,11 +394,11 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Validate:_ Byte-compare `raw_worklog` before/after == equal.
 - [ ] **6. Model-ladder tests.**
   - _Read:_ §4, §16 #3–#4, §15.1.
-  - _Do:_ Assert quality switch at **5**, infra switch at **3** (separate counters), success-reset to top, ladder-exhaustion abort.
-  - _Validate:_ Counters never cross-contaminate.
+  - _Do:_ Assert the model switches after **5** combined retries (quality + infra on one counter), success-reset to top, ladder-exhaustion abort.
+  - _Validate:_ Quality and infra failures share the one counter.
 - [ ] **7. Router pruning tests.**
   - _Read:_ §7, §15.1.
-  - _Do:_ Assert only `when`-matching delegates/tools enter the menu; `delegate:<agent_id>` parses; parent `when` gates direct-answer.
+  - _Do:_ Assert delegates are selected by `description`; `delegate:<agent_id>` parses; only `when`-matching tools enter the menu.
   - _Validate:_ Code vs. domain question route to the right delegate.
 - [ ] **8. Supabase tool tests.**
   - _Read:_ §6, §14, §15.1.
@@ -412,13 +412,13 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Read:_ §8, §17, §15.1.
   - _Do:_ Assert JSONL block events written and `LogSearch` finds them.
   - _Validate:_ Search returns the seeded run + line ranges.
-- [ ] **11. File-tool sandbox tests.**
+- [ ] **11. File-tool traversal-safety tests.**
   - _Read:_ §10 (OWASP A01/A03).
   - _Do:_ Assert Read/Search/Write reject `../` and absolute escapes; stay within `root`.
   - _Validate:_ Traversal attempts raise; in-root ops succeed.
 - [ ] **12. Integration smoke.**
   - _Read:_ §15.2.
-  - _Do:_ Load `example.json` with the stub model; assert tree builds, parent prunes→routes, delegate calls Supabase + writes under its `agent_id`, `cognitive_index ≤` budget, all four `wip` files exist, FTS finds the run.
+  - _Do:_ Load `example.json` with the stub model; assert tree builds, parent routes by description, delegate calls Supabase + writes under its `agent_id`, `cognitive_index ≤` budget, all four `worklog` files exist, FTS finds the run.
   - _Validate:_ One test drives the whole slice end-to-end.
 - [ ] **13. Budget property test.**
   - _Read:_ §3, §4, §15.4.
@@ -426,12 +426,12 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Validate:_ Property holds across many samples.
 - [ ] **14. Timeouts / retries / fall-through.**
   - _Read:_ §4, §14 (`OpenRouter` 429 backoff), §12 Phase 4.
-  - _Do:_ Reuse 429/backoff; on infra error fall through to the next model; confirm infra (not quality) budget is consumed.
-  - _Validate:_ Injected 429 retries then advances; quality counter unchanged.
+  - _Do:_ Reuse 429/backoff; on infra error consume the shared retry budget and fall through to the next model when it is spent.
+  - _Validate:_ Injected 429 retries then advances once the shared retry budget is exhausted.
 - [ ] **15. Approval hook.**
   - _Read:_ §10 (safety), §6 (`RunPythonTool`/`WriteFileTool`).
-  - _Do:_ Add a default-allow no-op approval hook; wire it to `RunPythonTool` + `WriteFileTool`.
-  - _Validate:_ `approval=deny` blocks execution/write; default allows.
+  - _Do:_ Add a `require_approval` hook (default false / no-op); wire it to `RunPythonTool` + `WriteFileTool`.
+  - _Validate:_ `require_approval: true` blocks until confirmed; default (false) allows.
 - [ ] **16. Skill-safety review.**
   - _Read:_ §6 (`SkillTool`), §10 (trusted-local), §16 #10.
   - _Do:_ Confirm skills load **trusted-local files only**; document the prompt-injection surface.
@@ -441,7 +441,7 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Do:_ Concurrently flush blocks from parent + both delegates.
   - _Validate:_ `raw_worklog` line ranges stay consistent and every `cognitive_index` pointer resolves.
 - [ ] **18. Resolve open questions.**
-  - _Read:_ §16 (#7 token measurement, #8 index summaries, #9 VectorMemory store, #10 `wip` lifecycle).
+  - _Read:_ §16 (#7 token measurement, #8 index summaries, #9 VectorMemory store, #10 `worklog_folder` lifecycle).
   - _Do:_ Make each decision and flip the `_TBD_` rows to a resolution.
   - _Validate:_ [planning.md](planning.md) §16 has no remaining `_TBD_`.
 - [ ] **19. CI wiring.**
@@ -455,4 +455,4 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
 
 ---
 
-_Companion to [planning.md](planning.md). Last updated: 2026-07-21._
+_Companion to [planning.md](planning.md). Last updated: 2026-07-29._

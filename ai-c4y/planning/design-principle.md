@@ -1,603 +1,205 @@
-# Domain Expert Model Training Pipeline from Enterprise Source Code
+# BVMS Domain-Expert Assistant — Design Principle
 
-## Goal
-
-Build a small but highly capable domain expert model (4B–12B) that understands:
-
-- Maritime business domain
-- Company workflows
-- Software architecture
-- Design decisions
-- Business rules
-- Operational constraints
-- Critical thinking and tradeoff analysis
-
-The objective is not to create a documentation chatbot, but an AI assistant capable of reasoning like a senior engineer, solution architect, or domain expert.
+> **Goal in one line:** turn a maritime enterprise codebase into an assistant that reasons like a
+> senior engineer + architect, running on **local small models**.
+>
+> **Two layers, one product.** The **knowledge layer** (this document) mines the hidden 80% of
+> knowledge out of code, schemas, and git and lands it in **two vector stores**. The **reasoning
+> layer** — [`ProgressiveAgentSLM`](planning.md) — serves that knowledge with disciplined memory
+> instead of a bigger model. The two stores are exactly the ones the agent's delegates query in
+> [example.json](example.json): `match_n8n_documents_bvms_neo` (business / domain) and
+> `match_n8n_code_bvms_neo` (code / technical).
 
 ---
 
-# Core Principle
+## 1. Goal
 
-Most enterprise knowledge is not found in documentation.
-
-Typically:
-
-- 20% is in Confluence, Wiki, ADRs, and documents
-- 80% is hidden inside:
-  - Service interactions
-  - Database schemas
-  - Business rules
-  - Workflow implementations
-  - Bug fixes
-  - Historical design decisions
-  - Git history
-
-The pipeline should focus on extracting this hidden knowledge.
+An assistant that answers like a **senior engineer, solution architect, and domain expert** — not a
+documentation search box. It must understand the maritime business, company workflows, software
+architecture, design decisions, business rules, operational constraints, and the tradeoffs behind
+them. It runs on **stock local SLMs** (e.g. `gpt-oss:20b`, `qwen3.6:27b`) with a cloud model as an
+automatic fallback — no bespoke 100k-example fine-tune is required to be useful.
 
 ---
 
-# Stage 1: Build a Company Knowledge Graph
+## 2. Core principle — knowledge is hidden, reasoning is disciplined
 
-## Objective
+Most enterprise knowledge is **not** in documentation:
 
-Convert source code into a structured representation of the system.
+- **~20%** lives in Confluence, wikis, ADRs, and design docs.
+- **~80%** is hidden in service interactions, database schemas, business rules, workflow code, bug
+  fixes, and years of git history.
 
-Instead of treating code as text, extract relationships between components.
+So the design is two moves:
+
+1. **Extract the hidden 80%** into structured, retrievable knowledge (§4).
+2. **Reason over it with memory discipline** — RAG + a bounded four-tier context + an append-only
+   worklog — so a _small_ model performs like an expert (§6). Quality comes from retrieval and
+   disciplined memory handling, **not** from a larger or fine-tuned model.
+
+Knowledge is split by **audience** → two stores → two delegates, so every answer is grounded in the
+right kind of source.
 
 ---
 
-## Extract
+## 3. Architecture at a glance
 
-### Services
-
-Example:
-
-```java
-VoyageService
-CargoService
-FuelOptimizationService
-PortCallService
+```mermaid
+flowchart TB
+    A1[Confluence / ADRs] --> B
+    A2[Source code: services, schemas, APIs] --> B
+    A3[Git history: commits, PRs, blame] --> B
+    B["Knowledge extraction — Stages 1–6 (§4)"]
+    B --> S1[("Docs store<br/>match_n8n_documents_bvms_neo")]
+    B --> S2[("Code store<br/>match_n8n_code_bvms_neo")]
+    O["bvms-assistant orchestrator"]
+    O -->|route by description| D1[bvms-general-knowledge]
+    O -->|route by description| D2[bvms-code-knowledge]
+    S1 --> D1
+    S2 --> D2
+    D1 --> ANS[Senior-level answer + Mermaid diagrams]
+    D2 --> ANS
 ```
 
-Extract:
+The extraction pipeline **fills the stores once**; the agent **queries them at run time**. Everything
+to the right of the stores is the `ProgressiveAgentSLM` design in [planning.md](planning.md).
 
-```json
-{
-  "service": "VoyageService",
-  "calls": ["FuelOptimizationService", "PortService"],
-  "writes": ["Voyage", "Route"],
-  "reads": ["WeatherForecast"],
-  "events": ["VoyageApproved"]
-}
+---
+
+## 4. The knowledge pipeline — extract the hidden 80%
+
+Six extraction stages. Each turns raw source into small, retrievable JSON records and routes them to
+one of the two stores.
+
+| Stage                    | Extracts                                                      | Concrete example (input → record)                                                                                                                    | → Store |
+| ------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| **1. Knowledge graph**   | Service / DB / API / event / entity relationships             | `VoyageService` → `{ "service": "VoyageService", "calls": ["FuelOptimizationService"], "writes": ["Voyage","Route"], "events": ["VoyageApproved"] }` | Code    |
+| **2. Business rules**    | Logic in `if` / validation / authorization / pricing gates    | `if (vessel.age > 25)` → `{ "rule": "Vessels older than 25 years require additional approval." }`                                                    | Docs    |
+| **3. Workflows**         | How a process executes across services                        | Controller → Service → Validation → RouteEngine → DB → Event → `{ "workflow": "Create Voyage", "steps": […] }`                                       | Docs    |
+| **4. Domain vocabulary** | Industry terms → definitions                                  | `Demurrage` → `{ "term": "Demurrage", "definition": "Penalty when load/unload exceeds agreed time." }`                                               | Docs    |
+| **5. Design decisions**  | Patterns (Saga, CQRS, Outbox…) → why / alternative / tradeoff | `Saga` → `{ "decision": "Saga", "reason": "Voyage spans services", "alternative": "2PC", "tradeoff": "Eventual consistency" }`                       | Code    |
+| **6. Git history**       | Problem / solution / reasoning from commits, PRs, blame       | "Fix race condition in fuel optimization" → `{ "problem": "Concurrency", "solution": "Locking", "reasoning": "Prevent inconsistent calculations" }`  | Code    |
+
+**Expected yield:** hundreds-to-thousands of business rules, a full system graph, a workflow library,
+a domain glossary, an ADR set, and a historical-decision base. Each record is embedded and upserted
+into its store; nothing has to be human-written first.
+
+---
+
+## 5. Two knowledge stores (what the delegates consume)
+
+The pipeline's whole output collapses into **two Supabase pgvector stores**, one per delegate in
+[example.json](example.json):
+
+| Store (RPC)                    | Delegate                 | Model                           | Holds (from stages)                                                               |
+| ------------------------------ | ------------------------ | ------------------------------- | --------------------------------------------------------------------------------- |
+| `match_n8n_documents_bvms_neo` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
+| `match_n8n_code_bvms_neo`      | `bvms-code-knowledge`    | `qwen3.6:27b` (pinned)          | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
+
+A parent picks a delegate purely by its **`description`** (planning §7), so "how does approval work"
+lands on the docs store and "where is the race condition fixed" lands on the code store — no routing
+rules to maintain.
+
+---
+
+## 6. From knowledge to answers — the reasoning layer
+
+The extracted stores become expert answers through the `ProgressiveAgentSLM` mechanics
+([planning.md](planning.md)):
+
+- **RAG-first retrieval.** Each delegate runs its Supabase RPC with `ranking: true`, re-ranking
+  chunks before they enter the prompt.
+- **Bounded four-tier context** (`context_window_breakdown`, planning §3). Budgets are _fractions_ of
+  the active model's `max_tokens`, so retrieved knowledge fits a small model without overflow.
+- **Append-only worklog + cognitive index** (planning §8). Both delegates write findings into one
+  shared `raw_worklog.log`; the orchestrator loops back over the code delegate's evidence and the
+  docs delegate's rules to synthesize one grounded answer.
+- **Senior-style behavior by policy** (`cognitive_behavior`, planning §5): `deep_think` decomposes the
+  question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid diagram, and
+  `say_no` **refuses to invent** an answer when the stores are silent — the guardrail against
+  hallucinated "facts".
+- **Model ladder** (planning §4): the local model does the frequent work; a cloud model escalates hard
+  steps, governed by a single `max_retries_untill_switching_models` budget.
+
+Net effect: expert reasoning emerges from **retrieval + memory discipline**, so the local model never
+has to _memorize_ the enterprise.
+
+---
+
+## 7. Teacher-generated data — evaluate first, distill later
+
+A stronger **teacher model** turns the stores into question/answer reasoning traces across six intents:
+
+| Intent            | Example question                                                |
+| ----------------- | --------------------------------------------------------------- |
+| Knowledge         | "Explain `VoyageService`. What is demurrage?"                   |
+| Workflow          | "Describe voyage approval. What can fail?"                      |
+| Architecture      | "Why was Saga chosen? Where are the bottlenecks?"               |
+| Critical thinking | "What are the architecture's weaknesses and risky assumptions?" |
+| Product           | "What feature gaps exist? What should be built next?"           |
+| Business          | "How does this workflow create value and revenue?"              |
+
+Use these traces in two ways, **in order**:
+
+1. **Evaluation set (now).** Prove the RAG agent answers each intent correctly over the stores. This
+   is the primary use — it needs no training.
+2. **Distillation set (optional, later).** To reduce retrieval dependence or latency, fine-tune the
+   local model on the traces.
+
+---
+
+## 8. Dataset shape & scale (optional distillation phase)
+
+If and when you distill, target this mix and volume:
+
+| Dataset type       | Share |
+| ------------------ | ----- |
+| Knowledge          | 30%   |
+| Workflow           | 20%   |
+| Architecture       | 20%   |
+| Critical thinking  | 15%   |
+| Product strategy   | 10%   |
+| Business reasoning | 5%    |
+
+**Scale:** 50,000–150,000 examples; **~100,000** is a good target for a serious assistant. Treat this
+as an enhancement — the assistant is already useful from RAG alone.
+
+---
+
+## 9. Build strategy — RAG-first, fine-tune optional
+
+```
+Confluence + Source code + Git
+        ↓  extract (Stages 1–6)
+Two Supabase vector stores  ───────►  usable assistant after this line
+        ↓  wire delegates (example.json)
+ProgressiveAgentSLM  (RAG + four-tier budget + worklog + cognitive_behavior)
+        ↓  (optional) teacher traces → distill
+Sharper, lower-retrieval local expert
 ```
 
----
+1. **Extract & embed** the six stages into the two stores.
+2. **Wire the two delegates** ([example.json](example.json)) — the assistant is valuable here, with
+   **zero training**.
+3. **Add policies + worklog** for multi-step, senior-level reasoning.
+4. **(Optional) Distill** teacher traces into the local model to cut retrieval reliance.
 
-### Database Entities
-
-```sql
-Voyage
-Cargo
-Vessel
-Port
-```
-
-Extract:
-
-```json
-{
-  "table": "Voyage",
-  "relations": ["Vessel", "Cargo", "Port"]
-}
-```
+The order matters: **do not** start with fine-tuning. Value ships at step 2.
 
 ---
 
-### API Endpoints
+## 10. Outcome
 
-```http
-POST /voyages
-```
+The assistant should answer, grounded in the two stores and reasoned through the agent:
 
-Extract:
+- What does this system do, and **why** was it designed this way?
+- What business problem does it solve, and what **tradeoffs** were accepted?
+- How does it **scale**, what **risks** exist, and how should it **evolve**?
 
-```json
-{
-  "endpoint": "/voyages",
-  "service": "VoyageService",
-  "entities": ["Voyage", "Route"]
-}
-```
+— behaving like a blend of **senior engineer, solution architect, product architect, domain expert,
+and tech lead**, on local hardware, rather than a documentation search engine.
 
 ---
 
-## Output
-
-A company-wide graph containing:
-
-- Service graph
-- Database graph
-- API graph
-- Event graph
-- Domain entity graph
-
-This becomes the foundation for all later reasoning.
-
----
-
-# Stage 2: Extract Business Rules
-
-## Objective
-
-Identify the business logic encoded in software.
-
-Business rules often represent years of domain knowledge.
-
----
-
-## Examples
-
-Code:
-
-```java
-if(vessel.age > 25)
-```
-
-Extract:
-
-```json
-{
-  "rule": "Vessels older than 25 years require additional approval."
-}
-```
-
----
-
-Code:
-
-```java
-if(voyage.status != APPROVED)
-```
-
-Extract:
-
-```json
-{
-  "rule": "Only approved voyages can proceed to execution."
-}
-```
-
----
-
-## What to Look For
-
-Search for:
-
-```text
-if statements
-validation rules
-authorization logic
-workflow gates
-pricing logic
-scheduling logic
-regulatory constraints
-```
-
----
-
-## Expected Output
-
-```text
-500–5000+ business rules
-```
-
-These become high-value training data.
-
----
-
-# Stage 3: Extract Workflows
-
-## Objective
-
-Understand how business processes execute across the system.
-
----
-
-## Example Workflow
-
-Voyage Creation
-
-```text
-Controller
- ↓
-VoyageService
- ↓
-Validation
- ↓
-RouteEngine
- ↓
-Database
- ↓
-Event Publication
-```
-
----
-
-Extract:
-
-```json
-{
-  "workflow": "Create Voyage",
-  "steps": [
-    "Validate request",
-    "Create voyage",
-    "Calculate route",
-    "Persist data",
-    "Publish event"
-  ]
-}
-```
-
----
-
-## Generate Training Questions
-
-Examples:
-
-```text
-Explain the voyage creation workflow.
-
-What are failure points?
-
-How would you scale this workflow?
-
-What monitoring should exist?
-```
-
----
-
-## Output
-
-A library of:
-
-- Business workflows
-- System workflows
-- Operational workflows
-
----
-
-# Stage 4: Extract Domain Vocabulary
-
-## Objective
-
-Teach the model industry-specific language.
-
----
-
-## Maritime Examples
-
-```text
-Demurrage
-Laytime
-Charter Party
-Bunker
-Ballast Voyage
-Deadweight
-Port Call
-```
-
----
-
-Extract:
-
-```json
-{
-  "term": "Demurrage",
-  "definition": "Penalty charged when loading or unloading exceeds agreed time."
-}
-```
-
----
-
-## Output
-
-A domain glossary.
-
-This dramatically improves expert-level responses.
-
----
-
-# Stage 5: Extract Design Decisions
-
-## Objective
-
-Understand why the architecture exists.
-
-This is where senior architect knowledge appears.
-
----
-
-## Detect Patterns
-
-Search for:
-
-```text
-Strategy
-Factory
-Saga
-CQRS
-Event Sourcing
-Outbox
-Circuit Breaker
-Caching
-Retry
-```
-
----
-
-## Generate Reasoning
-
-Prompt:
-
-```text
-Why was this pattern chosen?
-
-What alternatives existed?
-
-What tradeoffs were accepted?
-```
-
----
-
-Example:
-
-```json
-{
-  "decision": "Saga Pattern",
-  "reason": "Voyage operations span multiple services.",
-  "alternative": "Two-phase commit",
-  "tradeoff": "Eventual consistency"
-}
-```
-
----
-
-## Output
-
-Architecture Decision Records (ADRs)
-
-These are extremely valuable for training architect-level reasoning.
-
----
-
-# Stage 6: Mine Historical Decisions from Git
-
-## Objective
-
-Capture senior engineer thinking that never made it into documentation.
-
-Git history often contains years of design evolution.
-
----
-
-## Sources
-
-```bash
-git log
-git blame
-pull requests
-code reviews
-commit messages
-```
-
----
-
-## Examples
-
-Commit:
-
-```text
-Refactor scheduler to reduce database contention
-```
-
-Extract:
-
-```json
-{
-  "problem": "Database contention",
-  "solution": "Scheduler redesign",
-  "reasoning": "Improved throughput under peak load"
-}
-```
-
----
-
-Commit:
-
-```text
-Fix race condition in fuel optimization workflow
-```
-
-Extract:
-
-```json
-{
-  "problem": "Concurrency issue",
-  "solution": "Locking strategy",
-  "reasoning": "Prevent inconsistent calculations"
-}
-```
-
----
-
-## Output
-
-A historical engineering knowledge base containing:
-
-- Problems
-- Solutions
-- Tradeoffs
-- Lessons learned
-
----
-
-# Generating Expert-Level Training Data
-
-After Stages 1–6 are complete, use a stronger teacher model to generate reasoning examples.
-
----
-
-## Knowledge Questions
-
-```text
-Explain VoyageService.
-
-What is demurrage?
-
-How does fuel optimization work?
-```
-
----
-
-## Workflow Questions
-
-```text
-Describe voyage approval workflow.
-
-What services participate?
-
-What can fail?
-```
-
----
-
-## Architecture Questions
-
-```text
-Why was Saga chosen?
-
-What are scalability bottlenecks?
-
-How would you redesign this?
-```
-
----
-
-## Critical Thinking Questions
-
-```text
-What are weaknesses in the current architecture?
-
-What risks exist?
-
-What assumptions are dangerous?
-```
-
----
-
-## Product Questions
-
-```text
-What feature gaps exist?
-
-How could competitors outperform us?
-
-What should be built next?
-```
-
----
-
-## Business Questions
-
-```text
-How does this workflow create customer value?
-
-How does it generate revenue?
-
-What KPIs should be monitored?
-```
-
----
-
-# Dataset Structure
-
-Recommended distribution:
-
-| Dataset Type       | Percentage |
-| ------------------ | ---------- |
-| Knowledge          | 30%        |
-| Workflow           | 20%        |
-| Architecture       | 20%        |
-| Critical Thinking  | 15%        |
-| Product Strategy   | 10%        |
-| Business Reasoning | 5%         |
-
----
-
-# Recommended Scale
-
-For a serious enterprise assistant:
-
-```text
-50,000 – 150,000 examples
-```
-
-Good target:
-
-```text
-100,000 examples
-```
-
----
-
-# Training Strategy
-
-Do not rely solely on fine-tuning.
-
-Recommended architecture:
-
-```text
-Confluence
-       ↓
-
-Source Code
-       ↓
-
-Knowledge Extraction
-       ↓
-
-Vector Database
-       ↓
-
-RAG Retrieval
-       ↓
-
-Gemma/Qwen Fine-Tuning
-       ↓
-
-Domain Expert Assistant
-```
-
----
-
-# Final Goal
-
-The model should answer:
-
-- What does this system do?
-- Why was it designed this way?
-- What business problem does it solve?
-- What tradeoffs exist?
-- How can it scale globally?
-- What risks exist?
-- How should it evolve?
-
-The target outcome is an AI assistant that behaves like a combination of:
-
-- Senior Software Engineer
-- Solution Architect
-- Product Architect
-- Domain Expert
-- Technical Lead
-
-rather than a simple documentation search engine.
+_Companion to [planning.md](planning.md) (the reasoning layer) and [example.json](example.json) (the
+canonical config). Last updated: 2026-07-29._
