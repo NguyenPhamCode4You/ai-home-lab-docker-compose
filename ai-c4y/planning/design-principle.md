@@ -9,6 +9,14 @@
 > instead of a bigger model. The two stores are exactly the ones the agent's delegates query in
 > [example.json](example.json): `match_n8n_documents_bvms_neo` (business / domain) and
 > `match_n8n_code_bvms_neo` (code / technical).
+>
+> **One data model end to end.** Extraction emits small **JSON** records; the agent's worklog is
+> **append-only JSON** (`raw_worklog.jsonl`, [planning §8](planning.md)). The same structured shape
+> flows from source → store → answer, so every step is typed, addressable, and searchable.
+
+> **Revision 2026-08-01:** aligned the worklog references with [planning.md](planning.md)'s move to
+> append-only **JSON Lines** (`raw_worklog.jsonl`, block-addressed by `block_id`), and made the
+> "structured JSON end to end" principle explicit.
 
 ---
 
@@ -32,7 +40,7 @@ Most enterprise knowledge is **not** in documentation:
 
 So the design is two moves:
 
-1. **Extract the hidden 80%** into structured, retrievable knowledge (§4).
+1. **Extract the hidden 80%** into structured, retrievable JSON knowledge (§4).
 2. **Reason over it with memory discipline** — RAG + a bounded four-tier context + an append-only
    worklog — so a _small_ model performs like an expert (§6). Quality comes from retrieval and
    disciplined memory handling, **not** from a larger or fine-tuned model.
@@ -71,14 +79,14 @@ to the right of the stores is the `ProgressiveAgentSLM` design in [planning.md](
 Six extraction stages. Each turns raw source into small, retrievable JSON records and routes them to
 one of the two stores.
 
-| Stage                    | Extracts                                                      | Concrete example (input → record)                                                                                                                    | → Store |
-| ------------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| **1. Knowledge graph**   | Service / DB / API / event / entity relationships             | `VoyageService` → `{ "service": "VoyageService", "calls": ["FuelOptimizationService"], "writes": ["Voyage","Route"], "events": ["VoyageApproved"] }` | Code    |
-| **2. Business rules**    | Logic in `if` / validation / authorization / pricing gates    | `if (vessel.age > 25)` → `{ "rule": "Vessels older than 25 years require additional approval." }`                                                    | Docs    |
-| **3. Workflows**         | How a process executes across services                        | Controller → Service → Validation → RouteEngine → DB → Event → `{ "workflow": "Create Voyage", "steps": […] }`                                       | Docs    |
-| **4. Domain vocabulary** | Industry terms → definitions                                  | `Demurrage` → `{ "term": "Demurrage", "definition": "Penalty when load/unload exceeds agreed time." }`                                               | Docs    |
+| Stage                    | Extracts                                                     | Concrete example (input → record)                                                                                                                    | → Store |
+| ------------------------ | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| **1. Knowledge graph**   | Service / DB / API / event / entity relationships           | `VoyageService` → `{ "service": "VoyageService", "calls": ["FuelOptimizationService"], "writes": ["Voyage","Route"], "events": ["VoyageApproved"] }` | Code    |
+| **2. Business rules**    | Logic in `if` / validation / authorization / pricing gates  | `if (vessel.age > 25)` → `{ "rule": "Vessels older than 25 years require additional approval." }`                                                    | Docs    |
+| **3. Workflows**         | How a process executes across services                      | Controller → Service → Validation → RouteEngine → DB → Event → `{ "workflow": "Create Voyage", "steps": […] }`                                       | Docs    |
+| **4. Domain vocabulary** | Industry terms → definitions                                | `Demurrage` → `{ "term": "Demurrage", "definition": "Penalty when load/unload exceeds agreed time." }`                                               | Docs    |
 | **5. Design decisions**  | Patterns (Saga, CQRS, Outbox…) → why / alternative / tradeoff | `Saga` → `{ "decision": "Saga", "reason": "Voyage spans services", "alternative": "2PC", "tradeoff": "Eventual consistency" }`                       | Code    |
-| **6. Git history**       | Problem / solution / reasoning from commits, PRs, blame       | "Fix race condition in fuel optimization" → `{ "problem": "Concurrency", "solution": "Locking", "reasoning": "Prevent inconsistent calculations" }`  | Code    |
+| **6. Git history**       | Problem / solution / reasoning from commits, PRs, blame     | "Fix race condition in fuel optimization" → `{ "problem": "Concurrency", "solution": "Locking", "reasoning": "Prevent inconsistent calculations" }`  | Code    |
 
 **Expected yield:** hundreds-to-thousands of business rules, a full system graph, a workflow library,
 a domain glossary, an ADR set, and a historical-decision base. Each record is embedded and upserted
@@ -91,14 +99,14 @@ into its store; nothing has to be human-written first.
 The pipeline's whole output collapses into **two Supabase pgvector stores**, one per delegate in
 [example.json](example.json):
 
-| Store (RPC)                    | Delegate                 | Model                           | Holds (from stages)                                                               |
-| ------------------------------ | ------------------------ | ------------------------------- | --------------------------------------------------------------------------------- |
-| `match_n8n_documents_bvms_neo` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
+| Store (RPC)                    | Delegate                 | Model                           | Holds (from stages)                                                              |
+| ------------------------------ | ------------------------ | ------------------------------- | -------------------------------------------------------------------------------- |
+| `match_n8n_documents_bvms_neo` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)     |
 | `match_n8n_code_bvms_neo`      | `bvms-code-knowledge`    | `qwen3.6:27b` (pinned)          | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
 
-A parent picks a delegate purely by its **`description`** (planning §7), so "how does approval work"
-lands on the docs store and "where is the race condition fixed" lands on the code store — no routing
-rules to maintain.
+A parent picks a delegate purely by its **`description`** ([planning §7](planning.md)), so "how does
+approval work" lands on the docs store and "where is the race condition fixed" lands on the code
+store — no routing rules to maintain.
 
 ---
 
@@ -109,17 +117,19 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
 
 - **RAG-first retrieval.** Each delegate runs its Supabase RPC with `ranking: true`, re-ranking
   chunks before they enter the prompt.
-- **Bounded four-tier context** (`context_window_breakdown`, planning §3). Budgets are _fractions_ of
-  the active model's `max_tokens`, so retrieved knowledge fits a small model without overflow.
-- **Append-only worklog + cognitive index** (planning §8). Both delegates write findings into one
-  shared `raw_worklog.log`; the orchestrator loops back over the code delegate's evidence and the
-  docs delegate's rules to synthesize one grounded answer.
-- **Senior-style behavior by policy** (`cognitive_behavior`, planning §5): `deep_think` decomposes the
-  question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid diagram, and
-  `say_no` **refuses to invent** an answer when the stores are silent — the guardrail against
-  hallucinated "facts".
-- **Model ladder** (planning §4): the local model does the frequent work; a cloud model escalates hard
-  steps, governed by a single `max_retries_untill_switching_models` budget.
+- **Bounded four-tier context** (`context_window_breakdown`, [planning §3](planning.md)). Budgets are
+  _fractions_ of the active model's `max_tokens`, so retrieved knowledge fits a small model without
+  overflow.
+- **Append-only worklog + cognitive index** ([planning §8](planning.md)). Both delegates append
+  findings to one shared `raw_worklog.jsonl` (JSON Lines, block-addressed by `block_id`); the
+  orchestrator loops back over the code delegate's evidence and the docs delegate's rules — by index
+  lookup, not by replaying the whole log — to synthesize one grounded answer.
+- **Senior-style behavior by policy** (`cognitive_behavior`, [planning §5](planning.md)): `deep_think`
+  decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid
+  diagram, and `say_no` **refuses to invent** an answer when the stores are silent — the guardrail
+  against hallucinated "facts".
+- **Model ladder** ([planning §4](planning.md)): the local model does the frequent work; a cloud model
+  escalates hard steps, governed by a single `max_retries_until_switching_models` budget.
 
 Net effect: expert reasoning emerges from **retrieval + memory discipline**, so the local model never
 has to _memorize_ the enterprise.
@@ -128,7 +138,8 @@ has to _memorize_ the enterprise.
 
 ## 7. Teacher-generated data — evaluate first, distill later
 
-A stronger **teacher model** turns the stores into question/answer reasoning traces across six intents:
+A stronger **teacher model** turns the stores into question / answer reasoning traces across six
+intents:
 
 | Intent            | Example question                                                |
 | ----------------- | --------------------------------------------------------------- |
@@ -202,4 +213,4 @@ and tech lead**, on local hardware, rather than a documentation search engine.
 ---
 
 _Companion to [planning.md](planning.md) (the reasoning layer) and [example.json](example.json) (the
-canonical config). Last updated: 2026-07-29._
+canonical config). Last updated: 2026-08-01._

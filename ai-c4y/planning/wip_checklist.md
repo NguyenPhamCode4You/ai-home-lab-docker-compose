@@ -16,7 +16,7 @@
 
 - `pytest -q` passes for everything built so far.
 - No request ever exceeds the selected model's `max_tokens` (tiers are fractions of it that sum to < 1).
-- `raw_worklog.log` is **only ever appended to** (never rewritten); every `cognitive_index` pointer still resolves to a valid line range.
+- `raw_worklog.jsonl` is **only ever appended to** (never rewritten); every `cognitive_index` pointer still resolves to a valid `block_id`.
 
 ---
 
@@ -69,11 +69,11 @@ _Goal: the budget, model-ladder, and four-file `worklog` logging primitives ever
   - _Do:_ Select the first **reachable** model on the ladder (health/ping); `"auto"`/omitted `max_tokens` sizes to the platform default before fractions apply.
   - _Validate:_ With the top model reachable it wins; mark it unreachable and the next model is chosen.
 - [ ] **12. Retry budget + switch.**
-  - _Read:_ §2 (`max_retries_untill_switching_models`, default **5**), §4 (retry budget), §16 #3.
+  - _Read:_ §2 (`max_retries_until_switching_models`, default **5**), §4 (retry budget), §16 #3.
   - _Do:_ Track retries per model (quality self-eval + infra combined); on reaching the budget, advance the ladder pointer and reset the per-model counter.
   - _Validate:_ Feed 5 "not good enough" verdicts; assert the active model advances to index 1.
 - [ ] **13. Infra failures share the budget.**
-  - _Read:_ §2 (`max_retries_untill_switching_models`), §4 (one budget for quality + infra), §16 #3.
+  - _Read:_ §2 (`max_retries_until_switching_models`), §4 (one budget for quality + infra), §16 #3.
   - _Do:_ Count infra failures (timeout/HTTP/unreachable) against the **same** counter as quality failures; exhausting it advances the ladder.
   - _Validate:_ Mix 3 timeouts + 2 bad verdicts (= 5); assert the model advances after the 5th.
 - [ ] **14. Success resets the ladder.**
@@ -85,11 +85,11 @@ _Goal: the budget, model-ladder, and four-file `worklog` logging primitives ever
   - _Do:_ `tests/framework/test_model_chain.py` with stub clients: reachability selection, retry switch (5, quality + infra combined), success-reset, ladder exhaustion.
   - _Validate:_ `pytest tests/framework/test_model_chain.py` green.
 - [ ] **16. `RawWorklog` (append-only).**
-  - _Read:_ §8 (`raw_worklog.log` row), §17 (block delimiters + line ranges).
-  - _Do:_ Create `src/framework/logging/RawWorklog.py`: `append(block) -> (start_line, end_line)`; never rewrite.
-  - _Validate:_ Append 3 blocks; returned ranges are contiguous and re-reading those lines returns the exact block text.
+  - _Read:_ §8 (`raw_worklog.jsonl` row), §17 (JSON block records keyed by `block_id`).
+  - _Do:_ Create `src/framework/logging/RawWorklog.py`: `append(block) -> block_id` (one JSON line per block) + a `block_id → byte-offset` map for O(1) `fetch(block_id)`; never rewrite.
+  - _Validate:_ Append 3 blocks; each returned `block_id` fetches back the exact block record.
 - [ ] **17. `CognitiveIndex` (pointer map).**
-  - _Read:_ §8 (`cognitive_index.jsonl`), §17 (record schema: `block_id, ts, agent_id, iteration, phase, actor, raw_lines, summary, keywords, tokens`).
+  - _Read:_ §8 (`cognitive_index.jsonl`), §17 (record schema: `block_id, ts, agent_id, iteration, phase, actor, summary, keywords, tokens`).
   - _Do:_ Create `src/framework/logging/CognitiveIndex.py`: `append(pointer)`, `search(query)`, `compact(0.5)`; ~10–20-token summaries via `KeywordExtractor` / `SimpleEntityExtractor`.
   - _Validate:_ Each appended record matches the §17 schema; `search` returns the block whose keywords match.
 - [ ] **18. Per-agent windows + single writer.**
@@ -99,11 +99,11 @@ _Goal: the budget, model-ladder, and four-file `worklog` logging primitives ever
 - [ ] **19. `RunLogger` owns `<worklog_folder>/<run_id>/`.**
   - _Read:_ §8 (folder tree), §17.
   - _Do:_ Rework `logging/RunLogger.py` to create `<worklog_folder>/<run_id>/` and emit terminal + per-block events through the `Worklog` writer.
-  - _Validate:_ After a fake run, `<worklog_folder>/<run_id>/` contains `raw_worklog.log`, `cognitive_index.jsonl`, `context_window.log`, `response_window.log`.
+  - _Validate:_ After a fake run, `<worklog_folder>/<run_id>/` contains `raw_worklog.jsonl`, `cognitive_index.jsonl`, `context_window.log`, `response_window.log`.
 - [ ] **20. Progressive reflection (50%) — integrity.**
   - _Read:_ §3 (compaction), §8 ("Progressive reflection").
   - _Do:_ Implement `CognitiveIndex.compact(0.5)` + `ContextWindowLog.compact(0.5)` (merge pointers / drop stale blocks); `raw_worklog` untouched.
-  - _Validate:_ Append N blocks → compact → assert index/context shrink ~50%, `raw_worklog` byte-identical, and every surviving pointer still resolves to correct lines.
+  - _Validate:_ Append N blocks → compact → assert index/context shrink ~50%, `raw_worklog` byte-identical, and every surviving pointer still resolves to its block.
 
 ---
 
@@ -120,12 +120,12 @@ _Goal: a single `ProgressiveAgentSLM` that retrieves, routes, calls a tool, dele
   - _Do:_ Mark exactly what to keep vs. rewrite for recursion.
   - _Validate:_ Notes reference concrete method names you will reuse.
 - [ ] **3. `AgentConfig` fields.**
-  - _Read:_ §2 (all fields incl. `system_prompt`, `worklog_folder`, `max_retries_untill_switching_models`).
+  - _Read:_ §2 (all fields incl. `system_prompt`, `worklog_folder`, `max_retries_until_switching_models`).
   - _Do:_ Rework `AgentConfig.py` to parse every §2 field with the documented default (retry budget **5**).
   - _Validate:_ Loading the §13a parent dict yields all fields; missing optionals fall back to defaults.
 - [ ] **4. Delegate inheritance.**
   - _Read:_ §2 inheritance note, §7, §13a ("omit `models`… inherit").
-  - _Do:_ In `AgentConfig`, inherit `models` + `max_retries_untill_switching_models` + shared `worklog_folder` from parent; keep `context_window_breakdown`/`system_prompt`/`cognitive_behavior`/`tools` per-agent.
+  - _Do:_ In `AgentConfig`, inherit `models` + `max_retries_until_switching_models` + shared `worklog_folder` from parent; keep `context_window_breakdown`/`system_prompt`/`cognitive_behavior`/`tools` per-agent.
   - _Validate:_ A delegate omitting `models` reports the parent's ladder but its **own** `context_window_breakdown`.
 - [ ] **5. Config unit test.**
   - _Read:_ §15.1.
@@ -295,7 +295,7 @@ _Goal: build the whole agent tree from `example.json` (or a Python dict) with sc
   - _Validate:_ `example.json` diff against §13a is empty.
 - [ ] **3. Schema — core fields.**
   - _Read:_ §2 (types + required), §11 (`schema.json`).
-  - _Do:_ Write `config/schema.json`: required `agent_id`, `description`, ≥1 `model`; type each field (`system_prompt` str, `worklog_folder` str, `max_retries_untill_switching_models` int, `context_window_breakdown` fractions, etc.).
+  - _Do:_ Write `config/schema.json`: required `agent_id`, `description`, ≥1 `model`; type each field (`system_prompt` str, `worklog_folder` str, `max_retries_until_switching_models` int, `context_window_breakdown` fractions, etc.).
   - _Validate:_ Schema lints as valid JSON Schema.
 - [ ] **4. Schema — recursion.**
   - _Read:_ §7 (delegate = full agent).
@@ -319,7 +319,7 @@ _Goal: build the whole agent tree from `example.json` (or a Python dict) with sc
   - _Validate:_ Loading `example.json` returns a 3-node tree (parent + 2 delegates).
 - [ ] **9. `load.py` — inheritance.**
   - _Read:_ §2 inheritance note, §13a.
-  - _Do:_ Apply parent→delegate inheritance of `models` + `max_retries_untill_switching_models` + shared `worklog_folder`; keep per-agent fields isolated.
+  - _Do:_ Apply parent→delegate inheritance of `models` + `max_retries_until_switching_models` + shared `worklog_folder`; keep per-agent fields isolated.
   - _Validate:_ Delegates report the parent ladder + retry budget but their own `context_window_breakdown`/`system_prompt`/`tools`.
 - [ ] **10. `load.py` — build objects.**
   - _Read:_ §11, Phase 1 (`ProgressiveAgentSLM`, `ToolRegistry`).
@@ -390,7 +390,7 @@ _Goal: a green test suite, an integration smoke test, robust retries/timeouts, s
   - _Validate:_ Each rule asserted independently.
 - [ ] **5. Cognitive-index compaction tests.**
   - _Read:_ §3, §8, §17.
-  - _Do:_ Append N blocks → `compact(0.5)` → assert line-range integrity (every surviving pointer resolves) and `raw_worklog` immutability.
+  - _Do:_ Append N blocks → `compact(0.5)` → assert `block_id` integrity (every surviving pointer resolves) and `raw_worklog` immutability.
   - _Validate:_ Byte-compare `raw_worklog` before/after == equal.
 - [ ] **6. Model-ladder tests.**
   - _Read:_ §4, §16 #3–#4, §15.1.
