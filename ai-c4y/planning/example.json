@@ -5,6 +5,23 @@
 
   "worklog_folder": "wip/bvms-assistant",
 
+  // Directories the agent may READ / SEARCH side by side with the worklog (e.g. source code).
+  // Read-only — never mutated; WriteFileTool stays sandboxed to worklog_folder.
+  "working_folders": [
+    {
+      "path": "bvms/be-source-code",
+      "description": "BVMS backend source code"
+    },
+    {
+      "path": "bvms/fe-source-code",
+      "description": "BVMS frontend source code"
+    }
+  ],
+
+  // Max concurrent subprocesses for parallelizable work (delegate fan-out, tool calls, per-block
+  // metadata, DB upserts). 1 = strictly sequential (default); >1 = bounded parallel pool.
+  "parallel_supprocess": 1,
+
   "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
 
   "max_retries_until_switching_models": 5,
@@ -44,6 +61,35 @@
     "current_working_attention": 0.525
 
     // Then the remaining is reserved for answering
+  },
+
+  // Knowledge-graph / metadata subsystem: a background agent distills every flushed worklog block
+  // into entities, keywords, a 25-word summary, workflow & relationships and appends them to "file".
+  // The append-only worklog is SEGMENTED (worklog.segment_by / max_segment_lines) so the index can
+  // jump straight to a segment file + iteration + line. Optional graph_db / vector_db mirrors let old
+  // worklogs be retrieved dynamically (not just by reading files); both are disabled by default.
+  "knowledge_graph": {
+    "file": "knowledge_graph.jsonl",
+    "metadata_model": "inherit",
+
+    "worklog": {
+      "segment_by": "iteration",
+      "max_segment_lines": 2000
+    },
+
+    "graph_db": {
+      "enabled": false,
+      "type": "neo4j",
+      "url": "bolt://localhost:7687",
+      "database": "bvms_worklog"
+    },
+
+    "vector_db": {
+      "enabled": false,
+      "type": "supabase",
+      "function_name": "match_worklog_knowledge",
+      "table": "worklog_knowledge"
+    }
   },
 
   "cognitive_behavior": [

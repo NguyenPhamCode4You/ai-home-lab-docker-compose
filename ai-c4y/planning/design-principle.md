@@ -1,21 +1,21 @@
 # BVMS Domain-Expert Assistant — Design Principle
 
-> **Goal in one line:** turn a maritime enterprise codebase into an assistant that reasons like a
-> senior engineer + architect, running on **local small models**.
+> **In one line:** turn a maritime enterprise codebase into an assistant that reasons like a senior
+> engineer + architect on **local small models**.
 >
-> The **knowledge layer** mines the hidden 80% of
-> knowledge out of code, schemas, and git and lands it in **two vector stores**. The **reasoning
-> layer** — [`ProgressiveAgentSLM`](planning.md) — serves that knowledge with disciplined memory
+> Two layers make it work: a **knowledge layer** mines the hidden 80% of knowledge from code, schemas,
+> and git into **two vector stores**, and a **reasoning layer** — [`ProgressiveAgentSLM`](planning.md)
+> — serves it with RAG, a bounded context budget, and disciplined memory.
 
 ---
 
 ## 1. Goal
 
 An assistant that answers like a **senior engineer, solution architect, and domain expert** — not a
-documentation search box. It must understand the maritime business, company workflows, software
-architecture, design decisions, business rules, operational constraints, and the tradeoffs behind
-them. It runs on **stock local SLMs** (e.g. `gpt-oss:20b`, `qwen3.6:27b`) with a cloud model as an
-automatic fallback — no bespoke 100k-example fine-tune is required to be useful.
+documentation search box. It must grasp the maritime business, workflows, architecture, design
+decisions, business rules, and the tradeoffs behind them, running on **stock local SLMs** (e.g.
+`gpt-oss:20b`, `qwen3.6:27b`) with a cloud model as automatic fallback — no bespoke fine-tune required
+to be useful.
 
 ---
 
@@ -36,7 +36,8 @@ So the design is two moves:
 
 ## 3. Architecture at a glance
 
-The extraction pipeline **fills the stores once**; the delegate agents **queries them at run time** and **answer to question on their part** and the final answer is combined and delivered through the **Orchestrator**.
+The extraction pipeline **fills the stores once**; at run time the delegate agents **query them**,
+each answers **its part**, and the **orchestrator** combines the parts into the final answer.
 
 ```mermaid
 flowchart TB
@@ -98,23 +99,38 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
 - **Bounded four-tier context** (`context_window_breakdown`, [planning §3](planning.md)). Budgets are
   _fractions_ of the active model's `max_tokens`, so retrieved knowledge fits a small model without
   overflow.
-- **Append-only worklog + cognitive index** ([planning §8](planning.md)). Both delegates append
-  findings to one shared `raw_worklog.jsonl` (JSON Lines, block-addressed by `block_id`); the
-  orchestrator loops back over the code delegate's evidence and the docs delegate's rules — by index
-  lookup, not by replaying the whole log — to synthesize one grounded answer.
+- **Reads source side-by-side** ([planning §6](planning.md)). File tools can read and search the run's
+  `working_folders` (e.g. the BVMS backend / frontend checkout) read-only, alongside the two stores.
+- **Segmented worklog + cognitive index + knowledge graph** ([planning §8](planning.md)). Delegates
+  append findings to a shared, append-only worklog that is **segmented** into `worklog/seg-*.jsonl`; a
+  `cognitive_index` jumps to any block by segment / iteration / line, and a background metadata agent
+  distills each block into `knowledge_graph.jsonl` (entities, keywords, 25-word summary, workflow,
+  relationships) — optionally mirrored to a graph or vector DB. The orchestrator re-reads the code
+  delegate's evidence and the docs delegate's rules **by index lookup**, never by replaying the log.
 - **Senior-style behavior by policy** (`cognitive_behavior`, [planning §5](planning.md)): `deep_think`
   decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid
   diagram, and `say_no` **refuses to invent** an answer when the stores are silent — the guardrail
   against hallucinated "facts".
-- **Model ladder** ([planning §4](planning.md)): the local model does the frequent work; a cloud model
-  escalates hard steps, governed by a single `max_retries_until_switching_models` budget.
+- **Model ladder + parallelism** ([planning §2, §4](planning.md)): the local model does the frequent
+  work while a cloud model escalates hard steps under one `max_retries_until_switching_models` budget;
+  a single `parallel_supprocess` knob (default 1) runs delegate / tool / metadata work sequentially or
+  in a bounded pool.
 
 Net effect: expert reasoning emerges from **retrieval + memory discipline**, so the local model never
 has to _memorize_ the enterprise.
 
 ---
 
-## 7. RAG first, fine-tunning later
+## 7. Build strategy — RAG first, fine-tune optional
+
+Value ships **without any training**, so the order is deliberate — **do not start with fine-tuning**:
+
+1. **Extract & embed** the six stages into the two stores.
+2. **Wire the two delegates** ([example.json](example.json)) — the assistant is already useful here.
+3. **Add policies + worklog** for multi-step, senior-level reasoning.
+4. **(Optional) Distill** teacher traces into the local model to cut retrieval reliance.
+
+From RAG alone it must handle every intent below:
 
 | Intent            | Example question                                                |
 | ----------------- | --------------------------------------------------------------- |
@@ -125,55 +141,13 @@ has to _memorize_ the enterprise.
 | Product           | "What feature gaps exist? What should be built next?"           |
 | Business          | "How does this workflow create value and revenue?"              |
 
----
-
-## 8. Dataset shape & scale (optional fine-tunning phase)
-
-If and when you distill, target this mix and volume:
-
-| Dataset type       | Share |
-| ------------------ | ----- |
-| Knowledge          | 30%   |
-| Workflow           | 20%   |
-| Architecture       | 20%   |
-| Critical thinking  | 15%   |
-| Product strategy   | 10%   |
-| Business reasoning | 5%    |
-
-**Scale:** 50,000–150,000 examples; **~100,000** is a good target for a serious assistant. Treat this
-as an enhancement — the assistant is already useful from RAG alone.
+**Optional distillation.** If you later fine-tune, target ~50k–150k examples (≈100k is a solid goal),
+weighted knowledge 30% / workflow 20% / architecture 20% / critical-thinking 15% / product 10% /
+business 5%. It is an enhancement, not a prerequisite.
 
 ---
 
-## 9. Build strategy — RAG-first, fine-tune optional
-
-```
-Confluence + Source code + Git
-        ↓
-        extract (Stages 1–6)
-        ↓
-Two Supabase vector stores  ───────►  usable assistant after this line
-        ↓
-        wire delegates (example.json)
-        ↓
-ProgressiveAgentSLM  (RAG + four-tier budget + worklog + cognitive_behavior)
-        ↓
-        (optional) teacher traces → distill
-        ↓
-Sharper, lower-retrieval local expert
-```
-
-1. **Extract & embed** the six stages into the two stores.
-2. **Wire the two delegates** ([example.json](example.json)) — the assistant is valuable here, with
-   **zero training**.
-3. **Add policies + worklog** for multi-step, senior-level reasoning.
-4. **(Optional) Distill** teacher traces into the local model to cut retrieval reliance.
-
-The order matters: **do not** start with fine-tuning. Value ships at step 2.
-
----
-
-## 10. Outcome
+## 8. Outcome
 
 The assistant should answer, grounded in the two stores and reasoned through the agent:
 
@@ -187,4 +161,4 @@ and tech lead**, on local hardware, rather than a documentation search engine.
 ---
 
 _Companion to [planning.md](planning.md) (the reasoning layer) and [example.json](example.json) (the
-canonical config). Last updated: 2026-08-01._
+canonical config). Last updated: 2026-08-02._
