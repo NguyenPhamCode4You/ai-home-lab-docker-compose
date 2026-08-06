@@ -118,16 +118,40 @@
   "tools": [
     {
       "type": "ReadFileTool",
-      "when": "The user references a specific local file whose contents are needed to answer."
+      "when": "The user references a specific local file whose contents are needed to answer.",
+      "models": [
+        {
+          "platform": "ollama",
+          "name": "qwen3.5:9b",
+          "url": "http://localhost:11434",
+          "max_tokens": 32000
+        }
+      ]
     },
     {
       "type": "SearchFileTool",
-      "when": "You need to locate a file by name/glob or find where a term/symbol appears before reading it."
+      "when": "You need to locate a file by name/glob or find where a term/symbol appears before reading it.",
+      "models": [
+        {
+          "platform": "ollama",
+          "name": "qwen3.5:9b",
+          "url": "http://localhost:11434",
+          "max_tokens": 32000
+        }
+      ]
     },
     {
       "type": "WriteFileTool",
       "require_approval": true,
-      "when": "You must persist an artifact (notes, generated code, a report) to disk inside the sandbox root."
+      "when": "You must persist an artifact (notes, generated code, a report) to disk inside the sandbox root.",
+      "models": [
+        {
+          "platform": "ollama",
+          "name": "qwen3.5:9b",
+          "url": "http://localhost:11434",
+          "max_tokens": 32000
+        }
+      ]
     },
     {
       "type": "TodoTool",
