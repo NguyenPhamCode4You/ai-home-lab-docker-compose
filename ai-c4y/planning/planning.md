@@ -4,8 +4,9 @@
 > models (SLMs)**. One instance owns an identity, a `system_prompt`, a four-tier **context-window
 > budget** (`context_window_breakdown`, expressed as **fractions** of the active model's context), a
 > **ladder** of **models** (local→cloud, each with one retry budget), a set of **cognitive_behavior**
-> policies (`when → then`), a set of **tools** (Supabase vector search, todo, write-file, search-file,
-> vector-memory, skills, diagrams, python), a set of **working_folders** it may read / search (e.g.
+> policies (`when → then`), a set of **tools** (SQLite vector search, todo, write-file, search-file,
+> vector-memory, skills, diagrams, python — each tool may run its own tool-calling model), a set of
+> **working_folders** it may read / search (e.g.
 > source code), and a set of **delegates** — which are themselves `ProgressiveAgentSLM` instances.
 >
 > The agent _progressively_ builds a lightweight **cognitive index** over an **append-only, segmented
@@ -19,11 +20,25 @@
 > side; subprocess fan-out runs sequentially or in parallel per **`parallel_supprocess`**. Any model
 > slot can be escalated, plug-and-play, to a more capable **cloud** model (OpenRouter).
 >
-> The class reuses existing primitives (`Task`, model clients, `SupabaseVectorStore`,
+> The class reuses existing primitives (`Task`, model clients, `SqliteVectorStore` (sqlite-vec),
 > `DocumentRanking`, `PythonCodeExecute`, `KnowledgeCompression`, `IterationSummarizer`,
 > `AnswerEvaluator`, `FinalThoughtSummarizer`) and drops into `create_chat_backend` unchanged.
 
 **Status legend:** ⬜ Not started · 🟡 In progress · ✅ Done · ⛔ Blocked
+
+> **Revision 2026-08-06 — what changed & why (this pass):**
+>
+> 1. **Vector store is now embedded SQLite, not Supabase Postgres.** Every knowledge / memory / mirror
+>    store is a local **`sqlite-vec`** `.db` file you can copy or read directly — no server. Tools take
+>    `{ db_file, table }` instead of a pgvector `function_name`; the primary tool type is renamed
+>    `Supabase` → **`SqliteVector`**, backed by a new `SqliteVectorStore` (reusing `Embedding`) (§6, §8.3).
+> 2. **Graph store is now embedded & file-based, not Neo4j.** The optional `graph_db` mirror defaults to
+>    **Kuzu** — "the SQLite of graph databases": Cypher over a single local `path`, no server — with a
+>    zero-dependency **SQLite nodes/edges** fallback (`type: "sqlite"`, traversed by recursive CTEs).
+>    Both knowledge-graph mirrors are now plain local files (§8.3).
+> 3. **Tools carry their own `models` ladder.** A tool also drives an LLM (plan the call, read / rank
+>    results, write artifacts), so each tool entry may pin its **own `models`** — typically a leaner
+>    local model tuned for tool-calling — and **inherits the agent's `models`** when omitted (§6).
 
 > **Revision 2026-08-02 — what changed & why (this pass):**
 >
@@ -120,7 +135,7 @@ A single class configured by one object (JSON or Python). Every field has a sens
 | `max_retries_until_switching_models` | int         | One per-model retry budget covering **both** quality (self-eval) **and** infra (timeout / HTTP) failures. Default **5**. When a model exhausts it, **switch to the next model** on the ladder; ladder exhaustion ends the run (§4). |
 | `models`                             | list        | Priority **ladder** (§4), highest first. Each model carries its own `max_retries_until_switching_models`; a successful iteration resets the ladder to the top model.                                                                |
 | `cognitive_behavior`                 | list        | `when → then` behavioral policies (§5) rendered into the system prompt each iteration; also the run's todo checklist. Declarative only — no per-policy models.                                                                      |
-| `tools`                              | list        | Capabilities the agent may call, each with a `when` guidance string (§6): Supabase, todo, write-file, search-file, vector-memory, skills, …                                                                                         |
+| `tools`                              | list        | Capabilities the agent may call, each with a `when` guidance string and an **optional own `models`** ladder (§6): SQLite vector, todo, write-file, search-file, vector-memory, skills, …                                            |
 | `delegates`                          | list        | Nested `ProgressiveAgentSLM` configs (§7). The parent routes sub-questions to them by reading each one's `agent_id` / `description`.                                                                                                |
 
 > **Inheritance.** A delegate that omits `models` or `max_retries_until_switching_models` **inherits
@@ -291,33 +306,42 @@ remain), **visualize_diagram** (emit a diagram when structure / relationships ma
 Each tool entry tells the agent **what** the tool is and **when** to use it. The `when` string is
 injected next to the tool in the prompt so a small model calls it at the right moment.
 
-**Supabase (primary tool).** Vector search over a pgvector RPC — the most useful capability for these
-RAG agents.
+**SqliteVector (primary tool).** Vector search over an **embedded SQLite** store (the `sqlite-vec`
+extension) — a single local `.db` file you can copy or read directly, no server. The most useful
+capability for these RAG agents.
 
-| Key             | Meaning                                                                                                    |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| `type`          | `Supabase`.                                                                                                |
-| `function_name` | The pgvector RPC to call (e.g. `match_n8n_documents_bvms_neo`).                                            |
-| `ranking`       | If `true`, re-rank retrieved chunks with parallel `DocumentRanking` (reuse `RagAssistant.stream` batches). |
-| `when`          | Guidance: when this knowledge source is the right one to query.                                            |
+| Key       | Meaning                                                                                                    |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `type`    | `SqliteVector`.                                                                                            |
+| `db_file` | Path to the local `.db` file holding the embedded vectors (e.g. `knowledge/bvms_docs.db`).                 |
+| `table`   | The vector table to query inside that file (e.g. `bvms_documents`).                                        |
+| `ranking` | If `true`, re-rank retrieved chunks with parallel `DocumentRanking` (reuse `RagAssistant.stream` batches). |
+| `when`    | Guidance: when this knowledge source is the right one to query.                                            |
 
 All other tools follow the same `{ type, when, … }` shape, and each `when` is used both to guide the
 model and to **prune the menu** (§7): only tools whose `when` matches the current step are shown. The
-Supabase wrapper is built on the now-async `SupabaseVectorStore.async_query`.
+SqliteVector wrapper is built on the async `SqliteVectorStore.async_query` (sqlite-vec + `Embedding`).
+
+**Tools can pin their own `models` ladder.** A tool doesn't just execute code — it usually drives an
+LLM (to plan the call, read / rank results, or write an artifact). So each tool entry may carry its
+**own `models`** list (same shape as §4) — typically a **leaner local model tuned for tool-calling**
+(e.g. `qwen3.5:9b`) rather than the agent's heavy main ladder. A tool that omits `models` **inherits
+the agent's top-level `models`**; its `max_retries_until_switching_models` follows the same ladder
+semantics (§4).
 
 **Standard tool catalog** (industry-conventional shapes, reusing existing primitives):
 
-| Tool                  | Shape (beyond `type` + `when`)                  | Behavior                                                                                                                                                                                                                                                                                                                            |
-| --------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Supabase`            | `function_name`, `ranking`                      | **Primary.** pgvector RPC via `SupabaseVectorStore.async_query`; optional parallel `DocumentRanking`. Read-only domain knowledge base.                                                                                                                                                                                              |
-| `ReadFileTool`        | —                                               | Read a file's contents. Paths resolve under any `working_folders` root **or** the run's `worklog_folder`; `..` / absolute escapes rejected (OWASP A01/A03).                                                                                                                                                                         |
-| `SearchFileTool`      | `glob?`                                         | Locate files by name / glob or find where a term / symbol appears (ripgrep-style) across the `working_folders` + `worklog_folder`; returns path + line + snippet. Read-only, traversal-safe.                                                                                                                                        |
-| `WriteFileTool`       | `require_approval?`                             | Persist an artifact (notes, generated code, a report) **inside the `worklog_folder`** — `working_folders` (source) are read-only, never written. Path traversal / absolute escapes rejected (OWASP A01/A03). `require_approval: true` gates the write; default **false** → runs without prompting (home-lab). Reuses `FileHanlder`. |
-| `TodoTool`            | —                                               | Maintains the run's checklist (`todo.md` in the `worklog_folder`). The model **rewrites the whole list** (`[{id, content, status: pending\|in_progress\|completed}]`); the loop re-injects it each iteration (anti-drift).                                                                                                          |
-| `VectorMemoryTool`    | `function_name` (recall), `write_function_name` | The agent's **own, cross-run, writable** long-term memory (distinct from the read-only KB). `recall(query, k)` + `remember(text, tags?)`, backed by a Supabase memory table reusing `Embedding`. Naturally embeds `cognitive_index` summaries for semantic recall.                                                                  |
-| `SkillTool`           | `skills_dir`                                    | On-demand **procedure packs** (progressive disclosure): each skill file has `{ id, description, when }` frontmatter + a body of steps. Only id / description / when are always visible; the body loads when its `when` matches. **Trusted-local files only** (loading external skill text is a prompt-injection surface).           |
-| `GenerateDiagramTool` | —                                               | Emits Mermaid for the `visualize_diagram` policy.                                                                                                                                                                                                                                                                                   |
-| `RunPythonTool`       | `require_approval?`                             | Wraps `PythonCodeExecute`; `require_approval: true` gates execution; default **false** → runs without prompting. ⚠️ Autonomous execution — revisit before any non-local use.                                                                                                                                                        |
+| Tool                  | Shape (beyond `type` + `when`) | Behavior                                                                                                                                                                                                                                                                                                                            |
+| --------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SqliteVector`        | `db_file`, `table`, `ranking`  | **Primary.** Embedded vector search via `SqliteVectorStore.async_query` (sqlite-vec, single `.db` file); optional parallel `DocumentRanking`. Read-only domain knowledge base.                                                                                                                                                      |
+| `ReadFileTool`        | —                              | Read a file's contents. Paths resolve under any `working_folders` root **or** the run's `worklog_folder`; `..` / absolute escapes rejected (OWASP A01/A03).                                                                                                                                                                         |
+| `SearchFileTool`      | `glob?`                        | Locate files by name / glob or find where a term / symbol appears (ripgrep-style) across the `working_folders` + `worklog_folder`; returns path + line + snippet. Read-only, traversal-safe.                                                                                                                                        |
+| `WriteFileTool`       | `require_approval?`            | Persist an artifact (notes, generated code, a report) **inside the `worklog_folder`** — `working_folders` (source) are read-only, never written. Path traversal / absolute escapes rejected (OWASP A01/A03). `require_approval: true` gates the write; default **false** → runs without prompting (home-lab). Reuses `FileHanlder`. |
+| `TodoTool`            | —                              | Maintains the run's checklist (`todo.md` in the `worklog_folder`). The model **rewrites the whole list** (`[{id, content, status: pending\|in_progress\|completed}]`); the loop re-injects it each iteration (anti-drift).                                                                                                          |
+| `VectorMemoryTool`    | `db_file`, `table`             | The agent's **own, cross-run, writable** long-term memory (distinct from the read-only KB). `recall(query, k)` + `remember(text, tags?)`, backed by a local **SQLite** memory table (sqlite-vec) reusing `Embedding`. Naturally embeds `cognitive_index` summaries for semantic recall.                                             |
+| `SkillTool`           | `skills_dir`                   | On-demand **procedure packs** (progressive disclosure): each skill file has `{ id, description, when }` frontmatter + a body of steps. Only id / description / when are always visible; the body loads when its `when` matches. **Trusted-local files only** (loading external skill text is a prompt-injection surface).           |
+| `GenerateDiagramTool` | —                              | Emits Mermaid for the `visualize_diagram` policy.                                                                                                                                                                                                                                                                                   |
+| `RunPythonTool`       | `require_approval?`            | Wraps `PythonCodeExecute`; `require_approval: true` gates execution; default **false** → runs without prompting. ⚠️ Autonomous execution — revisit before any non-local use.                                                                                                                                                        |
 
 ---
 
@@ -342,7 +366,7 @@ and optional `cognitive_behavior` / `models` / `delegates`. The parent:
 
 Depth is bounded by each model's `max_retries_until_switching_models` at every level plus an overall
 recursion cap. Two RAG-backed delegates (`bvms-general-knowledge`, `bvms-code-knowledge`), each owning
-a Supabase function, is the canonical example (§13).
+an embedded SQLite vector store, is the canonical example (§13).
 
 ---
 
@@ -357,7 +381,8 @@ clear split**, plus a **derived knowledge layer**:
 - **Per-agent working windows = plain-text scratch** (`context_window.log` + `response_window.log`) —
   streamed to as the agent thinks, then discarded / compacted.
 - **Derived knowledge = a metadata knowledge graph** (`knowledge_graph.jsonl`, optionally mirrored to
-  a graph and/or vector DB) — built by a background metadata agent from every flushed block.
+  an embedded Kuzu graph and/or a SQLite vector DB) — built by a background metadata agent from every
+  flushed block.
 
 The tiers in §3 are the _prompt-side_ budget; these files are the _on-disk_ storage it draws from.
 
@@ -395,7 +420,7 @@ so `block_id`s stay unique and parallel delegates never interleave.
   "agent_id": "bvms-code-knowledge",
   "iteration": 3,
   "phase": "delegate",
-  "actor": "tool:Supabase",
+  "actor": "tool:SqliteVector",
   "content": "…the full verbatim block text…",
   "tokens": 512
 }
@@ -477,18 +502,21 @@ optional DBs (§8.3) grow richer from — semantic recall over the run's own his
 
 ### 8.3 Optional graph & vector database backends
 
+### 8.3 Optional graph & vector database backends — embedded & file-based
+
 By default the worklog is **file-only** — everything above works with no external services. For larger
-or longer-lived runs, the `knowledge_graph` config (§2) can mirror each record into either or both of:
+or longer-lived runs, the `knowledge_graph` config (§2) can mirror each record into either or both of
+these **embedded, file-based** backends (still no server to run):
 
-| Backend       | Config (`knowledge_graph.*`)                         | What it enables                                                                                                                                     |
-| ------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Graph DB**  | `graph_db: { enabled, type, url, database }`         | Entities → nodes, `relationships` → edges. Query old worklogs **structurally** via GraphQL / Cypher (e.g. "what calls `FuelOptimizationService`?"). |
-| **Vector DB** | `vector_db: { enabled, type, function_name, table }` | Embeds each summary + entities. **Semantic** recall over past worklogs via the same `SupabaseVectorStore`.                                          |
+| Backend       | Config (`knowledge_graph.*`)                   | What it enables                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Graph DB**  | `graph_db: { enabled, type, path }`            | Entities → nodes, `relationships` → edges in an **embedded Kuzu** database (the "SQLite of graph databases") at a single local `path`, queried with **Cypher** (e.g. "what calls `FuelOptimizationService`?"). Set `type: "sqlite"` to keep nodes/edges as tables in one `.db` file traversed by recursive CTEs instead (zero extra dependency). |
+| **Vector DB** | `vector_db: { enabled, type, db_file, table }` | Embeds each summary + entities into a local **SQLite** vector store (`sqlite-vec`, single `db_file`). **Semantic** recall over past worklogs via the same `SqliteVectorStore`.                                                                                                                                                                   |
 
-Both default **off**. When on, `cognitive_index.search()` can resolve a query against the graph or
-vector DB **dynamically** instead of only reading files — so a later run can loop back over an earlier
-run's knowledge without re-reading it. Mirror upserts run under `parallel_supprocess`, like the
-metadata step.
+Both default **off** and both live in a **file you can copy / read directly** — no service. When on,
+`cognitive_index.search()` can resolve a query against the graph or vector DB **dynamically** instead
+of only reading files — so a later run can loop back over an earlier run's knowledge without re-reading
+it. Mirror upserts run under `parallel_supprocess`, like the metadata step.
 
 ```
 <worklog_folder>/<run_id>/           # e.g. wip/bvms-assistant/<run_id>/
@@ -501,28 +529,28 @@ metadata step.
   response_window.log                # ← per-agent latest answer (flushed, then cleared)
   todo.md                            # ← TodoTool checklist (re-injected each iteration)
 # <worklog_folder>/index.db          # ← optional SQLite FTS5 over segments + cognitive_index (LogSearch)
-# graph DB / vector DB               # ← optional external mirrors of knowledge_graph.jsonl (§8.3)
+# knowledge_graph.kuzu / .db         # ← optional embedded mirrors of knowledge_graph.jsonl (Kuzu graph / SQLite vector, §8.3)
 ```
 
 ---
 
 ## 9. Goals → Components
 
-| Goal (user)                                                                     | Realized by                                                                                                                                                                        |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Single recursive class anyone can configure (one object)                        | `ProgressiveAgentSLM` + `AgentConfig` + `config/load.py`                                                                                                                           |
-| **Goal**: stay focused on the user-set goal                                     | `cognitive_behavior` policies + double-check / re-iterate loop (reuse `AnswerEvaluator`)                                                                                           |
-| **Knowledge**: text files + Supabase vector DB + own long-term memory           | `SupabaseTool` (primary, pgvector) + `FileKnowledgeTool` + `VectorMemoryTool` (writable, cross-run)                                                                                |
-| **Tools**: KB, files, search, write, todo, memory, skills, diagrams, python     | `ToolRegistry` + `tools/` (`SupabaseTool`, `ReadFileTool`, `SearchFileTool`, `WriteFileTool`, `TodoTool`, `VectorMemoryTool`, `SkillTool`, `GenerateDiagramTool`, `RunPythonTool`) |
-| **Cognition**: index the worklog, retrieve only what's needed, compact safely   | `CognitiveIndex` (pointer map, `block_id`-keyed) + `Reflector` 50% compaction (reuse `KnowledgeCompression` + `IterationSummarizer`)                                               |
-| **Delegate**: route by description, break into sub-agents, collect results      | Recursive `delegates` + `Router` (`description`-routed `delegate:<agent_id>`) dispatch                                                                                             |
-| **Worklog**: segmented append-only source of truth + per-agent working windows  | `worklog/seg-*.jsonl` segments + `cognitive_index.jsonl` (pointer map: `{segment, iteration, line, offset}`) shared; `context_window` + `response_window` per-agent                |
-| **Knowledge graph**: distill each block into entities/keywords/summary/workflow | `MetadataAgent` → `knowledge_graph.jsonl` (reuse `KeywordExtractor` / `SimpleEntityExtractor` + ladder model); optional graph / vector DB mirrors                                  |
-| **Working folders**: read / search external source dirs beside the log          | `working_folders[]` (`{ path, description }`) resolved read-only by `ReadFileTool` / `SearchFileTool`                                                                              |
-| **Parallelism**: run subprocess fan-out sequentially or in a bounded pool       | `parallel_supprocess` (default 1) via a shared `ParallelExecutor`                                                                                                                  |
-| Local/SLM-first with a model **ladder** (single per-model retry budget)         | `ModelChain` (ladder + `max_retries_until_switching_models`)                                                                                                                       |
-| Per-step logging to terminal + files for full-text search                       | `RunLogger` (block / JSONL) + `LogSearch` (SQLite FTS5 over the worklog logs)                                                                                                      |
-| Workflow configurable via JSON **and** Python                                   | `config/load.py` (`example.json` + `schema.json`) + `ProgressiveAgentSLM(...)`                                                                                                     |
+| Goal (user)                                                                     | Realized by                                                                                                                                                                            |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Single recursive class anyone can configure (one object)                        | `ProgressiveAgentSLM` + `AgentConfig` + `config/load.py`                                                                                                                               |
+| **Goal**: stay focused on the user-set goal                                     | `cognitive_behavior` policies + double-check / re-iterate loop (reuse `AnswerEvaluator`)                                                                                               |
+| **Knowledge**: text files + embedded SQLite vector DB + own long-term memory    | `SqliteVectorTool` (primary, sqlite-vec) + `FileKnowledgeTool` + `VectorMemoryTool` (writable, cross-run SQLite)                                                                       |
+| **Tools**: KB, files, search, write, todo, memory, skills, diagrams, python     | `ToolRegistry` + `tools/` (`SqliteVectorTool`, `ReadFileTool`, `SearchFileTool`, `WriteFileTool`, `TodoTool`, `VectorMemoryTool`, `SkillTool`, `GenerateDiagramTool`, `RunPythonTool`) |
+| **Cognition**: index the worklog, retrieve only what's needed, compact safely   | `CognitiveIndex` (pointer map, `block_id`-keyed) + `Reflector` 50% compaction (reuse `KnowledgeCompression` + `IterationSummarizer`)                                                   |
+| **Delegate**: route by description, break into sub-agents, collect results      | Recursive `delegates` + `Router` (`description`-routed `delegate:<agent_id>`) dispatch                                                                                                 |
+| **Worklog**: segmented append-only source of truth + per-agent working windows  | `worklog/seg-*.jsonl` segments + `cognitive_index.jsonl` (pointer map: `{segment, iteration, line, offset}`) shared; `context_window` + `response_window` per-agent                    |
+| **Knowledge graph**: distill each block into entities/keywords/summary/workflow | `MetadataAgent` → `knowledge_graph.jsonl` (reuse `KeywordExtractor` / `SimpleEntityExtractor` + ladder model); optional embedded Kuzu graph / SQLite vector mirrors                    |
+| **Working folders**: read / search external source dirs beside the log          | `working_folders[]` (`{ path, description }`) resolved read-only by `ReadFileTool` / `SearchFileTool`                                                                                  |
+| **Parallelism**: run subprocess fan-out sequentially or in a bounded pool       | `parallel_supprocess` (default 1) via a shared `ParallelExecutor`                                                                                                                      |
+| Local/SLM-first with a model **ladder** (single per-model retry budget)         | `ModelChain` (ladder + `max_retries_until_switching_models`)                                                                                                                           |
+| Per-step logging to terminal + files for full-text search                       | `RunLogger` (block / JSONL) + `LogSearch` (SQLite FTS5 over the worklog logs)                                                                                                          |
+| Workflow configurable via JSON **and** Python                                   | `config/load.py` (`example.json` + `schema.json`) + `ProgressiveAgentSLM(...)`                                                                                                         |
 
 ---
 
@@ -535,15 +563,16 @@ metadata step.
 | Models (defaults)    | **Per-agent ladder** (highest→lowest): first reachable model wins (the budget is proportional, so any model fits). Each model gets one `max_retries_until_switching_models` budget (default 5) covering **both** quality self-eval failures **and** infra errors; success resets the ladder to the top; the run ends when the ladder is exhausted. **OpenRouter** cloud as automatic fallback or promoted to top; `max_tokens: "auto"` uses the platform context, and every tier is a fraction of it. |
 | Worklog & memory     | **Segmented `worklog_folder` subsystem.** Shared **append-only** raw segments (`worklog/seg-*.jsonl`, rolled per iteration / size cap) + `cognitive_index.jsonl` (pointer map keyed by `block_id`, addressing `{segment, iteration, line, offset}`); per-agent `context_window.log` + `response_window.log` (plain-text scratch). One serialized writer; **`cognitive` is an index, not a compressed blob**; reflection compacts working views to 50%.                                                |
 | Storage format       | **Append-only JSON Lines**, **segmented** into `worklog/seg-*.jsonl` (one self-contained block per line, keyed by `block_id`) — chosen over text-with-line-ranges (fragile under compaction) and over one monolithic file (unbounded, can't jump). Enables typed metadata, O(1) fetch via `{segment, offset}`, jump by file / iteration / line, and direct FTS5 indexing.                                                                                                                             |
-| Knowledge graph      | A background **metadata agent** distills every flushed block into `{entities, keywords, ≤25-word summary, workflow, relationships}` → `knowledge_graph.jsonl`, optionally mirrored to a **graph DB** (GraphQL / Cypher) and/or **vector DB** for dynamic recall over past worklogs. Both DBs default **off** (file-only).                                                                                                                                                                             |
+| Knowledge graph      | A background **metadata agent** distills every flushed block into `{entities, keywords, ≤25-word summary, workflow, relationships}` → `knowledge_graph.jsonl`, optionally mirrored to an **embedded graph DB** (Kuzu / Cypher, or a SQLite nodes/edges fallback) and/or an **embedded SQLite vector DB** (sqlite-vec) for dynamic recall over past worklogs. Both are file-based and default **off** (file-only).                                                                                     |
 | Working folders      | `working_folders[]` are read / searched (never mutated) side by side with the log; `WriteFileTool` stays sandboxed to the `worklog_folder`.                                                                                                                                                                                                                                                                                                                                                           |
 | Parallelism          | One knob — `parallel_supprocess` (default **1**, sequential) — bounds concurrent subprocess fan-out (delegates, tools, metadata, DB upserts); `>1` = bounded pool, inherited by delegates.                                                                                                                                                                                                                                                                                                            |
 | Tool safety          | **Trust-local / ungated** (home-lab); `WriteFileTool` / `SearchFileTool` / `ReadFileTool` resolve paths under the run's `worklog_folder` with path-traversal / absolute-escape rejection (OWASP A01/A03); `skills` load **trusted-local files only**. Optional **`require_approval` (default false)** on `RunPythonTool` / `WriteFileTool`. ⚠️ Autonomous code execution can be destructive; revisit before any non-local use.                                                                        |
 | Tool-call protocol   | **Both** — native Ollama `/api/chat` tool-calling when supported; **prompted-JSON + robust parser** fallback for small models.                                                                                                                                                                                                                                                                                                                                                                        |
+| Tool models          | Each tool may pin its **own `models` ladder** (a leaner local model tuned for tool-calling); a tool that omits `models` **inherits the agent's** top-level ladder, with the same retry-budget semantics (§4, §6).                                                                                                                                                                                                                                                                                     |
 | Logging & search     | **JSONL events + per-run block records + SQLite FTS5 index** for full-text search.                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Sequencing           | **Phased** — MVP core agent first, then full tools / reflection, then workflow config, then hardening.                                                                                                                                                                                                                                                                                                                                                                                                |
 | Workflow config      | **JSON (`example.json`) + Python construction**, both via `config/load.py` with delegate inheritance + `schema.json` validation.                                                                                                                                                                                                                                                                                                                                                                      |
-| Isolation            | All new code under `src/framework/`. Existing files minimally touched (async `SupabaseVectorStore`, Ollama `/api/chat`).                                                                                                                                                                                                                                                                                                                                                                              |
+| Isolation            | All new code under `src/framework/`. Existing files minimally touched (new `SqliteVectorStore` (sqlite-vec) reusing `Embedding`, Ollama `/api/chat`).                                                                                                                                                                                                                                                                                                                                                 |
 
 ---
 
@@ -557,18 +586,18 @@ src/framework/
   ContextWindow.py               # four-tier fractional budget over the active model's max_tokens: conversation_history_awareness / cognitive_reflection_behavior / current_working_attention / (remainder=answer); cascade-on-zero + 50% compaction
   ModelChain.py                  # per-agent ladder → first reachable model; single per-model retry budget (max_retries_until_switching_models) covering quality + infra; success resets to top; platform factory; max_tokens "auto"
   CognitiveBehavior.py           # renders cognitive_behavior when → then rules into the system prompt
-  ToolRegistry.py                # Tool base + dispatch; each tool carries a `when` guidance string
+  ToolRegistry.py                # Tool base + dispatch; each tool carries a `when` guidance string + an optional own `models` ladder (inherits the agent's when omitted)
   ParallelExecutor.py            # bounded fan-out helper: runs subprocess steps (delegates, tools, metadata, DB upserts) sequentially (parallel_supprocess=1) or in a bounded pool (>1)
   agents/
     Reflector.py                 # progressive reflection: compacts context_window + cognitive_index to 50% when over budget; segments stay intact (index, not a compressed blob)
     Router.py                    # reads each delegate.description → picks delegate(s) for a sub-question (generalized _parse_agent_routing → delegate:<agent_id>)
   tools/
-    SupabaseTool.py              # PRIMARY: pgvector RPC via SupabaseVectorStore.async_query; optional parallel DocumentRanking when ranking=true
+    SqliteVectorTool.py          # PRIMARY: embedded vector search via SqliteVectorStore.async_query (sqlite-vec, single .db file); optional parallel DocumentRanking when ranking=true
     ReadFileTool.py              # read a file (resolved under worklog_folder; traversal-safe)
     SearchFileTool.py            # name/content search (ripgrep-style) → path + line + snippet; traversal-safe
     WriteFileTool.py             # write a file (traversal-safe); optional require_approval; reuses FileHanlder
     TodoTool.py                  # rewrites <worklog_folder>/todo.md checklist; re-injected each iteration (anti-drift)
-    VectorMemoryTool.py          # writable cross-run memory: recall()/remember() over a Supabase memory table (reuses Embedding)
+    VectorMemoryTool.py          # writable cross-run memory: recall()/remember() over a local SQLite memory table (sqlite-vec; reuses Embedding)
     SkillTool.py                 # on-demand procedure packs from skills_dir (progressive disclosure; trusted-local)
     GenerateDiagramTool.py       # emits Mermaid for the visualize_diagram policy
     RunPythonTool.py             # wraps tools/PythonCodeExecute; optional require_approval (default false)
@@ -579,7 +608,7 @@ src/framework/
     RawWorklog.py                # append-only, SEGMENTED worklog/seg-*.jsonl; append(block) → {block_id, segment, iteration, line, offset}; rolls per iteration / max_segment_lines; O(1) seek fetch()
     CognitiveIndex.py            # cognitive_index.jsonl pointer map; append(pointer{segment,iteration,line,offset})/search()/compact(0.5); resolves via graph/vector DB when enabled
     MetadataAgent.py             # distills each flushed block → knowledge_graph.jsonl (entities, keywords, ≤25-word summary, workflow, relationships); reuses KeywordExtractor/SimpleEntityExtractor + a ladder model
-    KnowledgeGraph.py            # knowledge_graph.jsonl store + optional mirrors: GraphStore (graph DB, GraphQL/Cypher) + vector DB upsert (SupabaseVectorStore)
+    KnowledgeGraph.py            # knowledge_graph.jsonl store + optional embedded mirrors: GraphStore (Kuzu/Cypher, or SQLite nodes/edges) + SqliteVectorStore upsert (sqlite-vec)
     ContextWindowLog.py          # per-agent context_window.log; stream()/retrieve(index)/compact(0.5)
     ResponseWindow.py            # per-agent response_window.log; write()/flush→raw+index+metadata/clear()
     LogSearch.py                 # SQLite FTS5 index (<worklog_folder>/index.db) over worklog/seg-*.jsonl + cognitive_index.jsonl + knowledge_graph.jsonl + search() + CLI
@@ -608,8 +637,9 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
   `max_retries_until_switching_models` (default 5) covering quality self-eval **and** infra failures;
   success resets to the top model; platform factory (`ollama`→`Ollama`, `open_router`→`OpenRouter`);
   `max_tokens: "auto"` sizing (§4). _(reworks `ModelRegistry`)_
-- [x] Make `SupabaseVectorStore` async: `async_query` + `async_get_documents_string` via
-      `httpx.AsyncClient` (sync preserved). _(IMPROVEMENTS.md §2)_
+- [~] **SQLite vector store** — `SqliteVectorStore` (`sqlite-vec`): `async_query` +
+  `async_get_documents_string` over a local `.db` file (reuses `Embedding`). Replaces the
+  Supabase / pgvector backend; the earlier async `SupabaseVectorStore` work is superseded. _(new)_
 - [~] `logging/` **worklog** subsystem (§8): append-only **segmented** `RawWorklog` (rolls per
   iteration / `max_segment_lines`; append → `{block_id, segment, iteration, line, offset}`) +
   `CognitiveIndex` (pointer map addressing `{segment, iteration, line, offset}`, cheap keyword
@@ -641,10 +671,11 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
   Forwarder)_
 - [~] `agents/Reflector.py`: the cognitive-accumulation compressor (reuse `KnowledgeCompression` +
   `IterationSummarizer`).
-- [~] `ToolRegistry.py` + `tools/SupabaseTool.py` (primary; `function_name` + `ranking`) +
+- [~] `ToolRegistry.py` + `tools/SqliteVectorTool.py` (primary; `db_file` + `table` + `ranking`) +
   `tools/ReadFileTool.py` + `tools/TodoTool.py`; file tools resolve paths under the run's
   `worklog_folder` **and** any `working_folders` root (read-only), traversal-safe; each tool carries
-  its `when` guidance (used for menu pruning).
+  its `when` guidance (used for menu pruning) and an optional own `models` ladder (inherits the
+  agent's when omitted).
 - [~] Wire `RunLogger` + the segmented `Worklog` subsystem (single serialized writer);
   `progressive_agent_slm_demo.py` via `create_chat_backend` (port 8001).
 
@@ -652,21 +683,22 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
 
 - [ ] Remaining tools: `SearchFileTool` (read / search `working_folders` + `worklog_folder`) +
       `WriteFileTool` (writes sandboxed to `worklog_folder`), `VectorMemoryTool` (cross-run memory over a
-      Supabase table), `SkillTool` (progressive-disclosure procedure packs), `GenerateDiagramTool`
+      local SQLite table, sqlite-vec), `SkillTool` (progressive-disclosure procedure packs), `GenerateDiagramTool`
       (Mermaid), `RunPythonTool` (wrap `PythonCodeExecute`, optional `require_approval`),
       `FileKnowledgeTool`.
 - [ ] `CognitiveBehavior.py`: render `cognitive_behavior` `when → then` rules into the system prompt;
       ship the baseline set (deep_think, double_check, visualize_diagram, say_no).
-- [ ] Supabase ranking path: parallel `DocumentRanking` batches (reuse `RagAssistant.stream`) when
+- [ ] `SqliteVector` ranking path: parallel `DocumentRanking` batches (reuse `RagAssistant.stream`) when
       `ranking: true`.
 - [ ] Budget enforcement: measure tokens (tokenizer or char-approx), trim each tier to budget,
       implement cascade-on-zero donation.
 - [ ] `logging/MetadataAgent.py`: distill each flushed block → `knowledge_graph.jsonl` (`entities`,
       `keywords`, ≤25-word `summary`, `workflow`, `relationships`) via `KeywordExtractor` /
       `SimpleEntityExtractor` + a ladder model; run under `parallel_supprocess` (§8.2). _(new)_
-- [ ] `logging/KnowledgeGraph.py`: optional mirrors of `knowledge_graph.jsonl` into a **graph DB**
-      (nodes / edges, GraphQL / Cypher) and/or a **vector DB** (`SupabaseVectorStore`); `cognitive_index.search`
-      resolves against them when enabled. Both default **off** (§8.3). _(new)_
+- [ ] `logging/KnowledgeGraph.py`: optional **embedded** mirrors of `knowledge_graph.jsonl` into a
+      **graph DB** (Kuzu / Cypher, or SQLite nodes/edges) and/or a **SQLite vector DB**
+      (`SqliteVectorStore`, sqlite-vec); `cognitive_index.search` resolves against them when enabled.
+      Both default **off** (§8.3). _(new)_
 - [ ] `logging/LogSearch.py`: SQLite FTS5 index (`<worklog_folder>/index.db`) over `worklog/seg-*.jsonl`
   - `cognitive_index.jsonl` + `knowledge_graph.jsonl` + search + CLI over all runs.
 
@@ -697,8 +729,8 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
 
 The canonical configuration (live copy: `src/framework/example.json`). It defines a top orchestrator
 with **two RAG-backed delegates** — each delegate is itself a full `ProgressiveAgentSLM` with its own
-proportional `context_window_breakdown` and Supabase function (the code delegate also pins its own
-`models`). The same tree can be authored in JSON or built in Python; both produce the same agent and
+proportional `context_window_breakdown` and embedded SQLite vector store (the code delegate also pins
+its own `models`). The same tree can be authored in JSON or built in Python; both produce the same agent and
 drop into `create_chat_backend`.
 
 ### 13a. JSON (declarative, recursive)
@@ -749,14 +781,13 @@ drop into `create_chat_backend`.
     "worklog": { "segment_by": "iteration", "max_segment_lines": 2000 },
     "graph_db": {
       "enabled": false,
-      "type": "neo4j",
-      "url": "bolt://localhost:7687",
-      "database": "bvms_worklog"
+      "type": "kuzu",
+      "path": "knowledge_graph.kuzu"
     },
     "vector_db": {
       "enabled": false,
-      "type": "supabase",
-      "function_name": "match_worklog_knowledge",
+      "type": "sqlite",
+      "db_file": "knowledge_graph.db",
       "table": "worklog_knowledge"
     }
   },
@@ -823,8 +854,9 @@ drop into `create_chat_backend`.
       },
       "tools": [
         {
-          "type": "Supabase",
-          "function_name": "match_n8n_documents_bvms_neo",
+          "type": "SqliteVector",
+          "db_file": "knowledge/bvms_docs.db",
+          "table": "bvms_documents",
           "ranking": true,
           "when": "Primary source for how BVMS works: architecture, components, business workflows, and features."
         }
@@ -848,8 +880,9 @@ drop into `create_chat_backend`.
       ],
       "tools": [
         {
-          "type": "Supabase",
-          "function_name": "match_n8n_code_bvms_neo",
+          "type": "SqliteVector",
+          "db_file": "knowledge/bvms_code.db",
+          "table": "bvms_code",
           "ranking": true,
           "when": "Primary source for code-level questions: internals, code structure, APIs, and implementation details."
         },
@@ -891,7 +924,9 @@ assistant = ProgressiveAgentSLM(
                      dict(path="bvms/fe-source-code", description="BVMS frontend source code")],
     parallel_supprocess=1,
     knowledge_graph=dict(file="knowledge_graph.jsonl", metadata_model="inherit",
-                         graph_db=dict(enabled=False), vector_db=dict(enabled=False)),
+                         graph_db=dict(enabled=False, type="kuzu", path="knowledge_graph.kuzu"),
+                         vector_db=dict(enabled=False, type="sqlite", db_file="knowledge_graph.db",
+                                        table="worklog_knowledge")),
     system_prompt="You are a helpful assistant that answers questions about BVMS by combining "
                   "domain knowledge, code analysis, and diagrams, delegating to specialists when needed.",
     context_window_breakdown=dict(conversation_history_awareness=0.025,
@@ -909,9 +944,11 @@ assistant = ProgressiveAgentSLM(
         dict(id="say_no",       when="No answer after exhausting sources.",  then="Say so honestly; never invent."),
     ],
     tools=[
-        dict(type="ReadFileTool", when="A referenced local file is needed."),
-        dict(type="TodoTool", when="Keep the run checklist current."),
-        dict(type="VectorMemoryTool", when="Recall/remember durable facts across runs."),
+        dict(type="ReadFileTool", when="A referenced local file is needed.",
+             models=[dict(platform="ollama", name="qwen3.5:9b", url="http://localhost:11434", max_tokens=32000)]),
+        dict(type="TodoTool", when="Keep the run checklist current."),  # inherits parent models
+        dict(type="VectorMemoryTool", db_file="memory/agent_memory.db", table="agent_memory",
+             when="Recall/remember durable facts across runs."),
     ],
     delegates=[
         ProgressiveAgentSLM(
@@ -920,7 +957,7 @@ assistant = ProgressiveAgentSLM(
             context_window_breakdown=dict(conversation_history_awareness=0,
                                           cognitive_reflection_behavior=0,
                                           current_working_attention=0.725),
-            tools=[dict(type="Supabase", function_name="match_n8n_documents_bvms_neo",
+            tools=[dict(type="SqliteVector", db_file="knowledge/bvms_docs.db", table="bvms_documents",
                         ranking=True, when="How BVMS works: architecture, features.")],
         ),  # inherits parent models + retry budget
         ProgressiveAgentSLM(
@@ -931,7 +968,7 @@ assistant = ProgressiveAgentSLM(
                                           current_working_attention=0.425),
             models=[dict(platform="ollama", name="qwen3.6:27b",
                          url="http://localhost:11434", max_tokens=64000)],
-            tools=[dict(type="Supabase", function_name="match_n8n_code_bvms_neo",
+            tools=[dict(type="SqliteVector", db_file="knowledge/bvms_code.db", table="bvms_code",
                         ranking=True, when="Code-level questions: internals, APIs.")],
         ),
     ],
@@ -959,10 +996,10 @@ if __name__ == "__main__":
 | `all_agent_responses` + `IterationSummarizer` compaction         | Seed for the segmented worklog blocks + the 50% progressive-reflection compaction                                     |
 | `KnowledgeCompression`, `IterationSummarizer`                    | `Reflector` — the 50% compaction of `context_window` + `cognitive_index` (not a blob)                                 |
 | `KeywordExtractor`, `SimpleEntityExtractor`                      | Cheap ~10–20-token `cognitive_index` summaries + `knowledge_graph` entities / keywords (LLM summary only when needed) |
-| `SupabaseVectorStore` + `Embedding`                              | `VectorMemoryTool` — writable cross-run memory table (`remember` / `recall`)                                          |
+| `SqliteVectorStore` (sqlite-vec) + `Embedding`                   | `VectorMemoryTool` — writable cross-run SQLite memory table (`remember` / `recall`)                                   |
 | `FileHanlder` / `PythonCodeExecute`                              | `WriteFileTool` / `SearchFileTool` / `RunPythonTool` (traversal-safe under `worklog_folder`)                          |
-| `RagAssistant.stream` (parallel `DocumentRanking` batches)       | `SupabaseTool` ranking path (`ranking: true`)                                                                         |
-| `SupabaseVectorStore.async_query`                                | `SupabaseTool` — the primary capability                                                                               |
+| `RagAssistant.stream` (parallel `DocumentRanking` batches)       | `SqliteVectorTool` ranking path (`ranking: true`)                                                                     |
+| `SqliteVectorStore.async_query` (sqlite-vec)                     | `SqliteVectorTool` — the primary capability (embedded, single `.db` file)                                             |
 | `Task` + DI-kwargs pattern                                       | `Router`, `Reflector` agents                                                                                          |
 | `AnswerEvaluator`, `FinalThoughtSummarizer`                      | `double_check` policy + final recap from the worklog                                                                  |
 | `PythonCodeExecute`                                              | `RunPythonTool` (optional `require_approval`, default false)                                                          |
@@ -976,10 +1013,10 @@ if __name__ == "__main__":
 1. **Unit**: config loader + delegate inheritance, four-tier **fractional** budgeting (trim +
    cascade-on-zero over each model's `max_tokens`), `cognitive_index` pointer append + 50% compaction,
    model-ladder switch (single retry budget covering quality + infra) + success-reset, `Router`
-   description-routing selection parser, `SupabaseTool`, segmented `Worklog` append / read (`block_id`
+   description-routing selection parser, `SqliteVectorTool`, segmented `Worklog` append / read (`block_id`
    integrity) behind one writer, `RunLogger` JSONL + FTS round-trip.
 2. **Integration smoke**: load `example.json` with a stub model — assert the tree builds, the parent
-   routes to a delegate by `description`, the delegate calls its Supabase tool and appends blocks under
+   routes to a delegate by `description`, the delegate calls its SQLite vector tool and appends blocks under
    its own `agent_id`, `cognitive_index` grows yet stays ≤ its budget, and the `worklog/` segments +
    `cognitive_index.jsonl` + `knowledge_graph.jsonl` (+ per-agent `context_window.log` / `response_window.log`) exist and FTS
    search returns the run.
@@ -1004,12 +1041,14 @@ if __name__ == "__main__":
 | 7   | Worklog storage format — text `.log` with line ranges, structured JSON, or a monolithic array?                | **Append-only JSON Lines**, **segmented** into `worklog/seg-*.jsonl` (one self-contained block per line, keyed by `block_id`). Line ranges were fragile under compaction and one monolithic file grew unbounded; segmented JSONL keeps append-only, adds typed metadata, works with FTS5, and enables O(1) jump by `{segment, iteration, line, offset}`. | ✅ Decided |
 | 8   | Token measurement for budgeting — real per-model tokenizer, or char≈token approximation?                      | Char-approx (reuse `CHARS_PER_TOKEN`) for P1; pluggable tokenizer in P2.                                                                                                                                                                                                                                                                                 | _TBD_      |
 | 9   | `cognitive_index` summaries — cheap keyword extraction or LLM per block?                                      | Keyword / entity extraction by default (`KeywordExtractor`); LLM summary only when needed.                                                                                                                                                                                                                                                               | _TBD_      |
-| 10  | `VectorMemory` scope & backing store — cross-run? Supabase table or local?                                    | Cross-run persistent; a dedicated Supabase memory table reusing `Embedding` (local store as a fallback).                                                                                                                                                                                                                                                 | _TBD_      |
+| 10  | `VectorMemory` scope & backing store — cross-run? SQLite file or server?                                      | Cross-run persistent; a dedicated **local SQLite** memory table (`sqlite-vec`) reusing `Embedding` — a single `.db` file, no server.                                                                                                                                                                                                                     | ✅ Decided |
 | 11  | `worklog_folder` lifecycle — one ephemeral `<worklog_folder>/<run_id>/` per question; `VectorMemory` durable? | Yes — `<worklog_folder>/<run_id>/` is per-run; durable cross-run knowledge lives in `VectorMemory`.                                                                                                                                                                                                                                                      | _TBD_      |
 | 12  | Worklog file growth — one big file, or many?                                                                  | **Segmented** into `worklog/seg-*.jsonl` (one segment per iteration; optional `max_segment_lines` cap). The `cognitive_index` addresses blocks by `{segment, iteration, line, offset}` for O(1) jump by file / iteration / line (§8.1).                                                                                                                  | ✅ Decided |
 | 13  | Per-block metadata — how is it produced, and where does it go?                                                | A background **metadata agent** distills each flushed block into `{entities, keywords, ≤25-word summary, workflow, relationships}` → `knowledge_graph.jsonl` (§8.2), reusing `KeywordExtractor` / `SimpleEntityExtractor` + a ladder model.                                                                                                              | ✅ Decided |
-| 14  | Dynamic retrieval over old worklogs — files only, or a database?                                              | Optional **graph DB** (nodes / edges, GraphQL / Cypher) and/or **vector DB** mirrors of `knowledge_graph.jsonl`; `cognitive_index.search` resolves against them when enabled. Both default **off** (§8.3).                                                                                                                                               | ✅ Decided |
+| 14  | Dynamic retrieval over old worklogs — files only, or a database?                                              | Optional **embedded** mirrors of `knowledge_graph.jsonl`: a file-based **graph DB** (Kuzu / Cypher, or a SQLite nodes/edges fallback) and/or a **SQLite vector DB** (`sqlite-vec`); `cognitive_index.search` resolves against them when enabled. Both are file-based and default **off** (§8.3).                                                         | ✅ Decided |
 | 15  | Sub-process concurrency — run steps sequentially or in parallel?                                              | One knob, `parallel_supprocess` (default **1** = sequential; `>1` = bounded pool), inherited by delegates; it bounds delegate / tool / metadata / DB-upsert fan-out (§2).                                                                                                                                                                                | ✅ Decided |
+| 16  | Vector store backend — hosted Supabase / pgvector, or embedded?                                               | **Embedded SQLite** (`sqlite-vec`): every knowledge / memory / mirror store is a single local `.db` file you can copy or read directly — no server. Tools take `{ db_file, table }`; the primary tool is `SqliteVector` on a new `SqliteVectorStore` (§6, §8.3).                                                                                         | ✅ Decided |
+| 17  | Tool models — reuse the agent's ladder, or run their own?                                                     | Each tool may pin its **own `models`** ladder (a leaner local model tuned for tool-calling); a tool that omits `models` **inherits the agent's** top-level ladder (§6).                                                                                                                                                                                  | ✅ Decided |
 
 ---
 
@@ -1025,7 +1064,7 @@ The `worklog` subsystem per run (see §8), replacing the old `runs/` artifacts:
   it by file / iteration / line and pull only the relevant blocks back into a working window.
 - **`knowledge_graph.jsonl`** — shared **metadata / knowledge graph**: one record per block from the
   metadata agent (§8.2) — entities, keywords, a ≤25-word summary, workflow, and relationships. Feeds
-  the optional graph / vector DB mirrors (§8.3).
+  the optional embedded Kuzu graph / SQLite vector mirrors (§8.3).
 - **`context_window.log`** — per-agent working set (plain text); compacted to 50% over its
   `current_working_attention` budget.
 - **`response_window.log`** — per-agent latest answer (plain text); flushed to the segments + index +
@@ -1042,7 +1081,7 @@ The `worklog` subsystem per run (see §8), replacing the old `runs/` artifacts:
   "agent_id": "bvms-code-knowledge",
   "iteration": 3,
   "phase": "delegate",
-  "actor": "tool:Supabase",
+  "actor": "tool:SqliteVector",
   "content": "…the full verbatim block text…",
   "tokens": 512
 }
@@ -1059,7 +1098,7 @@ The `worklog` subsystem per run (see §8), replacing the old `runs/` artifacts:
   "offset": 5342,
   "agent_id": "bvms-code-knowledge",
   "phase": "delegate",
-  "actor": "tool:Supabase",
+  "actor": "tool:SqliteVector",
   "summary": "≈10–20-token gist of the block",
   "keywords": ["voyage", "approval", "saga"],
   "tokens": 512

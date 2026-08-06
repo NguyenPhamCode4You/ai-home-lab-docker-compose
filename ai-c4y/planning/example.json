@@ -67,7 +67,8 @@
   // into entities, keywords, a 25-word summary, workflow & relationships and appends them to "file".
   // The append-only worklog is SEGMENTED (worklog.segment_by / max_segment_lines) so the index can
   // jump straight to a segment file + iteration + line. Optional graph_db / vector_db mirrors let old
-  // worklogs be retrieved dynamically (not just by reading files); both are disabled by default.
+  // worklogs be retrieved dynamically (not just by reading files); both are EMBEDDED & FILE-BASED
+  // (no server to run), and both are disabled by default.
   "knowledge_graph": {
     "file": "knowledge_graph.jsonl",
     "metadata_model": "inherit",
@@ -77,17 +78,21 @@
       "max_segment_lines": 2000
     },
 
+    // Embedded, file-based property graph (Kuzu) — the "SQLite of graph databases": Cypher queries
+    // over a single local path, no server. Set type "sqlite" to instead keep nodes/edges as tables
+    // in one .db file and traverse with recursive CTEs (zero extra dependency).
     "graph_db": {
       "enabled": false,
-      "type": "neo4j",
-      "url": "bolt://localhost:7687",
-      "database": "bvms_worklog"
+      "type": "kuzu",
+      "path": "knowledge_graph.kuzu"
     },
 
+    // Local SQLite vector store (sqlite-vec extension) — a single .db file you can copy / read
+    // directly, no server. Same embedded engine as the delegates' knowledge stores below.
     "vector_db": {
       "enabled": false,
-      "type": "supabase",
-      "function_name": "match_worklog_knowledge",
+      "type": "sqlite",
+      "db_file": "knowledge_graph.db",
       "table": "worklog_knowledge"
     }
   },
@@ -115,6 +120,9 @@
     }
   ],
 
+  // Tools also drive an LLM (to plan the call, read / rank results, write artifacts), so each tool may
+  // pin its OWN "models" ladder — a leaner local model tuned for tool-calling instead of the heavy
+  // main ladder. A tool that omits "models" inherits the agent's top-level "models".
   "tools": [
     {
       "type": "ReadFileTool",
@@ -159,6 +167,8 @@
     },
     {
       "type": "VectorMemoryTool",
+      "db_file": "memory/agent_memory.db",
+      "table": "agent_memory",
       "when": "Recall durable facts learned in previous runs, or remember a new durable fact worth reusing later."
     },
     {
@@ -178,8 +188,9 @@
       },
       "tools": [
         {
-          "type": "Supabase",
-          "function_name": "match_n8n_documents_bvms_neo",
+          "type": "SqliteVector",
+          "db_file": "knowledge/bvms_docs.db",
+          "table": "bvms_documents",
           "ranking": true,
           "when": "Primary source for how BVMS works: architecture, components, business workflows, and features."
         }
@@ -203,8 +214,9 @@
       ],
       "tools": [
         {
-          "type": "Supabase",
-          "function_name": "match_n8n_code_bvms_neo",
+          "type": "SqliteVector",
+          "db_file": "knowledge/bvms_code.db",
+          "table": "bvms_code",
           "ranking": true,
           "when": "Primary source for code-level questions: internals, code structure, APIs, and implementation details."
         },

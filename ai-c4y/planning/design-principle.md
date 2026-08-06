@@ -4,7 +4,7 @@
 > engineer + architect on **local small models**.
 >
 > Two layers make it work: a **knowledge layer** mines the hidden 80% of knowledge from code, schemas,
-> and git into **two vector stores**, and a **reasoning layer** — [`ProgressiveAgentSLM`](planning.md)
+> and git into **two local SQLite vector stores** (sqlite-vec), and a **reasoning layer** — [`ProgressiveAgentSLM`](planning.md)
 > — serves it with RAG, a bounded context budget, and disciplined memory.
 
 ---
@@ -45,8 +45,8 @@ flowchart TB
     A2[Source code: services, schemas, APIs] --> B
     A3[Git history: commits, PRs, blame] --> B
     B["Knowledge extraction<br/> Stages 1 –> 6 (§4)"]
-    B --> S1[("Docs store<br/>match_n8n_documents_bvms_neo")]
-    B --> S2[("Code store<br/>match_n8n_code_bvms_neo")]
+    B --> S1[("Docs store<br/>bvms_docs.db (sqlite-vec)")]
+    B --> S2[("Code store<br/>bvms_code.db (sqlite-vec)")]
     S1 --> B1["bvms-general-knowledge delegate<br/>gpt-oss:20b"]
     S2 --> B2["bvms-code-knowledge delegate<br/>qwen3.6:35b-a3b"]
     B1 --> ANS[Senior-level orchestrator<br/>qwen3.6:27b]
@@ -75,13 +75,13 @@ into its store; nothing has to be human-written first.
 
 ## 5. Two knowledge stores (what the delegates consume)
 
-The pipeline's whole output collapses into **two Supabase pgvector stores**, one per delegate in
-[example.json](example.json):
+The pipeline's whole output collapses into **two embedded SQLite vector stores** (`sqlite-vec`, each a
+single local `.db` file — no server), one per delegate in [example.json](example.json):
 
-| Store (RPC)                    | Delegate                 | Model                           | Holds (from stages)                                                               |
-| ------------------------------ | ------------------------ | ------------------------------- | --------------------------------------------------------------------------------- |
-| `match_n8n_documents_bvms_neo` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
-| `match_n8n_code_bvms_neo`      | `bvms-code-knowledge`    | `qwen3.6:27b` (pinned)          | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
+| Store (file · table)              | Delegate                 | Model                           | Holds (from stages)                                                               |
+| --------------------------------- | ------------------------ | ------------------------------- | --------------------------------------------------------------------------------- |
+| `bvms_docs.db` · `bvms_documents` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
+| `bvms_code.db` · `bvms_code`      | `bvms-code-knowledge`    | `qwen3.6:27b` (pinned)          | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
 
 A parent picks a delegate purely by its **`description`** ([planning §7](planning.md)), so "how does
 approval work" lands on the docs store and "where is the race condition fixed" lands on the code
@@ -94,8 +94,8 @@ store — no routing rules to maintain.
 The extracted stores become expert answers through the `ProgressiveAgentSLM` mechanics
 ([planning.md](planning.md)):
 
-- **RAG-first retrieval.** Each delegate runs its Supabase RPC with `ranking: true`, re-ranking
-  chunks before they enter the prompt.
+- **RAG-first retrieval.** Each delegate runs its embedded SQLite vector query (`sqlite-vec`) with
+  `ranking: true`, re-ranking chunks before they enter the prompt.
 - **Bounded four-tier context** (`context_window_breakdown`, [planning §3](planning.md)). Budgets are
   _fractions_ of the active model's `max_tokens`, so retrieved knowledge fits a small model without
   overflow.
@@ -105,7 +105,7 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
   append findings to a shared, append-only worklog that is **segmented** into `worklog/seg-*.jsonl`; a
   `cognitive_index` jumps to any block by segment / iteration / line, and a background metadata agent
   distills each block into `knowledge_graph.jsonl` (entities, keywords, 25-word summary, workflow,
-  relationships) — optionally mirrored to a graph or vector DB. The orchestrator re-reads the code
+  relationships) — optionally mirrored to an embedded Kuzu graph or SQLite vector DB. The orchestrator re-reads the code
   delegate's evidence and the docs delegate's rules **by index lookup**, never by replaying the log.
 - **Senior-style behavior by policy** (`cognitive_behavior`, [planning §5](planning.md)): `deep_think`
   decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid
