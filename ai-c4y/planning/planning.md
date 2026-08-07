@@ -26,6 +26,32 @@
 
 **Status legend:** ⬜ Not started · 🟡 In progress · ✅ Done · ⛔ Blocked
 
+> **Revision 2026-08-07 — what changed & why (folded in from the Hermes study, see
+> `analysis-against-hermes.md`):**
+>
+> 1. **Prompt-cache discipline.** The four-tier prompt is now assembled as a **byte-stable prefix**
+>    (run-constant `system_prompt` + `cognitive_behavior` + tool / delegate descriptions) plus a
+>    **volatile suffix** (retrieved blocks + answer). Rebuilding the prefix mid-run forces a full KV /
+>    prompt-cache re-prefill — the dominant latency cost on a local SLM — so the prefix is held
+>    identical until a **compaction**, the single sanctioned cache-invalidation event (§3).
+> 2. **Enforcement, not just prompting.** The critical `cognitive_behavior` policies are now backed by
+>    **deterministic turn-end guards** (`double_check` → verify-on-stop, `say_no` → grounding gate,
+>    anti-drift → tool-loop guard) because SLMs ignore prompt-only rules (§5).
+> 3. **Work vs. failover split.** `max_retries_until_switching_models` now triggers **model failover
+>    only**; a **separate `max_iterations`** total-work budget (parent 200 / delegate 50, with a
+>    **refund** for batched tool turns) bounds a run and a deep delegate tree independently (§2, §4).
+> 4. **Adaptive compaction.** Reflection compacts **only enough to fit** (not a fixed 50%), protects
+>    **head + tail**, and **updates** the prior summary (iterative, goal-tracking) rather than replacing
+>    it (§3, §8).
+> 5. **Hardened boundaries.** Delegates use a **typed immutable contract** (frozen request / result +
+>    state machine + restricted toolset + byte caps) (§7); file tools add a **sensitive-path deny-list**
+>    and instructional reads forbid pagination (§10); every external read is **byte- and deadline-
+>    bounded** (§4); block text is **redacted on egress** to any other model (§8.2).
+> 6. **Cheap-first, curated KG.** The metadata agent seeds entities / keywords / edges deterministically
+>    (incl. lexical overlap) **before** any LLM call, and a background curator marks records
+>    `stale` / `archived` — **never hard-deletes** (§8.2). Token budgeting is fixed to a single **`char/4`**
+>    heuristic for both estimate and threshold (Open Q#8).
+
 > **Revision 2026-08-06 — what changed & why (this pass):**
 >
 > 1. **Vector store is now embedded SQLite, not Supabase Postgres.** Every knowledge / memory / mirror
@@ -122,24 +148,26 @@
 A single class configured by one object (JSON or Python). Every field has a sensible default; only
 `agent_id`, `description`, and — on the root agent — at least one `model` are required.
 
-| Field                                | Type        | Meaning                                                                                                                                                                                                                             |
-| ------------------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `agent_id`                           | str         | Stable identifier. A parent addresses this agent as `delegate:<agent_id>`, and it labels the agent's blocks in the shared worklog.                                                                                                  |
-| `description`                        | str         | One-line capability summary. The **sole** signal a parent reads to decide whether to delegate here — no separate gate.                                                                                                              |
-| `system_prompt`                      | str \| null | The agent's base persona / instructions, rendered at the top of the `cognitive_reflection_behavior` tier (§3). Optional; when omitted, a default is built from `description` + `cognitive_behavior`. Per-agent (not inherited).     |
-| `worklog_folder`                     | str         | Directory for the run's worklog subsystem (§8). Delegates **share** the parent's `worklog_folder` — one shared log per run.                                                                                                         |
-| `working_folders`                    | list        | External directories the agent may **read / search** side by side with the log (e.g. source code), each `{ path, description }`. Read-only; never mutated (writes stay in the worklog). Inherited by delegates.                     |
-| `parallel_supprocess`                | int         | Max concurrent subprocesses for parallelizable work — delegate fan-out, tool calls, per-block metadata, DB upserts. **1** = strictly sequential (default); **>1** = bounded parallel pool. Inherited by delegates.                  |
-| `knowledge_graph`                    | object      | Config for the metadata / knowledge-graph subsystem (§8): the indexer model, the `knowledge_graph.jsonl` sink, and optional `graph_db` / `vector_db` mirrors. Inherited by delegates.                                               |
-| `context_window_breakdown`           | object      | The four-tier budget, expressed as **fractions** of the active model's `max_tokens` (§3) — the heart of the design. Real token counts are inferred per model.                                                                       |
-| `max_retries_until_switching_models` | int         | One per-model retry budget covering **both** quality (self-eval) **and** infra (timeout / HTTP) failures. Default **5**. When a model exhausts it, **switch to the next model** on the ladder; ladder exhaustion ends the run (§4). |
-| `models`                             | list        | Priority **ladder** (§4), highest first. Each model carries its own `max_retries_until_switching_models`; a successful iteration resets the ladder to the top model.                                                                |
-| `cognitive_behavior`                 | list        | `when → then` behavioral policies (§5) rendered into the system prompt each iteration; also the run's todo checklist. Declarative only — no per-policy models.                                                                      |
-| `tools`                              | list        | Capabilities the agent may call, each with a `when` guidance string and an **optional own `models`** ladder (§6): SQLite vector, todo, write-file, search-file, vector-memory, skills, …                                            |
-| `delegates`                          | list        | Nested `ProgressiveAgentSLM` configs (§7). The parent routes sub-questions to them by reading each one's `agent_id` / `description`.                                                                                                |
+| Field                                | Type        | Meaning                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent_id`                           | str         | Stable identifier. A parent addresses this agent as `delegate:<agent_id>`, and it labels the agent's blocks in the shared worklog.                                                                                                                                                                                   |
+| `description`                        | str         | One-line capability summary. The **sole** signal a parent reads to decide whether to delegate here — no separate gate.                                                                                                                                                                                               |
+| `system_prompt`                      | str \| null | The agent's base persona / instructions, rendered at the top of the `cognitive_reflection_behavior` tier (§3). Optional; when omitted, a default is built from `description` + `cognitive_behavior`. Per-agent (not inherited).                                                                                      |
+| `worklog_folder`                     | str         | Directory for the run's worklog subsystem (§8). Delegates **share** the parent's `worklog_folder` — one shared log per run.                                                                                                                                                                                          |
+| `working_folders`                    | list        | External directories the agent may **read / search** side by side with the log (e.g. source code), each `{ path, description }`. Read-only; never mutated (writes stay in the worklog). Inherited by delegates.                                                                                                      |
+| `parallel_supprocess`                | int         | Max concurrent subprocesses for parallelizable work — delegate fan-out, tool calls, per-block metadata, DB upserts. **1** = strictly sequential (default); **>1** = bounded parallel pool. Inherited by delegates.                                                                                                   |
+| `knowledge_graph`                    | object      | Config for the metadata / knowledge-graph subsystem (§8): the indexer model, the `knowledge_graph.jsonl` sink, and optional `graph_db` / `vector_db` mirrors. Inherited by delegates.                                                                                                                                |
+| `context_window_breakdown`           | object      | The four-tier budget, expressed as **fractions** of the active model's `max_tokens` (§3) — the heart of the design. Real token counts are inferred per model.                                                                                                                                                        |
+| `max_retries_until_switching_models` | int         | Per-model **failover** budget only — counts consecutive quality (self-eval) **and** infra (timeout / HTTP) failures on the _current_ model. Default **5**. When spent, **switch to the next model**; it does **not** cap total work (§4).                                                                            |
+| `max_iterations`                     | int         | Separate **total-work** budget: max progressive iterations for this agent (parent default **200**, delegate default **50**). Batched / programmatic tool turns are **refunded** so they don't burn it; bounds a deep delegate tree independently of the ladder (§4). Inherited (delegates default to a smaller cap). |
+| `models`                             | list        | Priority **ladder** (§4), highest first. Each model carries its own `max_retries_until_switching_models`; a successful iteration resets the ladder to the top model.                                                                                                                                                 |
+| `cognitive_behavior`                 | list        | `when → then` behavioral policies (§5) rendered into the system prompt each iteration; also the run's todo checklist. Declarative only — no per-policy models.                                                                                                                                                       |
+| `tools`                              | list        | Capabilities the agent may call, each with a `when` guidance string and an **optional own `models`** ladder (§6): SQLite vector, todo, write-file, search-file, vector-memory, skills, …                                                                                                                             |
+| `delegates`                          | list        | Nested `ProgressiveAgentSLM` configs (§7). The parent routes sub-questions to them by reading each one's `agent_id` / `description`.                                                                                                                                                                                 |
 
-> **Inheritance.** A delegate that omits `models` or `max_retries_until_switching_models` **inherits
-> the parent's**, and likewise inherits `working_folders`, `parallel_supprocess`, and `knowledge_graph`.
+> **Inheritance.** A delegate that omits `models`, `max_retries_until_switching_models`, or
+> `max_iterations` **inherits the parent's** (though `max_iterations` defaults to a smaller delegate
+> cap), and likewise inherits `working_folders`, `parallel_supprocess`, and `knowledge_graph`.
 > It shares the parent's `worklog_folder` (hence the shared segmented worklog + `cognitive_index` +
 > `knowledge_graph.jsonl`) while keeping its **own** `context_window.log` + `response_window.log`.
 > `context_window_breakdown`, `system_prompt`, `cognitive_behavior`, and `tools` are per-agent (not
@@ -169,13 +197,13 @@ the **remainder is reserved for the answer**. Rather than stuffing accumulated h
 prompt, the agent keeps the full record in the append-only **segmented worklog** (`worklog/seg-*.jsonl`)
 and a `cognitive_index` map over it; the tiers below bound what actually enters the prompt each step.
 
-| Tier                             | Default | Holds                                                                                                                                                                                                              | Budget / compaction rule                                                                                                                                  |
-| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `conversation_history_awareness` | 0.025   | A brief summary of the last few turns — just enough to stay coherent without repeating everything (the full history lives in the worklog).                                                                         | Set **0** for a stateless / one-shot agent; the freed budget is **donated to the next tier** so the agent "thinks harder".                                |
-| `cognitive_reflection_behavior`  | 0.325   | The cognition workspace: `system_prompt` + `cognitive_behavior` policies, tool + delegate descriptions and usage notes, and the internal reasoning / reflection trace used to pick the next step or switch models. | Hosts `cognitive_index` retrieval + reflection; when it and `current_working_attention` exceed budget, a progressive reflection compacts both to **50%**. |
-| `current_working_attention`      | 0.525   | The working set for this run: the current user question plus everything retrieved from tools, delegates, and the past worklog (blocks pulled from the segmented `worklog/` via the index).                         | Compacted to **50%** when over budget (stale blocks dropped — still recoverable from the segments).                                                       |
-| _(remainder ≈ 0.125)_            | —       | The answer the agent emits this iteration (backed by `response_window.log`, §8).                                                                                                                                   | Hard output cap = `max_tokens − Σ(declared tiers)`. Flushed to the segmented `worklog/` + indexed, then **cleared** for the next iteration.               |
-| _(unbounded)_                    | —       | The segmented `worklog/seg-*.jsonl` — every finished block from every agent / delegate, the **single source of truth**.                                                                                            | **Append-only, never rewritten.** No budget; this is what makes the 50% compactions above safe (nothing is truly lost).                                   |
+| Tier                             | Default | Holds                                                                                                                                                                                                              | Budget / compaction rule                                                                                                                                                           |
+| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `conversation_history_awareness` | 0.025   | A brief summary of the last few turns — just enough to stay coherent without repeating everything (the full history lives in the worklog).                                                                         | Set **0** for a stateless / one-shot agent; the freed budget is **donated to the next tier** so the agent "thinks harder".                                                         |
+| `cognitive_reflection_behavior`  | 0.325   | The cognition workspace: `system_prompt` + `cognitive_behavior` policies, tool + delegate descriptions and usage notes, and the internal reasoning / reflection trace used to pick the next step or switch models. | Hosts `cognitive_index` retrieval + reflection; when it and `current_working_attention` exceed budget, a progressive reflection compacts both **adaptively** (only enough to fit). |
+| `current_working_attention`      | 0.525   | The working set for this run: the current user question plus everything retrieved from tools, delegates, and the past worklog (blocks pulled from the segmented `worklog/` via the index).                         | Compacted **adaptively** when over budget (stale blocks dropped — still recoverable from the segments).                                                                            |
+| _(remainder ≈ 0.125)_            | —       | The answer the agent emits this iteration (backed by `response_window.log`, §8).                                                                                                                                   | Hard output cap = `max_tokens − Σ(declared tiers)`. Flushed to the segmented `worklog/` + indexed, then **cleared** for the next iteration.                                        |
+| _(unbounded)_                    | —       | The segmented `worklog/seg-*.jsonl` — every finished block from every agent / delegate, the **single source of truth**.                                                                                            | **Append-only, never rewritten.** No budget; this is what makes the adaptive compactions above safe (nothing is truly lost).                                                       |
 
 > The three declared fractions default to **0.025 / 0.325 / 0.525 = 0.875**, leaving **≈ 0.125** to
 > answer. They must sum to **< 1**; the loader rejects a breakdown that leaves no room for the answer
@@ -203,14 +231,23 @@ flowchart LR
     S --> R
 ```
 
-**Prompt assembly per step:**
+**Prompt assembly per step — a _stable prefix_ + a _volatile suffix_ (prompt-cache-safe):**
+
+The tiers are ordered so everything **constant for the run** sits in a **byte-stable prefix** the
+model's KV cache (Ollama / llama.cpp prefill) or a cloud provider's prompt cache can reuse every
+iteration; only the retrieved working set and the answer change per step. Rebuilding the prefix mid-run
+forces a full re-prefill — the dominant latency cost on a 20B model over a 62k window — so the prefix is
+held **byte-identical until a compaction genuinely forces a rebuild**, the single sanctioned
+cache-invalidation event.
 
 ```
-[ cognitive_reflection_behavior:  system_prompt + cognitive_behavior(when→then, todo)
-                                 + tool/delegate descriptions + reasoning/reflection trace   ≤ f_cog  × max_tokens ]
-[ conversation_history_awareness:  brief rolling summary of recent turns                     ≤ f_conv × max_tokens ]
-[ current_working_attention:       question + retrieved blocks (via cognitive_index) + tools ≤ f_work × max_tokens ]
-→ answer:                          the response for this iteration                           ≤ (1 − Σf) × max_tokens
+── stable prefix (constant per run → cached, never rebuilt except on compaction) ───────────
+[ system_prompt + cognitive_behavior(when→then) + tool/delegate descriptions        ⊂ f_cog  × max_tokens ]
+── volatile suffix (changes each iteration) ────────────────────────────────────────────────
+[ conversation_history_awareness:  brief rolling summary of recent turns            ≤ f_conv × max_tokens ]
+[ cognitive_reflection_behavior:   this-step reasoning / reflection trace + todo    (remainder of f_cog)  ]
+[ current_working_attention:       question + retrieved blocks (via cognitive_index) ≤ f_work × max_tokens ]
+→ answer:                          the response for this iteration                  ≤ (1 − Σf) × max_tokens
 ```
 
 **Core loop invariant — index & retrieve, then compact:**
@@ -225,8 +262,10 @@ per iteration:
     ids     ← cognitive_index.search(question)        # by keyword/summary now; via graph/vector DB when enabled
     working ← worklog.fetch(ids)                      # jump by {segment, iteration, line, offset} ⇒ O(1)
     if size(working) + size(cognitive_reflection) > budget:
-        reflect_and_compact(target = 0.5 * current_size)  # drop/merge pointers; blocks stay in the segments (recoverable)
+        reflect_and_compact(target = fit_under(budget))   # adaptive: shrink only enough to fit; protect head+tail; update the prior summary (iterative, goal-tracking); drop/merge pointers — blocks stay in the segments (recoverable)
     response_window ← respond(prompt)                 # ≤ (1 − Σf) × max_tokens
+    if final and not verify_on_stop(response_window):     # enforced double_check: evidence must cover the question
+        continue                                          # inject one more round while max_iterations remains
     flush(response_window → worklog + cognitive_index + metadata_agent); clear(response_window)
 ```
 
@@ -262,9 +301,14 @@ minimum-size gate. The list is a **ladder** with **one** per-model budget:
 - **Success resets the ladder.** When a model handles an iteration successfully, the ladder pointer
   resets to the **top** model for the next iteration (the cheapest capable model is always tried
   first).
-- **Stopping.** The run stops when the ladder is **exhausted** — the last model uses up its
-  `max_retries_until_switching_models`. There is no separate global iteration cap; ladder length ×
-  per-model budget bounds the total work.
+- **Stopping — two independent limits.** A run ends when **either** the model ladder is **exhausted**
+  (the last model spends its `max_retries_until_switching_models`) **or** the agent's separate
+  **`max_iterations`** total-work budget is hit (§2). Keeping _failover_ and _total work_ apart means a
+  run that is making progress but keeps failing self-eval on one model doesn't prematurely burn the
+  ladder, and a run that never fails still can't spin forever. Batched / programmatic tool turns are
+  **refunded** against `max_iterations`.
+- **Bounded I/O.** Every model call bounds its read with a **byte cap and a wall-clock deadline** (a
+  stalled local endpoint must not hang the run); a deadline hit counts as one infra failure.
 
 This is the per-agent generalization of a role-based registry — local-first with cloud as an automatic
 backstop, or cloud promoted to the top for hard steps.
@@ -298,6 +342,21 @@ model routing.
 **double_check** (verify the gathered evidence actually answers the question; re-iterate if gaps
 remain), **visualize_diagram** (emit a diagram when structure / relationships matter), **say_no**
 (answer honestly when the KB has no answer rather than hallucinate).
+
+> **Enforced, not just prompted.** Small models routinely _ignore_ prompt-only guidance, so the
+> **critical** policies are declarative on the surface **and backed by a deterministic turn-end guard**
+> in the loop (they stay authorable as `when → then`, but do not depend on the SLM choosing to obey):
+>
+> - **`double_check` → verify-on-stop.** When the agent tries to emit a final answer, a guard checks
+>   (via `AnswerEvaluator`) that the gathered evidence actually covers the question; if not — and
+>   `max_iterations` remains — it injects **one** more bounded retrieval round instead of returning.
+> - **`say_no` → grounding gate.** If retrieval returned nothing above a similarity floor, the guard
+>   forces the honest-refusal branch rather than trusting the model to pick it.
+> - **anti-drift → tool-loop guard.** Tools are classed idempotent-vs-mutating; a repeated identical
+>   call is detected and warned / short-circuited so an SLM can't spin on one tool.
+>
+> Non-critical policies (e.g. `visualize_diagram`) stay prompt-only. Guards are pure decisions; the
+> loop owns whether a decision becomes a nudge, a synthetic result, or a halt.
 
 ---
 
@@ -364,9 +423,17 @@ and optional `cognitive_behavior` / `models` / `delegates`. The parent:
    continues. Because the delegate's full work remains in the shared log, any **later** agent or
    delegate can loop back over it via the index.
 
-Depth is bounded by each model's `max_retries_until_switching_models` at every level plus an overall
-recursion cap. Two RAG-backed delegates (`bvms-general-knowledge`, `bvms-code-knowledge`), each owning
-an embedded SQLite vector store, is the canonical example (§13).
+**Typed, isolated boundary.** A parent never hands a delegate a live agent object; it hands a
+**frozen request** (`{ goal, context, role, allowed_toolsets?, blocked_tools? }`, with goal / context /
+result **byte-capped**) and receives a **frozen result** (`{ state, summary, block_id }`). Each delegate
+carries an explicit **state** (`pending → running → succeeded | failed | cancelled`), a `depth`, and a
+**restricted toolset** (a delegate need not — and usually should not — expose every parent tool). This
+immutable contract is what makes fan-out under `parallel_supprocess` and cancellation safe.
+
+Depth is bounded by an overall recursion cap; per-agent work is bounded by each delegate's own
+**`max_iterations`** (default 50, smaller than the parent's) and the model ladder. Two RAG-backed
+delegates (`bvms-general-knowledge`, `bvms-code-knowledge`), each owning an embedded SQLite vector
+store, is the canonical example (§13).
 
 ---
 
@@ -402,7 +469,7 @@ segment file + iteration + line**, so any past block is one seek away instead of
 | `worklog/seg-*.jsonl`   | shared    | JSONL  | **Append-only, never rewritten.** Rolling segments of finished blocks (one JSON record per line, keyed by `block_id`). The single source of truth.               |
 | `cognitive_index.jsonl` | shared    | JSONL  | One **pointer per block** → `{ block_id, segment, iteration, line, offset, summary, keywords }`. The map used to jump to and pull back only the relevant blocks. |
 | `knowledge_graph.jsonl` | shared    | JSONL  | One **metadata record per block** (entities, keywords, 25-word summary, workflow, relationships) from the metadata agent (§8.2). Feeds the optional DBs (§8.3).  |
-| `context_window.log`    | per-agent | text   | The agent's current working set; compacted to 50% when it exceeds the `current_working_attention` budget.                                                        |
+| `context_window.log`    | per-agent | text   | The agent's current working set; compacted adaptively when it exceeds the `current_working_attention` budget.                                                    |
 | `response_window.log`   | per-agent | text   | The agent's **latest** answer only; flushed to the worklog + index + metadata agent, then **cleared** each iteration.                                            |
 | `todo.md`               | shared    | text   | `TodoTool` checklist, re-injected each iteration.                                                                                                                |
 | `index.db` _(optional)_ | shared    | SQLite | FTS5 over the segments + `cognitive_index.jsonl` for `LogSearch`.                                                                                                |
@@ -456,8 +523,9 @@ matching pointers, and **seeks** just those blocks by `{ segment, offset }` into
 This is RAG over the team's own worklog — the trick that keeps SLM prompts small.
 
 **Progressive reflection (compaction).** When `context_window.log` + `cognitive_index` exceed their
-budgets, a reflection compacts **both to 50%** (merge / drop pointers, release stale blocks). Nothing
-is lost — the segments are immutable, so any dropped detail is one `{ segment, offset }` seek away.
+budgets, a reflection compacts **both adaptively** (only enough to fit; merge / drop pointers, release
+stale blocks — protecting head + tail). Nothing is lost — the segments are immutable, so any dropped
+detail is one `{ segment, offset }` seek away.
 
 **Delegate coordination.** A delegate returns just its **final** answer to its parent, but its full
 work lands in the shared segments under its `agent_id`, so any later teammate can loop back over it via
@@ -500,6 +568,18 @@ The metadata agent runs **off the critical path**: blocks are enqueued and proce
 in a bounded pool per `parallel_supprocess` (§2). Its records are what the `cognitive_index` and the
 optional DBs (§8.3) grow richer from — semantic recall over the run's own history.
 
+> **Cheap-first, curated, and egress-safe.**
+>
+> - **Cheap first.** `entities` / `keywords` / `relationships` are seeded by the deterministic
+>   extractors (`KeywordExtractor` / `SimpleEntityExtractor`) and lexical overlap **before** any LLM
+>   call; the ladder model is invoked only for the `summary` / `workflow`, or when extraction is weak.
+> - **Redact on egress.** A block's text may cross to a _different_ model (the metadata / ladder model,
+>   a delegate, a cloud escalation, or an optional DB), so secrets / PII are **redacted at that
+>   boundary** before the text leaves the agent.
+> - **Curate, never delete.** A background curator may mark `knowledge_graph` records / mirrored nodes
+>   `stale` or `archived` (recoverable) and consolidate duplicates — it **never hard-deletes**, so the
+>   segments remain the immutable source of truth.
+
 ### 8.3 Optional graph & vector database backends
 
 ### 8.3 Optional graph & vector database backends — embedded & file-based
@@ -525,7 +605,7 @@ it. Mirror upserts run under `parallel_supprocess`, like the metadata step.
     seg-002.jsonl
   cognitive_index.jsonl              # ← pointer map → {block_id, segment, iteration, line, offset, summary, keywords}
   knowledge_graph.jsonl              # ← metadata agent output: entities, keywords, 25-word summary, workflow, relationships
-  context_window.log                 # ← per-agent working set (compacts to 50% over budget)
+  context_window.log                 # ← per-agent working set (compacts adaptively over budget)
   response_window.log                # ← per-agent latest answer (flushed, then cleared)
   todo.md                            # ← TodoTool checklist (re-injected each iteration)
 # <worklog_folder>/index.db          # ← optional SQLite FTS5 over segments + cognitive_index (LogSearch)
@@ -542,7 +622,7 @@ it. Mirror upserts run under `parallel_supprocess`, like the metadata step.
 | **Goal**: stay focused on the user-set goal                                     | `cognitive_behavior` policies + double-check / re-iterate loop (reuse `AnswerEvaluator`)                                                                                               |
 | **Knowledge**: text files + embedded SQLite vector DB + own long-term memory    | `SqliteVectorTool` (primary, sqlite-vec) + `FileKnowledgeTool` + `VectorMemoryTool` (writable, cross-run SQLite)                                                                       |
 | **Tools**: KB, files, search, write, todo, memory, skills, diagrams, python     | `ToolRegistry` + `tools/` (`SqliteVectorTool`, `ReadFileTool`, `SearchFileTool`, `WriteFileTool`, `TodoTool`, `VectorMemoryTool`, `SkillTool`, `GenerateDiagramTool`, `RunPythonTool`) |
-| **Cognition**: index the worklog, retrieve only what's needed, compact safely   | `CognitiveIndex` (pointer map, `block_id`-keyed) + `Reflector` 50% compaction (reuse `KnowledgeCompression` + `IterationSummarizer`)                                                   |
+| **Cognition**: index the worklog, retrieve only what's needed, compact safely   | `CognitiveIndex` (pointer map, `block_id`-keyed) + `Reflector` **adaptive** compaction (head+tail-protected, iterative summary; reuse `KnowledgeCompression` + `IterationSummarizer`)  |
 | **Delegate**: route by description, break into sub-agents, collect results      | Recursive `delegates` + `Router` (`description`-routed `delegate:<agent_id>`) dispatch                                                                                                 |
 | **Worklog**: segmented append-only source of truth + per-agent working windows  | `worklog/seg-*.jsonl` segments + `cognitive_index.jsonl` (pointer map: `{segment, iteration, line, offset}`) shared; `context_window` + `response_window` per-agent                    |
 | **Knowledge graph**: distill each block into entities/keywords/summary/workflow | `MetadataAgent` → `knowledge_graph.jsonl` (reuse `KeywordExtractor` / `SimpleEntityExtractor` + ladder model); optional embedded Kuzu graph / SQLite vector mirrors                    |
@@ -556,23 +636,27 @@ it. Mirror upserts run under `parallel_supprocess`, like the metadata step.
 
 ## 10. Design Decisions
 
-| Topic                | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Agent & control flow | **Recursive progressive loop** — each step assembles the four-tier prompt (fractions of the active model), applies `cognitive_behavior` policies, calls tools / routes to delegates, then folds context + answer into `cognitive_index`; iterate until the model ladder is exhausted.                                                                                                                                                                                                                 |
-| Delegation           | **Follow `AssistantOrchestra`** routing (`_parse_agent_routing`), generalized to `delegate:<agent_id>`; a parent routes by reading each delegate's `description`. Delegates inherit `models` + `max_retries_until_switching_models`.                                                                                                                                                                                                                                                                  |
-| Models (defaults)    | **Per-agent ladder** (highest→lowest): first reachable model wins (the budget is proportional, so any model fits). Each model gets one `max_retries_until_switching_models` budget (default 5) covering **both** quality self-eval failures **and** infra errors; success resets the ladder to the top; the run ends when the ladder is exhausted. **OpenRouter** cloud as automatic fallback or promoted to top; `max_tokens: "auto"` uses the platform context, and every tier is a fraction of it. |
-| Worklog & memory     | **Segmented `worklog_folder` subsystem.** Shared **append-only** raw segments (`worklog/seg-*.jsonl`, rolled per iteration / size cap) + `cognitive_index.jsonl` (pointer map keyed by `block_id`, addressing `{segment, iteration, line, offset}`); per-agent `context_window.log` + `response_window.log` (plain-text scratch). One serialized writer; **`cognitive` is an index, not a compressed blob**; reflection compacts working views to 50%.                                                |
-| Storage format       | **Append-only JSON Lines**, **segmented** into `worklog/seg-*.jsonl` (one self-contained block per line, keyed by `block_id`) — chosen over text-with-line-ranges (fragile under compaction) and over one monolithic file (unbounded, can't jump). Enables typed metadata, O(1) fetch via `{segment, offset}`, jump by file / iteration / line, and direct FTS5 indexing.                                                                                                                             |
-| Knowledge graph      | A background **metadata agent** distills every flushed block into `{entities, keywords, ≤25-word summary, workflow, relationships}` → `knowledge_graph.jsonl`, optionally mirrored to an **embedded graph DB** (Kuzu / Cypher, or a SQLite nodes/edges fallback) and/or an **embedded SQLite vector DB** (sqlite-vec) for dynamic recall over past worklogs. Both are file-based and default **off** (file-only).                                                                                     |
-| Working folders      | `working_folders[]` are read / searched (never mutated) side by side with the log; `WriteFileTool` stays sandboxed to the `worklog_folder`.                                                                                                                                                                                                                                                                                                                                                           |
-| Parallelism          | One knob — `parallel_supprocess` (default **1**, sequential) — bounds concurrent subprocess fan-out (delegates, tools, metadata, DB upserts); `>1` = bounded pool, inherited by delegates.                                                                                                                                                                                                                                                                                                            |
-| Tool safety          | **Trust-local / ungated** (home-lab); `WriteFileTool` / `SearchFileTool` / `ReadFileTool` resolve paths under the run's `worklog_folder` with path-traversal / absolute-escape rejection (OWASP A01/A03); `skills` load **trusted-local files only**. Optional **`require_approval` (default false)** on `RunPythonTool` / `WriteFileTool`. ⚠️ Autonomous code execution can be destructive; revisit before any non-local use.                                                                        |
-| Tool-call protocol   | **Both** — native Ollama `/api/chat` tool-calling when supported; **prompted-JSON + robust parser** fallback for small models.                                                                                                                                                                                                                                                                                                                                                                        |
-| Tool models          | Each tool may pin its **own `models` ladder** (a leaner local model tuned for tool-calling); a tool that omits `models` **inherits the agent's** top-level ladder, with the same retry-budget semantics (§4, §6).                                                                                                                                                                                                                                                                                     |
-| Logging & search     | **JSONL events + per-run block records + SQLite FTS5 index** for full-text search.                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Sequencing           | **Phased** — MVP core agent first, then full tools / reflection, then workflow config, then hardening.                                                                                                                                                                                                                                                                                                                                                                                                |
-| Workflow config      | **JSON (`example.json`) + Python construction**, both via `config/load.py` with delegate inheritance + `schema.json` validation.                                                                                                                                                                                                                                                                                                                                                                      |
-| Isolation            | All new code under `src/framework/`. Existing files minimally touched (new `SqliteVectorStore` (sqlite-vec) reusing `Embedding`, Ollama `/api/chat`).                                                                                                                                                                                                                                                                                                                                                 |
+| Topic                | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Agent & control flow | **Recursive progressive loop** — each step assembles the four-tier prompt (fractions of the active model), applies `cognitive_behavior` policies, calls tools / routes to delegates, then folds context + answer into `cognitive_index`; iterate until the model ladder is exhausted.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Delegation           | **Follow `AssistantOrchestra`** routing (`_parse_agent_routing`), generalized to `delegate:<agent_id>`; a parent routes by reading each delegate's `description`. Delegates inherit `models` + `max_retries_until_switching_models`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Models (defaults)    | **Per-agent ladder** (highest→lowest): first reachable model wins (the budget is proportional, so any model fits). Each model gets one `max_retries_until_switching_models` budget (default 5) covering **both** quality self-eval failures **and** infra errors; success resets the ladder to the top; the run ends when the ladder is exhausted **or** the separate `max_iterations` total-work budget is hit (failover and total-work budgets are kept **orthogonal**). **OpenRouter** cloud as automatic fallback or promoted to top; `max_tokens: "auto"` uses the platform context, and every tier is a fraction of it.                                                                                                  |
+| Worklog & memory     | **Segmented `worklog_folder` subsystem.** Shared **append-only** raw segments (`worklog/seg-*.jsonl`, rolled per iteration / size cap) + `cognitive_index.jsonl` (pointer map keyed by `block_id`, addressing `{segment, iteration, line, offset}`); per-agent `context_window.log` + `response_window.log` (plain-text scratch). One serialized writer; **`cognitive` is an index, not a compressed blob**; reflection compacts working views **adaptively** (only enough to fit, protecting head + tail) via **iterative goal-tracking summaries**.                                                                                                                                                                          |
+| Storage format       | **Append-only JSON Lines**, **segmented** into `worklog/seg-*.jsonl` (one self-contained block per line, keyed by `block_id`) — chosen over text-with-line-ranges (fragile under compaction) and over one monolithic file (unbounded, can't jump). Enables typed metadata, O(1) fetch via `{segment, offset}`, jump by file / iteration / line, and direct FTS5 indexing.                                                                                                                                                                                                                                                                                                                                                      |
+| Knowledge graph      | A background **metadata agent** distills every flushed block into `{entities, keywords, ≤25-word summary, workflow, relationships}` → `knowledge_graph.jsonl`, optionally mirrored to an **embedded graph DB** (Kuzu / Cypher, or a SQLite nodes/edges fallback) and/or an **embedded SQLite vector DB** (sqlite-vec) for dynamic recall over past worklogs. Both are file-based and default **off** (file-only).                                                                                                                                                                                                                                                                                                              |
+| Working folders      | `working_folders[]` are read / searched (never mutated) side by side with the log; `WriteFileTool` stays sandboxed to the `worklog_folder`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Parallelism          | One knob — `parallel_supprocess` (default **1**, sequential) — bounds concurrent subprocess fan-out (delegates, tools, metadata, DB upserts); `>1` = bounded pool, inherited by delegates.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Tool safety          | **Trust-local / ungated** (home-lab); `WriteFileTool` / `SearchFileTool` / `ReadFileTool` resolve paths under the run's `worklog_folder` with path-traversal / absolute-escape rejection (OWASP A01/A03), **plus a content-based sensitive-path deny-list** (`.ssh` / `.env` / cloud-credential stores / `/etc/*`) that blocks reads & writes even inside an allowed root; `skills` load **trusted-local files only**; instructional reads (skills / prompts) forbid **`offset`/`limit` pagination** (a small model reads page 1 and skips the rest). Optional **`require_approval` (default false)** on `RunPythonTool` / `WriteFileTool`. ⚠️ Autonomous code execution can be destructive; revisit before any non-local use. |
+| Tool-call protocol   | **Both** — native Ollama `/api/chat` tool-calling when supported; **prompted-JSON + robust parser** fallback for small models.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Tool models          | Each tool may pin its **own `models` ladder** (a leaner local model tuned for tool-calling); a tool that omits `models` **inherits the agent's** top-level ladder, with the same retry-budget semantics (§4, §6).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Logging & search     | **JSONL events + per-run block records + SQLite FTS5 index** for full-text search — with a **trigram tokenizer** (substring / CJK), **incremental bounded merge** (indexing never blocks writes), **query char caps**, and a **resumable rebuild with progress**.                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Prompt caching       | **Stable prefix + volatile suffix.** Everything constant per run (`system_prompt`, `cognitive_behavior`, tool / delegate descriptions) sits in a byte-stable prefix so the model KV-cache / prompt-cache is reused every iteration; only the retrieved working set + answer change. The prefix is rebuilt **only** on a forced compaction — the single sanctioned cache-invalidation event (§3).                                                                                                                                                                                                                                                                                                                               |
+| Policy enforcement   | **Enforced, not just prompted.** Critical `cognitive_behavior` policies are declarative _and_ backed by deterministic turn-end guards — `double_check` → verify-on-stop, `say_no` → grounding gate, anti-drift → tool-loop guard — because SLMs ignore prompt-only rules (§5).                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Work vs. failover    | **Two orthogonal budgets.** `max_retries_until_switching_models` triggers _model failover_ only; a separate `max_iterations` caps _total work_ (parent 200 / delegate 50), with a **refund** for batched tool turns. Either limit can end a run (§2, §4).                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Egress redaction     | Block text may cross to a different model (metadata / ladder model, delegate, cloud escalation, optional DB); secrets / PII are **redacted at that boundary** before leaving the agent (§8.2).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Sequencing           | **Phased** — MVP core agent first, then full tools / reflection, then workflow config, then hardening.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Workflow config      | **JSON (`example.json`) + Python construction**, both via `config/load.py` with delegate inheritance + `schema.json` validation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Isolation            | All new code under `src/framework/`. Existing files minimally touched (new `SqliteVectorStore` (sqlite-vec) reusing `Embedding`, Ollama `/api/chat`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ---
 
@@ -583,19 +667,21 @@ src/framework/
   __init__.py
   ProgressiveAgentSLM.py         # the single recursive agent class: owns context_window_breakdown, models, cognitive_behavior, tools, delegates; runs the progressive loop and recurses into delegates
   AgentConfig.py                 # parsed config: agent_id, description, system_prompt, worklog_folder, working_folders[], parallel_supprocess, knowledge_graph, context_window_breakdown, max_retries_until_switching_models, models[], cognitive_behavior[], tools[], delegates[] (+ inheritance from parent)
-  ContextWindow.py               # four-tier fractional budget over the active model's max_tokens: conversation_history_awareness / cognitive_reflection_behavior / current_working_attention / (remainder=answer); cascade-on-zero + 50% compaction
-  ModelChain.py                  # per-agent ladder → first reachable model; single per-model retry budget (max_retries_until_switching_models) covering quality + infra; success resets to top; platform factory; max_tokens "auto"
+  ContextWindow.py               # four-tier fractional budget over the active model's max_tokens: conversation_history_awareness / cognitive_reflection_behavior / current_working_attention / (remainder=answer); cascade-on-zero; stable-prefix/volatile-suffix assembly (prompt-cache-safe); adaptive compaction
+  ModelChain.py                  # per-agent ladder → first reachable model; per-model FAILOVER budget (max_retries_until_switching_models) covering quality + infra; success resets to top; platform factory; max_tokens "auto"; byte+deadline-bounded reads
+  IterationBudget.py             # thread-safe TOTAL-WORK counter, separate from failover: consume()/refund() (batched tool turns don't count); parent 200 / delegate 50; either this or ladder exhaustion ends a run
   CognitiveBehavior.py           # renders cognitive_behavior when → then rules into the system prompt
   ToolRegistry.py                # Tool base + dispatch; each tool carries a `when` guidance string + an optional own `models` ladder (inherits the agent's when omitted)
   ParallelExecutor.py            # bounded fan-out helper: runs subprocess steps (delegates, tools, metadata, DB upserts) sequentially (parallel_supprocess=1) or in a bounded pool (>1)
   agents/
-    Reflector.py                 # progressive reflection: compacts context_window + cognitive_index to 50% when over budget; segments stay intact (index, not a compressed blob)
+    Reflector.py                 # progressive reflection (pluggable engine: should_compress()/compress()): compacts context_window + cognitive_index ADAPTIVELY (only enough to fit) when over budget; protects head+tail; updates the prior summary (iterative); segments stay intact (index, not a compressed blob)
     Router.py                    # reads each delegate.description → picks delegate(s) for a sub-question (generalized _parse_agent_routing → delegate:<agent_id>)
+    Guards.py                    # enforced turn-end policy guards: double_check→verify-on-stop (AnswerEvaluator), say_no→grounding gate (similarity floor), anti-drift→tool-loop guard (idempotent-vs-mutating + repeat detection)
   tools/
     SqliteVectorTool.py          # PRIMARY: embedded vector search via SqliteVectorStore.async_query (sqlite-vec, single .db file); optional parallel DocumentRanking when ranking=true
-    ReadFileTool.py              # read a file (resolved under worklog_folder; traversal-safe)
-    SearchFileTool.py            # name/content search (ripgrep-style) → path + line + snippet; traversal-safe
-    WriteFileTool.py             # write a file (traversal-safe); optional require_approval; reuses FileHanlder
+    ReadFileTool.py              # read a file (resolved under worklog_folder/working_folders; traversal-safe + sensitive-path deny-list)
+    SearchFileTool.py            # name/content search (ripgrep-style) → path + line + snippet; traversal-safe + deny-list
+    WriteFileTool.py             # write a file (sandboxed to worklog_folder; traversal-safe + deny-list); optional require_approval; reuses FileHanlder
     TodoTool.py                  # rewrites <worklog_folder>/todo.md checklist; re-injected each iteration (anti-drift)
     VectorMemoryTool.py          # writable cross-run memory: recall()/remember() over a local SQLite memory table (sqlite-vec; reuses Embedding)
     SkillTool.py                 # on-demand procedure packs from skills_dir (progressive disclosure; trusted-local)
@@ -606,10 +692,10 @@ src/framework/
     RunLogger.py                 # owns the worklog run dir; terminal + block events; single serialized writer
     Worklog.py                   # coordinator (segmented raw + cognitive_index + knowledge_graph + context_window + response_window)
     RawWorklog.py                # append-only, SEGMENTED worklog/seg-*.jsonl; append(block) → {block_id, segment, iteration, line, offset}; rolls per iteration / max_segment_lines; O(1) seek fetch()
-    CognitiveIndex.py            # cognitive_index.jsonl pointer map; append(pointer{segment,iteration,line,offset})/search()/compact(0.5); resolves via graph/vector DB when enabled
-    MetadataAgent.py             # distills each flushed block → knowledge_graph.jsonl (entities, keywords, ≤25-word summary, workflow, relationships); reuses KeywordExtractor/SimpleEntityExtractor + a ladder model
+    CognitiveIndex.py            # cognitive_index.jsonl pointer map; append(pointer{segment,iteration,line,offset})/search()/compact(adaptive); resolves via graph/vector DB when enabled
+    MetadataAgent.py             # distills each flushed block → knowledge_graph.jsonl (entities, keywords, ≤25-word summary, workflow, relationships); CHEAP-FIRST (KeywordExtractor/SimpleEntityExtractor + lexical overlap before any LLM); ladder model only for summary/workflow; redacts on egress; background curator marks stale/archived (never hard-deletes)
     KnowledgeGraph.py            # knowledge_graph.jsonl store + optional embedded mirrors: GraphStore (Kuzu/Cypher, or SQLite nodes/edges) + SqliteVectorStore upsert (sqlite-vec)
-    ContextWindowLog.py          # per-agent context_window.log; stream()/retrieve(index)/compact(0.5)
+    ContextWindowLog.py          # per-agent context_window.log; stream()/retrieve(index)/compact(adaptive)
     ResponseWindow.py            # per-agent response_window.log; write()/flush→raw+index+metadata/clear()
     LogSearch.py                 # SQLite FTS5 index (<worklog_folder>/index.db) over worklog/seg-*.jsonl + cognitive_index.jsonl + knowledge_graph.jsonl + search() + CLI
   config/
@@ -648,24 +734,30 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
   worklog.md/events.jsonl/transcript.md; the single `raw_worklog.jsonl` is now segmented)_
 - [ ] `ParallelExecutor`: bounded fan-out driven by `parallel_supprocess` (default 1 = sequential; >1
       = bounded pool) for delegates, independent tool calls, metadata, and DB upserts. _(new)_
-- [ ] Progressive reflection: compact `context_window.log` + `cognitive_index` to **50%** when over the
-      `current_working_attention` / `cognitive_reflection_behavior` budgets (merge / drop pointers, release
-      stale blocks; recoverable from the segments). _(new)_
+- [ ] `IterationBudget`: thread-safe **total-work** counter separate from model failover — `consume()` /
+      **`refund()`** (batched / programmatic tool turns don't count); parent default 200, delegate 50 (§2, §4). _(new)_
+- [ ] Progressive reflection (**pluggable engine** with a `should_compress()` / `compress()` lifecycle):
+      compact `context_window.log` + `cognitive_index` **adaptively** (only enough to fit) when over the
+      `current_working_attention` / `cognitive_reflection_behavior` budgets — **protect head + tail**,
+      **update** (not replace) the prior summary, merge / drop pointers (recoverable from the segments). _(new)_
+- [ ] Bounded I/O helper: every model / tool read is capped by **bytes + wall-clock deadline** (a stalled
+      local endpoint must not hang the run); a deadline hit is one infra failure (§4). _(new)_
 
 ### Phase 1 — Recursive core agent (runnable vertical slice) 🟡
 
 - [~] `AgentConfig.py`: parse `agent_id`, `description`, `system_prompt`, `worklog_folder`,
   `working_folders[]`, `parallel_supprocess` (default 1), `context_window_breakdown`,
-  `max_retries_until_switching_models` (default 5), `models[]`, `cognitive_behavior[]`, `tools[]`,
-  `knowledge_graph`, `delegates[]`; apply parent→delegate inheritance of the model ladder + retry
-  budget + shared `worklog_folder` + `working_folders` + `parallel_supprocess` + `knowledge_graph`.
+  `max_retries_until_switching_models` (default 5), `max_iterations` (parent 200 / delegate 50),
+  `models[]`, `cognitive_behavior[]`, `tools[]`, `knowledge_graph`, `delegates[]`; apply parent→delegate
+  inheritance of the model ladder + failover budget + `max_iterations` + shared `worklog_folder` +
+  `working_folders` + `parallel_supprocess` + `knowledge_graph`.
 - [~] `ProgressiveAgentSLM.py`: the single recursive class. Per step — retrieve relevant blocks from the
-  segmented worklog via `cognitive_index` into `context_window`, assemble the four-tier prompt,
-  select a model from the ladder, apply `cognitive_behavior` policies, route to delegates by
-  `description` / prune tools by `when`, emit the answer (remainder tier) into `response_window`, flush
-  the block to the segmented worklog + `cognitive_index.jsonl` + `knowledge_graph.jsonl`, quick
-  self-eval (switch model on repeated failure). Recurse into `delegates`; stop when the model ladder is
-  exhausted.
+  segmented worklog via `cognitive_index` into `context_window`, assemble the four-tier prompt **as a
+  byte-stable prefix + volatile suffix** (§3), select a model from the ladder, apply `cognitive_behavior`
+  policies, route to delegates by `description` / prune tools by `when`, emit the answer (remainder tier)
+  into `response_window`, flush the block to the segmented worklog + `cognitive_index.jsonl` +
+  `knowledge_graph.jsonl`, quick self-eval (switch model on repeated failure). Recurse into `delegates`;
+  stop when the model ladder is exhausted **or `max_iterations` is spent**.
 - [~] `agents/Router.py`: choose delegate(s) per sub-question by `description` via the generalized
   `_parse_agent_routing` (`delegate:<agent_id>`); prune the tool menu by each tool's `when`. _(reworks
   Forwarder)_
@@ -688,6 +780,14 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
       `FileKnowledgeTool`.
 - [ ] `CognitiveBehavior.py`: render `cognitive_behavior` `when → then` rules into the system prompt;
       ship the baseline set (deep_think, double_check, visualize_diagram, say_no).
+- [ ] **Enforcement guards** behind the critical policies (§5): `double_check` → **verify-on-stop**
+      (block a final answer whose evidence doesn't cover the question via `AnswerEvaluator`; inject one
+      more round while `max_iterations` remains); `say_no` → **grounding gate** (force honest refusal when
+      retrieval is below a similarity floor); anti-drift → **tool-loop guard** (idempotent-vs-mutating
+      classification + repeated-call detection). _(new)_
+- [ ] Safety hardening: **sensitive-path deny-list** on file tools (beyond traversal checks),
+      **no `offset`/`limit`** on instructional reads, and **egress redaction** of block text before it
+      crosses to any other model (§8.2, §10). _(new)_
 - [ ] `SqliteVector` ranking path: parallel `DocumentRanking` batches (reuse `RagAssistant.stream`) when
       `ranking: true`.
 - [ ] Budget enforcement: measure tokens (tokenizer or char-approx), trim each tier to budget,
@@ -700,7 +800,11 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
       (`SqliteVectorStore`, sqlite-vec); `cognitive_index.search` resolves against them when enabled.
       Both default **off** (§8.3). _(new)_
 - [ ] `logging/LogSearch.py`: SQLite FTS5 index (`<worklog_folder>/index.db`) over `worklog/seg-*.jsonl`
-  - `cognitive_index.jsonl` + `knowledge_graph.jsonl` + search + CLI over all runs.
+  - `cognitive_index.jsonl` + `knowledge_graph.jsonl` + search + CLI over all runs — **trigram
+    tokenizer** (substring / CJK), **incremental bounded merge** (never blocks writes), **query char
+    caps**, and a **resumable rebuild with progress** (§8).
+- [ ] `VectorMemoryTool` I/O discipline: **background prefetch pre-turn / sync post-turn** with a bounded
+      drain timeout, so long-term memory never blocks the critical path (§6). _(new)_
 
 ### Phase 3 — Config loader (JSON + Python) ⬜
 
@@ -713,14 +817,19 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
 ### Phase 4 — Hardening ⬜
 
 - [ ] Unit tests: config loader / inheritance (incl. `working_folders` / `parallel_supprocess` /
-      `knowledge_graph`), four-tier budgeting + cascade, `cognitive_index` pointer append + 50% compaction
-      (`block_id` integrity), **segmented worklog** append + jump by `{segment, iteration, line, offset}` +
-      segment rollover, **metadata agent** `knowledge_graph.jsonl` fields, **`ParallelExecutor`**
-      sequential-vs-pool (`parallel_supprocess`), optional graph / vector mirrors, model-ladder switch
-      (single retry budget) + success-reset, router description-routing parser, Supabase tool, `Worklog`
-      append / read behind one writer, `RunLogger` JSONL + FTS round-trip.
+      `knowledge_graph` / `max_iterations`), four-tier budgeting + cascade, **stable-prefix / volatile-suffix
+      assembly stays byte-identical across iterations** (cache-safety), `cognitive_index` pointer append +
+      **adaptive** compaction (head+tail protection, iterative summary, `block_id` integrity), **segmented
+      worklog** append + jump by `{segment, iteration, line, offset}` + segment rollover, **metadata agent**
+      `knowledge_graph.jsonl` fields + **cheap-first** extraction + **egress redaction**, **`IterationBudget`
+      consume / refund** + parent-vs-delegate caps, **`ParallelExecutor`** sequential-vs-pool
+      (`parallel_supprocess`), optional graph / vector mirrors, model-ladder **failover** switch + success-reset
+      (independent of `max_iterations`), **enforcement guards** (verify-on-stop / grounding gate / tool-loop),
+      **file-tool deny-list** + traversal rejection, router description-routing parser, Supabase tool, `Worklog`
+      append / read behind one writer, `RunLogger` JSONL + FTS round-trip (trigram / incremental merge).
 - [ ] Integration smoke test with a stub model implementing `.stream`.
-- [ ] Timeouts / retries (reuse 429 / backoff from `OpenRouter`); model fall-through.
+- [ ] Timeouts / retries (reuse 429 / backoff from `OpenRouter`); model fall-through; **byte + deadline
+      bounded reads** (§4).
 - [ ] Optional `require_approval` (default false) on `RunPythonTool` / any shell tool.
 
 ---
@@ -993,8 +1102,8 @@ if __name__ == "__main__":
 | `AssistantOrchestra.stream`                                      | `ProgressiveAgentSLM` per-step loop (route → execute → accumulate → reflect → iterate)                                |
 | `AssistantOrchestra._parse_agent_routing` / `_parse_eval_result` | `Router` delegate selection (`delegate:<agent_id>`) + double-check evaluation parsing                                 |
 | `AssistantOrchestra.add_agent` / `agents` registry               | The recursive `delegates` registry (each keyed by `agent_id` + `description`)                                         |
-| `all_agent_responses` + `IterationSummarizer` compaction         | Seed for the segmented worklog blocks + the 50% progressive-reflection compaction                                     |
-| `KnowledgeCompression`, `IterationSummarizer`                    | `Reflector` — the 50% compaction of `context_window` + `cognitive_index` (not a blob)                                 |
+| `all_agent_responses` + `IterationSummarizer` compaction         | Seed for the segmented worklog blocks + the adaptive progressive-reflection compaction                                |
+| `KnowledgeCompression`, `IterationSummarizer`                    | `Reflector` — the adaptive compaction of `context_window` + `cognitive_index` (not a blob)                            |
 | `KeywordExtractor`, `SimpleEntityExtractor`                      | Cheap ~10–20-token `cognitive_index` summaries + `knowledge_graph` entities / keywords (LLM summary only when needed) |
 | `SqliteVectorStore` (sqlite-vec) + `Embedding`                   | `VectorMemoryTool` — writable cross-run SQLite memory table (`remember` / `recall`)                                   |
 | `FileHanlder` / `PythonCodeExecute`                              | `WriteFileTool` / `SearchFileTool` / `RunPythonTool` (traversal-safe under `worklog_folder`)                          |
@@ -1011,7 +1120,7 @@ if __name__ == "__main__":
 ## 15. Verification
 
 1. **Unit**: config loader + delegate inheritance, four-tier **fractional** budgeting (trim +
-   cascade-on-zero over each model's `max_tokens`), `cognitive_index` pointer append + 50% compaction,
+   cascade-on-zero over each model's `max_tokens`), `cognitive_index` pointer append + adaptive compaction,
    model-ladder switch (single retry budget covering quality + infra) + success-reset, `Router`
    description-routing selection parser, `SqliteVectorTool`, segmented `Worklog` append / read (`block_id`
    integrity) behind one writer, `RunLogger` JSONL + FTS round-trip.
@@ -1039,7 +1148,7 @@ if __name__ == "__main__":
 | 5   | Per-step (per-policy) model choice?                                                                           | **No** — `cognitive_behavior` stays declarative (system-prompt + todo); model choice is global via the ladder.                                                                                                                                                                                                                                           | ✅ Decided |
 | 6   | Routing signal — how are delegates vs. tools selected?                                                        | **Delegates** are chosen by `description` only (agent-level `when` removed); **tools** keep a `when` that a cheap pre-pass uses to prune the menu before the SLM picks.                                                                                                                                                                                  | ✅ Decided |
 | 7   | Worklog storage format — text `.log` with line ranges, structured JSON, or a monolithic array?                | **Append-only JSON Lines**, **segmented** into `worklog/seg-*.jsonl` (one self-contained block per line, keyed by `block_id`). Line ranges were fragile under compaction and one monolithic file grew unbounded; segmented JSONL keeps append-only, adds typed metadata, works with FTS5, and enables O(1) jump by `{segment, iteration, line, offset}`. | ✅ Decided |
-| 8   | Token measurement for budgeting — real per-model tokenizer, or char≈token approximation?                      | Char-approx (reuse `CHARS_PER_TOKEN`) for P1; pluggable tokenizer in P2.                                                                                                                                                                                                                                                                                 | _TBD_      |
+| 8   | Token measurement for budgeting — real per-model tokenizer, or char≈token approximation?                      | **`char/4` for both the budget estimate AND the compaction threshold** (one heuristic, so measure and trigger never disagree — matches Hermes's `estimate_request_tokens_rough`); pluggable exact tokenizer in P2.                                                                                                                                       | ✅ Decided |
 | 9   | `cognitive_index` summaries — cheap keyword extraction or LLM per block?                                      | Keyword / entity extraction by default (`KeywordExtractor`); LLM summary only when needed.                                                                                                                                                                                                                                                               | _TBD_      |
 | 10  | `VectorMemory` scope & backing store — cross-run? SQLite file or server?                                      | Cross-run persistent; a dedicated **local SQLite** memory table (`sqlite-vec`) reusing `Embedding` — a single `.db` file, no server.                                                                                                                                                                                                                     | ✅ Decided |
 | 11  | `worklog_folder` lifecycle — one ephemeral `<worklog_folder>/<run_id>/` per question; `VectorMemory` durable? | Yes — `<worklog_folder>/<run_id>/` is per-run; durable cross-run knowledge lives in `VectorMemory`.                                                                                                                                                                                                                                                      | _TBD_      |
@@ -1049,6 +1158,11 @@ if __name__ == "__main__":
 | 15  | Sub-process concurrency — run steps sequentially or in parallel?                                              | One knob, `parallel_supprocess` (default **1** = sequential; `>1` = bounded pool), inherited by delegates; it bounds delegate / tool / metadata / DB-upsert fan-out (§2).                                                                                                                                                                                | ✅ Decided |
 | 16  | Vector store backend — hosted Supabase / pgvector, or embedded?                                               | **Embedded SQLite** (`sqlite-vec`): every knowledge / memory / mirror store is a single local `.db` file you can copy or read directly — no server. Tools take `{ db_file, table }`; the primary tool is `SqliteVector` on a new `SqliteVectorStore` (§6, §8.3).                                                                                         | ✅ Decided |
 | 17  | Tool models — reuse the agent's ladder, or run their own?                                                     | Each tool may pin its **own `models`** ladder (a leaner local model tuned for tool-calling); a tool that omits `models` **inherits the agent's** top-level ladder (§6).                                                                                                                                                                                  | ✅ Decided |
+| 18  | Prompt assembly — rebuild the whole prompt each iteration, or keep a stable prefix?                           | **Stable prefix + volatile suffix** (§3): run-constant tiers stay byte-stable so the KV / prompt cache is reused; compaction is the only sanctioned rebuild. _(Hermes lesson.)_                                                                                                                                                                          | ✅ Decided |
+| 19  | Behavioral policies — prompt-only, or enforced?                                                               | **Both** — declarative `when → then` on the surface, deterministic turn-end guards behind the critical ones (`double_check`, `say_no`, anti-drift), because SLMs ignore prompt-only rules (§5). _(Hermes lesson.)_                                                                                                                                       | ✅ Decided |
+| 20  | Total work vs. model failover — one budget or two?                                                            | **Two** — `max_retries_until_switching_models` = failover only; separate `max_iterations` = total work (parent 200 / delegate 50) with a refund for batched turns (§2, §4). _(Hermes lesson.)_                                                                                                                                                           | ✅ Decided |
+| 21  | Compaction target — fixed 50%, or adaptive?                                                                   | **Adaptive** — shrink only enough to fit, protect head + tail, and **update** the prior summary (iterative, goal-tracking) rather than replace it (§3, §8). _(Hermes lesson.)_                                                                                                                                                                           | ✅ Decided |
+| 22  | Delegate boundary — pass agent objects, or a typed contract?                                                  | **Typed, immutable contract** — frozen request (goal / context / role / allowed*toolsets, byte-capped) + frozen result + explicit state machine + restricted toolset (§7). *(Hermes lesson.)\_                                                                                                                                                           | ✅ Decided |
 
 ---
 
@@ -1065,7 +1179,7 @@ The `worklog` subsystem per run (see §8), replacing the old `runs/` artifacts:
 - **`knowledge_graph.jsonl`** — shared **metadata / knowledge graph**: one record per block from the
   metadata agent (§8.2) — entities, keywords, a ≤25-word summary, workflow, and relationships. Feeds
   the optional embedded Kuzu graph / SQLite vector mirrors (§8.3).
-- **`context_window.log`** — per-agent working set (plain text); compacted to 50% over its
+- **`context_window.log`** — per-agent working set (plain text); compacted adaptively over its
   `current_working_attention` budget.
 - **`response_window.log`** — per-agent latest answer (plain text); flushed to the segments + index +
   metadata agent, then cleared each iteration.
@@ -1137,4 +1251,4 @@ away.
 
 ---
 
-_Last updated: 2026-08-02_
+_Last updated: 2026-08-07_

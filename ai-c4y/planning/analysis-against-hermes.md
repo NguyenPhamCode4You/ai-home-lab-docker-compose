@@ -201,6 +201,75 @@ Not recommendations — just so we know what we're deliberately _not_ copying:
 Everything else in ProgressiveSML is confirmed by Hermes's convergent, shipped design and should
 proceed as planned.
 
+> **Status (2026-08-07): all six deltas applied** to [planning.md](planning.md) (new revision note +
+> edits to §2, §3, §4, §5, §7, §8.2, §10, §11, §12, §16) and [design-principle.md](design-principle.md) §6.
+
+---
+
+## 8. What ProgressiveSML solves that Hermes does _not_
+
+Convergence aside, our design deliberately answers three problems Hermes's architecture leaves on the
+table — all rooted in the **different target**: Hermes optimizes a _long-lived personal-assistant
+conversation_ on capable (often cloud) models; ProgressiveSML optimizes a _bounded, high-recall
+reasoning run over a fixed corpus_ on small local models.
+
+1. **Unbounded, addressable memory vs. a linear conversation Hermes must keep compressing.**
+   Hermes's context is one growing message list; when it fills, the compressor **summarizes the middle
+   and the detail is gone** ([context_compressor.py](temp/hermes-agent/agent/context_compressor.py),
+   [trajectory_compressor.py](temp/hermes-agent/trajectory_compressor.py)) — lossy by construction. Our
+   **segmented append-only worklog + `cognitive_index`** ([planning §8](planning.md)) makes compaction
+   touch only the _derived_ working view: every original block stays on disk and is one
+   `{segment, offset}` seek away. **Compaction is lossy for Hermes; for us it is recoverable.** For a
+   corpus assistant that must not "forget" a rule it read 30 iterations ago, this is the bigger win.
+
+2. **A team that loops back over each other's raw work vs. subagents that only return a summary.**
+   Hermes subagents are **isolated** and hand back a bounded result string
+   ([subagent_lifecycle.py](temp/hermes-agent/agent/subagent_lifecycle.py) `_MAX_RESULT_CHARS`); the
+   parent never sees the child's evidence, only its conclusion. Our delegates share **one worklog**, so
+   any later agent can retrieve a teammate's _original_ blocks by index — the code delegate's evidence
+   and the docs delegate's rules are cross-readable, not just their summaries. That's a strictly richer
+   collaboration model for multi-faceted questions ("how does approval work _and_ where is it coded").
+
+3. **A per-agent _proportional_ budget that runs the same config on any model vs. a fixed context knob.**
+   Hermes tunes to a model's context length and protects a fixed head (`protect_first_n`). Our
+   `context_window_breakdown` is expressed as **fractions of the active model's `max_tokens`**
+   ([planning §3](planning.md)), so the _same_ agent spec runs unchanged on a 20B/62k local model or a
+   cloud model with 10× the window — every tier scales automatically. This matters precisely because we
+   escalate _within one run_ across a heterogeneous ladder; Hermes swaps models between conversations.
+
+Secondary things we specify that Hermes leaves implicit: a **background knowledge-graph** with typed
+`relationships` per block (Hermes's `learning_graph` is skill/memory-level, not per-block), optional
+**embedded graph/vector mirrors** for cross-run recall, and a **declarative single-object config**
+(JSON _or_ Python) that a non-programmer can author — Hermes capability lives in code, plugins, and
+`config.yaml` fragments.
+
+## 9. Better overall, or over-engineered?
+
+**Neither strictly — it's a _different, defensible_ point on the design curve, with a real
+over-engineering risk in the middle tiers.** Honest read:
+
+- **Where it is genuinely better _for its target_:** the recoverable worklog (§8.1), shared-memory
+  delegation (§8.2), and proportional budgeting (§8.3) are not gratuitous — they directly serve
+  "high-recall reasoning over a fixed corpus on small models," which is a harder memory problem than
+  Hermes's. On that axis ProgressiveSML is the stronger design.
+- **Where the over-engineering risk is real:** the **knowledge_graph → optional Kuzu/graph-DB +
+  vector-DB mirrors** (§8.3) and the **metadata agent's five distilled fields per block** are a lot of
+  moving parts to build and keep correct _before_ we've proven the core loop earns its keep. Hermes's
+  lesson — **"the core is a narrow waist; capability lives at the edges"** — is the corrective: these
+  should stay **default-off and deferred to Phase 2+**, exactly as planned, and we should resist
+  shipping them until the file-only path demonstrably falls short. Two RAG delegates + a recoverable
+  worklog is already a useful assistant (design-principle §7 build order agrees).
+- **The pragmatic verdict:** build the **thin vertical slice first** (Phase 1: one agent, four-tier
+  prompt with the new stable-prefix, SqliteVector tool, segmented worklog, `cognitive_index`), prove it
+  on real BVMS questions, and only then turn on the metadata agent, the DB mirrors, and MoA. If we hold
+  that discipline, ProgressiveSML is **better-suited, not over-engineered**. If we build the whole §8
+  stack up front, it tips into over-engineered. The plan already sequences it correctly — the risk is
+  execution discipline, not the design.
+
+One concrete simplification worth adopting from Hermes regardless: **keep the always-present tool/core
+surface tiny** and push everything optional into on-demand **skills** (progressive disclosure), so the
+stable prefix — and the SLM's attention — stays lean.
+
 ---
 
 _Companion to [planning.md](planning.md) and [design-principle.md](design-principle.md). Source studied:

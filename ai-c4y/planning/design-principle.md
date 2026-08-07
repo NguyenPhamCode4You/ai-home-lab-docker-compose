@@ -107,14 +107,21 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
   distills each block into `knowledge_graph.jsonl` (entities, keywords, 25-word summary, workflow,
   relationships) — optionally mirrored to an embedded Kuzu graph or SQLite vector DB. The orchestrator re-reads the code
   delegate's evidence and the docs delegate's rules **by index lookup**, never by replaying the log.
-- **Senior-style behavior by policy** (`cognitive_behavior`, [planning §5](planning.md)): `deep_think`
-  decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits a Mermaid
-  diagram, and `say_no` **refuses to invent** an answer when the stores are silent — the guardrail
-  against hallucinated "facts".
-- **Model ladder + parallelism** ([planning §2, §4](planning.md)): the local model does the frequent
-  work while a cloud model escalates hard steps under one `max_retries_until_switching_models` budget;
-  a single `parallel_supprocess` knob (default 1) runs delegate / tool / metadata work sequentially or
-  in a bounded pool.
+- **Senior-style behavior by policy — _enforced_** (`cognitive_behavior`, [planning §5](planning.md)):
+  `deep_think` decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits
+  a Mermaid diagram, and `say_no` **refuses to invent** an answer when the stores are silent. Because a
+  small model can't be trusted to _obey_ prompt text, the critical policies are **backed by deterministic
+  turn-end guards** — `double_check` → verify-on-stop, `say_no` → a grounding gate — so the guardrail
+  against hallucinated "facts" holds even when the SLM would rather guess.
+- **Prompt-cache discipline** ([planning §3](planning.md)): the run-constant part of the prompt
+  (`system_prompt`, policies, tool / delegate descriptions) is a **byte-stable prefix** the model's KV
+  cache reuses every iteration; only the retrieved evidence + answer change. This is what keeps a
+  multi-step reasoning loop **fast on local hardware** — the prefix is re-prefilled only on a compaction.
+- **Model ladder + budgets + parallelism** ([planning §2, §4](planning.md)): the local model does the
+  frequent work while a cloud model escalates hard steps; **failover** (`max_retries_until_switching_models`)
+  and **total work** (`max_iterations`) are kept as separate budgets so a run neither burns the ladder
+  prematurely nor spins forever; a single `parallel_supprocess` knob (default 1) runs delegate / tool /
+  metadata work sequentially or in a bounded pool.
 
 Net effect: expert reasoning emerges from **retrieval + memory discipline**, so the local model never
 has to _memorize_ the enterprise.
@@ -161,4 +168,4 @@ and tech lead**, on local hardware, rather than a documentation search engine.
 ---
 
 _Companion to [planning.md](planning.md) (the reasoning layer) and [example.json](example.json) (the
-canonical config). Last updated: 2026-08-02._
+canonical config). Last updated: 2026-08-07._
