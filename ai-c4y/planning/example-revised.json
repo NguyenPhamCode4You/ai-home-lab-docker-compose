@@ -1,6 +1,9 @@
 {
   "id": "bvms-assistant",
+
   "description": "Specialized Agent that can answer technical question about BVMS (BBC Voyage Management System).",
+
+  "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
 
   "models": [
     {
@@ -20,38 +23,49 @@
   "max_retries_until_switching_models": 5,
 
   "context_window_breakdown_percentages": {
-    "cognition_layer": 32.5,
-    "attention_layer": 52.5,
-    "answer_layer": 15.0
+    "cognition_window": 32.5, // system prompt + working directories + tools + memory management + delegates descriptions
+    "attention_window": 52.5, // user question + retrival results + tools outputs + delegates outputs
+    "response_window": 15.0
   },
 
-  "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
-
+  // Policies define the agent's behavior in various situations, guiding its decision-making and actions.
+  // Happen in-codes, specified by the "when" condition, and the "then" action to take. The "hook" indicates when the policy is runned in the agent's workflow.
   "policies": [
     {
-      "id": "deep_planner",
+      "id": "deep_planning",
       "when": "The question is complex or spans multiple topics.",
-      "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering."
+      "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering.",
+      "hook": "before_answer"
     },
     {
-      "id": "clarifier",
+      "id": "clarification_needed",
       "when": "The question is not clear or ambiguous, and the agent cannot proceed without further information.",
-      "then": "Ask the user for clarification or additional context before proceeding."
+      "then": "Ask the user for clarification or additional context before proceeding.",
+      "hook": "before_answer"
     },
     {
-      "id": "visual_thinker",
+      "id": "visual_thinking",
       "when": "The answer involves a workflow, an architecture, or relationships between components.",
-      "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text."
+      "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text.",
+      "hook": "after_answer"
     },
     {
-      "id": "double_check",
+      "id": "double_checking",
       "when": "All delegates and tools for this iteration have returned their results.",
-      "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them."
+      "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them.",
+      "hook": "after_answer"
     },
     {
-      "id": "refuse_to_invent",
+      "id": "refusing_to_invent",
       "when": "No clear answer can be found after exhausting the relevant delegates and tools.",
-      "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer."
+      "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer.",
+      "hook": "after_answer"
+    },
+    {
+      "id": "analyzing_retrieval_results",
+      "when": "The agent has retrieved information from the knowledge base or memory.",
+      "then": "Analyze the retrieved information to determine its relevance and accuracy before using it to answer the question.",
+      "hook": "after_memory_retrieval"
     }
   ],
 
@@ -90,36 +104,65 @@
   ],
 
   "memory_management": {
-    "folder_path": "bvms/agent-memory",
+    "base_folder_path": "bvms/agent-memory",
     "data_stores": [
       {
-        "id": "iteration_result",
+        "id": "raw_iteration_result",
         "type": "jsonl",
-        "path": "/iteration_*.jsonl",
+        "path": "[base_folder_path]/raw_iteration_result/iteration_*.jsonl",
         "is_iteration_result": true,
-        "retrieval_tool": "JsonlQueryTool"
+        "retrieval_tool": "JsonlQueryTool",
+        "when": "Needing detailed tracing of the agent's reasoning and intermediate results for debugging or analysis of previous iterations."
       },
       {
-        "type": "jsonl",
-        "path": "[worklog_path]/knowledge_graph.jsonl",
-        "query_tool": "JsonlQueryTool"
-      },
-      {
+        "id": "distilled_knowledge",
         "type": "sqlite",
-        "path": "[worklog_path]/bvms_knowledge.db",
-        "table": "business_knowledge",
-        "query_tool": "SqliteVectorQueryTool"
+        "distill_from": ["iteration_result"],
+        "distill_prompt": "Distill the iteration result into a concise, structured knowledge representation that captures the key facts, relationships, and insights relevant to BVMS. Focus on accuracy and clarity, and avoid including irrelevant details.",
+        "path": "[base_folder_path]/bvms_knowledge_base.db",
+        "table": "knowledge",
+        "retrieval_tool": "SqliteVectorQueryTool",
+        "when": "Needing a structured knowledge about BVMS that have been previously studied for efficient retrieval and reasoning of relevant information."
       },
       {
+        "id": "conceptual_index",
         "type": "sqlite",
-        "path": "[worklog_path]/bvms_knowledge.db",
-        "table": "code_knowledge",
-        "query_tool": "SqliteVectorQueryTool"
+        "distill_from": ["distilled_knowledge"],
+        "distill_prompt": "Create a conceptual index that organizes the distilled knowledge into categories, concepts, and relationships. This index should facilitate efficient retrieval of information and support reasoning about BVMS.",
+        "path": "[base_folder_path]/bvms_knowledge_base.db",
+        "table": "conceptual_index",
+        "prompt_injection": true, // no need for "when" because this is a prompt injection
+        "retrieval_tool": "SqliteVectorQueryTool"
       },
       {
-        "type": "markdown",
-        "path": "[worklog_path]/cognitive_index.md",
-        "query_tool": "MarkdownQueryTool"
+        "id": "suituational_knowledge",
+        "type": "sqlite",
+        "distill_from": ["distilled_knowledge"],
+        "distill_prompt": "Extract situational knowledge from the distilled knowledge, focusing on context-specific information, scenarios, and conditions that may affect decision-making or problem-solving in BVMS.",
+        "path": "[base_folder_path]/bvms_knowledge_base.db",
+        "table": "situational_knowledge",
+        "retrieval_tool": "SqliteVectorQueryTool",
+        "when": "Needing context-specific information about what have been previously studied in BVMS to support decision-making or problem-solving."
+      },
+      {
+        "id": "design_decisions_knowledge",
+        "type": "sqlite",
+        "distill_from": ["distilled_knowledge"],
+        "distill_prompt": "Extract design decisions knowledge from the distilled knowledge, focusing on architectural choices, trade-offs, and rationale behind the design of BVMS. This knowledge should help understand the reasoning behind the system's structure and behavior.",
+        "path": "[base_folder_path]/bvms_knowledge_base.db",
+        "table": "design_decisions_knowledge",
+        "retrieval_tool": "SqliteVectorQueryTool",
+        "when": "Needing to understand the architectural choices, trade-offs, and rationale behind the design of BVMS to support decision-making or problem-solving."
+      },
+      {
+        "id": "known_edge_cases_knowledge",
+        "type": "sqlite",
+        "distill_from": ["raw_iteration_result", "distilled_knowledge"],
+        "distill_prompt": "Extract known edge cases knowledge from the raw iteration results and distilled knowledge, focusing on unusual or exceptional scenarios that may arise in BVMS. This knowledge should help identify potential pitfalls and guide the development of robust solutions.",
+        "path": "[base_folder_path]/bvms_knowledge_base.db",
+        "table": "known_edge_cases_knowledge",
+        "retrieval_tool": "SqliteVectorQueryTool",
+        "when": "Needing to identify potential pitfalls and guide the development of robust solutions in BVMS by understanding unusual or exceptional scenarios."
       }
     ]
   }
