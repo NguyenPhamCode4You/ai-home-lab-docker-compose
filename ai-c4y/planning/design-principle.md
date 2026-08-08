@@ -71,7 +71,7 @@ into its store; nothing has to be human-written first.
 
 ---
 
-## 5. Two knowledge stores (what the delegates consume)
+## 5. Two knowledge stores (what the RAG delegates consume)
 
 The pipeline's whole output collapses into **two embedded SQLite vector stores** (`sqlite-vec`, each a
 single local `.db` file — no server), one per delegate in [example.json](example.json):
@@ -104,10 +104,10 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
   metadata agent distills each block into **L2** facts (`knowledge_graph.jsonl` + a default-on
   `knowledge/facts.db`, searched by `KnowledgeSearchTool`); a situational summarizer rolls L2 up into an
   **L3** digest (`situational.md`) that, with the `cognitive_index`, is what actually enters the prompt;
-  **L4** is the behavior layer (system prompt, policies, delegates) held as the cached prefix. The
+  **L4** is the behavior layer (system prompt, reasoning policies, delegates) held as the cached prefix. The
   orchestrator re-reads the code delegate's evidence and the docs delegate's rules **by index lookup**,
   never by replaying the log — and each layer is progressively closer to the prompt.
-- **Senior-style behavior by policy — _enforced_** (`cognitive_behavior`, [planning §5](planning.md)):
+- **Senior-style behavior by reasoning policy — _enforced_** (`cognitive_behavior`, [planning §5](planning.md)):
   `deep_think` decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits
   a Mermaid diagram, and `say_no` **refuses to invent** an answer when the stores are silent. Because a
   small model can't be trusted to _obey_ prompt text, the critical policies are **backed by deterministic
