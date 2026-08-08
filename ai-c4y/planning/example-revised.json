@@ -1,0 +1,126 @@
+{
+  "id": "bvms-assistant",
+  "description": "Specialized Agent that can answer technical question about BVMS (BBC Voyage Management System).",
+
+  "models": [
+    {
+      "platform": "ollama",
+      "name": "gpt-oss:20b",
+      "url": "http://localhost:11434",
+      "max_tokens": 62000
+    },
+    {
+      "platform": "open_router",
+      "name": "anthropic/claude-3.5-sonnet",
+      "url": "https://openrouter.ai/api/v1",
+      "max_tokens": "auto"
+    }
+  ],
+
+  "max_retries_until_switching_models": 5,
+
+  "context_window_breakdown_percentages": {
+    "cognition_layer": 32.5,
+    "attention_layer": 52.5,
+    "answer_layer": 15.0
+  },
+
+  "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
+
+  "policies": [
+    {
+      "id": "deep_planner",
+      "when": "The question is complex or spans multiple topics.",
+      "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering."
+    },
+    {
+      "id": "clarifier",
+      "when": "The question is not clear or ambiguous, and the agent cannot proceed without further information.",
+      "then": "Ask the user for clarification or additional context before proceeding."
+    },
+    {
+      "id": "visual_thinker",
+      "when": "The answer involves a workflow, an architecture, or relationships between components.",
+      "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text."
+    },
+    {
+      "id": "double_check",
+      "when": "All delegates and tools for this iteration have returned their results.",
+      "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them."
+    },
+    {
+      "id": "refuse_to_invent",
+      "when": "No clear answer can be found after exhausting the relevant delegates and tools.",
+      "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer."
+    }
+  ],
+
+  "working_directories": [
+    {
+      "path": "bvms/be-source-code",
+      "description": "BVMS backend source code",
+      "writable": false
+    },
+    {
+      "path": "bvms/fe-source-code",
+      "description": "BVMS frontend source code",
+      "writable": true,
+      "write_approval": true
+    }
+  ],
+
+  "tools": [
+    {
+      "type": "ReadFileTool",
+      "when": "The user references a specific local file whose contents are needed to answer."
+    },
+    {
+      "type": "SearchFileTool",
+      "when": "You need to locate a file by name/glob or find where a term/symbol appears before reading it."
+    },
+    {
+      "type": "WriteFileTool",
+      "require_approval": true,
+      "when": "You must persist an artifact (notes, generated code, a report) to disk inside the sandbox root."
+    },
+    {
+      "type": "TodoTool",
+      "when": "At the start of a multi-step task, and whenever the plan changes: write/refresh the run's checklist so the agent stays on task across iterations."
+    }
+  ],
+
+  "memory_management": {
+    "folder_path": "bvms/agent-memory",
+    "data_stores": [
+      {
+        "id": "iteration_result",
+        "type": "jsonl",
+        "path": "/iteration_*.jsonl",
+        "is_iteration_result": true,
+        "retrieval_tool": "JsonlQueryTool"
+      },
+      {
+        "type": "jsonl",
+        "path": "[worklog_path]/knowledge_graph.jsonl",
+        "query_tool": "JsonlQueryTool"
+      },
+      {
+        "type": "sqlite",
+        "path": "[worklog_path]/bvms_knowledge.db",
+        "table": "business_knowledge",
+        "query_tool": "SqliteVectorQueryTool"
+      },
+      {
+        "type": "sqlite",
+        "path": "[worklog_path]/bvms_knowledge.db",
+        "table": "code_knowledge",
+        "query_tool": "SqliteVectorQueryTool"
+      },
+      {
+        "type": "markdown",
+        "path": "[worklog_path]/cognitive_index.md",
+        "query_tool": "MarkdownQueryTool"
+      }
+    ]
+  }
+}
