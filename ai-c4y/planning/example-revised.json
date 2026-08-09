@@ -14,16 +14,29 @@
   // Enable iteration logging to capture the agent's reasoning and intermediate results on each inference iteration, default is false.
   "iteration_logging_enabled": true,
 
-  // Default run mode is "assistant", which means the agent will operate in a conversational manner, answering user queries and providing information.
-  // Available options are:
-  // 1. assistant: The agent will operate in a conversational manner, answering user queries and providing information. have api_endpoints and communication channels.
-  // 2. research: Continuously research and gather information on a specific topic, without direct user interaction. have topics and goals.
-  // 3. reflection: Autonomously reflect its loggings and previous knowledge / memory to improve in memory management, have 'self_evaluation_quizz' for scoring self improvements.
+  // Operational mode — determines how this agent instance is run:
+  //   "assistant"  (default) — conversational query-answering mode. Requires api_configuration;
+  //                             exposes OpenAI-compatible HTTP endpoints and optional communication
+  //                             channels (terminal, Telegram, Open WebUI). This is the primary
+  //                             production deployment mode.
+  //   "research"   — autonomous knowledge-mining loop. Iterates over research_configuration.topics
+  //                  and goals without direct user interaction; stops on the first active stopping
+  //                  condition (goals satisfied / time limit / iteration cap). Optionally runs
+  //                  self_evaluation_quizz after the loop and can resume if the quiz fails.
+  //   "reflection" — autonomous self-improvement loop. Re-reads its own iteration_logging and
+  //                  memory_data_stores, scores itself via self_evaluation_quizz, and tightens
+  //                  memory management to improve future performance. Closes the cultivate →
+  //                  evaluate → improve cycle without human intervention.
   "run_mode": "assistant",
 
-  // API configuration for the agent, including the base URL, CORS settings, and authentication requirements.
-  // This allows the agent to expose its functionality via an API for integration with other systems or applications.
-  // Available when "assistant" run_mode is selected.
+  // HTTP server configuration for "assistant" mode. Exposes an OpenAI-compatible interface so the
+  // agent drops into Open WebUI, custom frontends, or any OpenAI-client library without an adapter.
+  // base_url:       the address and port the FastAPI server binds to.
+  // enable_cors:    allow cross-origin requests (required for browser-based clients like Open WebUI).
+  // authentication: set true to require an API key on every request.
+  // endpoints:      named route definitions; the stream endpoint is the primary integration path —
+  //                 prefer it over the non-streaming endpoint for interactive use.
+  // Ignored in "research" and "reflection" modes.
   "api_configuration": {
     "base_url": "http://localhost:8000",
     "enable_cors": true,
@@ -47,8 +60,15 @@
     }
   },
 
-  // Placeholder for Communication channels for the agent, allowing it to interact with users or other systems via different platforms.
-  // Available when "assistant" run_mode is selected. For now this is not important, focus on the api steam endpoint first
+  // Multi-platform delivery channels for "assistant" mode. Each channel runs independently alongside
+  // the API; set enabled: false on any entry to disable it without removing the config.
+  //   terminal:  prints responses to stdout — useful for local development and scripted pipelines.
+  //   telegram:  pushes responses to a Telegram bot; requires a valid bot_token from @BotFather.
+  //   openwebui: integrates with a running Open WebUI instance at the given url.
+  // The API stream endpoint (api_configuration) is the primary integration path — channels
+  // supplement it for push-based or terminal workflows. Ignored in "research" and "reflection" modes.
+  // Note: the key name "communiation_channels" contains a spelling error; it will be corrected to
+  // "communication_channels" in a future schema pass.
   "communiation_channels": {
     "terminal": {
       "enabled": true
@@ -63,16 +83,29 @@
     }
   },
 
-  // Research configuration for the agent, specifying the topics to research, goals to achieve, and evaluation prompts for assessing the gathered information.
-  // Available when "research" run_mode is selected.
-  // "stop_when_goals_achieved" default,
-  // or can be "time_limit" or "iterations_limit" as well. Set null to disable any stopping condition.
+  // Autonomous research loop settings. Active only when run_mode = "research".
+  //
+  // Stopping: the loop ends when ANY active stopping condition is met. Set a condition to null to
+  // disable it individually; disabling all three means the run continues until the model ladder is
+  // exhausted (not recommended — always set at least one safety cap).
+  //   stop_when_goals_achieved: semantic stop — the agent evaluates each goal against gathered
+  //                              knowledge and halts when all goals are satisfied. This is the
+  //                              primary stop and runs before the hard caps are checked.
+  //   time_limit:               wall-clock cap in seconds (null = disabled). A safety net to
+  //                              prevent runaway research loops on slow local hardware.
+  //   iterations_limit:         hard iteration cap (null = disabled). A secondary safety net
+  //                              independent of wall-clock time.
+  //
+  // After the loop:
+  //   run_quizz_after_research:     when true, fires self_evaluation_quizz to grade gathered knowledge.
+  //   resume_research_if_quizz_failed: when true and the quiz is below passing_total_scores, the
+  //                                    loop resumes with the unmet goals as new topics.
   "research_configuration": {
     "stop_when_goals_achieved": true,
     "time_limit": 7200,
     "iterations_limit": 100,
-    "run_quizz_after_research": true,
-    "resume_research_if_quizz_failed": true,
+    "run_quizz_after_finish": true,
+    "resume_if_quizz_failed": true,
     "topics": [
       "BVMS architecture",
       "BVMS code analysis",
@@ -86,8 +119,26 @@
     "evaluation_prompt": "Evaluate the gathered information and provide a summary of key findings, insights, and recommendations for further research or action."
   },
 
-  // Self-evaluation quiz for the agent, allowing it to assess its own performance and understanding of the BVMS domain.
-  // Available when "reflection" run_mode is selected. If available, also perform this action after "research" run_mode is completed.
+  // Reflection configuration. Active only when run_mode = "reflection".
+  // Options: "distillation" or "fine-tuning". Determines the type of reflection process the agent will perform on its memory stores.
+  "reflection_configuration": {
+    "relection_mode": "distillation",
+    "enabled": true,
+    "time_limit": 7200,
+    "iterations_limit": 50,
+    "run_quizz_after_finish": true,
+    "resume_if_quizz_failed": true
+  },
+
+  // Structured self-assessment for the agent's knowledge quality and reasoning. Triggered in two ways:
+  //   1. run_mode = "reflection": the agent re-reads its memory stores and grades itself independently.
+  //   2. After run_mode = "research" when run_quizz_after_research = true.
+  //
+  // Each question has a pre-authored expected answer and a point value (score). The agent answers
+  // each question from its memory stores and the result is evaluated against the expected answer.
+  // The total score is compared against passing_total_scores to determine pass / fail.
+  // A failed quiz can re-trigger the research loop (resume_research_if_quizz_failed) or a
+  // reflection loop to address knowledge gaps — closing the cultivate → evaluate → improve cycle.
   "self_evaluation_quizz": {
     "enabled": true,
     "questions": [
