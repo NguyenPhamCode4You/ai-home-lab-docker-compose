@@ -14,6 +14,107 @@
   // Enable iteration logging to capture the agent's reasoning and intermediate results on each inference iteration, default is false.
   "iteration_logging_enabled": true,
 
+  // Default run mode is "assistant", which means the agent will operate in a conversational manner, answering user queries and providing information.
+  // Available options are:
+  // 1. assistant: The agent will operate in a conversational manner, answering user queries and providing information. have api_endpoints and communication channels.
+  // 2. research: Continuously research and gather information on a specific topic, without direct user interaction. have topics and goals.
+  // 3. reflection: Autonomously reflect its loggings and previous knowledge / memory to improve in memory management, have 'self_evaluation_quizz' for scoring self improvements.
+  "run_mode": "assistant",
+
+  // API configuration for the agent, including the base URL, CORS settings, and authentication requirements.
+  // This allows the agent to expose its functionality via an API for integration with other systems or applications.
+  // Available when "assistant" run_mode is selected.
+  "api_configuration": {
+    "base_url": "http://localhost:8000",
+    "enable_cors": true,
+    "authentication": false,
+    "endpoints": {
+      "chat_completions": {
+        "path": "/api/v1/chat/completions",
+        "method": "POST",
+        "description": "Endpoint for generating chat completions based on user input and agent's knowledge."
+      },
+      "models": {
+        "path": "/api/v1/models",
+        "method": "GET",
+        "description": "Endpoint for retrieving the list of available models and their capabilities."
+      },
+      "stream_chat_completions": {
+        "path": "/api/v1/chat/completions/stream",
+        "method": "POST",
+        "description": "Endpoint for streaming chat completions in real-time, allowing for interactive conversations."
+      }
+    }
+  },
+
+  // Placeholder for Communication channels for the agent, allowing it to interact with users or other systems via different platforms.
+  // Available when "assistant" run_mode is selected. For now this is not important, focus on the api steam endpoint first
+  "communiation_channels": {
+    "terminal": {
+      "enabled": true
+    },
+    "telegram": {
+      "enabled": true,
+      "bot_token": "YOUR_TELEGRAM_BOT_TOKEN"
+    },
+    "openwebui": {
+      "enabled": true,
+      "url": "http://localhost:3000"
+    }
+  },
+
+  // Research configuration for the agent, specifying the topics to research, goals to achieve, and evaluation prompts for assessing the gathered information.
+  // Available when "research" run_mode is selected.
+  // "stop_when_goals_achieved" default,
+  // or can be "time_limit" or "iterations_limit" as well. Set null to disable any stopping condition.
+  "research_configuration": {
+    "stop_when_goals_achieved": true,
+    "time_limit": 7200,
+    "iterations_limit": 100,
+    "run_quizz_after_research": true,
+    "resume_research_if_quizz_failed": true,
+    "topics": [
+      "BVMS architecture",
+      "BVMS code analysis",
+      "BVMS design decisions"
+    ],
+    "goals": [
+      "Gather information on BVMS components",
+      "Analyze BVMS source code for best practices",
+      "Document BVMS design decisions and trade-offs"
+    ],
+    "evaluation_prompt": "Evaluate the gathered information and provide a summary of key findings, insights, and recommendations for further research or action."
+  },
+
+  // Self-evaluation quiz for the agent, allowing it to assess its own performance and understanding of the BVMS domain.
+  // Available when "reflection" run_mode is selected. If available, also perform this action after "research" run_mode is completed.
+  "self_evaluation_quizz": {
+    "enabled": true,
+    "questions": [
+      {
+        "question": "How well did the agent understand the BVMS domain?",
+        "answer": ".....",
+        "score": 5
+      },
+      {
+        "question": "How accurate and relevant were the answers provided by the agent?",
+        "answer": ".....",
+        "score": 5
+      },
+      {
+        "question": "How effectively did the agent utilize its knowledge base and tools?",
+        "answer": ".....",
+        "score": 25
+      }
+    ],
+    "passing_total_scores": 30,
+    "evaluation_criteria": [
+      "Accuracy of information",
+      "Clarity of explanations",
+      "Relevance to BVMS domain"
+    ]
+  },
+
   // When iteration logging is enabled, the agent will log its reasoning and intermediate results to a JSONL file for each iteration.
   // This is the L1 raw store. Its "id" ("iteration_result") is the canonical name referenced by both
   // behavior_policies "run_after" and memory_data_stores "distill_from" (they share one vocabulary).
@@ -35,7 +136,17 @@
   // that flag, then fails over top-down WITHIN that subset (after max_retries_until_switching_models).
   // Routing is by the STRUCTURED FLAGS below — "when" is human documentation / tiebreaker only, never
   // the sole routing signal (SLM-interpreted routing is nondeterministic).
-  // Flags: is_embedding_only, is_tool_selection, is_general_purpose, is_vision, is_multimodal, is_coding, is_fallback
+  //
+  // Flags:
+  // 1. is_embedding: for converting text to embeddings for semantic search or retrieval tasks
+  // 2. is_tool_selection: for efficiently selecting the best tool for a given task, based on the task's requirements and the available tools
+  // 3. is_general_purpose: default model for general-purpose reasoning, answering questions, and providing information
+  // 4. is_vision: for processing and analyzing visual data, such as images or videos, and providing insights based on visual content
+  // 5. is_multimodal: for handling tasks that involve multiple modalities, such as text, images, and audio, and integrating information from different sources
+  // 6. is_coding: for understanding, generating, and analyzing code, as well as providing programming-related assistance and solutions
+  // 7. is_fallback: for fallback models that can be used when other models are unavailable or fail to provide satisfactory results
+  // 8. is_memory_distillation: for distilling and retrieving structured knowledge from the agent's memory stores, enabling efficient access to relevant information and insights
+  // 9. is_reflection_and_evaluation: for reflecting on the agent's previous reasoning and intermediate results, evaluating its performance, and improving its decision-making and problem-solving capabilities
   //
   // Each model is an ENDPOINT binding (platform + name + url). Give each pre-loaded local model its OWN
   // url so it stays warm and work fans out ACROSS endpoints in parallel; "max_concurrency" caps how many
@@ -76,6 +187,7 @@
       "url": "http://localhost:11436",
       "is_general_purpose": true,
       "is_memory_distillation": true,
+      "is_reflection_and_evaluation": true,
       "is_coding": true,
       "max_tokens": 128000,
       "keep_warm": true,
@@ -101,6 +213,7 @@
       "url": "https://openrouter.ai/api/v1",
       "is_general_purpose": true,
       "is_memory_distillation": true,
+      "is_reflection_and_evaluation": true,
       "is_fallback": true,
       "max_tokens": "auto",
       "when": "general-purpose, cloud as final fallback model"
