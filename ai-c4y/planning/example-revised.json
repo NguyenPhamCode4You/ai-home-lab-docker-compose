@@ -1,74 +1,159 @@
 {
+  // [Required] Unique identifier for the agent, used for folder naming and logging purposes. It should be a unique string that clearly identifies the agent's purpose or domain
   "id": "bvms-assistant",
 
+  // Human-readable name for the agent, usefull for other agents to delegate tasks to this agent
   "description": "Specialized Agent that can answer technical question about BVMS (BBC Voyage Management System).",
 
+  // [Required] The system prompt is a string that defines the agent's role, behavior, and constraints. It should provide clear instructions on how the agent should respond to user queries, including any specific guidelines or limitations.
   "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
 
-  "models": [
+  // Base folder path for storing everything related to this agent operation, default is the agent's id, but can be customized to a different folder name if needed.
+  "base_folder_path": "bvms-assistant",
+
+  // Enable iteration logging to capture the agent's reasoning and intermediate results on each inference iteration, default is false.
+  "iteration_logging_enabled": true,
+
+  // When iteration logging is enabled, the agent will log its reasoning and intermediate results to a JSONL file for each iteration.
+  // This is a default configuration for the iteration logging data store, which can be customized as needed.
+  "iteration_logging": {
+    "type": "jsonl",
+    "path": "[base_folder_path]/iteration_logging/iteration_*.jsonl",
+    "retrieval_tool": "JsonlQueryTool",
+    "when": "Need raw log tracing of the agent's previous reasoning and intermediate results for debugging or analysis of a current problem."
+  },
+
+  // Leave null or "auto" to pick the first "general-purpose" model in the models ladder, or specify a model name to force the agent to use that model for all tasks.
+  "model_selection": "auto",
+
+  // [Required] Configure the models ladder to define the order of preference for model selection.
+  // The agent will attempt to use the first model in the list, and if it fails or reaches the maximum retries, it will switch to the next model in the ladder.
+  // The "when" condition specifies the context in which each model is preferred, allowing for dynamic model selection based on the task at hand. Default is "general-purpose" for all models
+  // Flags includes: "is_embedding_only", "is_tool_selection", "is_general_purpose", "is_vision", "is_multimodal"
+  "models_ladder": [
+    {
+      "platform": "ollama",
+      "name": "normic-embeddings:1.0.0",
+      "url": "http://localhost:11434",
+      "is_embedding_only": true,
+      "when": "converting text to embeddings for semantic search or retrieval tasks"
+    },
+    {
+      "platform": "ollama",
+      "name": "qwen3.5:4b",
+      "url": "http://localhost:11434",
+      "is_tool_selection": true,
+      "max_tokens": 62000,
+      "when": "tool selection only"
+    },
     {
       "platform": "ollama",
       "name": "gpt-oss:20b",
       "url": "http://localhost:11434",
-      "max_tokens": 62000
+      "is_general_purpose": true,
+      "max_tokens": 62000,
+      "when": "general-purpose"
+    },
+    {
+      "platform": "ollama",
+      "name": "qwen3.6:27b",
+      "url": "http://localhost:11434",
+      "is_general_purpose": true,
+      "max_tokens": 128000,
+      "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving"
+    },
+    {
+      "platform": "ollama",
+      "name": "qwen3.6:35b-a3b",
+      "url": "http://localhost:11434",
+      "is_general_purpose": true,
+      "is_vision": true,
+      "is_multimodal": true,
+      "max_tokens": 128000,
+      "when": "general-purpose, document writing, vision, multimodal reasoning"
     },
     {
       "platform": "open_router",
       "name": "anthropic/claude-3.5-sonnet",
       "url": "https://openrouter.ai/api/v1",
-      "max_tokens": "auto"
+      "is_general_purpose": true,
+      "max_tokens": "auto",
+      "when": "general-purpose, cloud as final fallback model"
     }
   ],
 
+  // Maximum number of retries the agent will attempt with the current model before switching to the next model in the ladder.
+  // This helps ensure that the agent can recover from failures or limitations of a specific model and continue processing the task with an alternative model.
+  // Default is 5 retries
   "max_retries_until_switching_models": 5,
 
+  // This is the default configuration for the agent's context window, which defines the context window is used
   "context_window_breakdown_percentages": {
-    "cognition_window": 32.5, // system prompt + working directories + tools + memory management + delegates descriptions
+    "cognition_window": 32.5, // system prompt + working directories + tools + memory management + delegates descriptions + model selections
     "attention_window": 52.5, // user question + retrival results + tools outputs + delegates outputs
     "response_window": 15.0
   },
 
+  // Allow circular policies to be defined, which can create loops in the agent's behavior.
+  // This can be useful for certain scenarios where iterative reasoning or feedback loops are desired, but it should be used with caution to avoid infinite loops or unintended consequences.
+  // When enabled = true, it solvely depends on the agent's model to stop the loop when it reaches a conclusion or determines that no further iterations are needed.
+  "circular_behavior_policies_allowed": true,
+
+  // Maximum number of circular rounds the agent will allow before stopping the loop and proceeding with the next step in its workflow.
+  // Default is 5 rounds, but it can be adjusted based on the complexity of the task and the desired level of iterative reasoning.
+  "behavior_policies_max_circular_rounds": 5,
+
   // Policies define the agent's behavior in various situations, guiding its decision-making and actions.
-  // Happen in-codes, specified by the "when" condition, and the "then" action to take. The "hook" indicates when the policy is runned in the agent's workflow.
-  "policies": [
+  // Happen in-codes, specified by the "when" condition, and the "then" action to take. The "run_after" indicates when the policy is runned in the agent's workflow.
+  // Options for "run_after" include: "question_received", "retrieval_result", "iteration_result", "final_answer" and can combine with other policies via "id" references.
+  "behavior_policies": [
     {
       "id": "deep_planning",
       "when": "The question is complex or spans multiple topics.",
       "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering.",
-      "hook": "before_answer"
+      "run_after": ["question_received"]
     },
     {
       "id": "clarification_needed",
       "when": "The question is not clear or ambiguous, and the agent cannot proceed without further information.",
       "then": "Ask the user for clarification or additional context before proceeding.",
-      "hook": "before_answer"
+      "run_after": ["question_received", "iteration_result"]
     },
     {
-      "id": "visual_thinking",
+      "id": "visual_representation",
       "when": "The answer involves a workflow, an architecture, or relationships between components.",
       "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text.",
-      "hook": "after_answer"
+      "run_after": ["iteration_result"]
     },
     {
       "id": "double_checking",
       "when": "All delegates and tools for this iteration have returned their results.",
       "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them.",
-      "hook": "after_answer"
+      "run_after": ["iteration_result", "deep_planning"]
     },
     {
       "id": "refusing_to_invent",
       "when": "No clear answer can be found after exhausting the relevant delegates and tools.",
       "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer.",
-      "hook": "after_answer"
+      "run_after": ["iteration_result"]
     },
     {
       "id": "analyzing_retrieval_results",
       "when": "The agent has retrieved information from the knowledge base or memory.",
       "then": "Analyze the retrieved information to determine its relevance and accuracy before using it to answer the question.",
-      "hook": "after_memory_retrieval"
+      "run_after": ["retrieval_result"]
+    },
+    {
+      "id": "self_reflection",
+      "when": "The agent has completed an iteration and has gathered new information or insights.",
+      "then": "Reflect on the iteration results and distill the key knowledge into a structured format for future reference.",
+      "run_after": ["final_answer"]
     }
   ],
 
+  // A set of working directories that the agent can access, each with a specified path and description.
+  // The agent can read from these directories, and if writable, it can also write to them.
+  // The "write_approval" flag indicates whether the agent needs approval before writing to the directory.
   "working_directories": [
     {
       "path": "bvms/be-source-code",
@@ -83,6 +168,8 @@
     }
   ],
 
+  // A set of tools that the agent can use to perform specific actions or access external resources.
+  // These are default tools that are available to the agent, and they can be used in conjunction with the agent's reasoning and decision-making processes.
   "tools": [
     {
       "type": "ReadFileTool",
@@ -100,70 +187,178 @@
     {
       "type": "TodoTool",
       "when": "At the start of a multi-step task, and whenever the plan changes: write/refresh the run's checklist so the agent stays on task across iterations."
+    },
+    {
+      "type": "GenerateDiagramTool",
+      "when": "The answer involves a workflow, an architecture, or relationships between components."
+    },
+    {
+      "type": "SqliteVectorQueryTool",
+      "when": "You need to query the structured knowledge base for relevant information to answer the question."
+    },
+    {
+      "type": "JsonlQueryTool",
+      "when": "You need to query the iteration logging data store for relevant information to answer the question."
     }
   ],
 
-  "memory_management": {
-    "base_folder_path": "bvms/agent-memory",
-    "data_stores": [
-      {
-        "id": "raw_iteration_result",
+  // A set of memory data stores that the agent can use to store and retrieve structured knowledge.
+  // Each memory data store has a unique identifier, type, and configuration for how it distills knowledge from previous iterations or other sources.
+  // The "distill_from" options = "run_after" options, and can comebined with "id" of both other memory data stores and behavior policies to create a chain of knowledge distillation and retrieval.
+  // The "when" condition specifies the context in which each memory data store is relevant, allowing for dynamic retrieval of information based on the task at hand.
+  // The "always_use_in_cognition_window" flag indicates whether all memory is added into the prompt, allowing the agent to incorporate relevant knowledge into its responses.
+  // The "cognition_window_budget_percentage" specifies the percentage of the cognition window allocated to this memory data store, allowing for fine-tuned control over the agent's context window.
+  "memory_data_stores": [
+    {
+      "id": "distilled_knowledge",
+      "type": "sqlite",
+      "distill_from": ["iteration_result", "final_answer", "self_reflection"],
+      "distill_prompt": "Distill the iteration result into a concise, structured knowledge representation that captures the key facts, relationships, and insights relevant to BVMS. Focus on accuracy and clarity, and avoid including irrelevant details.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing a structured knowledge about BVMS that have been previously studied for efficient retrieval and reasoning of relevant information."
+    },
+    {
+      "id": "conceptual_index",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Create a conceptual index that organizes the distilled knowledge into categories, concepts, and relationships. This index should facilitate efficient retrieval of information and support reasoning about BVMS.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "conceptual_index",
+      "always_use_in_cognition_window": true,
+      "cognition_window_budget_percentage": 15,
+      "retrieval_tool": "SqliteVectorQueryTool"
+    },
+    {
+      "id": "suituational_knowledge",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Extract situational knowledge from the distilled knowledge, focusing on context-specific information, scenarios, and conditions that may affect decision-making or problem-solving in BVMS.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "situational_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing context-specific information about what have been previously studied in BVMS to support decision-making or problem-solving."
+    },
+    {
+      "id": "design_decisions_knowledge",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Extract design decisions knowledge from the distilled knowledge, focusing on architectural choices, trade-offs, and rationale behind the design of BVMS. This knowledge should help understand the reasoning behind the system's structure and behavior.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "design_decisions_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing to understand the architectural choices, trade-offs, and rationale behind the design of BVMS to support decision-making or problem-solving."
+    },
+    {
+      "id": "known_edge_cases_knowledge",
+      "type": "sqlite",
+      "distill_from": ["raw_iteration_result", "distilled_knowledge"],
+      "distill_prompt": "Extract known edge cases knowledge from the raw iteration results and distilled knowledge, focusing on unusual or exceptional scenarios that may arise in BVMS. This knowledge should help identify potential pitfalls and guide the development of robust solutions.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "known_edge_cases_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing to identify potential pitfalls and guide the development of robust solutions in BVMS by understanding unusual or exceptional scenarios."
+    }
+  ],
+
+  // Max concurrent subprocesses for parallelizable work (delegate fan-out, tool calls, per-block
+  // metadata, DB upserts). 1 = strictly sequential (default); >1 = bounded parallel pool.
+  "parallel_subprocesses": 1,
+
+  // Delegates are other specialized agents that this agent can delegate tasks to when needed. Each delegate has its own unique identifier, description, system prompt, and configuration for iteration logging.
+  // Delegates can have their own logging folder and have access to the logging folder of the parent agent, allowing for a hierarchical structure of agents that can collaborate and share information.
+  "delegates": [
+    {
+      "id": "bvms-code-analyzer",
+      "description": "Specialized Agent that can analyze BVMS source code and provide insights, explanations, and recommendations based on the code structure, logic, and best practices.",
+      "system_prompt": "You are a specialized agent that can analyze BVMS source code and provide insights, explanations, and recommendations based on the code structure, logic, and best practices. You can delegate to other sub-agents when needed.",
+      "base_folder_path": "[base_folder_path]/bvms-code-analyzer",
+      "iteration_logging_enabled": true,
+      "iteration_logging": {
         "type": "jsonl",
-        "path": "[base_folder_path]/raw_iteration_result/iteration_*.jsonl",
-        "is_iteration_result": true,
+        "path": "[base_folder_path]/bvms-code-analyzer/iteration_logging/iteration_*.jsonl",
         "retrieval_tool": "JsonlQueryTool",
-        "when": "Needing detailed tracing of the agent's reasoning and intermediate results for debugging or analysis of previous iterations."
+        "when": "Need raw log tracing of the agent's previous reasoning and intermediate results for debugging or analysis of a current problem."
       },
-      {
-        "id": "distilled_knowledge",
-        "type": "sqlite",
-        "distill_from": ["iteration_result"],
-        "distill_prompt": "Distill the iteration result into a concise, structured knowledge representation that captures the key facts, relationships, and insights relevant to BVMS. Focus on accuracy and clarity, and avoid including irrelevant details.",
-        "path": "[base_folder_path]/bvms_knowledge_base.db",
-        "table": "knowledge",
-        "retrieval_tool": "SqliteVectorQueryTool",
-        "when": "Needing a structured knowledge about BVMS that have been previously studied for efficient retrieval and reasoning of relevant information."
-      },
-      {
-        "id": "conceptual_index",
-        "type": "sqlite",
-        "distill_from": ["distilled_knowledge"],
-        "distill_prompt": "Create a conceptual index that organizes the distilled knowledge into categories, concepts, and relationships. This index should facilitate efficient retrieval of information and support reasoning about BVMS.",
-        "path": "[base_folder_path]/bvms_knowledge_base.db",
-        "table": "conceptual_index",
-        "prompt_injection": true, // no need for "when" because this is a prompt injection
-        "retrieval_tool": "SqliteVectorQueryTool"
-      },
-      {
-        "id": "suituational_knowledge",
-        "type": "sqlite",
-        "distill_from": ["distilled_knowledge"],
-        "distill_prompt": "Extract situational knowledge from the distilled knowledge, focusing on context-specific information, scenarios, and conditions that may affect decision-making or problem-solving in BVMS.",
-        "path": "[base_folder_path]/bvms_knowledge_base.db",
-        "table": "situational_knowledge",
-        "retrieval_tool": "SqliteVectorQueryTool",
-        "when": "Needing context-specific information about what have been previously studied in BVMS to support decision-making or problem-solving."
-      },
-      {
-        "id": "design_decisions_knowledge",
-        "type": "sqlite",
-        "distill_from": ["distilled_knowledge"],
-        "distill_prompt": "Extract design decisions knowledge from the distilled knowledge, focusing on architectural choices, trade-offs, and rationale behind the design of BVMS. This knowledge should help understand the reasoning behind the system's structure and behavior.",
-        "path": "[base_folder_path]/bvms_knowledge_base.db",
-        "table": "design_decisions_knowledge",
-        "retrieval_tool": "SqliteVectorQueryTool",
-        "when": "Needing to understand the architectural choices, trade-offs, and rationale behind the design of BVMS to support decision-making or problem-solving."
-      },
-      {
-        "id": "known_edge_cases_knowledge",
-        "type": "sqlite",
-        "distill_from": ["raw_iteration_result", "distilled_knowledge"],
-        "distill_prompt": "Extract known edge cases knowledge from the raw iteration results and distilled knowledge, focusing on unusual or exceptional scenarios that may arise in BVMS. This knowledge should help identify potential pitfalls and guide the development of robust solutions.",
-        "path": "[base_folder_path]/bvms_knowledge_base.db",
-        "table": "known_edge_cases_knowledge",
-        "retrieval_tool": "SqliteVectorQueryTool",
-        "when": "Needing to identify potential pitfalls and guide the development of robust solutions in BVMS by understanding unusual or exceptional scenarios."
-      }
-    ]
-  }
+      "model_selection": "auto",
+      "models_ladder": [
+        {
+          "platform": "ollama",
+          "name": "normic-embeddings:1.0.0",
+          "url": "http://localhost:11434",
+          "is_embedding_only": true
+        },
+        {
+          "platform": "ollama",
+          "name": "qwen3.5:4b",
+          "url": "http://localhost:11434",
+          "max_tokens": 62000,
+          "when": "tool-selection",
+          "is_tool_selection": true
+        },
+        {
+          "platform": "ollama",
+          "name": "qwen3.6:27b",
+          "url": "http://localhost:11434",
+          "max_tokens": 128000,
+          "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving",
+          "is_general_purpose": true
+        },
+        {
+          "platform": "ollama",
+          "name": "qwen3.8:122b-a10b",
+          "url": "http://localhost:11434",
+          "max_tokens": 128000,
+          "when": "extreme problem-solving, deep code analysis, and complex reasoning tasks",
+          "is_general_purpose": true
+        },
+        {
+          "platform": "open_router",
+          "name": "anthropic/claude-3.5-sonnet",
+          "url": "https://openrouter.ai/api/v1",
+          "max_tokens": "auto",
+          "when": "deep technical planning, code analysis, and complex problem-solving, cloud as final fallback model",
+          "is_general_purpose": true
+        }
+      ],
+      "tools": [
+        {
+          "type": "SearchInternetTool",
+          "when": "You need to search the internet for relevant information to answer the question."
+        },
+        {
+          "type": "CodeAnalysisTool",
+          "when": "You need to analyze the BVMS source code to answer the question."
+        }
+      ],
+      // No distill configuration for this memory data store, as it is intended to store raw code analysis knowledge without further self improvement or distillation.
+      "memory_data_stores": [
+        {
+          "id": "code_analysis_knowledge",
+          "type": "sqlite",
+          "distill_from": [],
+          "path": "[base_folder_path]/bvms-code-analyzer/bvms_code_analysis_knowledge_base.db",
+          "table": "code_analysis_knowledge",
+          "retrieval_tool": "SqliteVectorQueryTool",
+          "when": "Needing a structured knowledge about BVMS code analysis that have been previously studied for efficient retrieval and reasoning of relevant information."
+        }
+      ],
+      "parallel_subprocesses": 1,
+      "behavior_policies": [
+        {
+          "id": "code_analysis_deep_planning",
+          "when": "The code analysis task is complex or spans multiple modules.",
+          "then": "Break it into sub-tasks and decide which delegate(s) and tool(s) each part needs before answering.",
+          "run_after": ["question_received"]
+        },
+        {
+          "id": "code_analysis_clarification_needed",
+          "when": "The code analysis task is not clear or ambiguous, and the agent cannot proceed without further information.",
+          "then": "Ask the user for clarification or additional context before proceeding.",
+          "run_after": ["question_received", "iteration_result"]
+        }
+      ]
+    }
+  ]
 }
