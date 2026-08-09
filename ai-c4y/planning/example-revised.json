@@ -97,9 +97,9 @@
   //                              independent of wall-clock time.
   //
   // After the loop:
-  //   run_quizz_after_research:     when true, fires self_evaluation_quizz to grade gathered knowledge.
-  //   resume_research_if_quizz_failed: when true and the quiz is below passing_total_scores, the
-  //                                    loop resumes with the unmet goals as new topics.
+  //   run_quizz_after_finish:    when true, fires self_evaluation_quizz to grade gathered knowledge.
+  //   resume_if_quizz_failed:    when true and the quiz score is below passing_total_scores, the
+  //                              loop resumes with the unmet goals as new topics.
   "research_configuration": {
     "stop_when_goals_achieved": true,
     "time_limit": 7200,
@@ -120,7 +120,19 @@
   },
 
   // Reflection configuration. Active only when run_mode = "reflection".
-  // Options: "distillation" or "fine-tuning". Determines the type of reflection process the agent will perform on its memory stores.
+  //
+  // relection_mode (note: spelling to be corrected to "reflection_mode" in a future schema pass):
+  //   "distillation" — re-reads iteration_logging + memory_data_stores, runs self_evaluation_quizz,
+  //                    and tightens memory management by re-distilling knowledge into the stores.
+  //   "fine-tuning"  — generates structured teacher/student training pairs from the iteration logs
+  //                    and distilled stores, suitable for later supervised fine-tuning of the local model.
+  //
+  // enabled:               master switch; false disables the block without removing it.
+  // time_limit:            wall-clock cap in seconds (null = disabled). Safety net for slow hardware.
+  // iterations_limit:      hard cap on reflection passes (null = disabled).
+  // run_quizz_after_finish: when true, fires self_evaluation_quizz after the reflection loop ends.
+  // resume_if_quizz_failed: when true and the quiz score is below passing_total_scores, re-runs
+  //                          the reflection loop targeting the failed questions as new goals.
   "reflection_configuration": {
     "relection_mode": "distillation",
     "enabled": true,
@@ -130,15 +142,20 @@
     "resume_if_quizz_failed": true
   },
 
-  // Structured self-assessment for the agent's knowledge quality and reasoning. Triggered in two ways:
-  //   1. run_mode = "reflection": the agent re-reads its memory stores and grades itself independently.
-  //   2. After run_mode = "research" when run_quizz_after_research = true.
+  // Structured self-assessment for the agent's knowledge quality and reasoning.
   //
-  // Each question has a pre-authored expected answer and a point value (score). The agent answers
-  // each question from its memory stores and the result is evaluated against the expected answer.
-  // The total score is compared against passing_total_scores to determine pass / fail.
-  // A failed quiz can re-trigger the research loop (resume_research_if_quizz_failed) or a
-  // reflection loop to address knowledge gaps — closing the cultivate → evaluate → improve cycle.
+  // Triggered by:
+  //   1. run_mode = "reflection": fires automatically after the reflection loop.
+  //   2. run_mode = "research":   fires when run_quizz_after_finish = true.
+  //
+  // enabled:               master switch; false skips the quiz entirely.
+  // questions:             pre-authored Q&A pairs. The agent answers each from its memory stores;
+  //                        the result is evaluated against the authored answer and scored.
+  // passing_total_scores:  minimum total score to consider the run successful.
+  // evaluation_criteria:   human-readable criteria used alongside scoring to guide evaluation.
+  //
+  // A failing total score can re-trigger research (resume_if_quizz_failed in research_configuration)
+  // or a further reflection pass — closing the cultivate → evaluate → improve loop.
   "self_evaluation_quizz": {
     "enabled": true,
     "questions": [
@@ -276,10 +293,15 @@
   // Default is 5 retries
   "max_retries_until_switching_models": 5,
 
-  // This is the default configuration for the agent's context window, which defines the context window is used
+  // Three proportional windows as percentages of the active model's max_tokens; must sum to 100.
+  //   cognition_window: stable prefix — system prompt, working dirs, tools, behavior_policies,
+  //                     delegate descriptions, and always_use_in_cognition_window memory stores.
+  //   attention_window: volatile per-iteration — user question, retrieval results, tool and delegate outputs.
+  //   response_window:  hard output cap for the answer emitted this iteration.
+  // See planning §3 for the full assembly order and compaction rules.
   "context_window_breakdown_percentages": {
-    "cognition_window": 32.5, // system prompt + working directories + tools + memory management + delegates descriptions + model selections
-    "attention_window": 52.5, // user question + retrival results + tools outputs + delegates outputs
+    "cognition_window": 32.5,
+    "attention_window": 52.5,
     "response_window": 15.0
   },
 

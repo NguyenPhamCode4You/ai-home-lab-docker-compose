@@ -130,14 +130,15 @@ The extracted stores become expert answers through the `ProgressiveAgentSLM` mec
   is what keeps a multi-step reasoning loop **fast on local hardware** — the prefix is re-prefilled only
   on a compaction.
 - **Capability-routed model pool + budgets + parallelism** ([planning §2, §4](planning.md)):
-  `models_ladder` tags each model by role (`is_embedding_only` / `is_tool_selection` /
-  `is_general_purpose` / `is_memory_distillation` / `is_coding` / `is_vision` / `is_multimodal` /
-  `is_fallback`) and `model_selection: "auto"` runs the first general-purpose one locally while a cloud
-  model escalates hard steps. Each job routes **by flag** to its own model, and pinning each pre-loaded
-  model to its **own warm endpoint** (`ollama` / `lmstudio` / `open_router`, `keep_warm`, bounded by
-  `max_concurrency`) lets **reasoning, embedding, and knowledge distillation run in parallel** — the
-  `is_memory_distillation` model cultivates the `memory_data_stores` on its own endpoint while the
-  general-purpose model keeps answering. **Failover** (`max_retries_until_switching_models`) and **loop
+  `models_ladder` tags each model by role (`is_embedding` / `is_tool_selection` /
+  `is_general_purpose` / `is_memory_distillation` / `is_reflection_and_evaluation` / `is_coding` /
+  `is_vision` / `is_multimodal` / `is_fallback`) and `model_selection: "auto"` runs the first
+  general-purpose one locally while a cloud model escalates hard steps. Each job routes **by flag** to
+  its own model — self-scoring and reflection-loop reasoning route to `is_reflection_and_evaluation`
+  (e.g. `qwen3.6:27b`) so expensive evaluation stays off the lightweight reasoning model — and pinning
+  each pre-loaded model to its **own warm endpoint** (`ollama` / `lmstudio` / `open_router`,
+  `keep_warm`, bounded by `max_concurrency`) lets **reasoning, embedding, distillation, and
+  self-evaluation run in parallel**. **Failover** (`max_retries_until_switching_models`) and **loop
   bounds** (`behavior_policies_max_circular_rounds`) are kept as separate budgets so a run neither burns
   the ladder prematurely nor spins forever; a single `parallel_subprocesses` knob (default 1) runs
   delegate / tool / distillation work sequentially or in a bounded pool.
