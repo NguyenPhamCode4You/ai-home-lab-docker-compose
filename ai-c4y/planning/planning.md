@@ -4,8 +4,9 @@
 > models (SLMs)**. One instance owns an identity (`id`), a `system_prompt`, a `base_folder_path` for all
 > its artifacts, a three-window **context budget** (`context_window_breakdown_percentages` —
 > **cognition / attention / response**, expressed as **percentages** of the active model's context), a
-> **`models_ladder`** (local→cloud, each entry role-tagged — embedding / tool-selection /
-> general-purpose / vision / multimodal — with one retry budget) chosen by `model_selection`, a set of
+> **`models_ladder`** (local→cloud, a **capability-routed pool** — each entry role-tagged embedding /
+> tool-selection / general-purpose / memory-distillation / coding / vision / multimodal and pinned to its
+> own warm endpoint — with one retry budget) chosen by `model_selection`, a set of
 > **`behavior_policies`** (`when → then`, each fired at a `run_after` hook and optionally allowed to
 > loop), a set of **tools** (SQLite vector query, JSONL query, read / search / write-file, todo,
 > diagrams, python — each tool may run its own tool-calling model), a set of **`working_directories`** it
@@ -32,6 +33,18 @@
 > `AnswerEvaluator`, `FinalThoughtSummarizer`) and drops into `create_chat_backend` unchanged.
 
 **Status legend:** ⬜ Not started · 🟡 In progress · ✅ Done · ⛔ Blocked
+
+> **Revision 2026-08-09 (b) — capability-routed model pool + parallel distillation:**
+>
+> The `models_ladder` is a **capability-routed pool**, not a single linear chain: each entry may carry
+> its own warm endpoint `url` (`platform` = `ollama` / **`lmstudio`** / `open_router`), `keep_warm`, and
+> `max_concurrency`, and its role flags gain **`is_memory_distillation`** (which model runs
+> `memory_data_stores` distillation), plus `is_coding` and `is_fallback`. Each job routes **by flag** to
+> its model — embeddings → `is_embedding_only`, tool-calling → `is_tool_selection`, distillation →
+> `is_memory_distillation`, reasoning → `is_general_purpose` — so distinct jobs run on **distinct warm
+> endpoints in parallel**. The earlier per-store `use_capability` idea is dropped as ambiguous: the
+> distillation model is declared **on the ladder** (exactly as `is_embedding_only` declares the embedding
+> model), not on each memory store (§4, §8.2).
 
 > **Revision 2026-08-09 — what changed & why (final schema pass; this supersedes the field names used in
 > the earlier revision notes below, which are kept as history):**
@@ -179,11 +192,15 @@
   **`memory_data_stores`** (SQLite knowledge tables). To think, it injects the always-on stores
   (`always_use_in_cognition_window`) and pulls the rest on demand through each store's `retrieval_tool`.
   On small models, quality comes from disciplined memory handling — not a bigger model.
-- **Local & SLM-first, cloud optional.** `models_ladder` is a priority ladder (highest → lowest) in
-  which each entry is **role-tagged** (`is_embedding_only` / `is_tool_selection` / `is_general_purpose`
-  / `is_vision` / `is_multimodal`); `model_selection` (`"auto"` → the first general-purpose entry) picks
-  the working model. Local Ollama models do the frequent work; a cloud model (OpenRouter) sits lower as
-  an automatic fallback, or is promoted for hard steps. Each model gets one bounded retry budget —
+- **Local & SLM-first, cloud optional.** `models_ladder` is a **capability-routed pool** in which each
+  entry is **role-tagged** (`is_embedding_only` / `is_tool_selection` / `is_general_purpose` /
+  `is_memory_distillation` / `is_coding` / `is_vision` / `is_multimodal` / `is_fallback`) and pinned to
+  its own endpoint (`ollama` / `lmstudio` / `open_router`); `model_selection` (`"auto"` → the first
+  general-purpose entry) picks the working reasoning model, while each job routes **by flag** to its
+  model. Local models do the frequent work; a cloud model (OpenRouter) sits lower as an automatic
+  fallback, or is promoted for hard steps. Pinning each pre-loaded model to its own **warm** endpoint
+  (`keep_warm`, bounded by `max_concurrency`) lets embedding, distillation, and reasoning run on
+  **distinct endpoints in parallel**. Each model gets one bounded retry budget —
   `max_retries_until_switching_models` — counting **both** quality (self-eval) **and** infra (timeout /
   HTTP) failures before the agent **switches to the next model** on the ladder (§4).
 - **Behavior by policy — declared, and fired in code.** `behavior_policies` is a list of `when → then`
@@ -213,26 +230,26 @@ A single class configured by one object (JSON or Python). Every field has a sens
 `id`, `description`, and — on the root agent — at least one general-purpose entry in `models_ladder`
 are required.
 
-| Field                                   | Type        | Meaning                                                                                                                                                                                                                                                                                     |
-| --------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                                    | str         | Stable identifier. A parent addresses this agent as `delegate:<id>`; it also names the agent's folder and labels its log records.                                                                                                                                                           |
-| `description`                           | str         | One-line capability summary. The **sole** signal a parent reads to decide whether to delegate here — no separate gate.                                                                                                                                                                      |
-| `system_prompt`                         | str \| null | The agent's base persona / instructions, rendered at the top of the `cognition_window` (§3). Optional; when omitted, a default is built from `description` + `behavior_policies`. Per-agent (not inherited).                                                                                |
-| `base_folder_path`                      | str         | Root folder for **everything** this agent produces — `iteration_logging`, `memory_data_stores`, todos (§8). Defaults to `id`. Delegates nest under the parent (`[base_folder_path]/<delegate-id>`) and may read the parent's tree — one shared run tree.                                    |
-| `iteration_logging_enabled`             | bool        | Turn on the raw per-iteration JSONL log (**L1**). Default **false**.                                                                                                                                                                                                                        |
-| `iteration_logging`                     | object      | Config for the raw log: `{ type: "jsonl", path, retrieval_tool, when }` — the append-only source of truth for a run, read back via its `retrieval_tool` (§8).                                                                                                                               |
-| `model_selection`                       | str         | `"auto"` / null → use the first `is_general_purpose` entry in the ladder; or a model `name` to pin one for all tasks (§4).                                                                                                                                                                  |
-| `models_ladder`                         | list        | Priority **ladder** (§4), highest first. Each entry is **role-tagged** (`is_embedding_only` / `is_tool_selection` / `is_general_purpose` / `is_vision` / `is_multimodal`) with a `when` hint and shares the agent's retry budget.                                                           |
-| `max_retries_until_switching_models`    | int         | Per-model **failover** budget — consecutive quality (self-eval) **and** infra (timeout / HTTP) failures on the _current_ model before switching to the next ladder entry. Default **5** (§4).                                                                                               |
-| `context_window_breakdown_percentages`  | object      | The **three-window** budget as **percentages** of the active model's `max_tokens` (§3): `cognition_window` / `attention_window` / `response_window`, summing to **100**.                                                                                                                    |
-| `circular_behavior_policies_allowed`    | bool        | Allow `behavior_policies` to loop back on each other (e.g. `double_checking` re-runs `deep_planning`). Bounded by the round cap below (§5).                                                                                                                                                 |
-| `behavior_policies_max_circular_rounds` | int         | Max loop rounds before the agent must proceed. Default **5** — the total-work bound that replaces the old `max_iterations` (§5).                                                                                                                                                            |
-| `behavior_policies`                     | list        | `when → then` policies (§5), each fired at a `run_after` hook. Rendered into the system prompt **and** executed deterministically in code.                                                                                                                                                  |
-| `working_directories`                   | list        | External directories the agent may **read** (and, when `writable`, write — optionally gated by `write_approval`), each `{ path, description, writable, write_approval? }` (§6). Inherited by delegates.                                                                                     |
-| `tools`                                 | list        | Capabilities the agent may call, each with a `when` guidance string and an **optional own `models_ladder`** (§6): SQLite vector query, JSONL query, read / search / write-file, todo, diagrams, python, …                                                                                   |
-| `memory_data_stores`                    | list        | Configurable SQLite knowledge stores the agent **distills** and retrieves (§8): `{ id, type, distill_from, distill_prompt?, path, table, retrieval_tool, when?, always_use_in_cognition_window?, cognition_window_budget_percentage? }`. Paths resolve under `base_folder_path`. Inherited. |
-| `parallel_subprocesses`                 | int         | Max concurrent subprocesses for parallelizable work — delegate fan-out, tool calls, distillation, DB upserts. **1** = strictly sequential (default); **>1** = bounded parallel pool. Inherited by delegates.                                                                                |
-| `delegates`                             | list        | Nested `ProgressiveAgentSLM` configs (§7). The parent routes sub-questions to them by reading each one's `id` / `description`.                                                                                                                                                              |
+| Field                                   | Type        | Meaning                                                                                                                                                                                                                                                                                                                                                                             |
+| --------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                                    | str         | Stable identifier. A parent addresses this agent as `delegate:<id>`; it also names the agent's folder and labels its log records.                                                                                                                                                                                                                                                   |
+| `description`                           | str         | One-line capability summary. The **sole** signal a parent reads to decide whether to delegate here — no separate gate.                                                                                                                                                                                                                                                              |
+| `system_prompt`                         | str \| null | The agent's base persona / instructions, rendered at the top of the `cognition_window` (§3). Optional; when omitted, a default is built from `description` + `behavior_policies`. Per-agent (not inherited).                                                                                                                                                                        |
+| `base_folder_path`                      | str         | Root folder for **everything** this agent produces — `iteration_logging`, `memory_data_stores`, todos (§8). Defaults to `id`. Delegates nest under the parent (`[base_folder_path]/<delegate-id>`) and may read the parent's tree — one shared run tree.                                                                                                                            |
+| `iteration_logging_enabled`             | bool        | Turn on the raw per-iteration JSONL log (**L1**). Default **false**.                                                                                                                                                                                                                                                                                                                |
+| `iteration_logging`                     | object      | Config for the raw log: `{ type: "jsonl", path, retrieval_tool, when }` — the append-only source of truth for a run, read back via its `retrieval_tool` (§8).                                                                                                                                                                                                                       |
+| `model_selection`                       | str         | `"auto"` / null → use the first `is_general_purpose` entry in the ladder; or a model `name` to pin one for all tasks (§4).                                                                                                                                                                                                                                                          |
+| `models_ladder`                         | list        | Priority **ladder** / capability-routed pool (§4), highest first. Each entry is **role-tagged** (`is_embedding_only` / `is_tool_selection` / `is_general_purpose` / `is_memory_distillation` / `is_coding` / `is_vision` / `is_multimodal` / `is_fallback`), pinned to its own endpoint (`keep_warm` / `max_concurrency`), with a `when` hint, and shares the agent's retry budget. |
+| `max_retries_until_switching_models`    | int         | Per-model **failover** budget — consecutive quality (self-eval) **and** infra (timeout / HTTP) failures on the _current_ model before switching to the next ladder entry. Default **5** (§4).                                                                                                                                                                                       |
+| `context_window_breakdown_percentages`  | object      | The **three-window** budget as **percentages** of the active model's `max_tokens` (§3): `cognition_window` / `attention_window` / `response_window`, summing to **100**.                                                                                                                                                                                                            |
+| `circular_behavior_policies_allowed`    | bool        | Allow `behavior_policies` to loop back on each other (e.g. `double_checking` re-runs `deep_planning`). Bounded by the round cap below (§5).                                                                                                                                                                                                                                         |
+| `behavior_policies_max_circular_rounds` | int         | Max loop rounds before the agent must proceed. Default **5** — the total-work bound that replaces the old `max_iterations` (§5).                                                                                                                                                                                                                                                    |
+| `behavior_policies`                     | list        | `when → then` policies (§5), each fired at a `run_after` hook. Rendered into the system prompt **and** executed deterministically in code.                                                                                                                                                                                                                                          |
+| `working_directories`                   | list        | External directories the agent may **read** (and, when `writable`, write — optionally gated by `write_approval`), each `{ path, description, writable, write_approval? }` (§6). Inherited by delegates.                                                                                                                                                                             |
+| `tools`                                 | list        | Capabilities the agent may call, each with a `when` guidance string and an **optional own `models_ladder`** (§6): SQLite vector query, JSONL query, read / search / write-file, todo, diagrams, python, …                                                                                                                                                                           |
+| `memory_data_stores`                    | list        | Configurable SQLite knowledge stores the agent **distills** and retrieves (§8): `{ id, type, distill_from, distill_prompt?, path, table, retrieval_tool, when?, always_use_in_cognition_window?, cognition_window_budget_percentage? }`. Paths resolve under `base_folder_path`. Inherited.                                                                                         |
+| `parallel_subprocesses`                 | int         | Max concurrent subprocesses for parallelizable work — delegate fan-out, tool calls, distillation, DB upserts. **1** = strictly sequential (default); **>1** = bounded parallel pool. Inherited by delegates.                                                                                                                                                                        |
+| `delegates`                             | list        | Nested `ProgressiveAgentSLM` configs (§7). The parent routes sub-questions to them by reading each one's `id` / `description`.                                                                                                                                                                                                                                                      |
 
 > **Inheritance.** A delegate that omits `models_ladder`, `model_selection`, or
 > `max_retries_until_switching_models` **inherits the parent's**, and likewise inherits
@@ -353,21 +370,29 @@ recover any detail by re-querying the raw log or the stores.
 `models_ladder` is an ordered list, highest priority first, and `model_selection` chooses which entry
 is active. Each entry:
 
-| Key          | Required | Meaning                                                                                                                                                                                                |
-| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `platform`   | yes      | `ollama` (local) or `open_router` (cloud). Maps to the existing `Ollama` / `OpenRouter` clients.                                                                                                       |
-| `name`       | yes      | Model name on that platform.                                                                                                                                                                           |
-| `url`        | no       | Platform endpoint (e.g. `http://localhost:11434` for Ollama, `https://openrouter.ai/api/v1` for OpenRouter). Defaults to the platform's env default.                                                   |
-| `max_tokens` | no       | Context ceiling. A number sets it; `"auto"` (or omitted) uses the platform's advertised context. Every `context_window_breakdown_percentages` window is taken against this value (§3).                 |
-| _role flags_ | no       | `is_embedding_only`, `is_tool_selection`, `is_general_purpose`, `is_vision`, `is_multimodal` — declare what an entry is good for so the agent picks the right model per job (default general-purpose). |
-| `when`       | no       | Plain-language hint for when this entry is preferred (e.g. `"tool selection only"`, `"coding, deep planning"`, `"cloud as final fallback"`).                                                           |
+| Key               | Required | Meaning                                                                                                                                                                                                                                                             |
+| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform`        | yes      | `ollama` / `lmstudio` (local, OpenAI-compatible) or `open_router` (cloud). Maps to the matching model client.                                                                                                                                                       |
+| `name`            | yes      | Model name on that platform.                                                                                                                                                                                                                                        |
+| `url`             | no       | Platform endpoint (e.g. `http://localhost:11434` for Ollama, `https://openrouter.ai/api/v1` for OpenRouter). Defaults to the platform's env default.                                                                                                                |
+| `max_tokens`      | no       | Context ceiling. A number sets it; `"auto"` (or omitted) uses the platform's advertised context. Every `context_window_breakdown_percentages` window is taken against this value (§3).                                                                              |
+| _role flags_      | no       | `is_embedding_only`, `is_tool_selection`, `is_general_purpose`, `is_memory_distillation`, `is_coding`, `is_vision`, `is_multimodal`, `is_fallback` — declare what an entry is good for so the runtime routes each job to the right model (default general-purpose). |
+| `keep_warm`       | no       | Ask the runtime to keep this model resident (never evict) so its endpoint stays hot for low-latency, parallel use.                                                                                                                                                  |
+| `max_concurrency` | no       | Max in-flight requests one endpoint accepts before it thrashes VRAM — the per-endpoint fan-out cap (global cap = `parallel_subprocesses`, §2).                                                                                                                      |
+| `when`            | no       | Plain-language hint for when this entry is preferred (documentation / tiebreaker only — routing is by the structured flags, not this text).                                                                                                                         |
 
-**Selection & the ladder.** `model_selection` picks the working model: `"auto"` (or null) selects the
-**first `is_general_purpose`** entry that is reachable; a model `name` pins that entry for all tasks.
-Role-flagged helpers are used for their job — the `is_embedding_only` model backs embeddings for the
-`memory_data_stores` / vector queries, the `is_tool_selection` model drives tool-call planning — while
-the general-purpose entries form the failover ladder. Because the budget is proportional to whatever
-model is chosen (§3), any model fits — there is no minimum-size gate. The ladder carries **one**
+**Selection & the ladder — a capability-routed pool.** `model_selection` picks the working reasoning
+model: `"auto"` (or null) selects the **first `is_general_purpose`** entry that is reachable; a model
+`name` pins that entry for general tasks. Every _other_ job routes **by structured flag** (never by the
+free-text `when`, which is SLM-nondeterministic): embeddings go to the **`is_embedding_only`** model,
+tool-call planning to **`is_tool_selection`**, `memory_data_stores` distillation to
+**`is_memory_distillation`** (§8.2), and coding / vision / multimodal sub-tasks prefer the entry with the
+matching flag — while the `is_general_purpose` entries form the failover chain (`is_fallback` last).
+Because each entry is an **endpoint** (`platform` + `name` + `url`), pinning each pre-loaded local model
+to its **own warm `url`** (`keep_warm`) lets these jobs run on **distinct endpoints in parallel** —
+reasoning, embedding and distillation no longer contend for one GPU; `max_concurrency` bounds per-endpoint
+fan-out and `parallel_subprocesses` bounds it globally (§2). Because the budget is proportional to
+whatever model is chosen (§3), any model fits — there is no minimum-size gate. The ladder carries **one**
 per-model budget:
 
 - **Retry budget — `max_retries_until_switching_models` (default 5).** A single counter per model
@@ -392,10 +417,11 @@ backstop, or cloud promoted to the top for hard steps.
 ```json
 "model_selection": "auto",
 "models_ladder": [
-  { "platform": "ollama",      "name": "normic-embeddings:1.0.0",     "url": "http://localhost:11434",       "is_embedding_only": true,   "when": "text → embeddings for semantic search" },
-  { "platform": "ollama",      "name": "qwen3.5:4b",                  "url": "http://localhost:11434",       "is_tool_selection": true,   "max_tokens": 62000, "when": "tool selection only" },
-  { "platform": "ollama",      "name": "gpt-oss:20b",                 "url": "http://localhost:11434",       "is_general_purpose": true,  "max_tokens": 62000, "when": "general-purpose" },
-  { "platform": "open_router", "name": "anthropic/claude-3.5-sonnet", "url": "https://openrouter.ai/api/v1", "is_general_purpose": true,  "max_tokens": "auto", "when": "cloud, final fallback" }
+  { "platform": "ollama",      "name": "nomic-embed-text",            "url": "http://localhost:11434",   "is_embedding_only": true,  "keep_warm": true, "max_concurrency": 4, "when": "text → embeddings" },
+  { "platform": "lmstudio",    "name": "qwen3.5:4b",                  "url": "http://localhost:1234/v1", "is_tool_selection": true,  "keep_warm": true, "max_concurrency": 2, "max_tokens": 62000, "when": "tool selection only" },
+  { "platform": "ollama",      "name": "gpt-oss:20b",                 "url": "http://localhost:11435",   "is_general_purpose": true, "keep_warm": true, "max_concurrency": 1, "max_tokens": 62000, "when": "general-purpose" },
+  { "platform": "ollama",      "name": "qwen3.6:27b",                 "url": "http://localhost:11436",   "is_general_purpose": true, "is_memory_distillation": true, "is_coding": true, "keep_warm": true, "max_concurrency": 1, "max_tokens": 128000, "when": "coding, deep planning, distillation" },
+  { "platform": "open_router", "name": "anthropic/claude-3.5-sonnet", "url": "https://openrouter.ai/api/v1", "is_general_purpose": true, "is_memory_distillation": true, "is_fallback": true, "max_tokens": "auto", "when": "cloud, final fallback" }
 ]
 ```
 
@@ -653,9 +679,11 @@ distilled_knowledge (L2)  ← [iteration_result, final_answer, self_reflection]
 
 `distilled_knowledge` compresses the run's raw output into structured facts; the downstream stores each
 re-distil those facts through their own `distill_prompt` into a focused slice (a conceptual index, the
-situational digest, design decisions, edge cases). Distillation runs **off the critical path** under
-`parallel_subprocesses` (§2). A **`self_reflection`** policy (`run_after: final_answer`, §5) is a common
-trigger, so the agent enriches its stores from its own conclusions.
+situational digest, design decisions, edge cases). Distillation runs **off the critical path** on the
+**`is_memory_distillation`** model (§4) — its own warm endpoint, so it runs **in parallel** with the
+reasoning and embedding models — bounded by `parallel_subprocesses` (§2). A **`self_reflection`** policy
+(`run_after: final_answer`, §5) is a common trigger, so the agent enriches its stores from its own
+conclusions.
 
 **Pre-built vs. self-cultivated.** A store with an **empty `distill_from`** (e.g. the delegate's
 `code_analysis_knowledge`, or the `bvms_docs.db` / `bvms_code.db` of
@@ -666,8 +694,8 @@ while the agent works. Both are queried the same way, through `SqliteVectorQuery
 > **Cheap-first, curated, and egress-safe.**
 >
 > - **Cheap first.** Deterministic extraction (`KeywordExtractor` / `SimpleEntityExtractor` + lexical
->   overlap) seeds entities / keywords **before** any LLM call; the ladder model runs the `distill_prompt`
->   only for the semantic summary, or when extraction is weak.
+>   overlap) seeds entities / keywords **before** any LLM call; the **`is_memory_distillation`** model
+>   runs the `distill_prompt` only for the semantic summary, or when extraction is weak.
 > - **Redact on egress.** A block's text may cross to a _different_ model (the distillation / ladder
 >   model, a delegate, a cloud escalation), so secrets / PII are **redacted at that boundary** before the
 >   text leaves the agent.
@@ -956,40 +984,52 @@ produce the same agent and drop into `create_chat_backend`.
   "models_ladder": [
     {
       "platform": "ollama",
-      "name": "normic-embeddings:1.0.0",
+      "name": "nomic-embed-text",
       "url": "http://localhost:11434",
       "is_embedding_only": true,
+      "keep_warm": true,
+      "max_concurrency": 4,
       "when": "text → embeddings for semantic search"
     },
     {
-      "platform": "ollama",
+      "platform": "lmstudio",
       "name": "qwen3.5:4b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:1234/v1",
       "is_tool_selection": true,
+      "keep_warm": true,
+      "max_concurrency": 2,
       "max_tokens": 62000,
       "when": "tool selection only"
     },
     {
       "platform": "ollama",
       "name": "gpt-oss:20b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:11435",
       "is_general_purpose": true,
+      "keep_warm": true,
+      "max_concurrency": 1,
       "max_tokens": 62000,
       "when": "general-purpose"
     },
     {
       "platform": "ollama",
       "name": "qwen3.6:27b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:11436",
       "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_coding": true,
+      "keep_warm": true,
+      "max_concurrency": 1,
       "max_tokens": 128000,
-      "when": "coding, technical reasoning, deep planning"
+      "when": "coding, technical reasoning, deep planning, distillation"
     },
     {
       "platform": "open_router",
       "name": "anthropic/claude-3.5-sonnet",
       "url": "https://openrouter.ai/api/v1",
       "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_fallback": true,
       "max_tokens": "auto",
       "when": "cloud, final fallback"
     }
@@ -1361,7 +1401,7 @@ if __name__ == "__main__":
 | 6   | Routing signal — how are delegates vs. tools selected?                                   | **Delegates** are chosen by `description` only (agent-level `when` removed); **tools** keep a `when` that a cheap pre-pass uses to prune the menu before the SLM picks.                                                                                                    | ✅ Decided |
 | 7   | Raw-log storage format — text with line ranges, structured JSON, or a monolithic array?  | **Append-only JSON Lines** in `iteration_logging/iteration_*.jsonl` (one self-contained block per line, one file per iteration) — typed, greppable, FTS-indexable, read back per iteration via `JsonlQueryTool`. Distilled knowledge lives in SQLite `memory_data_stores`. | ✅ Decided |
 | 8   | Token measurement for budgeting — real per-model tokenizer, or char≈token approximation? | **`char/4` for both the budget estimate AND the compaction threshold** (one heuristic, so measure and trigger never disagree — matches Hermes's `estimate_request_tokens_rough`); pluggable exact tokenizer in P2.                                                         | ✅ Decided |
-| 9   | `memory_data_stores` distillation — cheap keyword extraction or LLM per block?           | Cheap-first: `KeywordExtractor` / `SimpleEntityExtractor` + lexical overlap seed each record; the ladder model runs the `distill_prompt` summary only when needed (§8.2).                                                                                                  | _TBD_      |
+| 9   | `memory_data_stores` distillation — cheap keyword extraction or LLM per block?           | Cheap-first: `KeywordExtractor` / `SimpleEntityExtractor` + lexical overlap seed each record; the **`is_memory_distillation`** model runs the `distill_prompt` summary only when needed (§4, §8.2).                                                                        | _TBD_      |
 | 10  | Long-term memory scope & backing store — cross-run? SQLite file or server?               | Cross-run persistent via `memory_data_stores` — embedded **local SQLite** (`sqlite-vec`) reusing `Embedding`, a single `.db` file under `base_folder_path`, no server.                                                                                                     | ✅ Decided |
 | 11  | `base_folder_path` lifecycle — ephemeral per run, or durable?                            | The `iteration_logging` raw log is per-run; the `memory_data_stores` live under `base_folder_path` and **persist across runs** by default (durable cross-run knowledge). Revisit if per-run isolation is later required.                                                   | _TBD_      |
 | 12  | Raw-log file growth — one big file, or many?                                             | **Many** — one `iteration_*.jsonl` file per iteration under `iteration_logging/`, so a long run never grows one giant file and `JsonlQueryTool` can scope a query to a single iteration (§8.1).                                                                            | ✅ Decided |
