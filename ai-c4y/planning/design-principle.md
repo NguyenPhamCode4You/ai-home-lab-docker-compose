@@ -45,11 +45,14 @@ flowchart TB
     B["Knowledge extraction<br/> Stages 1 –> 6 (§4)"]
     B --> S1[("Docs store<br/>bvms_docs.db (sqlite-vec)")]
     B --> S2[("Code store<br/>bvms_code.db (sqlite-vec)")]
-    S1 --> B1["bvms-general-knowledge delegate<br/>gpt-oss:20b"]
-    S2 --> B2["bvms-code-knowledge delegate<br/>qwen3.6:35b-a3b"]
-    B1 --> ANS[Senior-level orchestrator<br/>qwen3.6:27b]
+    S1 --> ANS["bvms-assistant orchestrator<br/>gpt-oss:20b (auto)"]
+    S2 --> B2["bvms-code-analyzer delegate<br/>qwen3.6:27b"]
     B2 --> ANS
 ```
+
+Both stores are wired into the assistant as **pre-built `memory_data_stores`** ([planning §8](planning.md)):
+knowledge tables with an **empty `distill_from`**, filled once by the pipeline and read at run time
+through `SqliteVectorQueryTool`.
 
 ## 4. The knowledge pipeline — extract the hidden 80%
 
@@ -71,16 +74,22 @@ into its store; nothing has to be human-written first.
 
 ---
 
-## 5. Two knowledge stores (what the RAG delegates consume)
+## 5. Two knowledge stores (pre-built `memory_data_stores`)
 
 The pipeline's whole output collapses into **two embedded SQLite vector stores** (`sqlite-vec`, each a
-single local `.db` file — no server), one per delegate in [example.json](example.json):
+single local `.db` file — no server), wired into the assistant as **pre-built `memory_data_stores`**
+([planning §8](planning.md)) — stores whose **`distill_from` is empty**, i.e. filled once by the
+extraction pipeline and never self-mutated — and queried at run time through `SqliteVectorQueryTool`:
 
-| Store (file · table)              | Delegate                 | Model                           | Holds (from stages)                                                               |
-| --------------------------------- | ------------------------ | ------------------------------- | --------------------------------------------------------------------------------- |
-| `bvms_docs.db` · `bvms_documents` | `bvms-general-knowledge` | inherits parent (`gpt-oss:20b`) | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
-| `bvms_code.db` · `bvms_code`      | `bvms-code-knowledge`    | `qwen3.6:27b` (pinned)          | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
+| Store (file · table)              | Consumed by               | Model                  | Holds (from stages)                                                               |
+| --------------------------------- | ------------------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| `bvms_docs.db` · `bvms_documents` | `bvms-assistant` (parent) | `gpt-oss:20b` (auto)   | Business rules, workflows, domain glossary — _how BVMS behaves_ (Stages 2–4)      |
+| `bvms_code.db` · `bvms_code`      | `bvms-code-analyzer`      | `qwen3.6:27b` (pinned) | Service/DB/API graph, design decisions, git lessons — _how BVMS is built_ (1,5,6) |
 
+Alongside these read-only stores the assistant also **cultivates its own** `memory_data_stores` while it
+works (`distilled_knowledge`, `conceptual_index`, `situational_knowledge`, `design_decisions_knowledge`,
+`known_edge_cases_knowledge`) — distilled from its `iteration_logging` raw log via each store's
+`distill_prompt` — so what it learns while answering is captured for reuse ([planning §8](planning.md)).
 A parent picks a delegate purely by its **`description`** ([planning §7](planning.md)), so "how does
 approval work" lands on the docs store and "where is the race condition fixed" lands on the code
 store — no routing rules to maintain.
@@ -92,36 +101,41 @@ store — no routing rules to maintain.
 The extracted stores become expert answers through the `ProgressiveAgentSLM` mechanics
 ([planning.md](planning.md)):
 
-- **RAG-first retrieval.** Each delegate runs its embedded SQLite vector query (`sqlite-vec`) with
-  `ranking: true`, re-ranking chunks before they enter the prompt.
-- **Bounded four-tier context** (`context_window_breakdown`, [planning §3](planning.md)). Budgets are
-  _fractions_ of the active model's `max_tokens`, so retrieved knowledge fits a small model without
-  overflow.
-- **Reads source side-by-side** ([planning §6](planning.md)). File tools can read and search the run's
-  `working_folders` (e.g. the BVMS backend / frontend checkout) read-only, alongside the two stores.
-- **Four-layer memory: L1 raw → L2 facts → L3 situational → L4 behavior** ([planning §8](planning.md)).
-  Delegates append findings to a shared, append-only **L1** worklog (`worklog/seg-*.jsonl`); a background
-  metadata agent distills each block into **L2** facts (`knowledge_graph.jsonl` + a default-on
-  `knowledge/facts.db`, searched by `KnowledgeSearchTool`); a situational summarizer rolls L2 up into an
-  **L3** digest (`situational.md`) that, with the `cognitive_index`, is what actually enters the prompt;
-  **L4** is the behavior layer (system prompt, reasoning policies, delegates) held as the cached prefix. The
-  orchestrator re-reads the code delegate's evidence and the docs delegate's rules **by index lookup**,
-  never by replaying the log — and each layer is progressively closer to the prompt.
-- **Senior-style behavior by reasoning policy — _enforced_** (`cognitive_behavior`, [planning §5](planning.md)):
-  `deep_think` decomposes the question, `double_check` verifies the evidence, `visualize_diagram` emits
-  a Mermaid diagram, and `say_no` **refuses to invent** an answer when the stores are silent. Because a
-  small model can't be trusted to _obey_ prompt text, the critical policies are **backed by deterministic
-  turn-end guards** — `double_check` → verify-on-stop, `say_no` → a grounding gate — so the guardrail
-  against hallucinated "facts" holds even when the SLM would rather guess.
+- **RAG-first retrieval.** Each store is queried through `SqliteVectorQueryTool` (`sqlite-vec`) with
+  re-ranking, so the best chunks enter the prompt.
+- **Bounded three-window context** (`context_window_breakdown_percentages`, [planning §3](planning.md)).
+  The active model's context splits into `cognition_window` / `attention_window` / `response_window`
+  (percentages that sum to 100), so retrieved knowledge fits a small model without overflow.
+- **Reads source side-by-side** ([planning §6](planning.md)). File tools read and search the run's
+  `working_directories` (e.g. the BVMS backend / frontend checkout) — read-only unless a directory is
+  marked `writable` (optionally gated by `write_approval`), alongside the two stores.
+- **Cultivated, layered memory** ([planning §8](planning.md)). Every iteration's raw reasoning is
+  appended to the append-only `iteration_logging` log (`iteration_*.jsonl`, the raw source of truth);
+  a chain of `memory_data_stores` distils that log — and each other — via each store's `distill_prompt`
+  into `distilled_knowledge`, a `conceptual_index`, and situational / design-decision / edge-case
+  knowledge. Stores flagged `always_use_in_cognition_window` (bounded by a `cognition_window_budget_percentage`)
+  ride in the prompt every step; the rest are pulled on demand through their `retrieval_tool`. The
+  orchestrator re-reads a delegate's evidence by querying these stores, never by replaying the log —
+  and each store is progressively closer to the prompt.
+- **Senior-style behavior by policy — fired on hooks, allowed to loop** (`behavior_policies`, [planning §5](planning.md)):
+  `deep_planning` decomposes the question (`run_after: question_received`), `analyzing_retrieval_results`
+  vets what came back, `double_checking` verifies the evidence and — with `circular_behavior_policies_allowed`
+  — can loop back into `deep_planning` up to `behavior_policies_max_circular_rounds`, `visual_representation`
+  emits a Mermaid diagram, and `refusing_to_invent` **refuses to invent** an answer when the stores are
+  silent. Because each policy runs **in code** at its `run_after` hook (not merely as prompt text), the
+  guardrail against hallucinated "facts" holds even when the SLM would rather guess.
 - **Prompt-cache discipline** ([planning §3](planning.md)): the run-constant part of the prompt
-  (`system_prompt`, policies, tool / delegate descriptions) is a **byte-stable prefix** the model's KV
-  cache reuses every iteration; only the retrieved evidence + answer change. This is what keeps a
-  multi-step reasoning loop **fast on local hardware** — the prefix is re-prefilled only on a compaction.
-- **Model ladder + budgets + parallelism** ([planning §2, §4](planning.md)): the local model does the
-  frequent work while a cloud model escalates hard steps; **failover** (`max_retries_until_switching_models`)
-  and **total work** (`max_iterations`) are kept as separate budgets so a run neither burns the ladder
-  prematurely nor spins forever; a single `parallel_supprocess` knob (default 1) runs delegate / tool /
-  metadata work sequentially or in a bounded pool.
+  (`system_prompt`, policies, tool / delegate descriptions, always-in-cognition memory) is a **byte-stable
+  prefix** the model's KV cache reuses every iteration; only the retrieved evidence + answer change. This
+  is what keeps a multi-step reasoning loop **fast on local hardware** — the prefix is re-prefilled only
+  on a compaction.
+- **Role-tagged model ladder + budgets + parallelism** ([planning §2, §4](planning.md)): `models_ladder`
+  tags each model by role (`is_embedding_only` / `is_tool_selection` / `is_general_purpose` / `is_vision`
+  / `is_multimodal`) and `model_selection: "auto"` runs the first general-purpose one locally while a cloud
+  model escalates hard steps; **failover** (`max_retries_until_switching_models`) and **loop bounds**
+  (`behavior_policies_max_circular_rounds`) are kept as separate budgets so a run neither burns the ladder
+  prematurely nor spins forever; a single `parallel_subprocesses` knob (default 1) runs delegate / tool /
+  distillation work sequentially or in a bounded pool.
 
 Net effect: expert reasoning emerges from **retrieval + memory discipline**, so the local model never
 has to _memorize_ the enterprise.
@@ -132,9 +146,9 @@ has to _memorize_ the enterprise.
 
 Value ships **without any training**, so the order is deliberate — **do not start with fine-tuning**:
 
-1. **Extract & embed** the six stages into the two stores.
-2. **Wire the two delegates** ([example.json](example.json)) — the assistant is already useful here.
-3. **Add policies + worklog** for multi-step, senior-level reasoning.
+1. **Extract & embed** the six stages into the two pre-built stores.
+2. **Wire the two stores + delegate** ([example-revised.json](example-revised.json)) — the assistant is already useful here.
+3. **Add `behavior_policies` + `iteration_logging` + cultivated `memory_data_stores`** for multi-step, senior-level reasoning.
 4. **(Optional) Distill** teacher traces into the local model to cut retrieval reliance.
 
 From RAG alone it must handle every intent below:
@@ -167,5 +181,5 @@ and tech lead**, on local hardware, rather than a documentation search engine.
 
 ---
 
-_Companion to [planning.md](planning.md) (the reasoning layer) and [example.json](example.json) (the
-canonical config). Last updated: 2026-08-08._
+_Companion to [planning.md](planning.md) (the reasoning layer) and
+[example-revised.json](example-revised.json) (the canonical config). Last updated: 2026-08-09._
