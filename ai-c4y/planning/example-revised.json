@@ -15,61 +15,84 @@
   "iteration_logging_enabled": true,
 
   // When iteration logging is enabled, the agent will log its reasoning and intermediate results to a JSONL file for each iteration.
-  // This is a default configuration for the iteration logging data store, which can be customized as needed.
+  // This is the L1 raw store. Its "id" ("iteration_result") is the canonical name referenced by both
+  // behavior_policies "run_after" and memory_data_stores "distill_from" (they share one vocabulary).
   "iteration_logging": {
+    "id": "iteration_result",
     "type": "jsonl",
     "path": "[base_folder_path]/iteration_logging/iteration_*.jsonl",
     "retrieval_tool": "JsonlQueryTool",
     "when": "Need raw log tracing of the agent's previous reasoning and intermediate results for debugging or analysis of a current problem."
   },
 
-  // Leave null or "auto" to pick the first "general-purpose" model in the models ladder, or specify a model name to force the agent to use that model for all tasks.
+  // Default reasoning model: leave null / "auto" to pick the first "is_general_purpose" model in the
+  // ladder, or name a model to force it for GENERAL reasoning. Embedding / tool-selection tasks always
+  // auto-route to the model flagged for that capability (below), regardless of this setting.
   "model_selection": "auto",
 
-  // [Required] Configure the models ladder to define the order of preference for model selection.
-  // The agent will attempt to use the first model in the list, and if it fails or reaches the maximum retries, it will switch to the next model in the ladder.
-  // The "when" condition specifies the context in which each model is preferred, allowing for dynamic model selection based on the task at hand. Default is "general-purpose" for all models
-  // Flags includes: "is_embedding_only", "is_tool_selection", "is_general_purpose", "is_vision", "is_multimodal"
+  // [Required] The models ladder is a CAPABILITY-ROUTED POOL, not a single linear chain. For a task
+  // type (embedding / tool-selection / general / vision / coding) the runtime FILTERS to models with
+  // that flag, then fails over top-down WITHIN that subset (after max_retries_until_switching_models).
+  // Routing is by the STRUCTURED FLAGS below — "when" is human documentation / tiebreaker only, never
+  // the sole routing signal (SLM-interpreted routing is nondeterministic).
+  // Flags: is_embedding_only, is_tool_selection, is_general_purpose, is_vision, is_multimodal, is_coding, is_fallback
+  //
+  // Each model is an ENDPOINT binding (platform + name + url). Give each pre-loaded local model its OWN
+  // url so it stays warm and work fans out ACROSS endpoints in parallel; "max_concurrency" caps how many
+  // requests one endpoint takes before it thrashes VRAM, and "keep_warm" asks the runtime not to evict it.
   "models_ladder": [
     {
       "platform": "ollama",
-      "name": "normic-embeddings:1.0.0",
+      "name": "nomic-embed-text",
       "url": "http://localhost:11434",
-      "is_embedding_only": true,
+      "is_embedding": true,
+      "keep_warm": true,
+      "max_concurrency": 4,
       "when": "converting text to embeddings for semantic search or retrieval tasks"
     },
     {
-      "platform": "ollama",
+      "platform": "lmstudio",
       "name": "qwen3.5:4b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:1234/v1",
       "is_tool_selection": true,
       "max_tokens": 62000,
+      "keep_warm": true,
+      "max_concurrency": 2,
       "when": "tool selection only"
     },
     {
       "platform": "ollama",
       "name": "gpt-oss:20b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:11435",
       "is_general_purpose": true,
       "max_tokens": 62000,
+      "keep_warm": true,
+      "max_concurrency": 1,
       "when": "general-purpose"
     },
     {
       "platform": "ollama",
       "name": "qwen3.6:27b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:11436",
       "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_coding": true,
       "max_tokens": 128000,
+      "keep_warm": true,
+      "max_concurrency": 1,
       "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving"
     },
     {
       "platform": "ollama",
       "name": "qwen3.6:35b-a3b",
-      "url": "http://localhost:11434",
+      "url": "http://localhost:11437",
       "is_general_purpose": true,
+      "is_memory_distillation": true,
       "is_vision": true,
       "is_multimodal": true,
       "max_tokens": 128000,
+      "keep_warm": true,
+      "max_concurrency": 1,
       "when": "general-purpose, document writing, vision, multimodal reasoning"
     },
     {
@@ -77,6 +100,8 @@
       "name": "anthropic/claude-3.5-sonnet",
       "url": "https://openrouter.ai/api/v1",
       "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_fallback": true,
       "max_tokens": "auto",
       "when": "general-purpose, cloud as final fallback model"
     }
@@ -94,18 +119,23 @@
     "response_window": 15.0
   },
 
-  // Allow circular policies to be defined, which can create loops in the agent's behavior.
-  // This can be useful for certain scenarios where iterative reasoning or feedback loops are desired, but it should be used with caution to avoid infinite loops or unintended consequences.
-  // When enabled = true, it solvely depends on the agent's model to stop the loop when it reaches a conclusion or determines that no further iterations are needed.
-  "circular_behavior_policies_allowed": true,
+  // Allow circular policies (a policy whose "run_after" chain can loop back on itself, e.g.
+  // double_checking → deep_planning → double_checking) for iterative reasoning / feedback loops.
+  // Default FALSE — an SLM cannot be trusted to stop a loop on its own; when enabled, termination is
+  // guaranteed by the HARD cap "behavior_policies_max_circular_rounds", not by the model's judgment.
+  "circular_behavior_policies_allowed": false,
 
   // Maximum number of circular rounds the agent will allow before stopping the loop and proceeding with the next step in its workflow.
   // Default is 5 rounds, but it can be adjusted based on the complexity of the task and the desired level of iterative reasoning.
   "behavior_policies_max_circular_rounds": 5,
 
-  // Policies define the agent's behavior in various situations, guiding its decision-making and actions.
-  // Happen in-codes, specified by the "when" condition, and the "then" action to take. The "run_after" indicates when the policy is runned in the agent's workflow.
-  // Options for "run_after" include: "question_received", "retrieval_result", "iteration_result", "final_answer" and can combine with other policies via "id" references.
+  // Policies shape behavior via a "when" condition and a "then" action, ENFORCED in-code at a trigger
+  // rather than merely hoped-for in the prompt. "run_after" is a dependency DAG keyed by a shared
+  // vocabulary of lifecycle events + other policy / store ids:
+  //   lifecycle events: "question_received", "retrieval_result", "iteration_result", "final_answer".
+  // Semantics: run_after entries are OR-eligible TRIGGERS — the policy becomes eligible after ANY of
+  // them fires, then actually runs only if its "when" holds. Cycles are allowed only when
+  // circular_behavior_policies_allowed = true and are bounded by behavior_policies_max_circular_rounds.
   "behavior_policies": [
     {
       "id": "deep_planning",
@@ -191,23 +221,21 @@
     {
       "type": "GenerateDiagramTool",
       "when": "The answer involves a workflow, an architecture, or relationships between components."
-    },
-    {
-      "type": "SqliteVectorQueryTool",
-      "when": "You need to query the structured knowledge base for relevant information to answer the question."
-    },
-    {
-      "type": "JsonlQueryTool",
-      "when": "You need to query the iteration logging data store for relevant information to answer the question."
     }
+    // Memory retrieval tools are AUTO-REGISTERED — one per store (iteration_logging + each
+    // memory_data_store), each bound to that store's id + table (e.g. SqliteVectorQueryTool for
+    // "distilled_knowledge", JsonlQueryTool for "iteration_result"), so a call is never ambiguous
+    // about which store / table it hits. They are not listed here.
   ],
 
-  // A set of memory data stores that the agent can use to store and retrieve structured knowledge.
-  // Each memory data store has a unique identifier, type, and configuration for how it distills knowledge from previous iterations or other sources.
-  // The "distill_from" options = "run_after" options, and can comebined with "id" of both other memory data stores and behavior policies to create a chain of knowledge distillation and retrieval.
-  // The "when" condition specifies the context in which each memory data store is relevant, allowing for dynamic retrieval of information based on the task at hand.
-  // The "always_use_in_cognition_window" flag indicates whether all memory is added into the prompt, allowing the agent to incorporate relevant knowledge into its responses.
-  // The "cognition_window_budget_percentage" specifies the percentage of the cognition window allocated to this memory data store, allowing for fine-tuned control over the agent's context window.
+  // Memory stores that distill + retrieve structured knowledge. "distill_from" shares the "run_after"
+  // vocabulary (lifecycle events + other store / policy ids), forming one distill-and-retrieve DAG.
+  //   • "when" — guidance for the store's (auto-registered) retrieval tool.
+  //   • "always_use_in_cognition_window" — the store's top rows are ALWAYS injected into the prompt,
+  //      capped by "cognition_window_budget_percentage".
+  //   • "use_capability" — pins which model capability (hence which warm ENDPOINT) runs this store's
+  //      distillation, so distillations spread across endpoints and run in parallel. Embedding always
+  //      routes to the is_embedding_only endpoint regardless.
   "memory_data_stores": [
     {
       "id": "distilled_knowledge",
@@ -231,7 +259,7 @@
       "retrieval_tool": "SqliteVectorQueryTool"
     },
     {
-      "id": "suituational_knowledge",
+      "id": "situational_knowledge",
       "type": "sqlite",
       "distill_from": ["distilled_knowledge"],
       "distill_prompt": "Extract situational knowledge from the distilled knowledge, focusing on context-specific information, scenarios, and conditions that may affect decision-making or problem-solving in BVMS.",
@@ -253,7 +281,7 @@
     {
       "id": "known_edge_cases_knowledge",
       "type": "sqlite",
-      "distill_from": ["raw_iteration_result", "distilled_knowledge"],
+      "distill_from": ["iteration_result", "distilled_knowledge"],
       "distill_prompt": "Extract known edge cases knowledge from the raw iteration results and distilled knowledge, focusing on unusual or exceptional scenarios that may arise in BVMS. This knowledge should help identify potential pitfalls and guide the development of robust solutions.",
       "path": "[base_folder_path]/bvms_knowledge_base.db",
       "table": "known_edge_cases_knowledge",
@@ -262,9 +290,11 @@
     }
   ],
 
-  // Max concurrent subprocesses for parallelizable work (delegate fan-out, tool calls, per-block
-  // metadata, DB upserts). 1 = strictly sequential (default); >1 = bounded parallel pool.
-  "parallel_subprocesses": 1,
+  // Global ceiling on concurrent subprocesses for parallelizable work (delegate fan-out, tool calls,
+  // policy runs, per-store distillations, DB upserts). 1 = strictly sequential; >1 = bounded pool.
+  // Fan-out is ALSO bounded PER ENDPOINT by each model's "max_concurrency", so parallelism pays off
+  // only when work spreads across DISTINCT warm endpoints (routed via "use_capability" / flags).
+  "parallel_subprocesses": 4,
 
   // Delegates are other specialized agents that this agent can delegate tasks to when needed. Each delegate has its own unique identifier, description, system prompt, and configuration for iteration logging.
   // Delegates can have their own logging folder and have access to the logging folder of the parent agent, allowing for a hierarchical structure of agents that can collaborate and share information.
@@ -276,6 +306,7 @@
       "base_folder_path": "[base_folder_path]/bvms-code-analyzer",
       "iteration_logging_enabled": true,
       "iteration_logging": {
+        "id": "iteration_result",
         "type": "jsonl",
         "path": "[base_folder_path]/bvms-code-analyzer/iteration_logging/iteration_*.jsonl",
         "retrieval_tool": "JsonlQueryTool",
@@ -285,33 +316,43 @@
       "models_ladder": [
         {
           "platform": "ollama",
-          "name": "normic-embeddings:1.0.0",
+          "name": "nomic-embed-text",
           "url": "http://localhost:11434",
-          "is_embedding_only": true
+          "is_embedding_only": true,
+          "keep_warm": true,
+          "max_concurrency": 4
         },
         {
-          "platform": "ollama",
+          "platform": "lmstudio",
           "name": "qwen3.5:4b",
-          "url": "http://localhost:11434",
+          "url": "http://localhost:1234/v1",
           "max_tokens": 62000,
           "when": "tool-selection",
-          "is_tool_selection": true
+          "is_tool_selection": true,
+          "keep_warm": true,
+          "max_concurrency": 2
         },
         {
           "platform": "ollama",
           "name": "qwen3.6:27b",
-          "url": "http://localhost:11434",
+          "url": "http://localhost:11436",
           "max_tokens": 128000,
           "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving",
-          "is_general_purpose": true
+          "is_general_purpose": true,
+          "is_coding": true,
+          "keep_warm": true,
+          "max_concurrency": 1
         },
         {
           "platform": "ollama",
           "name": "qwen3.8:122b-a10b",
-          "url": "http://localhost:11434",
+          "url": "http://localhost:11438",
           "max_tokens": 128000,
           "when": "extreme problem-solving, deep code analysis, and complex reasoning tasks",
-          "is_general_purpose": true
+          "is_general_purpose": true,
+          "is_coding": true,
+          "keep_warm": true,
+          "max_concurrency": 1
         },
         {
           "platform": "open_router",
@@ -319,7 +360,8 @@
           "url": "https://openrouter.ai/api/v1",
           "max_tokens": "auto",
           "when": "deep technical planning, code analysis, and complex problem-solving, cloud as final fallback model",
-          "is_general_purpose": true
+          "is_general_purpose": true,
+          "is_fallback": true
         }
       ],
       "tools": [
@@ -332,7 +374,7 @@
           "when": "You need to analyze the BVMS source code to answer the question."
         }
       ],
-      // No distill configuration for this memory data store, as it is intended to store raw code analysis knowledge without further self improvement or distillation.
+      // No distillation for this store (distill_from: []); the analyzer WRITES its findings here directly
       "memory_data_stores": [
         {
           "id": "code_analysis_knowledge",
