@@ -67,9 +67,7 @@
   //   openwebui: integrates with a running Open WebUI instance at the given url.
   // The API stream endpoint (api_configuration) is the primary integration path — channels
   // supplement it for push-based or terminal workflows. Ignored in "research" and "reflection" modes.
-  // Note: the key name "communiation_channels" contains a spelling error; it will be corrected to
-  // "communication_channels" in a future schema pass.
-  "communiation_channels": {
+  "communication_channels": {
     "terminal": {
       "enabled": true
     },
@@ -121,7 +119,7 @@
 
   // Reflection configuration. Active only when run_mode = "reflection".
   //
-  // relection_mode (note: spelling to be corrected to "reflection_mode" in a future schema pass):
+  // reflection_mode:
   //   "distillation" — re-reads iteration_logging + memory_data_stores, runs self_evaluation_quizz,
   //                    and tightens memory management by re-distilling knowledge into the stores.
   //   "fine-tuning"  — generates structured teacher/student training pairs from the iteration logs
@@ -134,7 +132,7 @@
   // resume_if_quizz_failed: when true and the quiz score is below passing_total_scores, re-runs
   //                          the reflection loop targeting the failed questions as new goals.
   "reflection_configuration": {
-    "relection_mode": "distillation",
+    "reflection_mode": "distillation",
     "enabled": true,
     "time_limit": 7200,
     "iterations_limit": 50,
@@ -160,26 +158,32 @@
     "enabled": true,
     "questions": [
       {
-        "question": "How well did the agent understand the BVMS domain?",
-        "answer": ".....",
-        "score": 5
+        "question": "How accurately did the agent understand and apply BVMS domain knowledge?",
+        "answer": "The agent demonstrated accurate understanding of BVMS concepts including voyage management workflows, vessel regulations, demurrage calculations, and system architecture. It correctly referenced domain-specific terminology and applied business rules appropriately.",
+        "score": 10
       },
       {
-        "question": "How accurate and relevant were the answers provided by the agent?",
-        "answer": ".....",
-        "score": 5
+        "question": "How clear, complete, and well-structured were the agent's answers?",
+        "answer": "Answers were clearly organized with logical flow, included relevant details without unnecessary verbosity, used appropriate technical depth for the audience, and provided actionable insights or next steps where applicable.",
+        "score": 10
       },
       {
-        "question": "How effectively did the agent utilize its knowledge base and tools?",
-        "answer": ".....",
-        "score": 25
+        "question": "How effectively did the agent utilize its knowledge base, tools, and delegates?",
+        "answer": "The agent queried relevant memory stores (bvms_docs.db, bvms_code.db), used appropriate tools (file search, code analysis, diagrams), delegated sub-questions to specialist agents when beneficial, and synthesized results into a coherent response.",
+        "score": 10
+      },
+      {
+        "question": "Did the agent appropriately refuse to answer when information was unavailable rather than hallucinate?",
+        "answer": "When retrieval returned insufficient evidence below the similarity threshold, the agent honestly stated what it could not determine and suggested how to refine the question or gather additional data, rather than inventing plausible-sounding but unsupported answers.",
+        "score": 10
       }
     ],
-    "passing_total_scores": 30,
+    "passing_total_scores": 32,
     "evaluation_criteria": [
       "Accuracy of information",
       "Clarity of explanations",
-      "Relevance to BVMS domain"
+      "Relevance to BVMS domain",
+      "Honest refusal when knowledge is insufficient"
     ]
   },
 
@@ -421,7 +425,7 @@
   //      capped by "cognition_window_budget_percentage".
   //   • "use_capability" — pins which model capability (hence which warm ENDPOINT) runs this store's
   //      distillation, so distillations spread across endpoints and run in parallel. Embedding always
-  //      routes to the is_embedding_only endpoint regardless.
+  //      routes to the is_embedding endpoint regardless.
   "memory_data_stores": [
     {
       "id": "distilled_knowledge",
@@ -504,7 +508,7 @@
           "platform": "ollama",
           "name": "nomic-embed-text",
           "url": "http://localhost:11434",
-          "is_embedding_only": true,
+          "is_embedding": true,
           "keep_warm": true,
           "max_concurrency": 4
         },
@@ -560,7 +564,9 @@
           "when": "You need to analyze the BVMS source code to answer the question."
         }
       ],
-      // No distillation for this store (distill_from: []); the analyzer WRITES its findings here directly
+      // No distillation for this store (distill_from: []); the analyzer WRITES its findings here
+      // directly. This is a pre-built external knowledge base — filled by the code analysis
+      // extraction pipeline, not self-cultivated at runtime.
       "memory_data_stores": [
         {
           "id": "code_analysis_knowledge",

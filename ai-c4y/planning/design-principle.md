@@ -72,6 +72,16 @@ one of the two stores.
 a domain glossary, an ADR set, and a historical-decision base. Each record is embedded and upserted
 into its store; nothing has to be human-written first.
 
+> **Extraction pipeline mechanics.** The six stages are implemented as a Python CLI (`scripts/extract.py`)
+> using: **GitPython** for git history parsing (`git log --all --oneline`, `git diff`, `git blame`),
+> **langchain-community document loaders** for Confluence/Markdown/PDF ingestion, and custom AST parsers
+> (Python's `ast` module, TypeScript's `typescript` package) for source code analysis. Each stage runs as
+> a separate subprocess under `parallel_subprocesses` control; failures in one stage do not block others —
+> partial results are saved to a staging directory and retried on next run. For large repos (>10k files),
+> the pipeline shards by directory and merges results post-extraction. Error handling includes: skipping
+> binary files, truncating records >4KB (to fit embedding models), and logging extraction stats
+> (files processed, records created, errors) to `extraction_log.jsonl`.
+
 ---
 
 ## 5. Two knowledge stores (pre-built `memory_data_stores`)
@@ -93,6 +103,14 @@ works (`distilled_knowledge`, `conceptual_index`, `situational_knowledge`, `desi
 A parent picks a delegate purely by its **`description`** ([planning §7](planning.md)), so "how does
 approval work" lands on the docs store and "where is the race condition fixed" lands on the code
 store — no routing rules to maintain.
+
+> **Cross-store retrieval.** When questions span multiple domains (e.g., "Why does voyage approval fail
+> for vessels over 25 years?" — requires business rules from `bvms_docs.db` AND code logic from
+> `bvms_code.db`), the orchestrator queries **both stores in parallel** via separate
+> `SqliteVectorQueryTool` calls. Results are merged into a single attention window; if one store returns
+> no results above the similarity threshold (default 0.3), the agent explicitly notes "no relevant
+> knowledge found" rather than hallucinating. Delegates can also query parent stores via shared
+> `base_folder_path`, enabling hierarchical knowledge access without duplicating data.
 
 ---
 

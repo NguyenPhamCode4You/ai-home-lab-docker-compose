@@ -88,10 +88,10 @@
 > its own warm endpoint `url` (`platform` = `ollama` / **`lmstudio`** / `open_router`), `keep_warm`, and
 > `max_concurrency`, and its role flags gain **`is_memory_distillation`** (which model runs
 > `memory_data_stores` distillation), plus `is_coding` and `is_fallback`. Each job routes **by flag** to
-> its model — embeddings → `is_embedding_only`, tool-calling → `is_tool_selection`, distillation →
+> its model — embeddings → `is_embedding`, tool-calling → `is_tool_selection`, distillation →
 > `is_memory_distillation`, reasoning → `is_general_purpose` — so distinct jobs run on **distinct warm
 > endpoints in parallel**. The earlier per-store `use_capability` idea is dropped as ambiguous: the
-> distillation model is declared **on the ladder** (exactly as `is_embedding_only` declares the embedding
+> distillation model is declared **on the ladder** (exactly as `is_embedding` declares the embedding
 > model), not on each memory store (§4, §8.2).
 
 > **Revision 2026-08-09 — what changed & why (final schema pass; this supersedes the field names used in
@@ -120,7 +120,7 @@
 >    prompt text. `circular_behavior_policies_allowed` + `behavior_policies_max_circular_rounds` bound
 >    iterative loops (e.g. `double_checking → deep_planning`), replacing the standalone `max_iterations`
 >    budget (§5).
-> 5. **Role-tagged model ladder.** `models_ladder` entries carry role flags (`is_embedding_only`,
+> 5. **Role-tagged model ladder.** `models_ladder` entries carry role flags (`is_embedding`,
 >    `is_tool_selection`, `is_general_purpose`, `is_vision`, `is_multimodal`) and `model_selection`
 >    (`"auto"` → first general-purpose) picks the working model; failover still walks the ladder on
 >    `max_retries_until_switching_models` (§4).
@@ -361,6 +361,13 @@ retrieved on demand into the attention window through each store's `retrieval_to
 > rejects a breakdown that leaves no room for the answer (§12 Phase 3). For `gpt-oss:20b`
 > (`max_tokens: 62000`) they resolve to ≈ **20,150 / 32,550 / 9,300** tokens; swap in a bigger-context
 > model and every window scales up automatically.
+>
+> **Why these numbers?** The cognition_window at ~33% reserves space for the system prompt, behavior
+> policies, tool/delegate descriptions, and always-on memory stores (e.g., conceptual_index). The
+> attention_window at ~52% accommodates retrieved knowledge chunks from multiple stores plus delegate
+> outputs. The response_window at ~15% prevents runaway outputs on small models while still allowing
+> detailed answers. These ratios were chosen empirically: cognition < 30% starves the model of context,
+> attention < 45% limits retrieval quality, and response > 20% wastes tokens on verbose SLM output.
 
 **How one iteration works:**
 
@@ -433,16 +440,16 @@ recover any detail by re-querying the raw log or the stores.
 `models_ladder` is an ordered list, highest priority first, and `model_selection` chooses which entry
 is active. Each entry:
 
-| Key               | Required | Meaning                                                                                                                                                                                                                                                                                                                                          |
-| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `platform`        | yes      | `ollama` / `lmstudio` (local, OpenAI-compatible) or `open_router` (cloud). Maps to the matching model client.                                                                                                                                                                                                                                    |
-| `name`            | yes      | Model name on that platform.                                                                                                                                                                                                                                                                                                                     |
-| `url`             | no       | Platform endpoint (e.g. `http://localhost:11434` for Ollama, `https://openrouter.ai/api/v1` for OpenRouter). Defaults to the platform's env default.                                                                                                                                                                                             |
-| `max_tokens`      | no       | Context ceiling. A number sets it; `"auto"` (or omitted) uses the platform's advertised context. Every `context_window_breakdown_percentages` window is taken against this value (§3).                                                                                                                                                           |
-| _role flags_      | no       | `is_embedding` (canonical name; `is_embedding_only` is an alias), `is_tool_selection`, `is_general_purpose`, `is_memory_distillation`, `is_reflection_and_evaluation`, `is_coding`, `is_vision`, `is_multimodal`, `is_fallback` — declare what an entry is good for so the runtime routes each job to the right model (default general-purpose). |
-| `keep_warm`       | no       | Ask the runtime to keep this model resident (never evict) so its endpoint stays hot for low-latency, parallel use.                                                                                                                                                                                                                               |
-| `max_concurrency` | no       | Max in-flight requests one endpoint accepts before it thrashes VRAM — the per-endpoint fan-out cap (global cap = `parallel_subprocesses`, §2).                                                                                                                                                                                                   |
-| `when`            | no       | Plain-language hint for when this entry is preferred (documentation / tiebreaker only — routing is by the structured flags, not this text).                                                                                                                                                                                                      |
+| Key               | Required | Meaning                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `platform`        | yes      | `ollama` / `lmstudio` (local, OpenAI-compatible) or `open_router` (cloud). Maps to the matching model client.                                                                                                                                                                                                                                              |
+| `name`            | yes      | Model name on that platform.                                                                                                                                                                                                                                                                                                                               |
+| `url`             | no       | Platform endpoint (e.g. `http://localhost:11434` for Ollama, `https://openrouter.ai/api/v1` for OpenRouter). Defaults to the platform's env default.                                                                                                                                                                                                       |
+| `max_tokens`      | no       | Context ceiling. A number sets it; `"auto"` (or omitted) uses the platform's advertised context. Every `context_window_breakdown_percentages` window is taken against this value (§3).                                                                                                                                                                     |
+| _role flags_      | no       | `is_embedding` (canonical name; `is_embedding_only` is a deprecated alias), `is_tool_selection`, `is_general_purpose`, `is_memory_distillation`, `is_reflection_and_evaluation`, `is_coding`, `is_vision`, `is_multimodal`, `is_fallback` — declare what an entry is good for so the runtime routes each job to the right model (default general-purpose). |
+| `keep_warm`       | no       | Ask the runtime to keep this model resident (never evict) so its endpoint stays hot for low-latency, parallel use.                                                                                                                                                                                                                                         |
+| `max_concurrency` | no       | Max in-flight requests one endpoint accepts before it thrashes VRAM — the per-endpoint fan-out cap (global cap = `parallel_subprocesses`, §2).                                                                                                                                                                                                             |
+| `when`            | no       | Plain-language hint for when this entry is preferred (documentation / tiebreaker only — routing is by the structured flags, not this text).                                                                                                                                                                                                                |
 
 **Selection & the ladder — a capability-routed pool.** `model_selection` picks the working reasoning
 model: `"auto"` (or null) selects the **first `is_general_purpose`** entry that is reachable; a model
@@ -474,6 +481,17 @@ per-model budget:
   prematurely burn the ladder, and a run that never fails still can't spin forever.
 - **Bounded I/O.** Every model call bounds its read with a **byte cap and a wall-clock deadline** (a
   stalled local endpoint must not hang the run); a deadline hit counts as one infra failure.
+
+> **Model failover semantics by flag.** When a specific capability fails (e.g., `is_coding` returns poor
+> results), the runtime does NOT fall back to the next `is_general_purpose` model — it falls back to the
+> **next entry with the same flag**. If no other `is_coding` model exists, then it tries the next
+> `is_general_purpose`. This prevents a coding task from being answered by a model not optimized for code.
+> Example: if `qwen3.6:27b` (is_coding + is_general_purpose) fails twice, the runtime tries `qwen3.8:122b`
+> (also is_coding + is_general_purpose) before falling back to `claude-3.5-sonnet`.
+>
+> **Endpoint saturation.** When all warm endpoints are at their `max_concurrency` limit, new requests queue
+> in a FIFO buffer bounded by `parallel_subprocesses`. If the queue exceeds 10 seconds, the request times out
+> and counts as one infra failure. This prevents VRAM thrashing from too many concurrent model loads.
 
 This is the per-agent generalization of a role-based registry — local-first with cloud as an automatic
 backstop, or cloud promoted to the top for hard steps.
@@ -563,7 +581,7 @@ both the **pre-built** knowledge bases (`distill_from: []`) and the agent's **se
 All other tools follow the same `{ type, when, … }` shape, and each `when` is used both to guide the
 model and to **prune the menu** (§7): only tools whose `when` matches the current step are shown. The
 `SqliteVectorQueryTool` wrapper is built on the async `SqliteVectorStore.async_query` (sqlite-vec +
-`Embedding`); embeddings use the ladder's `is_embedding_only` model (§4).
+`Embedding`); embeddings use the ladder's `is_embedding` model (§4).
 
 **Tools can pin their own `models_ladder`.** A tool doesn't just execute code — it usually drives an
 LLM (to plan the call, read / rank results, or write an artifact). So each tool entry may carry its
@@ -620,10 +638,47 @@ carries an explicit **state** (`pending → running → succeeded | failed | can
 **restricted toolset** (a delegate need not — and usually should not — expose every parent tool). This
 immutable contract is what makes fan-out under `parallel_subprocesses` and cancellation safe.
 
+> **Delegate communication format.** The result object has three fields:
+>
+> - `state`: `"succeeded"`, `"failed"`, or `"cancelled"` — tells the parent whether to trust the answer.
+> - `summary`: A structured JSON object (not free-text) containing `{ answer, evidence_refs, confidence }`.
+>   The `evidence_refs` list contains `{ store_id, chunk_id, similarity_score }` so the parent can re-query
+>   specific delegate findings without replaying the full log. `confidence` is a float 0–1 from the delegate's
+>   self-evaluation (used by the parent's `double_checking` policy).
+> - `ref`: A pointer to the delegate's work (`"[base_folder_path]/<delegate-id>/iteration_logging/iteration_N.jsonl"`),
+>   allowing the parent to re-read raw reasoning if needed.
+>
+> The parent **does not** automatically embed delegate output into its own memory stores — it queries them on
+> demand via `SqliteVectorQueryTool`. This keeps stores lean and avoids duplicating knowledge across agents.
+
 Depth is bounded by an overall recursion cap; per-agent work is bounded by each delegate's own
 **`behavior_policies_max_circular_rounds`** and the model ladder. A specialized `bvms-code-analyzer`
 delegate — with its own bigger `models_ladder`, `CodeAnalysisTool` / `SearchInternetTool`, and a
 pre-built `code_analysis_knowledge` store — is the canonical example (§13).
+
+---
+
+## 7b. Failure Modes & Recovery
+
+The system handles failures at multiple levels, each with explicit recovery paths:
+
+| Failure Type                                 | Trigger                                                             | Behavior                                                                                                  | Recovery                                                                                               |
+| -------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Model endpoint down**                      | HTTP timeout / connection refused on any `models_ladder` entry      | Counts as 1 infra failure against `max_retries_until_switching_models`; logs error to `iteration_logging` | Tries next model in ladder; if all exhausted, returns honest refusal with list of unavailable models   |
+| **Distillation produces garbage**            | LLM output fails JSON parsing or similarity score < threshold       | Store update skipped; iteration still logged; warning appended to `todo.md`                               | Retried on next reflection pass; pre-built stores unaffected                                           |
+| **No retrieval results above threshold**     | `SqliteVectorQueryTool` returns empty set or all scores below 0.3   | Agent notes "no relevant knowledge found" in reasoning trace; does NOT hallucinate                        | Suggests refining question, expanding working directories, or running research mode to populate stores |
+| **All models exhausted**                     | Every model spends its `max_retries_until_switching_models` budget  | Loop terminates; returns best-effort answer from last successful iteration                                | User can adjust ladder (add better local model), increase retries, or enable cloud fallback            |
+| **Circular policy loop hits cap**            | `behavior_policies_max_circular_rounds` reached without convergence | Policy chain breaks; agent proceeds to final answer with partial evidence                                 | Logs warning; suggests increasing round cap or simplifying policy DAG for next run                     |
+| **Context window overflow after compaction** | Even aggressive compaction cannot fit under budget                  | Drops lowest-similarity retrieval results; keeps head + tail protected                                    | Returns answer with note "some retrieved knowledge was truncated due to context limits"                |
+
+> **Health check endpoint.** In `assistant` mode, the API server exposes `GET /api/v1/health` returning:
+>
+> - `models`: List of warm endpoints with current concurrency vs. `max_concurrency`
+> - `stores`: Sizes (row counts) and last-distilled timestamps for each `memory_data_store`
+> - `windows`: Current token usage in each context window (cognition / attention / response)
+> - `delegates`: Active delegate states and recursion depth
+>
+> This enables external monitoring tools to detect saturation or stale stores before they impact user queries.
 
 ---
 
@@ -712,7 +767,34 @@ immutable and the stores are derived, so any dropped detail is one query away.
 lands in its own `iteration_logging` / `memory_data_stores` nested under the parent's `base_folder_path`,
 so any later teammate can loop back over it by querying those stores.
 
-### 8.2 `memory_data_stores` — configurable distilled knowledge (L2 / L3)
+> **Cross-store retrieval.** When a question spans multiple domains (e.g., "Why does voyage approval fail
+> for vessels over 25 years?" — requires both business rules from `bvms_docs.db` and code logic from
+> `bvms_code.db`), the orchestrator queries **both stores in parallel** via separate
+> `SqliteVectorQueryTool` calls, each with its own `{ db_file, table }`. Results are merged into a single
+> attention window; if one store returns no results above the similarity threshold, the agent notes this
+> explicitly rather than pretending the question has no answer. Delegates can also be routed to query
+> specific stores — e.g., `bvms-code-analyzer` is configured with `bvms_code.db` as its primary knowledge
+> source, but can fall back to the parent's `bvms_docs.db` via shared `base_folder_path`.
+
+**Progressive reflection (compaction).** When the working set exceeds its window budget, a reflection
+compacts it **adaptively** (only enough to fit; protect head + tail). Nothing is lost — the log is
+immutable and the stores are derived, so any dropped detail is one query away.
+
+> **Compaction algorithm.** Triggered when `size(attention_window) + size(always_on_memory) > budget`:
+>
+> 1. **Identify stale entries** — retrieval results older than the current iteration's question, tool
+>    outputs from completed delegate calls, and previous iteration traces not referenced by current reasoning.
+> 2. **Protect head + tail** — the system prompt / behavior policies (head) and the most recent 20% of
+>    retrieved knowledge (tail, likely most relevant) are never compacted.
+> 3. **Compress iteratively** — for each stale entry, replace verbose tool output with a one-line summary
+>    (e.g., "SqliteVectorQueryTool returned 5 chunks from bvms_docs.db, top match: 'Voyage approval requires...'").
+> 4. **Update prior summary** — if a previous compaction produced a summary, append new key findings to it
+>    rather than replacing; this preserves goal-tracking across iterations.
+> 5. **Verify fit** — re-measure the window; if still over budget, repeat from step 1 with lower-priority entries.
+>
+> Distillation runs **asynchronously** (off the critical path via `parallel_subprocesses`). If distillation
+> fails for a store, the iteration is still logged to `iteration_logging` — the failure is recorded but does
+> not block the loop. Deferred distillation can be retried during a `reflection` mode pass.
 
 Each entry declares a knowledge store the agent cultivates. Schema:
 
@@ -1062,7 +1144,7 @@ produce the same agent and drop into `create_chat_backend`.
       "platform": "ollama",
       "name": "nomic-embed-text",
       "url": "http://localhost:11434",
-      "is_embedding_only": true,
+      "is_embedding": true,
       "keep_warm": true,
       "max_concurrency": 4,
       "when": "text → embeddings for semantic search"
@@ -1360,7 +1442,7 @@ assistant = ProgressiveAgentSLM(
                            retrieval_tool="JsonlQueryTool", when="Trace previous reasoning / results."),
     model_selection="auto",
     models_ladder=[
-        dict(platform="ollama", name="normic-embeddings:1.0.0", url="http://localhost:11434", is_embedding_only=True),
+        dict(platform="ollama", name="normic-embeddings:1.0.0", url="http://localhost:11434", is_embedding=True),
         dict(platform="ollama", name="qwen3.5:4b", url="http://localhost:11434", is_tool_selection=True, max_tokens=62000, when="tool selection only"),
         dict(platform="ollama", name="gpt-oss:20b", url="http://localhost:11434", is_general_purpose=True, max_tokens=62000, when="general-purpose"),
         dict(platform="open_router", name="anthropic/claude-3.5-sonnet", url="https://openrouter.ai/api/v1", is_general_purpose=True, max_tokens="auto", when="cloud, final fallback"),
