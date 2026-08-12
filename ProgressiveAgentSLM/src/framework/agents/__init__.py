@@ -1,0 +1,1 @@
+# src/framework/agents — Router, Reflector, Guards, and hook-rule agents

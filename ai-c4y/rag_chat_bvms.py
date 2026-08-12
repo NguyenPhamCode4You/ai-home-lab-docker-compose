@@ -9,7 +9,6 @@ from src.agents.models.OpenRouter import OpenRouter
 load_dotenv()
 
 default_model = Ollama(model="qwen3.6:27b", think=False)
-# default_model = OpenRouter(model='google/gemma-4-26b-a4b-it')
 
 bvms_rag_assistant = RagAssistant(
     query_function_name="match_n8n_documents_bvms_neo",

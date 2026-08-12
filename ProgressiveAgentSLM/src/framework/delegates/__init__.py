@@ -1,0 +1,1 @@
+# src/framework/delegates — typed immutable delegate contracts (§7)

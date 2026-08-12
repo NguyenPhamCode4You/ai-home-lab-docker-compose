@@ -25,7 +25,7 @@ assistant = AssistantOrchestra(
         llm_model=default_model,
     ),
     llm_final_thought_summarizer=FinalThoughtSummarizer(
-        llm_model=default_model,
+        llm_model=Ollama(model="qwen3.6:27b", think=False)
     ),
     llm_answer_evaluator=AnswerEvaluator(
         llm_model=default_model,
