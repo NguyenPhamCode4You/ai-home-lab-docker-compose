@@ -63,6 +63,32 @@ The execution plan is [`planning/wip_checklist.md`](planning/wip_checklist.md) �
 Phases 0–4, each with "read / do / validate". The design is in [`planning/planning.md`](planning/planning.md);
 the Hermes porting map is [`planning/steal-list-hermes.md`](planning/steal-list-hermes.md).
 
-> **Status (2026-08-12):** scaffolding complete — the project folder, package layout, planning home,
+## How to resume / continue the build
+
+The tracker is the single source of truth for "what's next." To pick up where we left off, paste this
+into a fresh session:
+
+> Continue implementing **ProgressiveAgentSLM** in `ProgressiveAgentSLM/`.
+>
+> 1. Read `ProgressiveAgentSLM/planning/wip_checklist.md` (the execution tracker) and
+>    `ProgressiveAgentSLM/planning/planning.md` §12 (phases) to orient on where we are.
+> 2. Run `python validate_scaffold.py` and `pytest -q` from `ProgressiveAgentSLM/` to confirm the
+>    current green baseline.
+> 3. Work the checklist **top-to-bottom, one item at a time**. For each item: read the referenced plan
+>    section + source file, implement the change, add/update the unit test, and mark the item `[x]` in
+>    `wip_checklist.md` **only after its `_Validate_` line passes**.
+> 4. Start with the next unfinished item (currently **Phase 0 item 5**), then continue through Phase 0
+>    and into Phase 1.
+> 5. Keep the global gates green: `pytest -q` passes, no request exceeds the selected model's
+>    `max_tokens`, and `iteration_logging/*.jsonl` is only ever appended to.
+> 6. When you finish a phase, update the phase status in `planning.md` §12 and the footer date in
+>    `wip_checklist.md`, then summarize what you did and what's next.
+
+**Resume tips:** always read the tracker first; run the validation + tests before changing anything so
+you start from a known-good state; and only mark an item `[x]` once its `_Validate_` line passes — that
+keeps the tracker honest and every session resumable.
+
+> **Status (2026-08-13):** scaffolding complete — the project folder, package layout, planning home,
 > Hermes ports (bounded I/O, CircularRounds, safety, redact, guards, contracts), the config loader
-> (JSONC → tree), and a green-from-day-one test suite. Phases 0–4 core algorithms are the next checkpoint.
+> (JSONC → tree), and a green-from-day-one test suite. Phases 0–4 core algorithms are the next
+> checkpoint (next: Phase 0 item 5).
