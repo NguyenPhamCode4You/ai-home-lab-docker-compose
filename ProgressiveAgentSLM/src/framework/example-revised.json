@@ -1,0 +1,598 @@
+{
+  // [Required] Unique identifier for the agent, used for folder naming and logging purposes. It should be a unique string that clearly identifies the agent's purpose or domain
+  "id": "bvms-assistant",
+
+  // Human-readable name for the agent, usefull for other agents to delegate tasks to this agent
+  "description": "Specialized Agent that can answer technical question about BVMS (BBC Voyage Management System).",
+
+  // [Required] The system prompt is a string that defines the agent's role, behavior, and constraints. It should provide clear instructions on how the agent should respond to user queries, including any specific guidelines or limitations.
+  "system_prompt": "You are a helpful assistant that answers questions about BVMS (BBC Voyage Management System) by combining domain knowledge, code analysis, and diagrams. You can delegate to specialist sub-agents when needed.",
+
+  // Base folder path for storing everything related to this agent operation, default is the agent's id, but can be customized to a different folder name if needed.
+  "base_folder_path": "bvms-assistant",
+
+  // Enable iteration logging to capture the agent's reasoning and intermediate results on each inference iteration, default is false.
+  "iteration_logging_enabled": true,
+
+  // Operational mode — determines how this agent instance is run:
+  //   "assistant"  (default) — conversational query-answering mode. Requires api_configuration;
+  //                             exposes OpenAI-compatible HTTP endpoints and optional communication
+  //                             channels (terminal, Telegram, Open WebUI). This is the primary
+  //                             production deployment mode.
+  //   "research"   — autonomous knowledge-mining loop. Iterates over research_configuration.topics
+  //                  and goals without direct user interaction; stops on the first active stopping
+  //                  condition (goals satisfied / time limit / iteration cap). Optionally runs
+  //                  self_evaluation_quizz after the loop and can resume if the quiz fails.
+  //   "reflection" — autonomous self-improvement loop. Re-reads its own iteration_logging and
+  //                  memory_data_stores, scores itself via self_evaluation_quizz, and tightens
+  //                  memory management to improve future performance. Closes the cultivate →
+  //                  evaluate → improve cycle without human intervention.
+  "run_mode": "assistant",
+
+  // HTTP server configuration for "assistant" mode. Exposes an OpenAI-compatible interface so the
+  // agent drops into Open WebUI, custom frontends, or any OpenAI-client library without an adapter.
+  // base_url:       the address and port the FastAPI server binds to.
+  // enable_cors:    allow cross-origin requests (required for browser-based clients like Open WebUI).
+  // authentication: set true to require an API key on every request.
+  // endpoints:      named route definitions; the stream endpoint is the primary integration path —
+  //                 prefer it over the non-streaming endpoint for interactive use.
+  // Ignored in "research" and "reflection" modes.
+  "api_configuration": {
+    "base_url": "http://localhost:8000",
+    "enable_cors": true,
+    "authentication": false,
+    "endpoints": {
+      "chat_completions": {
+        "path": "/api/v1/chat/completions",
+        "method": "POST",
+        "description": "Endpoint for generating chat completions based on user input and agent's knowledge."
+      },
+      "models": {
+        "path": "/api/v1/models",
+        "method": "GET",
+        "description": "Endpoint for retrieving the list of available models and their capabilities."
+      },
+      "stream_chat_completions": {
+        "path": "/api/v1/chat/completions/stream",
+        "method": "POST",
+        "description": "Endpoint for streaming chat completions in real-time, allowing for interactive conversations."
+      }
+    }
+  },
+
+  // Multi-platform delivery channels for "assistant" mode. Each channel runs independently alongside
+  // the API; set enabled: false on any entry to disable it without removing the config.
+  //   terminal:  prints responses to stdout — useful for local development and scripted pipelines.
+  //   telegram:  pushes responses to a Telegram bot; requires a valid bot_token from @BotFather.
+  //   openwebui: integrates with a running Open WebUI instance at the given url.
+  // The API stream endpoint (api_configuration) is the primary integration path — channels
+  // supplement it for push-based or terminal workflows. Ignored in "research" and "reflection" modes.
+  "communication_channels": {
+    "terminal": {
+      "enabled": true
+    },
+    "telegram": {
+      "enabled": true,
+      "bot_token": "YOUR_TELEGRAM_BOT_TOKEN"
+    },
+    "openwebui": {
+      "enabled": true,
+      "url": "http://localhost:3000"
+    }
+  },
+
+  // Autonomous research loop settings. Active only when run_mode = "research".
+  //
+  // Stopping: the loop ends when ANY active stopping condition is met. Set a condition to null to
+  // disable it individually; disabling all three means the run continues until the model ladder is
+  // exhausted (not recommended — always set at least one safety cap).
+  //   stop_when_goals_achieved: semantic stop — the agent evaluates each goal against gathered
+  //                              knowledge and halts when all goals are satisfied. This is the
+  //                              primary stop and runs before the hard caps are checked.
+  //   time_limit:               wall-clock cap in seconds (null = disabled). A safety net to
+  //                              prevent runaway research loops on slow local hardware.
+  //   iterations_limit:         hard iteration cap (null = disabled). A secondary safety net
+  //                              independent of wall-clock time.
+  //
+  // After the loop:
+  //   run_quizz_after_finish:    when true, fires self_evaluation_quizz to grade gathered knowledge.
+  //   resume_if_quizz_failed:    when true and the quiz score is below passing_total_scores, the
+  //                              loop resumes with the unmet goals as new topics.
+  "research_configuration": {
+    "stop_when_goals_achieved": true,
+    "time_limit": 7200,
+    "iterations_limit": 100,
+    "run_quizz_after_finish": true,
+    "resume_if_quizz_failed": true,
+    "topics": [
+      "BVMS architecture",
+      "BVMS code analysis",
+      "BVMS design decisions"
+    ],
+    "goals": [
+      "Gather information on BVMS components",
+      "Analyze BVMS source code for best practices",
+      "Document BVMS design decisions and trade-offs"
+    ],
+    "evaluation_prompt": "Evaluate the gathered information and provide a summary of key findings, insights, and recommendations for further research or action."
+  },
+
+  // Reflection configuration. Active only when run_mode = "reflection".
+  //
+  // reflection_mode:
+  //   "distillation" — re-reads iteration_logging + memory_data_stores, runs self_evaluation_quizz,
+  //                    and tightens memory management by re-distilling knowledge into the stores.
+  //   "fine-tuning"  — generates structured teacher/student training pairs from the iteration logs
+  //                    and distilled stores, suitable for later supervised fine-tuning of the local model.
+  //
+  // enabled:               master switch; false disables the block without removing it.
+  // time_limit:            wall-clock cap in seconds (null = disabled). Safety net for slow hardware.
+  // iterations_limit:      hard cap on reflection passes (null = disabled).
+  // run_quizz_after_finish: when true, fires self_evaluation_quizz after the reflection loop ends.
+  // resume_if_quizz_failed: when true and the quiz score is below passing_total_scores, re-runs
+  //                          the reflection loop targeting the failed questions as new goals.
+  "reflection_configuration": {
+    "reflection_mode": "distillation",
+    "enabled": true,
+    "time_limit": 7200,
+    "iterations_limit": 50,
+    "run_quizz_after_finish": true,
+    "resume_if_quizz_failed": true
+  },
+
+  // Structured self-assessment for the agent's knowledge quality and reasoning.
+  //
+  // Triggered by:
+  //   1. run_mode = "reflection": fires automatically after the reflection loop.
+  //   2. run_mode = "research":   fires when run_quizz_after_finish = true.
+  //
+  // enabled:               master switch; false skips the quiz entirely.
+  // questions:             pre-authored Q&A pairs. The agent answers each from its memory stores;
+  //                        the result is evaluated against the authored answer and scored.
+  // passing_total_scores:  minimum total score to consider the run successful.
+  // evaluation_criteria:   human-readable criteria used alongside scoring to guide evaluation.
+  //
+  // A failing total score can re-trigger research (resume_if_quizz_failed in research_configuration)
+  // or a further reflection pass — closing the cultivate → evaluate → improve loop.
+  "self_evaluation_quizz": {
+    "enabled": true,
+    "questions": [
+      {
+        "question": "How accurately did the agent understand and apply BVMS domain knowledge?",
+        "answer": "The agent demonstrated accurate understanding of BVMS concepts including voyage management workflows, vessel regulations, demurrage calculations, and system architecture. It correctly referenced domain-specific terminology and applied business rules appropriately.",
+        "score": 10
+      },
+      {
+        "question": "How clear, complete, and well-structured were the agent's answers?",
+        "answer": "Answers were clearly organized with logical flow, included relevant details without unnecessary verbosity, used appropriate technical depth for the audience, and provided actionable insights or next steps where applicable.",
+        "score": 10
+      },
+      {
+        "question": "How effectively did the agent utilize its knowledge base, tools, and delegates?",
+        "answer": "The agent queried relevant memory stores (bvms_docs.db, bvms_code.db), used appropriate tools (file search, code analysis, diagrams), delegated sub-questions to specialist agents when beneficial, and synthesized results into a coherent response.",
+        "score": 10
+      },
+      {
+        "question": "Did the agent appropriately refuse to answer when information was unavailable rather than hallucinate?",
+        "answer": "When retrieval returned insufficient evidence below the similarity threshold, the agent honestly stated what it could not determine and suggested how to refine the question or gather additional data, rather than inventing plausible-sounding but unsupported answers.",
+        "score": 10
+      }
+    ],
+    "passing_total_scores": 32,
+    "evaluation_criteria": [
+      "Accuracy of information",
+      "Clarity of explanations",
+      "Relevance to BVMS domain",
+      "Honest refusal when knowledge is insufficient"
+    ]
+  },
+
+  // When iteration logging is enabled, the agent will log its reasoning and intermediate results to a JSONL file for each iteration.
+  // This is the L1 raw store. Its "id" ("iteration_result") is the canonical name referenced by both
+  // behavior_policies "run_after" and memory_data_stores "distill_from" (they share one vocabulary).
+  "iteration_logging": {
+    "id": "iteration_result",
+    "type": "jsonl",
+    "path": "[base_folder_path]/iteration_logging/iteration_*.jsonl",
+    "retrieval_tool": "JsonlQueryTool",
+    "when": "Need raw log tracing of the agent's previous reasoning and intermediate results for debugging or analysis of a current problem."
+  },
+
+  // Default reasoning model: leave null / "auto" to pick the first "is_general_purpose" model in the
+  // ladder, or name a model to force it for GENERAL reasoning. Embedding / tool-selection tasks always
+  // auto-route to the model flagged for that capability (below), regardless of this setting.
+  "model_selection": "auto",
+
+  // [Required] The models ladder is a CAPABILITY-ROUTED POOL, not a single linear chain. For a task
+  // type (embedding / tool-selection / general / vision / coding) the runtime FILTERS to models with
+  // that flag, then fails over top-down WITHIN that subset (after max_retries_until_switching_models).
+  // Routing is by the STRUCTURED FLAGS below — "when" is human documentation / tiebreaker only, never
+  // the sole routing signal (SLM-interpreted routing is nondeterministic).
+  //
+  // Flags:
+  // 1. is_embedding: for converting text to embeddings for semantic search or retrieval tasks
+  // 2. is_tool_selection: for efficiently selecting the best tool for a given task, based on the task's requirements and the available tools
+  // 3. is_general_purpose: default model for general-purpose reasoning, answering questions, and providing information
+  // 4. is_vision: for processing and analyzing visual data, such as images or videos, and providing insights based on visual content
+  // 5. is_multimodal: for handling tasks that involve multiple modalities, such as text, images, and audio, and integrating information from different sources
+  // 6. is_coding: for understanding, generating, and analyzing code, as well as providing programming-related assistance and solutions
+  // 7. is_fallback: for fallback models that can be used when other models are unavailable or fail to provide satisfactory results
+  // 8. is_memory_distillation: for distilling and retrieving structured knowledge from the agent's memory stores, enabling efficient access to relevant information and insights
+  // 9. is_reflection_and_evaluation: for reflecting on the agent's previous reasoning and intermediate results, evaluating its performance, and improving its decision-making and problem-solving capabilities
+  //
+  // Each model is an ENDPOINT binding (platform + name + url). Give each pre-loaded local model its OWN
+  // url so it stays warm and work fans out ACROSS endpoints in parallel; "max_concurrency" caps how many
+  // requests one endpoint takes before it thrashes VRAM, and "keep_warm" asks the runtime not to evict it.
+  "models_ladder": [
+    {
+      "platform": "ollama",
+      "name": "nomic-embed-text",
+      "url": "http://localhost:11434",
+      "is_embedding": true,
+      "keep_warm": true,
+      "max_concurrency": 4,
+      "when": "converting text to embeddings for semantic search or retrieval tasks"
+    },
+    {
+      "platform": "lmstudio",
+      "name": "qwen3.5:4b",
+      "url": "http://localhost:1234/v1",
+      "is_tool_selection": true,
+      "max_tokens": 62000,
+      "keep_warm": true,
+      "max_concurrency": 2,
+      "when": "tool selection only"
+    },
+    {
+      "platform": "ollama",
+      "name": "gpt-oss:20b",
+      "url": "http://localhost:11435",
+      "is_general_purpose": true,
+      "max_tokens": 62000,
+      "keep_warm": true,
+      "max_concurrency": 1,
+      "when": "general-purpose"
+    },
+    {
+      "platform": "ollama",
+      "name": "qwen3.6:27b",
+      "url": "http://localhost:11436",
+      "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_reflection_and_evaluation": true,
+      "is_coding": true,
+      "max_tokens": 128000,
+      "keep_warm": true,
+      "max_concurrency": 1,
+      "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving"
+    },
+    {
+      "platform": "ollama",
+      "name": "qwen3.6:35b-a3b",
+      "url": "http://localhost:11437",
+      "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_vision": true,
+      "is_multimodal": true,
+      "max_tokens": 128000,
+      "keep_warm": true,
+      "max_concurrency": 1,
+      "when": "general-purpose, document writing, vision, multimodal reasoning"
+    },
+    {
+      "platform": "open_router",
+      "name": "anthropic/claude-3.5-sonnet",
+      "url": "https://openrouter.ai/api/v1",
+      "is_general_purpose": true,
+      "is_memory_distillation": true,
+      "is_reflection_and_evaluation": true,
+      "is_fallback": true,
+      "max_tokens": "auto",
+      "when": "general-purpose, cloud as final fallback model"
+    }
+  ],
+
+  // Maximum number of retries the agent will attempt with the current model before switching to the next model in the ladder.
+  // This helps ensure that the agent can recover from failures or limitations of a specific model and continue processing the task with an alternative model.
+  // Default is 5 retries
+  "max_retries_until_switching_models": 5,
+
+  // Three proportional windows as percentages of the active model's max_tokens; must sum to 100.
+  //   cognition_window: stable prefix — system prompt, working dirs, tools, behavior_policies,
+  //                     delegate descriptions, and always_use_in_cognition_window memory stores.
+  //   attention_window: volatile per-iteration — user question, retrieval results, tool and delegate outputs.
+  //   response_window:  hard output cap for the answer emitted this iteration.
+  // See planning §3 for the full assembly order and compaction rules.
+  "context_window_breakdown_percentages": {
+    "cognition_window": 32.5,
+    "attention_window": 52.5,
+    "response_window": 15.0
+  },
+
+  // Allow circular policies (a policy whose "run_after" chain can loop back on itself, e.g.
+  // double_checking → deep_planning → double_checking) for iterative reasoning / feedback loops.
+  // Default FALSE — an SLM cannot be trusted to stop a loop on its own; when enabled, termination is
+  // guaranteed by the HARD cap "behavior_policies_max_circular_rounds", not by the model's judgment.
+  "circular_behavior_policies_allowed": false,
+
+  // Maximum number of circular rounds the agent will allow before stopping the loop and proceeding with the next step in its workflow.
+  // Default is 5 rounds, but it can be adjusted based on the complexity of the task and the desired level of iterative reasoning.
+  "behavior_policies_max_circular_rounds": 5,
+
+  // Policies shape behavior via a "when" condition and a "then" action, ENFORCED in-code at a trigger
+  // rather than merely hoped-for in the prompt. "run_after" is a dependency DAG keyed by a shared
+  // vocabulary of lifecycle events + other policy / store ids:
+  //   lifecycle events: "question_received", "retrieval_result", "iteration_result", "final_answer".
+  // Semantics: run_after entries are OR-eligible TRIGGERS — the policy becomes eligible after ANY of
+  // them fires, then actually runs only if its "when" holds. Cycles are allowed only when
+  // circular_behavior_policies_allowed = true and are bounded by behavior_policies_max_circular_rounds.
+  "behavior_policies": [
+    {
+      "id": "deep_planning",
+      "when": "The question is complex or spans multiple topics.",
+      "then": "Break it into sub-questions and decide which delegate(s) and tool(s) each part needs before answering.",
+      "run_after": ["question_received"]
+    },
+    {
+      "id": "clarification_needed",
+      "when": "The question is not clear or ambiguous, and the agent cannot proceed without further information.",
+      "then": "Ask the user for clarification or additional context before proceeding.",
+      "run_after": ["question_received", "iteration_result"]
+    },
+    {
+      "id": "visual_representation",
+      "when": "The answer involves a workflow, an architecture, or relationships between components.",
+      "then": "Call GenerateDiagramTool to produce a Mermaid diagram that illustrates the concept alongside the text.",
+      "run_after": ["iteration_result"]
+    },
+    {
+      "id": "double_checking",
+      "when": "All delegates and tools for this iteration have returned their results.",
+      "then": "Verify the gathered evidence actually answers the question; if gaps remain and iterations are left, run another round to fill them.",
+      "run_after": ["iteration_result", "deep_planning"]
+    },
+    {
+      "id": "refusing_to_invent",
+      "when": "No clear answer can be found after exhausting the relevant delegates and tools.",
+      "then": "Tell the user honestly that the answer is not available and suggest how to refine the question. Never invent an answer.",
+      "run_after": ["iteration_result"]
+    },
+    {
+      "id": "analyzing_retrieval_results",
+      "when": "The agent has retrieved information from the knowledge base or memory.",
+      "then": "Analyze the retrieved information to determine its relevance and accuracy before using it to answer the question.",
+      "run_after": ["retrieval_result"]
+    },
+    {
+      "id": "self_reflection",
+      "when": "The agent has completed an iteration and has gathered new information or insights.",
+      "then": "Reflect on the iteration results and distill the key knowledge into a structured format for future reference.",
+      "run_after": ["final_answer"]
+    }
+  ],
+
+  // A set of working directories that the agent can access, each with a specified path and description.
+  // The agent can read from these directories, and if writable, it can also write to them.
+  // The "write_approval" flag indicates whether the agent needs approval before writing to the directory.
+  "working_directories": [
+    {
+      "path": "bvms/be-source-code",
+      "description": "BVMS backend source code",
+      "writable": false
+    },
+    {
+      "path": "bvms/fe-source-code",
+      "description": "BVMS frontend source code",
+      "writable": true,
+      "write_approval": true
+    }
+  ],
+
+  // A set of tools that the agent can use to perform specific actions or access external resources.
+  // These are default tools that are available to the agent, and they can be used in conjunction with the agent's reasoning and decision-making processes.
+  "tools": [
+    {
+      "type": "ReadFileTool",
+      "when": "The user references a specific local file whose contents are needed to answer."
+    },
+    {
+      "type": "SearchFileTool",
+      "when": "You need to locate a file by name/glob or find where a term/symbol appears before reading it."
+    },
+    {
+      "type": "WriteFileTool",
+      "require_approval": true,
+      "when": "You must persist an artifact (notes, generated code, a report) to disk inside the sandbox root."
+    },
+    {
+      "type": "TodoTool",
+      "when": "At the start of a multi-step task, and whenever the plan changes: write/refresh the run's checklist so the agent stays on task across iterations."
+    },
+    {
+      "type": "GenerateDiagramTool",
+      "when": "The answer involves a workflow, an architecture, or relationships between components."
+    }
+    // Memory retrieval tools are AUTO-REGISTERED — one per store (iteration_logging + each
+    // memory_data_store), each bound to that store's id + table (e.g. SqliteVectorQueryTool for
+    // "distilled_knowledge", JsonlQueryTool for "iteration_result"), so a call is never ambiguous
+    // about which store / table it hits. They are not listed here.
+  ],
+
+  // Memory stores that distill + retrieve structured knowledge. "distill_from" shares the "run_after"
+  // vocabulary (lifecycle events + other store / policy ids), forming one distill-and-retrieve DAG.
+  //   • "when" — guidance for the store's (auto-registered) retrieval tool.
+  //   • "always_use_in_cognition_window" — the store's top rows are ALWAYS injected into the prompt,
+  //      capped by "cognition_window_budget_percentage".
+  //   • "use_capability" — pins which model capability (hence which warm ENDPOINT) runs this store's
+  //      distillation, so distillations spread across endpoints and run in parallel. Embedding always
+  //      routes to the is_embedding endpoint regardless.
+  "memory_data_stores": [
+    {
+      "id": "distilled_knowledge",
+      "type": "sqlite",
+      "distill_from": ["iteration_result", "final_answer", "self_reflection"],
+      "distill_prompt": "Distill the iteration result into a concise, structured knowledge representation that captures the key facts, relationships, and insights relevant to BVMS. Focus on accuracy and clarity, and avoid including irrelevant details.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing a structured knowledge about BVMS that have been previously studied for efficient retrieval and reasoning of relevant information."
+    },
+    {
+      "id": "conceptual_index",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Create a conceptual index that organizes the distilled knowledge into categories, concepts, and relationships. This index should facilitate efficient retrieval of information and support reasoning about BVMS.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "conceptual_index",
+      "always_use_in_cognition_window": true,
+      "cognition_window_budget_percentage": 15,
+      "retrieval_tool": "SqliteVectorQueryTool"
+    },
+    {
+      "id": "situational_knowledge",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Extract situational knowledge from the distilled knowledge, focusing on context-specific information, scenarios, and conditions that may affect decision-making or problem-solving in BVMS.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "situational_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing context-specific information about what have been previously studied in BVMS to support decision-making or problem-solving."
+    },
+    {
+      "id": "design_decisions_knowledge",
+      "type": "sqlite",
+      "distill_from": ["distilled_knowledge"],
+      "distill_prompt": "Extract design decisions knowledge from the distilled knowledge, focusing on architectural choices, trade-offs, and rationale behind the design of BVMS. This knowledge should help understand the reasoning behind the system's structure and behavior.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "design_decisions_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing to understand the architectural choices, trade-offs, and rationale behind the design of BVMS to support decision-making or problem-solving."
+    },
+    {
+      "id": "known_edge_cases_knowledge",
+      "type": "sqlite",
+      "distill_from": ["iteration_result", "distilled_knowledge"],
+      "distill_prompt": "Extract known edge cases knowledge from the raw iteration results and distilled knowledge, focusing on unusual or exceptional scenarios that may arise in BVMS. This knowledge should help identify potential pitfalls and guide the development of robust solutions.",
+      "path": "[base_folder_path]/bvms_knowledge_base.db",
+      "table": "known_edge_cases_knowledge",
+      "retrieval_tool": "SqliteVectorQueryTool",
+      "when": "Needing to identify potential pitfalls and guide the development of robust solutions in BVMS by understanding unusual or exceptional scenarios."
+    }
+  ],
+
+  // Global ceiling on concurrent subprocesses for parallelizable work (delegate fan-out, tool calls,
+  // policy runs, per-store distillations, DB upserts). 1 = strictly sequential; >1 = bounded pool.
+  // Fan-out is ALSO bounded PER ENDPOINT by each model's "max_concurrency", so parallelism pays off
+  // only when work spreads across DISTINCT warm endpoints (routed via "use_capability" / flags).
+  "parallel_subprocesses": 4,
+
+  // Delegates are other specialized agents that this agent can delegate tasks to when needed. Each delegate has its own unique identifier, description, system prompt, and configuration for iteration logging.
+  // Delegates can have their own logging folder and have access to the logging folder of the parent agent, allowing for a hierarchical structure of agents that can collaborate and share information.
+  "delegates": [
+    {
+      "id": "bvms-code-analyzer",
+      "description": "Specialized Agent that can analyze BVMS source code and provide insights, explanations, and recommendations based on the code structure, logic, and best practices.",
+      "system_prompt": "You are a specialized agent that can analyze BVMS source code and provide insights, explanations, and recommendations based on the code structure, logic, and best practices. You can delegate to other sub-agents when needed.",
+      "base_folder_path": "[base_folder_path]/bvms-code-analyzer",
+      "iteration_logging_enabled": true,
+      "iteration_logging": {
+        "id": "iteration_result",
+        "type": "jsonl",
+        "path": "[base_folder_path]/bvms-code-analyzer/iteration_logging/iteration_*.jsonl",
+        "retrieval_tool": "JsonlQueryTool",
+        "when": "Need raw log tracing of the agent's previous reasoning and intermediate results for debugging or analysis of a current problem."
+      },
+      "model_selection": "auto",
+      "models_ladder": [
+        {
+          "platform": "ollama",
+          "name": "nomic-embed-text",
+          "url": "http://localhost:11434",
+          "is_embedding": true,
+          "keep_warm": true,
+          "max_concurrency": 4
+        },
+        {
+          "platform": "lmstudio",
+          "name": "qwen3.5:4b",
+          "url": "http://localhost:1234/v1",
+          "max_tokens": 62000,
+          "when": "tool-selection",
+          "is_tool_selection": true,
+          "keep_warm": true,
+          "max_concurrency": 2
+        },
+        {
+          "platform": "ollama",
+          "name": "qwen3.6:27b",
+          "url": "http://localhost:11436",
+          "max_tokens": 128000,
+          "when": "general-purpose, coding, technical reasoning, deep planning, and complex problem-solving",
+          "is_general_purpose": true,
+          "is_coding": true,
+          "keep_warm": true,
+          "max_concurrency": 1
+        },
+        {
+          "platform": "ollama",
+          "name": "qwen3.8:122b-a10b",
+          "url": "http://localhost:11438",
+          "max_tokens": 128000,
+          "when": "extreme problem-solving, deep code analysis, and complex reasoning tasks",
+          "is_general_purpose": true,
+          "is_coding": true,
+          "keep_warm": true,
+          "max_concurrency": 1
+        },
+        {
+          "platform": "open_router",
+          "name": "anthropic/claude-3.5-sonnet",
+          "url": "https://openrouter.ai/api/v1",
+          "max_tokens": "auto",
+          "when": "deep technical planning, code analysis, and complex problem-solving, cloud as final fallback model",
+          "is_general_purpose": true,
+          "is_fallback": true
+        }
+      ],
+      "tools": [
+        {
+          "type": "SearchInternetTool",
+          "when": "You need to search the internet for relevant information to answer the question."
+        },
+        {
+          "type": "CodeAnalysisTool",
+          "when": "You need to analyze the BVMS source code to answer the question."
+        }
+      ],
+      // No distillation for this store (distill_from: []); the analyzer WRITES its findings here
+      // directly. This is a pre-built external knowledge base — filled by the code analysis
+      // extraction pipeline, not self-cultivated at runtime.
+      "memory_data_stores": [
+        {
+          "id": "code_analysis_knowledge",
+          "type": "sqlite",
+          "distill_from": [],
+          "path": "[base_folder_path]/bvms-code-analyzer/bvms_code_analysis_knowledge_base.db",
+          "table": "code_analysis_knowledge",
+          "retrieval_tool": "SqliteVectorQueryTool",
+          "when": "Needing a structured knowledge about BVMS code analysis that have been previously studied for efficient retrieval and reasoning of relevant information."
+        }
+      ],
+      "parallel_subprocesses": 1,
+      "behavior_policies": [
+        {
+          "id": "code_analysis_deep_planning",
+          "when": "The code analysis task is complex or spans multiple modules.",
+          "then": "Break it into sub-tasks and decide which delegate(s) and tool(s) each part needs before answering.",
+          "run_after": ["question_received"]
+        },
+        {
+          "id": "code_analysis_clarification_needed",
+          "when": "The code analysis task is not clear or ambiguous, and the agent cannot proceed without further information.",
+          "then": "Ask the user for clarification or additional context before proceeding.",
+          "run_after": ["question_received", "iteration_result"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+httpx
+
+# Dev / test
+pytest
+pytest-asyncio
+
+# Optional: sqlite-vec + embeddings (Phase 1/2)
+# sqlite-vec
+
+# Optional: tool-calling extras (Phase 2)
+# markdown
+# firecrawl-py

@@ -1,0 +1,1 @@
+# src/framework/config — JSON/Python config loader + schema

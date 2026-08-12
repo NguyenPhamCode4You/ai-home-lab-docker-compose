@@ -34,6 +34,29 @@
 
 **Status legend:** ⬜ Not started · 🟡 In progress · ✅ Done · ⛔ Blocked
 
+> **Revision 2026-08-12 — design review vs. the on-disk code; see [`review-revise-design.md`](review-revise-design.md).**
+>
+> 1. **Accuracy pass (Phases 0–1).** Several `[~]` items read as "exists, needs rework" but the code on
+>    disk (`src/framework/`) is the _earlier_ flat / four-tier-fractional / Supabase design. The
+>    recursive three-window-percentage / sqlite-vec / JSONC design is **not implemented** — marked `[]`
+>    not-shipped below where the disk proves it.
+> 2. **New named owners.** `TokenCounter` (tokenizer seam), `bounded_io` (byte + deadline on every
+>    external read), `run_clock` (whole-run wall-clock cap), `NoFindingsGuard` (deterministic re-plan +
+>    refusal after consecutive empty retrievals), `QuizEngine` (owner of `self_evaluation_quizz`) added
+>    to Phase 2. `ApiServer`/health surface added to Phase 3.
+> 3. **Config loader.** `example-revised.json` is **JSONC (commented)** — the Phase 3 loader must strip
+>    comments; `load_agent` builds a **single self-similar JSON → full recursive tree** (resolve
+>    `[base_folder_path]` per node), not a flat `add_agent()` list.
+> 4. **§8 risks added.** Linked-history risk (design-decisions / edge-case stores must be deduped +
+>    gated on a sparse hook, or they dilute retrieval) and an always-on-store refresh guard.
+> 5. **§15 case adds** a byte-identical stable-prefix assertion and a `bounded_io` / `run_clock` cost
+>    test, so budget/concurrency claims are provable.
+> 6. **Porting map added.** A concrete file-by-file "steal list" from the pulled-down Hermes project
+>    (`temp/hermes-agent`) — what to port _immediately_ vs. adapt vs. skip, with target files. See
+>    [`steal-list-hermes.md`](steal-list-hermes.md). The 30-minute quick win is the **bounded I/O trio**
+>    (`bounded_io` + `CircularRounds` + file `safety`) — self-contained, maps 1:1 to Phase 0 items, and
+>    hardens the current flat loop before the bigger rework.
+
 > **Revision 2026-08-09 (d) — `reflection_configuration`, `is_reflection_and_evaluation` flag, field-name alignment:**
 >
 > 1. **`reflection_configuration` section added.** `run_mode: "reflection"` now has its own explicit
@@ -877,6 +900,22 @@ the same store, no separate mirror needed. Delegates nest their own log + stores
     bvms_code_analysis_knowledge_base.db   # ← the delegate's pre-built code_analysis_knowledge store
 ```
 
+> **Design risks & open loops (2026-08-12, from [`review-revise-design.md`](review-revise-design.md) §7):**
+>
+> - **Linked-history risk.** `known_edge_cases_knowledge` (no `when` guard) and
+>   `design_decisions_knowledge` (distilled from _every_ `iteration_result`) risk growing into
+>   unstructured dumps that dilute retrieval. Gate the latter on a **sparse** hook (`research` /
+>   `reflection`) or a `when`; dedupe + archive + consolidate the former (see the curation flywheel in
+>   Phase 2). Cheap-first gap-sparing.
+> - **Always-on-store refresh guard.** "Refreshed only when upstream changes materially" needs a
+>   `min_material_change` threshold on the cheap `is_memory_distillation` endpoint, or L3 stores are
+>   constantly re-issued and the warm endpoint thrashes.
+> - **Shared-`.db` math.** `cognition_window_budget_percentage` is a share of the _cognition window_,
+>   not of the model's `max_tokens`; the loader must validate the always-on **sum** fits each agent's
+>   cognition window (Phase 3).
+> - **Response window vs. visuals.** A 15% `response_window` is tight for a Mermaid diagram + text on an
+>   8k model — write the diagram to a file and link it, or widen the window (tuning note).
+
 ---
 
 ## 9. Goals → Components
@@ -991,106 +1030,137 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
 
 ### Phase 0 — Foundation primitives 🟡
 
-- [~] `ContextWindow.py`: three-window **percentage** budget (`cognition_window` / `attention_window` /
-  `response_window`, sum = 100) over the active model's `max_tokens`, always-on-store budgeting,
-  budget-bounded trimming (§3). _(new)_
-- [~] `ModelChain.py`: role-tagged **`models_ladder`** + `model_selection` (`"auto"` → first
-  `is_general_purpose`); single per-model retry budget `max_retries_until_switching_models` (default 5)
-  covering quality self-eval **and** infra failures; success resets to the selection; platform factory
-  (`ollama`→`Ollama`, `open_router`→`OpenRouter`); `max_tokens: "auto"` sizing (§4). _(reworks
-  `ModelRegistry`)_
-- [~] **SQLite vector store** — `SqliteVectorStore` (`sqlite-vec`): `async_query` +
-  `async_get_documents_string` over a local `.db` file (reuses `Embedding`). Replaces the
-  Supabase / pgvector backend; the earlier async `SupabaseVectorStore` work is superseded. _(new)_
-- [~] `memory/` subsystem (§8): append-only `RawLog` (`iteration_logging/iteration_*.jsonl`, one file
-  per iteration) + `MemoryStore` / `MemoryStores` (SQLite `memory_data_stores` distilled per
-  `distill_from` / `distill_prompt`), coordinated behind **one serialized writer**; `RunLogger` owns
-  `[base_folder_path]/`. _(reworks the old worklog.md/events.jsonl/transcript.md)_
-- [ ] `ParallelExecutor`: bounded fan-out driven by `parallel_subprocesses` (default 1 = sequential; >1
-      = bounded pool) for delegates, independent tool calls, distillation, and DB upserts. _(new)_
-- [ ] `CircularRounds`: thread-safe **loop** counter separate from model failover — bounds
-      `behavior_policies` loops by `behavior_policies_max_circular_rounds` (default 5) when
-      `circular_behavior_policies_allowed` (§2, §5). _(new)_
-- [ ] Progressive reflection (**pluggable engine** with a `should_compress()` / `compress()` lifecycle):
-      compact the working set **adaptively** (only enough to fit) when over the `cognition_window` /
-      `attention_window` budgets — **protect head + tail**, **update** (not replace) the prior summary
-      (recoverable from the raw log / stores). _(new)_
-- [ ] Bounded I/O helper: every model / tool read is capped by **bytes + wall-clock deadline** (a stalled
-      local endpoint must not hang the run); a deadline hit is one infra failure (§4). _(new)_
+> **2026-08-12 accuracy pass.** On-disk code is the _earlier_ four-tier-fractional / Supabase design —
+> these items are **not shipped**, not merely "rework". See
+> [`review-revise-design.md`](review-revise-design.md) §2 for the code-vs-doc diff.
+
+- [ ] `ContextWindow.py`: three-window **percentage** budget (`cognition_window` / `attention_window` /
+      `response_window`, sum = 100) over the active model's `max_tokens`, always-on-store budgeting,
+      budget-bounded trimming (§3). _(new; the on-disk `ContextWindow.py` is the stale four-tier fractional
+      version — must be rebuilt)_
+- [ ] `ModelChain.py`: role-tagged **`models_ladder`** + `model_selection` (`"auto"` → first
+      `is_general_purpose`); single per-model retry budget `max_retries_until_switching_models` (default 5)
+      covering quality self-eval **and** infra failures; success resets to the selection; platform factory
+      (`ollama`→`Ollama`, `open_router`→`OpenRouter`); `max_tokens: "auto"` sizing (§4). _(new; reworks
+      the role→chain `ModelRegistry.py`, which lacks ladder/success-reset/flag routing)_
+- [ ] **SQLite vector store** — `SqliteVectorStore` (`sqlite-vec`): `async_query` +
+      `async_get_documents_string` over a local `.db` file (reuses `Embedding`). Replaces the
+      Supabase / pgvector backend; the on-disk `src/agents/tools/SupabaseVectorStore.py` is superseded. _(new)_
+- [ ] `memory/` subsystem (§8): append-only `RawLog` (`iteration_logging/iteration_*.jsonl`, one file
+      per iteration) + `MemoryStore` / `MemoryStores` (SQLite `memory_data_stores` distilled per
+      `distill_from` / `distill_prompt`, with a **shared-`.db`/per-table schema contract** — every store
+      may point at one file but must be isolated per `table`, §3.1 of the review), coordinated behind **one
+      serialized writer**; `RunLogger` owns `[base_folder_path]/`. _(new; reworks the on-disk single-file
+      `Worklog.py` / `runs/<run_id>/` layout)_
+- [ ] `TokenCounter`: the `char/4` heuristic (`tokens.py`) with a pluggable tokenizer seam — **one
+      measure for both budget and threshold** (§3, Open Q#8). _(new)_
+- [ ] `bounded_io`: every model / tool read is capped by **bytes + wall-clock deadline** (a stalled
+      local endpoint must not hang the run); a deadline hit is one infra failure (§4). \_(new)
 
 ### Phase 1 — Recursive core agent (runnable vertical slice) 🟡
 
-- [~] `AgentConfig.py`: parse `id`, `description`, `system_prompt`, `base_folder_path`,
-  `iteration_logging(_enabled)`, `model_selection`, `models_ladder[]`,
-  `max_retries_until_switching_models` (default 5), `context_window_breakdown_percentages`,
-  `circular_behavior_policies_allowed`, `behavior_policies_max_circular_rounds`, `behavior_policies[]`,
-  `working_directories[]`, `tools[]`, `memory_data_stores[]`, `parallel_subprocesses` (default 1),
-  `delegates[]`; apply parent→delegate inheritance of the `models_ladder` + `model_selection` + failover
-  budget + `working_directories` + `parallel_subprocesses` + `behavior_policies_max_circular_rounds`, and
-  nest each delegate's log + stores under the parent's `base_folder_path`.
-- [~] `ProgressiveAgentSLM.py`: the single recursive class. Per step — retrieve relevant knowledge from
-  the `memory_data_stores` (via `SqliteVectorQueryTool`) / raw log (via `JsonlQueryTool`), assemble the
-  three-window prompt **as a byte-stable prefix + volatile suffix** (§3), select a model from the ladder
-  via `model_selection`, fire `behavior_policies` at their `run_after` hooks, route to delegates by
-  `description` / prune tools by `when`, emit the answer (`response_window`), append the block to
-  `iteration_logging` + distil it into the stores, self-eval (switch model on repeated failure). Recurse
-  into `delegates`; stop when the model ladder is exhausted **or the circular-round cap is spent**.
-- [~] `agents/Router.py`: choose delegate(s) per sub-question by `description` via the generalized
-  `_parse_agent_routing` (`delegate:<id>`); prune the tool menu by each tool's `when`. _(reworks
-  Forwarder)_
-- [~] `agents/Reflector.py`: the cognitive-accumulation compressor (reuse `KnowledgeCompression` +
-  `IterationSummarizer`).
-- [~] `ToolRegistry.py` + `tools/SqliteVectorQueryTool.py` (primary; `path` + `table` + `ranking`) +
-  `tools/JsonlQueryTool.py` + `tools/ReadFileTool.py` + `tools/TodoTool.py`; file tools resolve paths
-  under the run's `base_folder_path` **and** any `working_directories` root (honoring `writable`),
-  traversal-safe; each tool carries its `when` guidance (used for menu pruning) and an optional own
-  `models_ladder` (inherits the agent's when omitted); the loader binds each store's `retrieval_tool`.
-- [~] Wire `RunLogger` + the `memory/` subsystem (single serialized writer);
-  `progressive_agent_slm_demo.py` via `create_chat_backend` (port 8001).
+> **2026-08-12 accuracy pass.** On-disk `ProgressiveAgentSLM.py` is a **flat** orchestrator
+> (`_delegates` dict, Forwarder/Reflector DI, `_CHARS_PER_TOKEN`, no windows/ladder/stores) — the
+> recursive three-window/sqlite-vec design below is **not implemented**; the demo still wires a flat
+> agent. See [`review-revise-design.md`](review-revise-design.md) §2, §3.5.
+
+- [ ] `AgentConfig.py`: parse `id`, `description`, `system_prompt`, `base_folder_path`,
+      `iteration_logging(_enabled)`, `model_selection`, `models_ladder[]`,
+      `max_retries_until_switching_models` (default 5), `context_window_breakdown_percentages`,
+      `circular_behavior_policies_allowed`, `behavior_policies_max_circular_rounds`, `behavior_policies[]`,
+      `working_directories[]`, `tools[]`, `memory_data_stores[]`, `parallel_subprocesses` (default 1),
+      `delegates[]`; apply parent→delegate inheritance of the `models_ladder` + `model_selection` + failover
+      budget + `working_directories` + `parallel_subprocesses` + `behavior_policies_max_circular_rounds`, and
+      nest each delegate's log + stores under the parent's `base_folder_path`. _(new; the on-disk
+      `AgentConfig` only has `goal/knowledge/tools/sub_agents/reflection/…`)_
+- [ ] `ProgressiveAgentSLM.py`: the single recursive class. Per step — retrieve relevant knowledge from
+      the `memory_data_stores` (via `SqliteVectorQueryTool`) / raw log (via `JsonlQueryTool`), assemble the
+      three-window prompt **as a byte-stable prefix + volatile suffix** (§3), select a model from the ladder
+      via `model_selection`, fire `behavior_policies` at their `run_after` hooks, route to delegates by
+      `description` / prune tools by `when`, emit the answer (`response_window`), append the block to
+      `iteration_logging` + distil it into the stores, self-eval (switch model on repeated failure). Recurse
+      into `delegates`; stop when the model ladder is exhausted **or the circular-round cap is spent**. _(new;
+      reworks the flat loop on disk)_
+- [ ] `agents/Router.py`: choose delegate(s) per sub-question by `description` via the generalized
+      `_parse_agent_routing` (`delegate:<id>`); prune the tool menu by each tool's `when`. _(replaces
+      Forwarder + add_agent/add_tool registration)_
+- [ ] `agents/Reflector.py`: the cognitive-accumulation compressor (reuse `KnowledgeCompression` +
+      `IterationSummarizer`).
+- [ ] `ToolRegistry.py` + `tools/SqliteVectorQueryTool.py` (primary; `path` + `table` + `ranking`) +
+      `tools/JsonlQueryTool.py` + `tools/ReadFileTool.py` + `tools/TodoTool.py`; file tools resolve paths
+      under the run's `base_folder_path` **and** any `working_directories` root (honoring `writable`),
+      traversal-safe; each tool carries its `when` guidance (used for menu pruning) and an optional own
+      `models_ladder` (inherits the agent's when omitted); the loader binds each store's `retrieval_tool`.
+      _(new; on-disk tools are `ReadFileTool` w/o safety + `VectorSearchTool` over Supabase)_
+- [ ] Wire `RunLogger` + the `memory/` subsystem (single serialized writer);
+      `progressive_agent_slm_demo.py` via `create_chat_backend` (port 8001) — the demo must `load_agent`
+      the recursive tree from `example-revised.json`, not hand-wire a flat `ModelRegistry(chat/reflection/
+reasoning)`.
 
 ### Phase 2 — Full tools, behavior policies, model routing ⬜
 
 - [ ] Remaining tools: `SearchFileTool` (read / search `working_directories` + `base_folder_path`) +
       `WriteFileTool` (writes to `base_folder_path` + `writable` dirs), `GenerateDiagramTool`
       (Mermaid), `RunPythonTool` (wrap `PythonCodeExecute`, optional `require_approval`),
-      `SearchInternetTool`, `CodeAnalysisTool`.
+      `SearchInternetTool`, `CodeAnalysisTool`. _(none of these exist on disk; see
+      [`review-revise-design.md`](review-revise-design.md) §2)_
 - [ ] `BehaviorPolicies.py`: render `behavior_policies` `when → then` rules into the system prompt **and**
       fire them at their `run_after` hooks; ship the baseline set (deep_planning, analyzing_retrieval_results,
       double_checking, visual_representation, refusing_to_invent, self_reflection); honor
       `circular_behavior_policies_allowed`.
 - [ ] **Enforcement guards** behind the critical policies (§5): `double_checking` → **verify-on-stop**
       (block a final answer whose evidence doesn't cover the question via `AnswerEvaluator`; loop one
-      more round while circular rounds remain); `refusing_to_invent` → **grounding gate** (force honest
-      refusal when retrieval is below a similarity floor); anti-drift → **tool-loop guard**
+      more round while circular rounds remain); `refusing_to_invent` → **grounding gate** backed by a
+      **`NoFindingsGuard`** (count consecutive empty retrievals; after 1, force a deterministic re-plan +
+      honest-refusal branch — the enforcement SLMs ignore as prompt text); anti-drift → **tool-loop guard**
       (idempotent-vs-mutating classification + repeated-call detection). _(new)_
+- [ ] **`run_clock`** — whole-run wall-clock cap (`max_run_seconds`) + failover when a forward pass on an
+      endpoint is too slow; on top of per-model retries and the circular-round cap. _(new)_
+- [ ] **Memory curation flywheel** (§7.1 of the review): dedupe + archive + consolidate the loose stores
+      (`known_edge_cases_knowledge`, `design_decisions_knowledge`) so they don't grow into unstructured
+      dumps — gate `design_decisions_knowledge` on a **sparse** hook (research/reflection) or a `when`,
+      by a size/similarity threshold. Uses the **`is_memory_distillation`** endpoint. _(new)_
 - [ ] Safety hardening: **sensitive-path deny-list** on file tools (beyond traversal checks),
       **no `offset`/`limit`** on instructional reads, and **egress redaction** of block text before it
       crosses to any other model (§8.2, §10). _(new)_
 - [ ] `SqliteVectorQueryTool` ranking path: parallel `DocumentRanking` batches (reuse `RagAssistant.stream`)
       when `ranking: true`.
-- [ ] Budget enforcement: measure tokens (tokenizer or char-approx), trim each window to budget, cap each
-      always-on store by its `cognition_window_budget_percentage`.
+- [ ] Budget enforcement: measure tokens with **`TokenCounter`** (`tokens.py`, char-approx now, native
+      tokenizer later), trim each window to budget, cap each always-on store by its
+      `cognition_window_budget_percentage` (validated: the always-on **sum** fits the agent's cognition
+      window, §3.2 of the review).
 - [ ] `memory/Distiller.py` (**L1 → L2/L3 promoter**): run each store's `distill_from` → `distill_prompt`
       into structured records via `KeywordExtractor` / `SimpleEntityExtractor` + a ladder model
       (cheap-first), embedding into the store; run under `parallel_subprocesses` (§8.2). _(new)_
 - [ ] `memory/MemoryStores.py` + `tools/SqliteVectorQueryTool.py`: the `memory_data_stores` DAG
       (`distill_from` ordering) + vector/keyword retrieval; distinguish pre-built (`distill_from: []`)
-      from self-cultivated stores (§6, §8.2). _(new)_
+      from self-cultivated stores, **with a shared-`.db`/per-table schema contract** (§6, §8.2, review §3.1). _(new)_
 - [ ] Always-in-cognition injection (**L3**): keep `conceptual_index` / `situational_knowledge` current
-      on **material upstream change** (threshold-triggered, cheap model) and inject them into the cognition
+      on **material upstream change** (threshold-triggered via a **refresh guard**, cheap `is_memory_distillation`
+      model, `min_material_change` so L3 isn't constantly re-issued) and inject them into the cognition
       window within their `cognition_window_budget_percentage` (§3, §8.3). _(new)_
 - [ ] `memory/LogSearch.py`: SQLite FTS5 index over `iteration_logging/*.jsonl` + search + CLI over all
       runs — **trigram tokenizer** (substring / CJK), **incremental bounded merge** (never blocks writes),
-      **query char caps**, and a **resumable rebuild with progress** (§8).
+      **query char caps**, and a **resumable rebuild with progress** (§8). _(new)_
+- [ ] `QuizEngine` — the owner of `self_evaluation_quizz`: scores the authored questions against `memory_data_stores`,
+      compares to `passing_total_scores`, and drives `run_quizz_after_finish` / `resume_if_quizz_failed`
+      in `research`/`reflection` mode, routed to the **`is_reflection_and_evaluation`** ladder model. _(new;
+      gives the config's self-eval block a class — §3.4)_
 
 ### Phase 3 — Config loader (JSON + Python) ⬜
 
-- [ ] `config/load.py` + `config/schema.json`: build a `ProgressiveAgentSLM` tree from
-      `example-revised.json` (or a Python dict) with validation + delegate inheritance; the schema covers
-      `iteration_logging`, `models_ladder` role flags, `context_window_breakdown_percentages` (sum = 100),
-      `behavior_policies` (incl. `run_after` + circular), `working_directories` (incl. `writable` /
-      `write_approval`), `memory_data_stores` (incl. `distill_from` / `always_use_in_cognition_window`),
-      and `parallel_subprocesses`.
+- [ ] `config/load.py` + `config/schema.json`: build a `ProgressiveAgentSLM` **tree** from
+      `example-revised.json` (or a Python dict) with validation + delegate inheritance — **a single
+      self-similar JSON → full recursive tree** (resolve `[base_folder_path]` per node, not a flat
+      `add_agent()` list; review §6.1). The loader must **strip JSONC comments** (`example-revised.json`
+      is commented JSON), and the schema covers `iteration_logging`, `models_ladder` role flags,
+      `context_window_breakdown_percentages` (sum = 100), `behavior_policies` (incl. `run_after` +
+      circular), `working_directories` (incl. `writable` / `write_approval`), `memory_data_stores`
+      (incl. `distill_from` / `always_use_in_cognition_window` — **always-on budget sum must fit the
+      agent's cognition window**), and `parallel_subprocesses`.
+- [ ] `ApiServer` + `GET /api/v1/health` (from §7b) as a real deliverable: models (warm endpoints'
+      concurrency vs. `max_concurrency`), stores (row counts / last-distilled), windows (actual token
+      usage per window), delegates (states / depth). _(review §6.3)_
 - [ ] Round-trip the canonical `example-revised.json` (§13) end-to-end as a worked example + regression
       check; authoring README.
 
@@ -1098,15 +1168,20 @@ progressive_agent_slm_demo.py    # entry point: load config → ProgressiveAgent
 
 - [ ] Unit tests: config loader / inheritance (incl. `working_directories` / `parallel_subprocesses` /
       `memory_data_stores` / circular-round cap), three-window budgeting (sum = 100), **stable-prefix /
-      volatile-suffix assembly stays byte-identical across iterations** (cache-safety), `memory_data_stores`
+      volatile-suffix assembly stays byte-identical across iterations** (cache-safety) **and never
+      exceeds the selected model's `max_tokens`**, `memory_data_stores`
       distillation (`distill_from` DAG ordering, `distill_prompt` records, pre-built vs. self-cultivated),
       **raw log** append + per-iteration `JsonlQueryTool` read, **cheap-first** extraction + **egress
       redaction**, **`CircularRounds`** loop cap, **`ParallelExecutor`** sequential-vs-pool
       (`parallel_subprocesses`), model-ladder **failover** switch + success-reset + `model_selection` (auto
       → first general-purpose), **enforcement guards** (verify-on-stop / grounding gate / tool-loop),
       **file-tool deny-list** + traversal rejection + `writable` dirs, router description-routing parser,
-      `SqliteVectorQueryTool`, `RunLogger` JSONL + FTS round-trip (trigram / incremental merge).
-- [ ] Integration smoke test with a stub model implementing `.stream`.
+      `SqliteVectorQueryTool`, `RunLogger` JSONL + FTS round-trip (trigram / incremental merge),
+      **`bounded_io`** (byte cap + deadline on reads; deadline → one infra failure) and **`run_clock`**
+      (whole-run wall-clock cap).
+- [ ] Integration smoke test with a stub model implementing `.stream` — and a **stub for
+      `example-revised.json` (JSONC) → tree** load asserting the loader strips comments and the tree
+      builds with inheritance applied.
 - [ ] Timeouts / retries (reuse 429 / backoff from `OpenRouter`); model fall-through; **byte + deadline
       bounded reads** (§4).
 - [ ] Optional `require_approval` (default false) on `RunPythonTool` / any shell tool.
@@ -1530,20 +1605,26 @@ if __name__ == "__main__":
 ## 15. Verification
 
 1. **Unit**: config loader + delegate inheritance, three-window **percentage** budgeting (trim so each
-   window fits the model's `max_tokens`, sum = 100), `memory_data_stores` distillation (`distill_from`
-   DAG + `distill_prompt` records) + retrieval, model-ladder switch (single retry budget covering
-   quality + infra) + success-reset + `model_selection`, `Router` description-routing selection parser,
-   `SqliteVectorQueryTool`, `RawLog` append / read (`JsonlQueryTool`) behind one writer, `RunLogger`
-   JSONL + FTS round-trip.
-2. **Integration smoke**: load `example-revised.json` with a stub model — assert the tree builds, the
-   parent routes to `bvms-code-analyzer` by `description`, the delegate calls its tools and writes under
+   window fits the model's `max_tokens`, sum = 100), **stable-prefix / volatile-suffix assembly stays
+   byte-identical across iterations** (cache-safety, review §5.5) and **never exceeds the selected
+   model's `max_tokens`**, `memory_data_stores` distillation (`distill_from`
+   DAG + `distill_prompt` records) + retrieval (incl. the **shared-`.db`/per-table** contract),
+   model-ladder switch (single retry budget covering quality + infra) + success-reset + `model_selection`,
+   `TokenCounter` (char/4), **`bounded_io`** (byte cap + deadline → one infra failure) and **`run_clock`**
+   (whole-run wall-clock cap), `Router` description-routing selection parser, `SqliteVectorQueryTool`,
+   `RawLog` append / read (`JsonlQueryTool`) behind one writer, `RunLogger` JSONL + FTS round-trip.
+2. **Integration smoke**: load `example-revised.json` (**JSONC — assert the loader strips comments** and
+   builds the **full recursive tree** with inheritance applied) with a stub model — assert the parent
+   routes to `bvms-code-analyzer` by `description`, the delegate calls its tools and writes under
    its own `base_folder_path`, the `memory_data_stores` grow yet stay ≤ their budgets, and the
    `iteration_logging/*.jsonl` + the store `.db` exist and FTS search returns the run.
-3. **Manual**: launch `progressive_agent_slm_demo.py` via uvicorn, ask a multi-step BVMS question,
+3. **Manual**: launch `progressive_agent_slm_demo.py` (which now `load_agent`s `example-revised.json`
+   and serves via `create_chat_backend` + uvicorn on port 8001), ask a multi-step BVMS question,
    confirm streamed think / route / delegate / answer, per-block log append + distillation, and on-disk
    logs searchable via the `LogSearch` CLI.
-4. **Budget**: assert no request exceeds the selected model's `max_tokens`, and that a delegate omitting
-   `models_ladder` inherits the parent's chain.
+4. **Budget**: assert no request exceeds the selected model's `max_tokens`, the always-on-store **sum**
+   fits each agent's cognition window, and that a delegate omitting `models_ladder` inherits the
+   parent's chain.
 
 ---
 
